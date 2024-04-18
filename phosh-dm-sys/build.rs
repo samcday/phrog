@@ -17,10 +17,10 @@ fn main() {
     let build_path = build_path.to_str().unwrap();
 
     let static_lib: PathBuf = [build_path, "src"].iter().collect();
-    println!("cargo:rustc-link-lib=static=phosh");
     println!("cargo:rustc-link-lib=static=phosh-tool");
+    println!("cargo:rustc-link-lib=static=phosh");
     println!("cargo:rustc-link-search=native={}", static_lib.to_str().unwrap());
-    meson::build("../../phosh", build_path);
+    meson::build("../phosh", build_path);
 
     let libcall_static_lib: PathBuf = [build_path, "subprojects/libcall-ui/src"].iter().collect();
     println!("cargo:rustc-link-search=native={}", libcall_static_lib.to_str().unwrap());

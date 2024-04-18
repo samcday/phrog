@@ -58,5 +58,4 @@ extern "C" {
     //=========================================================================
     pub fn phosh_shell_get_type() -> GType;
     pub fn phosh_shell_get_default() -> *mut PhoshShell;
-
 }

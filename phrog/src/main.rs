@@ -1,10 +1,9 @@
 use std::ffi::{c_char, c_int};
 
 extern "C" {
-    fn phosh_log_set_log_domains (domains: *const c_char);
-
+    fn phosh_log_set_log_domains(domains: *const c_char);
     fn hdy_init();
-    fn cui_init (v: c_int);
+    fn cui_init(v: c_int);
 }
 
 fn main() {
