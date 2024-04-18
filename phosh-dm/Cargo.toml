@@ -1,0 +1,32 @@
+[package]
+name = "phosh-dm"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+libc = "0.2"
+bitflags = "2.2"
+glib = { version = "0.18", branch = "0.18", git = "https://github.com/gtk-rs/gtk-rs-core.git" }
+
+[dependencies.ffi]
+package = "phosh-dm-sys"
+path = "../phosh-dm-sys"
+
+[dependencies.gtk]
+version = '0.18'
+branch = "0.18"
+git = "https://github.com/gtk-rs/gtk3-rs.git"
+features = ['v3_24']
+
+#[dependencies.glib]
+#package = "glib-sys"
+#git = "https://github.com/gtk-rs/gtk-rs-core"
+#
+#[dependencies.glib-macros]
+#package = "glib-macros"
+#git = "https://github.com/gtk-rs/gtk-rs-core"
+#version = "0.18"
+#
+#[dependencies.gobject]
+#package = "gobject-sys"
+#git = "https://github.com/gtk-rs/gtk-rs-core"
