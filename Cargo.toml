@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "phosh-dm",
+    "phosh-dm-sys", "phrog",
+]

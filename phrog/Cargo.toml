@@ -1,0 +1,15 @@
+[package]
+name = "phrog"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies.phosh-dm]
+path = "../phosh-dm"
+
+[dependencies.gtk]
+version = '0.18'
+branch = "0.18"
+git = "https://github.com/gtk-rs/gtk3-rs.git"
+features = ['v3_24']
