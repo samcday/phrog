@@ -22,27 +22,49 @@ and/or use gtk-doc annotations.  -->
            glib:type-struct="ShellClass">
       <doc xml:space="preserve"
            filename="src/shell.c"
-           line="95">The shell singleton
+           line="96">The shell singleton
 
 #PhoshShell is responsible for instantiating the GUI
 parts of the shell#PhoshTopPanel, #PhoshHome,… and the managers that
 interface with DBus #PhoshMonitorManager, #PhoshFeedbackManager, …
 and coordinates between them.</doc>
-      <source-position filename="src/plugin-shell.h" line="18"/>
+      <source-position filename="src/plugin-shell.h" line="24"/>
       <implements name="Gio.ActionGroup"/>
       <implements name="Gio.ActionMap"/>
       <function name="get_default" c:identifier="phosh_shell_get_default">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="2039">Get the shell singleton</doc>
-        <source-position filename="src/plugin-shell.h" line="20"/>
+             line="2041">Get the shell singleton</doc>
+        <source-position filename="src/plugin-shell.h" line="26"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="2044">The shell singleton</doc>
+               line="2046">The shell singleton</doc>
           <type name="Shell" c:type="PhoshShell*"/>
         </return-value>
       </function>
+      <virtual-method name="setup_idle_cb">
+        <source-position filename="src/plugin-shell.h" line="23"/>
+        <return-value transfer-ownership="none">
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Shell" c:type="PhoshShell*"/>
+          </instance-parameter>
+        </parameters>
+      </virtual-method>
+      <method name="set_default" c:identifier="phosh_shell_set_default">
+        <source-position filename="src/plugin-shell.h" line="27"/>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="shell" transfer-ownership="none">
+            <type name="Shell" c:type="PhoshShell*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
       <property name="builtin-monitor"
                 introspectable="0"
                 transfer-ownership="none">
@@ -87,6 +109,9 @@ from #PhoshLockscreenManager for easier access.</doc>
                 default-value="PHOSH_STATE_NONE">
         <type/>
       </property>
+      <field name="parent_instance">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
       <glib:signal name="ready" when="last">
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
@@ -96,9 +121,22 @@ from #PhoshLockscreenManager for easier access.</doc>
     <record name="ShellClass"
             c:type="PhoshShellClass"
             glib:is-gtype-struct-for="Shell">
-      <source-position filename="src/plugin-shell.h" line="18"/>
+      <source-position filename="src/plugin-shell.h" line="24"/>
       <field name="parent_class">
         <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="setup_idle_cb">
+        <callback name="setup_idle_cb">
+          <source-position filename="src/plugin-shell.h" line="23"/>
+          <return-value transfer-ownership="none">
+            <type name="gboolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="self" transfer-ownership="none">
+              <type name="Shell" c:type="PhoshShell*"/>
+            </parameter>
+          </parameters>
+        </callback>
       </field>
     </record>
   </namespace>

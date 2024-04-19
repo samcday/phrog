@@ -6,3 +6,6 @@
 mod shell;
 pub use self::shell::Shell;
 
+pub(crate) mod traits {
+    pub use super::shell::ShellExt;
+}
