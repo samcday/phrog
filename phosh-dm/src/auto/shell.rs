@@ -16,8 +16,21 @@ glib::wrapper! {
 }
 
 impl Shell {
-        pub const NONE: Option<&'static Shell> = None;
-    
+    pub fn is_docked(&self) -> bool {
+        ObjectExt::property(self, "docked")
+    }
+
+    pub fn set_docked(&self, docked: bool) {
+        ObjectExt::set_property(self,"docked", docked)
+    }
+
+    pub fn is_locked(&self) -> bool {
+        ObjectExt::property(self, "locked")
+    }
+
+    pub fn set_locked(&self, locked: bool) {
+        ObjectExt::set_property(self,"locked", locked)
+    }
 
     #[doc(alias = "phosh_shell_get_default")]
     #[doc(alias = "get_default")]
@@ -27,75 +40,43 @@ impl Shell {
             from_glib_none(ffi::phosh_shell_get_default())
         }
     }
-}
-
-mod sealed {
-    pub trait Sealed {}
-    impl<T: super::IsA<super::Shell>> Sealed for T {}
-}
-
-pub trait ShellExt: IsA<Shell> + sealed::Sealed + 'static {
-    #[doc(alias = "phosh_shell_set_default")]
-    fn set_default(&self) {
-        unsafe {
-            ffi::phosh_shell_set_default(self.as_ref().to_glib_none().0);
-        }
-    }
-
-    fn is_docked(&self) -> bool {
-        ObjectExt::property(self.as_ref(), "docked")
-    }
-
-    fn set_docked(&self, docked: bool) {
-        ObjectExt::set_property(self.as_ref(),"docked", docked)
-    }
-
-    fn is_locked(&self) -> bool {
-        ObjectExt::property(self.as_ref(), "locked")
-    }
-
-    fn set_locked(&self, locked: bool) {
-        ObjectExt::set_property(self.as_ref(),"locked", locked)
-    }
 
     #[doc(alias = "ready")]
-    fn connect_ready<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn ready_trampoline<P: IsA<Shell>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshShell, f: glib::ffi::gpointer) {
+    pub fn connect_ready<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn ready_trampoline<F: Fn(&Shell) + 'static>(this: *mut ffi::PhoshShell, f: glib::ffi::gpointer) {
             let f: &F = &*(f as *const F);
-            f(Shell::from_glib_borrow(this).unsafe_cast_ref())
+            f(&from_glib_borrow(this))
         }
         unsafe {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"ready\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(ready_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(ready_trampoline::<F> as *const ())), Box_::into_raw(f))
         }
     }
 
     #[doc(alias = "docked")]
-    fn connect_docked_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn notify_docked_trampoline<P: IsA<Shell>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshShell, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+    pub fn connect_docked_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_docked_trampoline<F: Fn(&Shell) + 'static>(this: *mut ffi::PhoshShell, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
             let f: &F = &*(f as *const F);
-            f(Shell::from_glib_borrow(this).unsafe_cast_ref())
+            f(&from_glib_borrow(this))
         }
         unsafe {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"notify::docked\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_docked_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_docked_trampoline::<F> as *const ())), Box_::into_raw(f))
         }
     }
 
     #[doc(alias = "locked")]
-    fn connect_locked_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn notify_locked_trampoline<P: IsA<Shell>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshShell, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+    pub fn connect_locked_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_locked_trampoline<F: Fn(&Shell) + 'static>(this: *mut ffi::PhoshShell, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
             let f: &F = &*(f as *const F);
-            f(Shell::from_glib_borrow(this).unsafe_cast_ref())
+            f(&from_glib_borrow(this))
         }
         unsafe {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"notify::locked\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_locked_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_locked_trampoline::<F> as *const ())), Box_::into_raw(f))
         }
     }
 }
-
-impl<O: IsA<Shell>> ShellExt for O {}

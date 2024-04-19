@@ -14,7 +14,4 @@ macro_rules! assert_initialized_main_thread {
 }
 
 mod auto;
-pub mod subclass;
-
 pub use auto::*;
-pub use auto::traits::*;
