@@ -1,8 +1,7 @@
 mod lockscreen;
 
-use std::ffi::{c_char, c_int};
-use gtk::glib::{ObjectExt, StaticType};
-use gtk::glib::subclass::register_type;
+use std::ffi::{c_char, c_int, CString};
+use gtk::glib::{StaticType};
 use crate::lockscreen::Lockscreen;
 
 extern "C" {
@@ -22,7 +21,8 @@ fn main() {
     let _ = Lockscreen::static_type();
 
     unsafe {
-        phosh_log_set_log_domains(c"all".as_ptr());
+        let loglevel = CString::new(std::env::var("G_MESSAGES_DEBUG").unwrap_or("".to_string())).unwrap();
+        phosh_log_set_log_domains(loglevel.as_ptr());
         hdy_init();
         cui_init(1);
     }

@@ -1,6 +1,6 @@
 use glib::{Class, prelude::*, subclass::prelude::*};
 use glib::translate::*;
-use crate::{LayerSurface, Lockscreen};
+use crate::Lockscreen;
 use crate::subclass::layer_surface::LayerSurfaceImpl;
 
 pub trait LockscreenImpl: LockscreenImplExt + ObjectImpl {

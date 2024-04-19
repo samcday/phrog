@@ -7,6 +7,7 @@ and/or use gtk-doc annotations.  -->
             xmlns:c="http://www.gtk.org/introspection/c/1.0"
             xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
   <include name="Gtk" version="3.0"/>
+  <include name="Handy" version="1"/>
   <package name="phosh-dm-0"/>
   <namespace name="PhoshDM"
              version="0"
@@ -193,6 +194,9 @@ and/or use gtk-doc annotations.  -->
                 construct-only="1"
                 transfer-ownership="none">
         <type/>
+      </property>
+      <property name="carousel" transfer-ownership="none">
+        <type name="Handy.Carousel"/>
       </property>
       <field name="parent_instance">
         <type name="LayerSurface" c:type="PhoshLayerSurface"/>

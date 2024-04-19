@@ -17,8 +17,8 @@ name = "atk-sys"
 version = "0.18.1"
 source = "git+https://github.com/gtk-rs/gtk3-rs.git?branch=0.18#00133512bfc8bbb8e9be59b20e93406c6a3eeb21"
 dependencies = [
- "glib-sys 0.18.5",
- "gobject-sys 0.18.5",
+ "glib-sys",
+ "gobject-sys",
  "libc",
  "system-deps",
 ]
@@ -53,7 +53,7 @@ name = "cairo-sys-rs"
 version = "0.18.5"
 source = "git+https://github.com/gtk-rs/gtk-rs-core.git?branch=0.18#42b9caf98e03ded086362d9653ca58fe94dc8658"
 dependencies = [
- "glib-sys 0.18.5",
+ "glib-sys",
  "libc",
  "system-deps",
 ]
@@ -201,8 +201,8 @@ version = "0.18.5"
 source = "git+https://github.com/gtk-rs/gtk-rs-core.git?branch=0.18#42b9caf98e03ded086362d9653ca58fe94dc8658"
 dependencies = [
  "gio-sys",
- "glib-sys 0.18.5",
- "gobject-sys 0.18.5",
+ "glib-sys",
+ "gobject-sys",
  "libc",
  "system-deps",
 ]
@@ -215,8 +215,8 @@ dependencies = [
  "cairo-sys-rs",
  "gdk-pixbuf-sys",
  "gio-sys",
- "glib-sys 0.18.5",
- "gobject-sys 0.18.5",
+ "glib-sys",
+ "gobject-sys",
  "libc",
  "pango-sys",
  "pkg-config",
@@ -246,8 +246,8 @@ name = "gio-sys"
 version = "0.18.5"
 source = "git+https://github.com/gtk-rs/gtk-rs-core.git?branch=0.18#42b9caf98e03ded086362d9653ca58fe94dc8658"
 dependencies = [
- "glib-sys 0.18.5",
- "gobject-sys 0.18.5",
+ "glib-sys",
+ "gobject-sys",
  "libc",
  "system-deps",
  "winapi",
@@ -266,8 +266,8 @@ dependencies = [
  "futures-util",
  "gio-sys",
  "glib-macros",
- "glib-sys 0.18.5",
- "gobject-sys 0.18.5",
+ "glib-sys",
+ "gobject-sys",
  "libc",
  "memchr",
  "once_cell",
@@ -298,30 +298,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "glib-sys"
-version = "0.20.0"
-source = "git+https://github.com/gtk-rs/gtk-rs-core#060c972ea5f4a6c6c69d3b178b37d936e5f800ec"
-dependencies = [
- "libc",
- "system-deps",
-]
-
-[[package]]
 name = "gobject-sys"
 version = "0.18.5"
 source = "git+https://github.com/gtk-rs/gtk-rs-core.git?branch=0.18#42b9caf98e03ded086362d9653ca58fe94dc8658"
 dependencies = [
- "glib-sys 0.18.5",
- "libc",
- "system-deps",
-]
-
-[[package]]
-name = "gobject-sys"
-version = "0.20.0"
-source = "git+https://github.com/gtk-rs/gtk-rs-core#060c972ea5f4a6c6c69d3b178b37d936e5f800ec"
-dependencies = [
- "glib-sys 0.20.0",
+ "glib-sys",
  "libc",
  "system-deps",
 ]
@@ -356,8 +337,8 @@ dependencies = [
  "gdk-pixbuf-sys",
  "gdk-sys",
  "gio-sys",
- "glib-sys 0.18.5",
- "gobject-sys 0.18.5",
+ "glib-sys",
+ "gobject-sys",
  "libc",
  "pango-sys",
  "system-deps",
@@ -410,6 +391,38 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c198f91728a82281a64e1f4f9eeb25d82cb32a5de251c6bd1b5154d63a8e7bd"
 
 [[package]]
+name = "libhandy"
+version = "0.11.0"
+source = "git+https://gitlab.gnome.org/World/Rust/libhandy-rs#0a0f18734e5054dee3c1667f7f04bb6e93214721"
+dependencies = [
+ "gdk",
+ "gdk-pixbuf",
+ "gio",
+ "glib",
+ "gtk",
+ "libc",
+ "libhandy-sys",
+ "pango",
+]
+
+[[package]]
+name = "libhandy-sys"
+version = "0.11.0"
+source = "git+https://gitlab.gnome.org/World/Rust/libhandy-rs#0a0f18734e5054dee3c1667f7f04bb6e93214721"
+dependencies = [
+ "gdk-pixbuf-sys",
+ "gdk-sys",
+ "gio-sys",
+ "glib-sys",
+ "gobject-sys",
+ "gtk-sys",
+ "libc",
+ "pango-sys",
+ "pkg-config",
+ "system-deps",
+]
+
+[[package]]
 name = "linux-raw-sys"
 version = "0.4.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -459,8 +472,8 @@ name = "pango-sys"
 version = "0.18.5"
 source = "git+https://github.com/gtk-rs/gtk-rs-core.git?branch=0.18#42b9caf98e03ded086362d9653ca58fe94dc8658"
 dependencies = [
- "glib-sys 0.18.5",
- "gobject-sys 0.18.5",
+ "glib-sys",
+ "gobject-sys",
  "libc",
  "system-deps",
 ]
@@ -473,6 +486,7 @@ dependencies = [
  "glib",
  "gtk",
  "libc",
+ "libhandy",
  "phosh-dm-sys",
 ]
 
@@ -480,8 +494,8 @@ dependencies = [
 name = "phosh-dm-sys"
 version = "0.0.1"
 dependencies = [
- "glib-sys 0.20.0",
- "gobject-sys 0.20.0",
+ "glib-sys",
+ "gobject-sys",
  "gtk-sys",
  "libc",
  "meson",

@@ -16,4 +16,9 @@ generate = [
     "PhoshDM.Shell",
 ]
 
-manual = []
+manual = [
+    "Handy.Carousel",
+]
+
+[crate_name_overrides]
+"handy" = "libhandy"

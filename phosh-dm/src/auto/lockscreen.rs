@@ -42,6 +42,10 @@ pub trait LockscreenExt: IsA<Lockscreen> + sealed::Sealed + 'static {
         }
     }
 
+    fn carousel(&self) -> Option<libhandy::Carousel> {
+        ObjectExt::property(self.as_ref(), "carousel")
+    }
+
     #[doc(alias = "lockscreen-unlock")]
     fn connect_lockscreen_unlock<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn lockscreen_unlock_trampoline<P: IsA<Lockscreen>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshLockscreen, f: glib::ffi::gpointer) {
@@ -65,6 +69,19 @@ pub trait LockscreenExt: IsA<Lockscreen> + sealed::Sealed + 'static {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"wakeup-output\0".as_ptr() as *const _,
                 Some(std::mem::transmute::<_, unsafe extern "C" fn()>(wakeup_output_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+        }
+    }
+
+    #[doc(alias = "carousel")]
+    fn connect_carousel_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_carousel_trampoline<P: IsA<Lockscreen>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshLockscreen, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+            let f: &F = &*(f as *const F);
+            f(Lockscreen::from_glib_borrow(this).unsafe_cast_ref())
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"notify::carousel\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_carousel_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 }
