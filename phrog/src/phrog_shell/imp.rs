@@ -1,5 +1,6 @@
 use gtk::glib;
-use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass};
+use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass, ObjectSubclassExt};
+use phosh_dm::ShellExt;
 use phosh_dm::subclass::shell::ShellImpl;
 
 #[derive(Default)]
@@ -19,5 +20,7 @@ impl ObjectImpl for PhrogShell {
 impl ShellImpl for PhrogShell {
     fn setup(&self) {
         println!("PhrogShell setup.");
+        self.obj().panels_create();
+        self.obj().setup_primary_monitor_signal_handlers();
     }
 }

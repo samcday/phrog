@@ -61,6 +61,8 @@ extern "C" {
     //=========================================================================
     pub fn phosh_shell_get_type() -> GType;
     pub fn phosh_shell_get_default() -> *mut PhoshShell;
+    pub fn phosh_shell_panels_create(self_: *mut PhoshShell);
     pub fn phosh_shell_set_default(shell: *mut PhoshShell);
+    pub fn phosh_shell_setup_primary_monitor_signal_handlers(self_: *mut PhoshShell);
 
 }

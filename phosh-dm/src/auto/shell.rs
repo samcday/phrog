@@ -35,10 +35,24 @@ mod sealed {
 }
 
 pub trait ShellExt: IsA<Shell> + sealed::Sealed + 'static {
+    #[doc(alias = "phosh_shell_panels_create")]
+    fn panels_create(&self) {
+        unsafe {
+            ffi::phosh_shell_panels_create(self.as_ref().to_glib_none().0);
+        }
+    }
+
     #[doc(alias = "phosh_shell_set_default")]
     fn set_default(&self) {
         unsafe {
             ffi::phosh_shell_set_default(self.as_ref().to_glib_none().0);
+        }
+    }
+
+    #[doc(alias = "phosh_shell_setup_primary_monitor_signal_handlers")]
+    fn setup_primary_monitor_signal_handlers(&self) {
+        unsafe {
+            ffi::phosh_shell_setup_primary_monitor_signal_handlers(self.as_ref().to_glib_none().0);
         }
     }
 
