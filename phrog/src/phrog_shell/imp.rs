@@ -17,7 +17,8 @@ impl ObjectImpl for PhrogShell {
 }
 
 impl ShellImpl for PhrogShell {
-    fn setup(&self) {
-        println!("PhrogShell setup.");
+    fn setup_idle_cb(&self) -> bool {
+        println!("hehe.");
+        return false;
     }
 }

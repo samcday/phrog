@@ -26,14 +26,14 @@ use glib::{gboolean, gconstpointer, gpointer, GType};
 #[repr(C)]
 pub struct PhoshShellClass {
     pub parent_class: gobject::GObjectClass,
-    pub setup: Option<unsafe extern "C" fn(*mut PhoshShell)>,
+    pub setup_idle_cb: Option<unsafe extern "C" fn(*mut PhoshShell) -> gboolean>,
 }
 
 impl ::std::fmt::Debug for PhoshShellClass {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.debug_struct(&format!("PhoshShellClass @ {self:p}"))
          .field("parent_class", &self.parent_class)
-         .field("setup", &self.setup)
+         .field("setup_idle_cb", &self.setup_idle_cb)
          .finish()
     }
 }
