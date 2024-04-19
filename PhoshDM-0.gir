@@ -34,12 +34,12 @@ and coordinates between them.</doc>
       <function name="get_default" c:identifier="phosh_shell_get_default">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="2052">Get the shell singleton</doc>
+             line="2051">Get the shell singleton</doc>
         <source-position filename="src/plugin-shell.h" line="26"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="2057">The shell singleton</doc>
+               line="2056">The shell singleton</doc>
           <type name="Shell" c:type="PhoshShell*"/>
         </return-value>
       </function>
@@ -54,17 +54,6 @@ and coordinates between them.</doc>
           </instance-parameter>
         </parameters>
       </virtual-method>
-      <method name="panels_create" c:identifier="phosh_shell_panels_create">
-        <source-position filename="src/plugin-shell.h" line="35"/>
-        <return-value transfer-ownership="none">
-          <type name="none" c:type="void"/>
-        </return-value>
-        <parameters>
-          <instance-parameter name="self" transfer-ownership="none">
-            <type name="Shell" c:type="PhoshShell*"/>
-          </instance-parameter>
-        </parameters>
-      </method>
       <method name="set_default" c:identifier="phosh_shell_set_default">
         <source-position filename="src/plugin-shell.h" line="27"/>
         <return-value transfer-ownership="none">
@@ -76,24 +65,12 @@ and coordinates between them.</doc>
           </instance-parameter>
         </parameters>
       </method>
-      <method name="setup_primary_monitor_signal_handlers"
-              c:identifier="phosh_shell_setup_primary_monitor_signal_handlers">
-        <source-position filename="src/plugin-shell.h" line="36"/>
-        <return-value transfer-ownership="none">
-          <type name="none" c:type="void"/>
-        </return-value>
-        <parameters>
-          <instance-parameter name="self" transfer-ownership="none">
-            <type name="Shell" c:type="PhoshShell*"/>
-          </instance-parameter>
-        </parameters>
-      </method>
       <property name="builtin-monitor"
                 introspectable="0"
                 transfer-ownership="none">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1197">The built in monitor. This is a hardware property and hence can
+             line="1196">The built in monitor. This is a hardware property and hence can
 only be read. It can be %NULL when not present or disabled.</doc>
         <type/>
       </property>
@@ -103,7 +80,7 @@ only be read. It can be %NULL when not present or disabled.</doc>
                 default-value="FALSE">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1186">Whether the device is currently docked. This mirrors the property
+             line="1185">Whether the device is currently docked. This mirrors the property
 from #PhoshDockedManager for easier access.</doc>
         <type name="gboolean" c:type="gboolean"/>
       </property>
@@ -113,7 +90,7 @@ from #PhoshDockedManager for easier access.</doc>
                 default-value="FALSE">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1176">Whether the screen is currently locked. This mirrors the property
+             line="1175">Whether the screen is currently locked. This mirrors the property
 from #PhoshLockscreenManager for easier access.</doc>
         <type name="gboolean" c:type="gboolean"/>
       </property>
@@ -123,7 +100,7 @@ from #PhoshLockscreenManager for easier access.</doc>
                 transfer-ownership="none">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1209">The primary monitor that has the panels, lock screen etc.</doc>
+             line="1208">The primary monitor that has the panels, lock screen etc.</doc>
         <type/>
       </property>
       <property name="shell-state"

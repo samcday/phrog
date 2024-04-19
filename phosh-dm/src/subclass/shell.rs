@@ -5,7 +5,7 @@ use crate::Shell;
 
 pub trait ShellImpl: ShellImplExt + ObjectImpl {
     fn setup(&self) {
-        self.parent_setup();
+        self.parent_setup()
     }
 }
 
