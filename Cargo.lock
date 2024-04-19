@@ -482,6 +482,7 @@ version = "0.0.1"
 dependencies = [
  "glib-sys 0.20.0",
  "gobject-sys 0.20.0",
+ "gtk-sys",
  "libc",
  "meson",
  "shell-words",

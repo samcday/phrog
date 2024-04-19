@@ -9,6 +9,11 @@ single_version_file = true
 generate_safety_asserts = true
 deprecate_by_min_version = true
 
-generate = ["PhoshDM.Shell"]
+generate = [
+    "PhoshDM.LayerSurface",
+    "PhoshDM.Lockscreen",
+    "PhoshDM.LockscreenPage",
+    "PhoshDM.Shell",
+]
 
 manual = []

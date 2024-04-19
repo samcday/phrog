@@ -13,5 +13,13 @@ macro_rules! assert_initialized_main_thread {
     };
 }
 
+// No-op
+macro_rules! skip_assert_initialized {
+    () => {};
+}
+
 mod auto;
+pub mod subclass;
+
 pub use auto::*;
+pub use auto::traits::*;

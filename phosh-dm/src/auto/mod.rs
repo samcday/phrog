@@ -3,6 +3,19 @@
 // from ../gir-files
 // DO NOT EDIT
 
+mod layer_surface;
+pub use self::layer_surface::LayerSurface;
+
+mod lockscreen;
+pub use self::lockscreen::Lockscreen;
+
 mod shell;
 pub use self::shell::Shell;
 
+mod enums;
+pub use self::enums::LockscreenPage;
+
+pub(crate) mod traits {
+    pub use super::layer_surface::LayerSurfaceExt;
+    pub use super::lockscreen::LockscreenExt;
+}

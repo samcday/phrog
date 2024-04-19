@@ -13,6 +13,231 @@ and/or use gtk-doc annotations.  -->
              shared-library="libphosh.so"
              c:identifier-prefixes="Phosh"
              c:symbol-prefixes="phosh">
+    <class name="LayerSurface"
+           c:symbol-prefix="layer_surface"
+           c:type="PhoshLayerSurface"
+           parent="Gtk.Window"
+           glib:type-name="PhoshLayerSurface"
+           glib:get-type="phosh_layer_surface_get_type"
+           glib:type-struct="LayerSurfaceClass">
+      <source-position filename="src/layersurface.h" line="31"/>
+      <implements name="Atk.ImplementorIface"/>
+      <implements name="Gtk.Buildable"/>
+      <virtual-method name="configured">
+        <doc xml:space="preserve"
+             filename="src/layersurface.h"
+             line="22">invoked when layer surface is configured</doc>
+        <source-position filename="src/layersurface.h" line="30"/>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="LayerSurface" c:type="PhoshLayerSurface*"/>
+          </instance-parameter>
+        </parameters>
+      </virtual-method>
+      <property name="anchor"
+                writable="1"
+                transfer-ownership="none"
+                default-value="0">
+        <type name="guint" c:type="guint"/>
+      </property>
+      <property name="configured-height"
+                transfer-ownership="none"
+                default-value="0">
+        <type name="guint" c:type="guint"/>
+      </property>
+      <property name="configured-width"
+                transfer-ownership="none"
+                default-value="0">
+        <type name="guint" c:type="guint"/>
+      </property>
+      <property name="exclusive-zone"
+                writable="1"
+                transfer-ownership="none"
+                default-value="0">
+        <type name="gint" c:type="gint"/>
+      </property>
+      <property name="height"
+                writable="1"
+                transfer-ownership="none"
+                default-value="0">
+        <type name="guint" c:type="guint"/>
+      </property>
+      <property name="kbd-interactivity"
+                writable="1"
+                transfer-ownership="none"
+                default-value="FALSE">
+        <type name="gboolean" c:type="gboolean"/>
+      </property>
+      <property name="layer"
+                writable="1"
+                transfer-ownership="none"
+                default-value="0">
+        <type name="guint" c:type="guint"/>
+      </property>
+      <property name="layer-shell" writable="1" transfer-ownership="none">
+        <type name="gpointer" c:type="gpointer"/>
+      </property>
+      <property name="margin-bottom"
+                writable="1"
+                transfer-ownership="none"
+                default-value="0">
+        <type name="gint" c:type="gint"/>
+      </property>
+      <property name="margin-left"
+                writable="1"
+                transfer-ownership="none"
+                default-value="0">
+        <type name="gint" c:type="gint"/>
+      </property>
+      <property name="margin-right"
+                writable="1"
+                transfer-ownership="none"
+                default-value="0">
+        <type name="gint" c:type="gint"/>
+      </property>
+      <property name="margin-top"
+                writable="1"
+                transfer-ownership="none"
+                default-value="0">
+        <type name="gint" c:type="gint"/>
+      </property>
+      <property name="namespace" writable="1" transfer-ownership="none">
+        <type name="utf8" c:type="gchar*"/>
+      </property>
+      <property name="width"
+                writable="1"
+                transfer-ownership="none"
+                default-value="0">
+        <type name="guint" c:type="guint"/>
+      </property>
+      <property name="wl-output" writable="1" transfer-ownership="none">
+        <type name="gpointer" c:type="gpointer"/>
+      </property>
+      <field name="parent_instance">
+        <type name="Gtk.Window" c:type="GtkWindow"/>
+      </field>
+      <glib:signal name="configured" when="last">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </glib:signal>
+    </class>
+    <record name="LayerSurfaceClass"
+            c:type="PhoshLayerSurfaceClass"
+            glib:is-gtype-struct-for="LayerSurface">
+      <source-position filename="src/layersurface.h" line="31"/>
+      <field name="parent_class">
+        <doc xml:space="preserve"
+             filename="src/layersurface.h"
+             line="21">The parent class</doc>
+        <type name="Gtk.WindowClass" c:type="GtkWindowClass"/>
+      </field>
+      <field name="configured">
+        <doc xml:space="preserve"
+             filename="src/layersurface.h"
+             line="22">invoked when layer surface is configured</doc>
+        <callback name="configured">
+          <source-position filename="src/layersurface.h" line="30"/>
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="self" transfer-ownership="none">
+              <type name="LayerSurface" c:type="PhoshLayerSurface*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+    </record>
+    <class name="Lockscreen"
+           c:symbol-prefix="lockscreen"
+           c:type="PhoshLockscreen"
+           parent="LayerSurface"
+           glib:type-name="PhoshLockscreen"
+           glib:get-type="phosh_lockscreen_get_type"
+           glib:type-struct="LockscreenClass">
+      <source-position filename="src/lockscreen.h" line="34"/>
+      <implements name="Atk.ImplementorIface"/>
+      <implements name="Gtk.Buildable"/>
+      <method name="get_page" c:identifier="phosh_lockscreen_get_page">
+        <source-position filename="src/lockscreen.h" line="37"/>
+        <return-value transfer-ownership="none">
+          <type name="LockscreenPage" c:type="PhoshLockscreenPage"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Lockscreen" c:type="PhoshLockscreen*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="set_page" c:identifier="phosh_lockscreen_set_page">
+        <source-position filename="src/lockscreen.h" line="36"/>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Lockscreen" c:type="PhoshLockscreen*"/>
+          </instance-parameter>
+          <parameter name="page" transfer-ownership="none">
+            <type name="LockscreenPage" c:type="PhoshLockscreenPage"/>
+          </parameter>
+        </parameters>
+      </method>
+      <property name="calls-manager"
+                introspectable="0"
+                writable="1"
+                construct-only="1"
+                transfer-ownership="none">
+        <type/>
+      </property>
+      <field name="parent_instance">
+        <type name="LayerSurface" c:type="PhoshLayerSurface"/>
+      </field>
+      <glib:signal name="lockscreen-unlock" when="last">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </glib:signal>
+      <glib:signal name="wakeup-output" when="last">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </glib:signal>
+    </class>
+    <record name="LockscreenClass"
+            c:type="PhoshLockscreenClass"
+            glib:is-gtype-struct-for="Lockscreen">
+      <source-position filename="src/lockscreen.h" line="34"/>
+      <field name="parent_class">
+        <type name="LayerSurfaceClass" c:type="PhoshLayerSurfaceClass"/>
+      </field>
+    </record>
+    <enumeration name="LockscreenPage" c:type="PhoshLockscreenPage">
+      <doc xml:space="preserve"
+           filename="src/lockscreen.h"
+           line="13">This enum indicates which page is shown on the lockscreen.
+This helps #PhoshGnomeShellManager to decide when to emit
+AcceleratorActivated events over DBus</doc>
+      <source-position filename="src/lockscreen.h" line="25"/>
+      <member name="default"
+              value="0"
+              c:identifier="PHOSH_LOCKSCREEN_PAGE_DEFAULT">
+        <doc xml:space="preserve"
+             filename="src/lockscreen.h"
+             line="15">The default locked page</doc>
+      </member>
+      <member name="unlock"
+              value="1"
+              c:identifier="PHOSH_LOCKSCREEN_PAGE_UNLOCK">
+        <doc xml:space="preserve"
+             filename="src/lockscreen.h"
+             line="16">The unlock page (where PIN is entered)</doc>
+      </member>
+    </enumeration>
     <class name="Shell"
            c:symbol-prefix="shell"
            c:type="PhoshShell"
@@ -22,7 +247,7 @@ and/or use gtk-doc annotations.  -->
            glib:type-struct="ShellClass">
       <doc xml:space="preserve"
            filename="src/shell.c"
-           line="95">The shell singleton
+           line="96">The shell singleton
 
 #PhoshShell is responsible for instantiating the GUI
 parts of the shell#PhoshTopPanel, #PhoshHome,… and the managers that
@@ -34,12 +259,12 @@ and coordinates between them.</doc>
       <function name="get_default" c:identifier="phosh_shell_get_default">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="2039">Get the shell singleton</doc>
+             line="2040">Get the shell singleton</doc>
         <source-position filename="src/plugin-shell.h" line="20"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="2044">The shell singleton</doc>
+               line="2045">The shell singleton</doc>
           <type name="Shell" c:type="PhoshShell*"/>
         </return-value>
       </function>
@@ -48,7 +273,7 @@ and coordinates between them.</doc>
                 transfer-ownership="none">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1186">The built in monitor. This is a hardware property and hence can
+             line="1187">The built in monitor. This is a hardware property and hence can
 only be read. It can be %NULL when not present or disabled.</doc>
         <type/>
       </property>
@@ -58,7 +283,7 @@ only be read. It can be %NULL when not present or disabled.</doc>
                 default-value="FALSE">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1175">Whether the device is currently docked. This mirrors the property
+             line="1176">Whether the device is currently docked. This mirrors the property
 from #PhoshDockedManager for easier access.</doc>
         <type name="gboolean" c:type="gboolean"/>
       </property>
@@ -68,7 +293,7 @@ from #PhoshDockedManager for easier access.</doc>
                 default-value="FALSE">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1165">Whether the screen is currently locked. This mirrors the property
+             line="1166">Whether the screen is currently locked. This mirrors the property
 from #PhoshLockscreenManager for easier access.</doc>
         <type name="gboolean" c:type="gboolean"/>
       </property>
@@ -78,7 +303,7 @@ from #PhoshLockscreenManager for easier access.</doc>
                 transfer-ownership="none">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1198">The primary monitor that has the panels, lock screen etc.</doc>
+             line="1199">The primary monitor that has the panels, lock screen etc.</doc>
         <type/>
       </property>
       <property name="shell-state"

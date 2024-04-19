@@ -10,5 +10,6 @@ single_version_file = true
 external_libraries = [
     "GLib",
     "GObject",
+    "Gtk",
 ]
 split_build_rs = true
