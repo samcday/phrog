@@ -33,7 +33,7 @@ fn main() {
         println!("Shell is ready");
     });
 
-    println!("shell instance: {:?}", shell);
+    shell.set_locked(true);
 
     gtk::main();
 }

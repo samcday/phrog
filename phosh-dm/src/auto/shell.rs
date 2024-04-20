@@ -16,6 +16,13 @@ glib::wrapper! {
 }
 
 impl Shell {
+    #[doc(alias = "phosh_shell_set_locked")]
+    pub fn set_locked(&self, locked: bool) {
+        unsafe {
+            ffi::phosh_shell_set_locked(self.to_glib_none().0, locked.into_glib());
+        }
+    }
+
     pub fn is_docked(&self) -> bool {
         ObjectExt::property(self, "docked")
     }
@@ -26,10 +33,6 @@ impl Shell {
 
     pub fn is_locked(&self) -> bool {
         ObjectExt::property(self, "locked")
-    }
-
-    pub fn set_locked(&self, locked: bool) {
-        ObjectExt::set_property(self,"locked", locked)
     }
 
     #[doc(alias = "phosh_shell_get_default")]

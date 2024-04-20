@@ -272,6 +272,33 @@ and coordinates between them.</doc>
           <type name="Shell" c:type="PhoshShell*"/>
         </return-value>
       </function>
+      <method name="set_locked"
+              c:identifier="phosh_shell_set_locked"
+              glib:set-property="locked">
+        <doc xml:space="preserve"
+             filename="src/shell.c"
+             line="2315">Lock the shell. We proxy to lockscreen-manager to avoid
+that other parts of the shell need to care about this
+abstraction.</doc>
+        <source-position filename="src/plugin-shell.h" line="28"/>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <doc xml:space="preserve"
+                 filename="src/shell.c"
+                 line="2317">The #PhoshShell singleton</doc>
+            <type name="Shell" c:type="PhoshShell*"/>
+          </instance-parameter>
+          <parameter name="locked" transfer-ownership="none">
+            <doc xml:space="preserve"
+                 filename="src/shell.c"
+                 line="2318">%TRUE to lock the shell</doc>
+            <type name="gboolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
       <property name="builtin-monitor"
                 introspectable="0"
                 transfer-ownership="none">
@@ -294,6 +321,7 @@ from #PhoshDockedManager for easier access.</doc>
       <property name="locked"
                 writable="1"
                 transfer-ownership="none"
+                setter="set_locked"
                 default-value="FALSE">
         <doc xml:space="preserve"
              filename="src/shell.c"

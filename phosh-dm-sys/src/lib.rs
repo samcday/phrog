@@ -134,5 +134,6 @@ extern "C" {
     //=========================================================================
     pub fn phosh_shell_get_type() -> GType;
     pub fn phosh_shell_get_default() -> *mut PhoshShell;
+    pub fn phosh_shell_set_locked(self_: *mut PhoshShell, locked: gboolean);
 
 }
