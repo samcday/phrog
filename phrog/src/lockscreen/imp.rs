@@ -1,12 +1,16 @@
 use gtk::glib;
+use gtk::glib::once_cell::unsync::OnceCell;
 use gtk::prelude::ContainerExt;
 use gtk::subclass::prelude::{ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt};
 use phosh_dm::LockscreenExt;
 use phosh_dm::subclass::layer_surface::LayerSurfaceImpl;
 use phosh_dm::subclass::lockscreen::LockscreenImpl;
+use crate::user_session_page::UserSessionPage;
 
 #[derive(Default)]
-pub struct Lockscreen;
+pub struct Lockscreen {
+    user_session_page: OnceCell<UserSessionPage>,
+}
 
 #[glib::object_subclass]
 impl ObjectSubclass for Lockscreen {
@@ -18,14 +22,16 @@ impl ObjectSubclass for Lockscreen {
 impl ObjectImpl for Lockscreen {
     fn constructed(&self) {
         self.parent_constructed();
+
+        let user_session_page = UserSessionPage::new();
+        self.user_session_page.set(user_session_page).unwrap();
+
         if let Some(c) = self.obj().carousel() {
-            // Scalpel approach: remove the first page from the default lockscreen (clock widget)
-            println!("carousel has {} pages", c.n_pages());
+            // Remove the first page from the default lockscreen (clock widget)
             c.remove(c.children().first().unwrap());
-            // Up next: grab Phog user selection composite template:
-            // https://gitlab.com/mobian1/phog/-/blob/main/src/ui/lockscreen.ui#L20-90
-            // Bind that to a new PhrogUser widget (parent GtkBox)
-            // Construct that new widget and prepend it to carousel.
+
+            // Replace it with the user+session selection page.
+            c.prepend(self.user_session_page.get().unwrap())
         }
     }
 }
