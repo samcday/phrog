@@ -25,16 +25,16 @@ fn session_list(path: &str, session_type: &str, sessions: &mut HashMap<String, S
             continue;
         };
         // Use the Name= entry as key for de-duplication.
-        let name = info.name().to_string();
-        if sessions.contains_key(&name) {
+        let name = info.name();
+        if sessions.contains_key(name.as_str()) {
             continue;
         }
-        sessions.insert(name.clone(), SessionObject::new(
+        sessions.insert(name.to_string(), SessionObject::new(
             &name,
-            &session_type,
-            &info.commandline().map_or(String::new(), |v| v.to_string_lossy().into()),
-            &info.string("DesktopNames").map_or(String::new(), |v| v.to_string())
-                .trim_end_matches(";").replace(";", ":")
+            session_type,
+            &info.commandline().map_or(String::new(), |v| v.to_string_lossy().to_string()),
+            &info.string("DesktopNames").and_then(|v| Some(v.trim_end_matches(";")
+                .replace(";", ":"))).unwrap_or(String::new())
         ));
     }
 }
