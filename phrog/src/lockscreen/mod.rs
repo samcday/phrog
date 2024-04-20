@@ -1,7 +1,7 @@
 mod imp;
 
-use glib::Object;
 use gtk::glib;
+use glib::Object;
 
 glib::wrapper! {
     pub struct Lockscreen(ObjectSubclass<imp::Lockscreen>)

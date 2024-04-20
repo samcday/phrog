@@ -383,6 +383,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "glob"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
+
+[[package]]
 name = "gobject-sys"
 version = "0.18.5"
 source = "git+https://github.com/gtk-rs/gtk-rs-core.git?branch=0.18#42b9caf98e03ded086362d9653ca58fe94dc8658"
@@ -604,6 +610,7 @@ name = "phrog"
 version = "0.1.0"
 dependencies = [
  "glib-build-tools",
+ "glob",
  "gtk",
  "libhandy",
  "phosh-dm",

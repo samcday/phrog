@@ -1,5 +1,7 @@
 mod lockscreen;
 mod user_session_page;
+mod sessions;
+mod session_object;
 
 use std::ffi::{c_char, c_int, CString};
 use gtk::glib::{StaticType};
@@ -12,8 +14,6 @@ extern "C" {
 }
 
 fn main() {
-    println!("Hello, world!");
-
     gtk::gio::resources_register_include!("phrog.gresource").expect("Failed to register resources.");
 
     gtk::init().unwrap();

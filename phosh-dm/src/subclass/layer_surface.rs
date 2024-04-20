@@ -1,5 +1,4 @@
-use glib::{Class, prelude::*, subclass::prelude::*};
-use glib::translate::*;
+use glib::{Class, subclass::prelude::*};
 use crate::LayerSurface;
 
 pub trait LayerSurfaceImpl: LayerSurfaceImplExt + ObjectImpl {
@@ -17,6 +16,5 @@ impl<T: LayerSurfaceImpl> LayerSurfaceImplExt for T {}
 unsafe impl<T: LayerSurfaceImpl> IsSubclassable<T> for LayerSurface {
     fn class_init(class: &mut Class<Self>) {
         Self::parent_class_init::<T>(class);
-        let klass = class.as_mut();
     }
 }

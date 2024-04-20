@@ -3,3 +3,4 @@ members = [
     "phosh-dm",
     "phosh-dm-sys", "phrog",
 ]
+resolver = "2"
