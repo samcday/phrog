@@ -27,7 +27,7 @@ impl ObjectImpl for Lockscreen {
         self.user_session_page.set(user_session_page).unwrap();
 
         if let Some(c) = self.obj().carousel() {
-            // Remove the first page from the default lockscreen (clock widget)
+            // Remove the first page from the default lockscreen (info widget)
             c.remove(c.children().first().unwrap());
 
             // Replace it with the user+session selection page.

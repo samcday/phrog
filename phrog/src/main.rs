@@ -2,6 +2,7 @@ mod lockscreen;
 mod user_session_page;
 mod sessions;
 mod session_object;
+mod users;
 
 use std::ffi::{c_char, c_int, CString};
 use gtk::glib::{StaticType};

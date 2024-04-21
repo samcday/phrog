@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 glob = "0.3.1"
+uzers = { git = "https://github.com/rustadopt/uzers-rs", rev = "8fb29db" }
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
