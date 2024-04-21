@@ -1,7 +1,8 @@
 use glib::{Class, subclass::prelude::*};
+use gtk::subclass::widget::WidgetImpl;
 use crate::LayerSurface;
 
-pub trait LayerSurfaceImpl: LayerSurfaceImplExt + ObjectImpl {
+pub trait LayerSurfaceImpl: LayerSurfaceImplExt + WidgetImpl + ObjectImpl {
 }
 
 mod sealed {

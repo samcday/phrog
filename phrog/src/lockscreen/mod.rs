@@ -5,7 +5,7 @@ use glib::Object;
 
 glib::wrapper! {
     pub struct Lockscreen(ObjectSubclass<imp::Lockscreen>)
-        @extends phosh_dm::Lockscreen;
+        @extends phosh_dm::Lockscreen, gtk::Widget;
 }
 
 impl Lockscreen {
