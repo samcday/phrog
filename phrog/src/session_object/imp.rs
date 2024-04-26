@@ -1,8 +1,8 @@
-use std::cell::OnceCell;
 use gtk::glib;
 use gtk::glib::Properties;
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
+use std::cell::OnceCell;
 
 #[derive(Properties, Default)]
 #[properties(wrapper_type = super::SessionObject)]

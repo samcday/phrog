@@ -9,7 +9,12 @@ pub fn users() -> HashMap<String, String> {
     let uid_range = uid_range();
     unsafe { uzers::all_users() }
         .filter(|u| uid_range.contains(&u.uid()))
-        .map(|u| (u.name().to_string_lossy().to_string(), u.gecos().to_string_lossy().to_string()))
+        .map(|u| {
+            (
+                u.name().to_string_lossy().to_string(),
+                u.gecos().to_string_lossy().to_string(),
+            )
+        })
         .collect()
 }
 
@@ -20,10 +25,18 @@ fn uid_range() -> RangeInclusive<uzers::uid_t> {
     if let Ok(defs) = std::fs::read_to_string("/etc/login.defs") {
         for line in defs.lines() {
             if line.starts_with("UID_MIN") {
-                min_uid = line.strip_prefix("UID_MIN").unwrap().parse::<u32>().unwrap_or(DEFAULT_MIN_UID);
+                min_uid = line
+                    .strip_prefix("UID_MIN")
+                    .unwrap()
+                    .parse::<u32>()
+                    .unwrap_or(DEFAULT_MIN_UID);
             }
             if line.starts_with("UID_MAX") {
-                max_uid = line.strip_prefix("UID_MAX").unwrap().parse::<u32>().unwrap_or(DEFAULT_MIN_UID);
+                max_uid = line
+                    .strip_prefix("UID_MAX")
+                    .unwrap()
+                    .parse::<u32>()
+                    .unwrap_or(DEFAULT_MIN_UID);
             }
         }
     }

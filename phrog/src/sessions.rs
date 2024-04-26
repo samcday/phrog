@@ -1,13 +1,17 @@
-use std::collections::HashMap;
+use crate::session_object::SessionObject;
 use glob::glob;
 use gtk::gio::DesktopAppInfo;
 use gtk::glib::g_warning;
 use gtk::prelude::*;
-use crate::session_object::SessionObject;
+use std::collections::HashMap;
 
 pub fn sessions() -> Vec<SessionObject> {
     let mut sessions = HashMap::new();
-    session_list("/usr/share/wayland-sessions/*.desktop", "wayland", &mut sessions);
+    session_list(
+        "/usr/share/wayland-sessions/*.desktop",
+        "wayland",
+        &mut sessions,
+    );
     session_list("/usr/share/xsessions/*.desktop", "x11", &mut sessions);
     sessions.values().cloned().collect()
 }
@@ -19,8 +23,12 @@ fn session_list(path: &str, session_type: &str, sessions: &mut HashMap<String, S
             return;
         }
         Ok(iter) => iter,
-    }.flatten() {
-        let info = if let Some(info) = DesktopAppInfo::from_filename(&f) { info } else {
+    }
+    .flatten()
+    {
+        let info = if let Some(info) = DesktopAppInfo::from_filename(&f) {
+            info
+        } else {
             g_warning!("session", "Unable to parse session file {:?}", f);
             continue;
         };
@@ -29,12 +37,19 @@ fn session_list(path: &str, session_type: &str, sessions: &mut HashMap<String, S
         if sessions.contains_key(name.as_str()) {
             continue;
         }
-        sessions.insert(name.to_string(), SessionObject::new(
-            &name,
-            session_type,
-            &info.commandline().map_or(String::new(), |v| v.to_string_lossy().to_string()),
-            &info.string("DesktopNames").and_then(|v| Some(v.trim_end_matches(";")
-                .replace(";", ":"))).unwrap_or(String::new())
-        ));
+        sessions.insert(
+            name.to_string(),
+            SessionObject::new(
+                &name,
+                session_type,
+                &info
+                    .commandline()
+                    .map_or(String::new(), |v| v.to_string_lossy().to_string()),
+                &info
+                    .string("DesktopNames")
+                    .and_then(|v| Some(v.trim_end_matches(";").replace(";", ":")))
+                    .unwrap_or(String::new()),
+            ),
+        );
     }
 }

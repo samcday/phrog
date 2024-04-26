@@ -1,12 +1,12 @@
 mod lockscreen;
-mod user_session_page;
-mod sessions;
 mod session_object;
+mod sessions;
+mod user_session_page;
 mod users;
 
-use std::ffi::{c_char, c_int, CString};
-use gtk::glib::{StaticType};
 use crate::lockscreen::Lockscreen;
+use gtk::glib::StaticType;
+use std::ffi::{c_char, c_int, CString};
 
 extern "C" {
     fn phosh_log_set_log_domains(domains: *const c_char);
@@ -15,7 +15,8 @@ extern "C" {
 }
 
 fn main() {
-    gtk::gio::resources_register_include!("phrog.gresource").expect("Failed to register resources.");
+    gtk::gio::resources_register_include!("phrog.gresource")
+        .expect("Failed to register resources.");
 
     gtk::init().unwrap();
 
@@ -25,7 +26,8 @@ fn main() {
     let _ = Lockscreen::static_type();
 
     unsafe {
-        let loglevel = CString::new(std::env::var("G_MESSAGES_DEBUG").unwrap_or("".to_string())).unwrap();
+        let loglevel =
+            CString::new(std::env::var("G_MESSAGES_DEBUG").unwrap_or("".to_string())).unwrap();
         phosh_log_set_log_domains(loglevel.as_ptr());
         hdy_init();
         cui_init(1);

@@ -1,5 +1,6 @@
 use crate::session_object::SessionObject;
 use crate::user_session_page::UserSessionPage;
+use async_channel::{Receiver, Sender};
 use greetd_ipc::codec::SyncCodec;
 use greetd_ipc::{Request, Response};
 use gtk::glib::{clone, closure_local, ObjectExt};
@@ -12,7 +13,6 @@ use phosh_dm::subclass::lockscreen::LockscreenImpl;
 use phosh_dm::{LockscreenExt, LockscreenPage};
 use std::cell::{OnceCell, RefCell};
 use std::os::unix::net::UnixStream;
-use async_channel::{Receiver, Sender};
 
 #[derive(Default)]
 pub struct Lockscreen {
@@ -35,7 +35,9 @@ fn run_greetd() -> (Sender<Request>, Receiver<Response>) {
 
         while let Ok(req) = greetd_req_recv.recv_blocking() {
             req.write_to(&mut sock).unwrap();
-            greetd_resp_send.send_blocking(Response::read_from(&mut sock).unwrap()).unwrap();
+            greetd_resp_send
+                .send_blocking(Response::read_from(&mut sock).unwrap())
+                .unwrap();
         }
     });
 

@@ -1,16 +1,16 @@
-use std::cell::OnceCell;
-use std::sync::OnceLock;
+use crate::session_object::SessionObject;
+use crate::{sessions, users};
 use glib::subclass::InitializingObject;
+use gtk::gio::ListStore;
+use gtk::glib::subclass::Signal;
+use gtk::glib::{clone, Properties};
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
 use gtk::{glib, CompositeTemplate, ListBox};
-use gtk::gio::ListStore;
-use gtk::glib::{clone, Properties};
-use gtk::glib::subclass::Signal;
-use libhandy::ActionRow;
 use libhandy::prelude::*;
-use crate::session_object::SessionObject;
-use crate::{sessions, users};
+use libhandy::ActionRow;
+use std::cell::OnceCell;
+use std::sync::OnceLock;
 
 #[derive(CompositeTemplate, Default)]
 #[template(resource = "/com/samcday/phrog/lockscreen-user-session.ui")]
@@ -46,7 +46,13 @@ impl ObjectImpl for UserSessionPage {
         self.parent_constructed();
 
         for user in users::users() {
-            self.box_users.add(&ActionRow::builder().title(user.1).subtitle(user.0).activatable(true).build());
+            self.box_users.add(
+                &ActionRow::builder()
+                    .title(user.1)
+                    .subtitle(user.0)
+                    .activatable(true)
+                    .build(),
+            );
         }
         self.box_users.show_all();
 
@@ -58,23 +64,28 @@ impl ObjectImpl for UserSessionPage {
             this.obj().emit_by_name::<()>("login", &[&username, &session]);
         }));
 
+        self.sessions
+            .set(ListStore::new::<SessionObject>())
+            .unwrap();
+        self.sessions
+            .get()
+            .unwrap()
+            .extend_from_slice(&sessions::sessions());
 
-        self.sessions.set(ListStore::new::<SessionObject>()).unwrap();
-        self.sessions.get().unwrap().extend_from_slice(&sessions::sessions());
-
-        self.row_sessions.bind_name_model(Some(self.sessions.get().unwrap()), Some(Box::new(|v| {
-            v.downcast_ref::<SessionObject>().unwrap().name()
-        })));
+        self.row_sessions.bind_name_model(
+            Some(self.sessions.get().unwrap()),
+            Some(Box::new(|v| {
+                v.downcast_ref::<SessionObject>().unwrap().name()
+            })),
+        );
     }
 
     fn signals() -> &'static [Signal] {
         static SIGNALS: OnceLock<Vec<Signal>> = OnceLock::new();
         SIGNALS.get_or_init(|| {
-            vec![
-                Signal::builder("login")
-                    .param_types([String::static_type(), SessionObject::static_type()])
-                    .build()
-            ]
+            vec![Signal::builder("login")
+                .param_types([String::static_type(), SessionObject::static_type()])
+                .build()]
         })
     }
 }
