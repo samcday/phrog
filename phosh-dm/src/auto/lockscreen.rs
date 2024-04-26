@@ -42,8 +42,25 @@ pub trait LockscreenExt: IsA<Lockscreen> + sealed::Sealed + 'static {
         }
     }
 
+    #[doc(alias = "phosh_lockscreen_shake_label")]
+    fn shake_label(&self) {
+        unsafe {
+            ffi::phosh_lockscreen_shake_label(self.as_ref().to_glib_none().0);
+        }
+    }
+
     fn carousel(&self) -> Option<libhandy::Carousel> {
         ObjectExt::property(self.as_ref(), "carousel")
+    }
+
+    #[doc(alias = "entry-pin")]
+    fn entry_pin(&self) -> Option<gtk::Entry> {
+        ObjectExt::property(self.as_ref(), "entry-pin")
+    }
+
+    #[doc(alias = "lbl-unlock-status")]
+    fn lbl_unlock_status(&self) -> Option<gtk::Label> {
+        ObjectExt::property(self.as_ref(), "lbl-unlock-status")
     }
 
     #[doc(alias = "lockscreen-unlock")]
@@ -82,6 +99,32 @@ pub trait LockscreenExt: IsA<Lockscreen> + sealed::Sealed + 'static {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"notify::carousel\0".as_ptr() as *const _,
                 Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_carousel_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+        }
+    }
+
+    #[doc(alias = "entry-pin")]
+    fn connect_entry_pin_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_entry_pin_trampoline<P: IsA<Lockscreen>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshLockscreen, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+            let f: &F = &*(f as *const F);
+            f(Lockscreen::from_glib_borrow(this).unsafe_cast_ref())
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"notify::entry-pin\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_entry_pin_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+        }
+    }
+
+    #[doc(alias = "lbl-unlock-status")]
+    fn connect_lbl_unlock_status_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_lbl_unlock_status_trampoline<P: IsA<Lockscreen>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshLockscreen, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+            let f: &F = &*(f as *const F);
+            f(Lockscreen::from_glib_borrow(this).unsafe_cast_ref())
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"notify::lbl-unlock-status\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_lbl_unlock_status_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 }

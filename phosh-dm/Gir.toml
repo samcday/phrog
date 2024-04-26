@@ -17,6 +17,8 @@ generate = [
 ]
 
 manual = [
+    "Gtk.Entry",
+    "Gtk.Label",
     "Handy.Carousel",
 ]
 

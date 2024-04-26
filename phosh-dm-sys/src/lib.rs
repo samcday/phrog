@@ -48,12 +48,14 @@ impl ::std::fmt::Debug for PhoshLayerSurfaceClass {
 #[repr(C)]
 pub struct PhoshLockscreenClass {
     pub parent_class: PhoshLayerSurfaceClass,
+    pub unlock_submit_cb: Option<unsafe extern "C" fn(*mut PhoshLockscreen)>,
 }
 
 impl ::std::fmt::Debug for PhoshLockscreenClass {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.debug_struct(&format!("PhoshLockscreenClass @ {self:p}"))
          .field("parent_class", &self.parent_class)
+         .field("unlock_submit_cb", &self.unlock_submit_cb)
          .finish()
     }
 }
@@ -128,6 +130,7 @@ extern "C" {
     pub fn phosh_lockscreen_get_type() -> GType;
     pub fn phosh_lockscreen_get_page(self_: *mut PhoshLockscreen) -> PhoshLockscreenPage;
     pub fn phosh_lockscreen_set_page(self_: *mut PhoshLockscreen, page: PhoshLockscreenPage);
+    pub fn phosh_lockscreen_shake_label(self_: *mut PhoshLockscreen);
 
     //=========================================================================
     // PhoshShell

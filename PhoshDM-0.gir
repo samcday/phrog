@@ -160,11 +160,22 @@ and/or use gtk-doc annotations.  -->
            glib:type-name="PhoshLockscreen"
            glib:get-type="phosh_lockscreen_get_type"
            glib:type-struct="LockscreenClass">
-      <source-position filename="src/lockscreen.h" line="34"/>
+      <source-position filename="src/lockscreen.h" line="36"/>
       <implements name="Atk.ImplementorIface"/>
       <implements name="Gtk.Buildable"/>
+      <virtual-method name="unlock_submit_cb">
+        <source-position filename="src/lockscreen.h" line="35"/>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Lockscreen" c:type="PhoshLockscreen*"/>
+          </instance-parameter>
+        </parameters>
+      </virtual-method>
       <method name="get_page" c:identifier="phosh_lockscreen_get_page">
-        <source-position filename="src/lockscreen.h" line="37"/>
+        <source-position filename="src/lockscreen.h" line="39"/>
         <return-value transfer-ownership="none">
           <type name="LockscreenPage" c:type="PhoshLockscreenPage"/>
         </return-value>
@@ -175,7 +186,7 @@ and/or use gtk-doc annotations.  -->
         </parameters>
       </method>
       <method name="set_page" c:identifier="phosh_lockscreen_set_page">
-        <source-position filename="src/lockscreen.h" line="36"/>
+        <source-position filename="src/lockscreen.h" line="38"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
         </return-value>
@@ -188,6 +199,17 @@ and/or use gtk-doc annotations.  -->
           </parameter>
         </parameters>
       </method>
+      <method name="shake_label" c:identifier="phosh_lockscreen_shake_label">
+        <source-position filename="src/lockscreen.h" line="40"/>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Lockscreen" c:type="PhoshLockscreen*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
       <property name="calls-manager"
                 introspectable="0"
                 writable="1"
@@ -197,6 +219,12 @@ and/or use gtk-doc annotations.  -->
       </property>
       <property name="carousel" transfer-ownership="none">
         <type name="Handy.Carousel"/>
+      </property>
+      <property name="entry-pin" transfer-ownership="none">
+        <type name="Gtk.Entry"/>
+      </property>
+      <property name="lbl-unlock-status" transfer-ownership="none">
+        <type name="Gtk.Label"/>
       </property>
       <field name="parent_instance">
         <type name="LayerSurface" c:type="PhoshLayerSurface"/>
@@ -215,9 +243,22 @@ and/or use gtk-doc annotations.  -->
     <record name="LockscreenClass"
             c:type="PhoshLockscreenClass"
             glib:is-gtype-struct-for="Lockscreen">
-      <source-position filename="src/lockscreen.h" line="34"/>
+      <source-position filename="src/lockscreen.h" line="36"/>
       <field name="parent_class">
         <type name="LayerSurfaceClass" c:type="PhoshLayerSurfaceClass"/>
+      </field>
+      <field name="unlock_submit_cb">
+        <callback name="unlock_submit_cb">
+          <source-position filename="src/lockscreen.h" line="35"/>
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="self" transfer-ownership="none">
+              <type name="Lockscreen" c:type="PhoshLockscreen*"/>
+            </parameter>
+          </parameters>
+        </callback>
       </field>
     </record>
     <enumeration name="LockscreenPage" c:type="PhoshLockscreenPage">

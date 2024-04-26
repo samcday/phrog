@@ -23,8 +23,8 @@ mod imp {
     use crate::user_session_page::UserSessionPage;
     use async_channel::{Receiver, Sender};
     use greetd_ipc::codec::SyncCodec;
-    use greetd_ipc::{Request, Response};
-    use gtk::glib::{clone, closure_local, ObjectExt};
+    use greetd_ipc::{ErrorType, Request, Response};
+    use gtk::glib::{clone, closure_local, g_critical, g_warning, ObjectExt};
     use gtk::prelude::*;
     use gtk::subclass::prelude::{ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt};
     use gtk::subclass::widget::WidgetImpl;
@@ -38,6 +38,8 @@ mod imp {
     #[derive(Default)]
     pub struct Lockscreen {
         user_session_page: OnceCell<UserSessionPage>,
+        greetd_sender: OnceCell<Sender<Request>>,
+        greetd_receiver: OnceCell<Receiver<Response>>,
     }
 
     #[glib::object_subclass]
@@ -55,10 +57,22 @@ mod imp {
             let mut sock = UnixStream::connect(std::env::var("GREETD_SOCK").unwrap()).unwrap();
 
             while let Ok(req) = greetd_req_recv.recv_blocking() {
-                req.write_to(&mut sock).unwrap();
-                greetd_resp_send
-                    .send_blocking(Response::read_from(&mut sock).unwrap())
-                    .unwrap();
+                if let Err(err) = req.write_to(&mut sock) {
+                    g_critical!("greetd", "error sending request: {}", err);
+                    continue;
+                }
+                match Response::read_from(&mut sock) {
+                    Err(err) => {
+                        g_critical!("greetd", "error receiving response: {}", err);
+                        continue;
+                    }
+                    Ok(resp) => {
+                        if let Err(err) = greetd_resp_send.send_blocking(resp) {
+                            g_critical!("greetd", "error sending response on channel: {}", err);
+                            continue;
+                        }
+                    }
+                }
             }
         });
 
@@ -81,28 +95,81 @@ mod imp {
 
             let (greetd_sender, greetd_receiver) = run_greetd();
 
+            self.greetd_sender.set(greetd_sender.clone()).unwrap();
+            self.greetd_receiver.set(greetd_receiver.clone()).unwrap();
+
             self.user_session_page.get().unwrap()
                 .connect_closure("login", false, closure_local!(@weak-allow-none self as this => move |_: UserSessionPage, username: String, session: SessionObject| {
-                let this = if let Some(this) = this { this } else {
-                    return;
-                };
+                    let this = if let Some(this) = this { this } else {
+                        return;
+                    };
 
-                this.obj().upcast_ref::<Widget>().set_sensitive(false);
+                    this.obj().upcast_ref::<Widget>().set_sensitive(false);
 
-                glib::spawn_future_local(clone!(@strong greetd_sender, @strong greetd_receiver => async move {
-                    greetd_sender.send(Request::CreateSession { username }).await.unwrap();
-                    let resp = greetd_receiver.recv().await.unwrap();
+                    glib::spawn_future_local(clone!(@strong greetd_sender, @strong greetd_receiver => async move {
+                        greetd_sender.send(Request::CreateSession { username }).await.unwrap();
+                        this.obj().upcast_ref::<Widget>().set_sensitive(true);
 
-                    this.obj().upcast_ref::<Widget>().set_sensitive(true);
-                    this.obj().upcast_ref::<phosh_dm::Lockscreen>().set_page(LockscreenPage::Unlock);
-                }));
+                        match greetd_receiver.recv().await {
+                            Ok(resp) => this.on_greetd_resp(resp),
+                            Err(err) => {
+                                // TODO: visual thing here (shake the user list view? pop a modal?)
+                                panic!("failed to create greetd session: {}", err);
+                            }
+                        }
+                    }));
             }));
         }
     }
 
+    impl Lockscreen {
+        fn on_greetd_resp(&self, resp: Response) {
+            match resp {
+                Response::AuthMessage { auth_message, auth_message_type } => {
+                    if auth_message == "Password:" {
+                        self.obj().lbl_unlock_status().unwrap().set_label("Enter Passcode");
+                    } else {
+                        self.obj().lbl_unlock_status().unwrap().set_label(&auth_message);
+                    }
+                    self.obj().entry_pin().unwrap().delete_text(0, -1);
+                    self.obj().upcast_ref::<phosh_dm::Lockscreen>().set_page(LockscreenPage::Unlock);
+                }
+                Response::Error { error_type, description } => {
+                    if let ErrorType::AuthError = error_type {
+                        self.obj().upcast_ref::<phosh_dm::Lockscreen>().shake_label();
+                        self.obj().lbl_unlock_status().unwrap().set_label(&description);
+                    }
+                }
+                r => {
+                    panic!("unhandled greetd response: {:?}", r);
+                }
+            }
+        }
+    }
+
     impl LayerSurfaceImpl for Lockscreen {}
-
     impl WidgetImpl for Lockscreen {}
+    impl LockscreenImpl for Lockscreen {
+        fn unlock_submit_cb(&self) {
+            let greetd_sender = self.greetd_sender.get().unwrap().clone();
+            let greetd_receiver = self.greetd_receiver.get().unwrap().clone();
+            glib::spawn_future_local(clone!(@strong greetd_sender, @strong greetd_receiver, @weak self as this => async move {
+                this.obj().upcast_ref::<Widget>().set_sensitive(false);
+                this.obj().lbl_unlock_status().unwrap().set_label("Checking...");
 
-    impl LockscreenImpl for Lockscreen {}
+                greetd_sender.send(Request::PostAuthMessageResponse {
+                    response: Some(this.obj().entry_pin().unwrap().text().to_string())
+                }).await.unwrap();
+
+                match greetd_receiver.recv().await {
+                    Ok(resp) => this.on_greetd_resp(resp),
+                    Err(err) => {
+                        panic!("failed to create greetd session: {}", err);
+                    }
+                }
+
+                this.obj().upcast_ref::<Widget>().set_sensitive(true);
+            }));
+        }
+    }
 }

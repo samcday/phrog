@@ -3,6 +3,7 @@ use gtk::subclass::widget::WidgetImpl;
 use crate::LayerSurface;
 
 pub trait LayerSurfaceImpl: LayerSurfaceImplExt + WidgetImpl + ObjectImpl {
+
 }
 
 mod sealed {
