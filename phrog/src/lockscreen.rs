@@ -23,23 +23,26 @@ mod imp {
     use crate::user_session_page::UserSessionPage;
     use async_channel::{Receiver, Sender};
     use greetd_ipc::codec::SyncCodec;
-    use greetd_ipc::{ErrorType, Request, Response};
-    use gtk::glib::{clone, closure_local, g_critical, g_warning, ObjectExt};
-    use gtk::prelude::*;
+    use greetd_ipc::{AuthMessageType, ErrorType, Request, Response};
+    use gtk::glib::{Cast, clone, closure_local, g_critical, g_warning, ObjectExt};
     use gtk::subclass::prelude::{ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt};
     use gtk::subclass::widget::WidgetImpl;
     use gtk::{gio, glib, Widget};
     use phosh_dm::subclass::layer_surface::LayerSurfaceImpl;
     use phosh_dm::subclass::lockscreen::LockscreenImpl;
     use phosh_dm::{LockscreenExt, LockscreenPage};
-    use std::cell::{OnceCell, RefCell};
+    use std::cell::{Cell, OnceCell, RefCell};
     use std::os::unix::net::UnixStream;
+    use std::process;
+    use anyhow::{anyhow, Context};
+    use gtk::traits::{ContainerExt, EditableExt, LabelExt, WidgetExt, EntryExt};
 
     #[derive(Default)]
     pub struct Lockscreen {
         user_session_page: OnceCell<UserSessionPage>,
         greetd_sender: OnceCell<Sender<Request>>,
         greetd_receiver: OnceCell<Receiver<Response>>,
+
     }
 
     #[glib::object_subclass]
@@ -99,50 +102,80 @@ mod imp {
             self.greetd_receiver.set(greetd_receiver.clone()).unwrap();
 
             self.user_session_page.get().unwrap()
-                .connect_closure("login", false, closure_local!(@weak-allow-none self as this => move |_: UserSessionPage, username: String, session: SessionObject| {
+                .connect_closure("login", false, closure_local!(@weak-allow-none self as this => move |_: UserSessionPage| {
                     let this = if let Some(this) = this { this } else {
                         return;
                     };
 
                     this.obj().upcast_ref::<Widget>().set_sensitive(false);
-
                     glib::spawn_future_local(clone!(@strong greetd_sender, @strong greetd_receiver => async move {
-                        greetd_sender.send(Request::CreateSession { username }).await.unwrap();
-                        this.obj().upcast_ref::<Widget>().set_sensitive(true);
-
-                        match greetd_receiver.recv().await {
-                            Ok(resp) => this.on_greetd_resp(resp),
-                            Err(err) => {
-                                // TODO: visual thing here (shake the user list view? pop a modal?)
-                                panic!("failed to create greetd session: {}", err);
-                            }
+                        if let Err(err) = this.start_login().await {
+                            // TODO: visual thing here (shake the user list view? pop a modal?)
+                            panic!("failed to create greetd session: {}", err);
                         }
+                        this.obj().upcast_ref::<Widget>().set_sensitive(true);
                     }));
             }));
         }
     }
 
     impl Lockscreen {
-        fn on_greetd_resp(&self, resp: Response) {
-            match resp {
-                Response::AuthMessage { auth_message, auth_message_type } => {
-                    if auth_message == "Password:" {
-                        self.obj().lbl_unlock_status().unwrap().set_label("Enter Passcode");
-                    } else {
-                        self.obj().lbl_unlock_status().unwrap().set_label(&auth_message);
-                    }
-                    self.obj().entry_pin().unwrap().delete_text(0, -1);
-                    self.obj().upcast_ref::<phosh_dm::Lockscreen>().set_page(LockscreenPage::Unlock);
+        async fn start_login(&self) -> anyhow::Result<()> {
+            let req = Request::CreateSession {
+                username: self.user_session_page.get().unwrap().username().unwrap(),
+            };
+
+            match self.greetd_req(req).await? {
+                Response::AuthMessage { auth_message_type, auth_message} => {
+                    self.greetd_auth_msg(auth_message_type, auth_message);
+                    Ok(())
                 }
-                Response::Error { error_type, description } => {
-                    if let ErrorType::AuthError = error_type {
-                        self.obj().upcast_ref::<phosh_dm::Lockscreen>().shake_label();
-                        self.obj().lbl_unlock_status().unwrap().set_label(&description);
-                    }
+                Response::Success => {
+                    // Some kind of PAM autologin madness? Just roll with it.
+                    self.start_session().await?;
+                    Ok(())
                 }
-                r => {
-                    panic!("unhandled greetd response: {:?}", r);
+                v => Err(anyhow!("unexpected response to start session: {:?}", v))
+            }
+        }
+
+        async fn start_session(&self) -> anyhow::Result<()> {
+            self.obj().lbl_unlock_status().unwrap().set_label("Logging in...");
+
+            let session = self.user_session_page.get().unwrap().session();
+
+            self.greetd_req(Request::StartSession {
+                cmd: vec![session.command()],
+                env: vec![
+                    format!("XDG_SESSION_TYPE={}", session.session_type()),
+                    format!("XDG_CURRENT_DESKTOP={}", session.desktop_names()),
+                    format!("XDG_SESSION_DESKTOP={}", session.id()),
+                    format!("GDMSESSION={}", session.id()),
+                ],
+            }).await.context("start session")?;
+
+            process::exit(0);
+
+            Ok(())
+        }
+
+        fn greetd_auth_msg(&self, auth_message_type: AuthMessageType, auth_message: String) {
+            if auth_message == "Password:" {
+                self.obj().lbl_unlock_status().unwrap().set_label("Enter Passcode");
+            } else {
+                self.obj().lbl_unlock_status().unwrap().set_label(&auth_message);
+            }
+            self.obj().entry_pin().unwrap().delete_text(0, -1);
+            self.obj().upcast_ref::<phosh_dm::Lockscreen>().set_page(LockscreenPage::Unlock);
+        }
+
+        async fn greetd_req(&self, req: Request) -> anyhow::Result<Response> {
+            self.greetd_sender.get().unwrap().send(req).await.context("send greetd request")?;
+            match self.greetd_receiver.get().unwrap().recv().await.context("receive greetd response")? {
+                Response::Error { error_type: ErrorType::Error, description } => {
+                    Err(anyhow!("greetd error: {}", description))
                 }
+                resp => Ok(resp)
             }
         }
     }
@@ -151,24 +184,39 @@ mod imp {
     impl WidgetImpl for Lockscreen {}
     impl LockscreenImpl for Lockscreen {
         fn unlock_submit_cb(&self) {
-            let greetd_sender = self.greetd_sender.get().unwrap().clone();
-            let greetd_receiver = self.greetd_receiver.get().unwrap().clone();
-            glib::spawn_future_local(clone!(@strong greetd_sender, @strong greetd_receiver, @weak self as this => async move {
+            glib::spawn_future_local(clone!(@weak self as this => async move {
                 this.obj().upcast_ref::<Widget>().set_sensitive(false);
                 this.obj().lbl_unlock_status().unwrap().set_label("Checking...");
 
-                greetd_sender.send(Request::PostAuthMessageResponse {
+                let resp = this.greetd_req(Request::PostAuthMessageResponse {
                     response: Some(this.obj().entry_pin().unwrap().text().to_string())
-                }).await.unwrap();
+                }).await;
 
-                match greetd_receiver.recv().await {
-                    Ok(resp) => this.on_greetd_resp(resp),
-                    Err(err) => {
-                        panic!("failed to create greetd session: {}", err);
-                    }
+                if let Err(err) = resp {
+                    // TODO: what to do here?
+                    panic!("greetd error: {:?}", err);
                 }
 
-                this.obj().upcast_ref::<Widget>().set_sensitive(true);
+                match resp.unwrap() {
+                    Response::AuthMessage { auth_message_type, auth_message} => {
+                        this.greetd_auth_msg(auth_message_type, auth_message);
+                        this.obj().upcast_ref::<Widget>().set_sensitive(true);
+                    }
+                    Response::Error { error_type: ErrorType::AuthError, description } => {
+                        this.obj().lbl_unlock_status().unwrap().set_label(&description);
+                        // shake_label will re-enable self when finished
+                        this.obj().upcast_ref::<phosh_dm::Lockscreen>().shake_label();
+                        glib::timeout_future_seconds(1).await;
+
+                        if let Err(err) = this.start_login().await {
+                            // TODO: what to do here?
+                            panic!("failed to restart greetd session: {:?}", err);
+                        }
+                    }
+                    Response::Success => this.start_session().await.unwrap(),
+                    v => panic!("unexpected greetd response: {:?}", v)
+                };
+
             }));
         }
     }

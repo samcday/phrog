@@ -1,6 +1,8 @@
 [workspace]
 members = [
+    "fakegreet",
     "phosh-dm",
-    "phosh-dm-sys", "phrog",
+    "phosh-dm-sys",
+    "phrog",
 ]
 resolver = "2"

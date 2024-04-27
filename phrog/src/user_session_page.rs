@@ -1,5 +1,13 @@
 use glib::Object;
 use gtk::glib;
+use gtk::glib::{Cast, CastNone};
+use gtk::prelude::ListModelExt;
+use gtk::subclass::prelude::ObjectSubclassIsExt;
+use gtk::traits::ListBoxExt;
+use libhandy::ActionRow;
+use libhandy::prelude::ActionRowExt;
+use libhandy::traits::ComboRowExt;
+use crate::session_object::SessionObject;
 
 glib::wrapper! {
     pub struct UserSessionPage(ObjectSubclass<imp::UserSessionPage>)
@@ -10,6 +18,18 @@ impl UserSessionPage {
     pub fn new() -> Self {
         Object::builder().build()
     }
+
+    pub fn session(&self) -> SessionObject {
+        let session_idx = self.imp().row_sessions.selected_index() as u32;
+        let sessions = self.imp().sessions.get().unwrap();
+        sessions.item(session_idx).clone().and_downcast::<SessionObject>().unwrap()
+    }
+
+    pub fn username(&self) -> Option<String> {
+        self.imp().box_users.selected_row()
+            .and_then(|row| row.downcast_ref::<ActionRow>().unwrap().subtitle())
+            .and_then(|str| Some(str.to_string()))
+    }
 }
 
 mod imp {
@@ -18,7 +38,7 @@ mod imp {
     use glib::subclass::InitializingObject;
     use gtk::gio::ListStore;
     use gtk::glib::subclass::Signal;
-    use gtk::glib::{clone, Properties};
+    use gtk::glib::clone;
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
     use gtk::{glib, CompositeTemplate, ListBox};
@@ -29,7 +49,6 @@ mod imp {
 
     #[derive(CompositeTemplate, Default)]
     #[template(resource = "/com/samcday/phrog/lockscreen-user-session.ui")]
-    // #[properties(wrapper_type = super::UserSessionPage)]
     pub struct UserSessionPage {
         #[template_child]
         pub box_users: TemplateChild<ListBox>,
@@ -37,7 +56,7 @@ mod imp {
         #[template_child]
         pub row_sessions: TemplateChild<libhandy::ComboRow>,
 
-        sessions: OnceCell<ListStore>,
+        pub sessions: OnceCell<ListStore>,
     }
 
     #[glib::object_subclass]
@@ -55,7 +74,6 @@ mod imp {
         }
     }
 
-    // #[glib::derived_properties]
     impl ObjectImpl for UserSessionPage {
         fn constructed(&self) {
             self.parent_constructed();
@@ -72,12 +90,8 @@ mod imp {
             self.box_users.show_all();
 
             self.box_users.connect_row_activated(clone!(@weak self as this => move |_, row| {
-            let username = row.downcast_ref::<ActionRow>().unwrap().subtitle().unwrap();
-            let session_idx = this.row_sessions.selected_index() as u32;
-            let sessions = this.sessions.get().unwrap();
-            let session = sessions.item(session_idx).clone().and_downcast::<SessionObject>().unwrap();
-            this.obj().emit_by_name::<()>("login", &[&username, &session]);
-        }));
+                this.obj().emit_by_name::<()>("login", &[]);
+            }));
 
             self.sessions
                 .set(ListStore::new::<SessionObject>())
@@ -99,7 +113,6 @@ mod imp {
             static SIGNALS: OnceLock<Vec<Signal>> = OnceLock::new();
             SIGNALS.get_or_init(|| {
                 vec![Signal::builder("login")
-                    .param_types([String::static_type(), SessionObject::static_type()])
                     .build()]
             })
         }

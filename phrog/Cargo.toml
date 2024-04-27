@@ -8,6 +8,7 @@ glob = "0.3.1"
 greetd_ipc = { version = "0.10.0", features = ["sync-codec"] }
 uzers = { git = "https://github.com/rustadopt/uzers-rs", rev = "8fb29db" }
 async-channel = "2.2.1"
+anyhow = "1.0.82"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

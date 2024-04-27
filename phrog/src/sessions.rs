@@ -26,21 +26,22 @@ fn session_list(path: &str, session_type: &str, sessions: &mut HashMap<String, S
     }
     .flatten()
     {
+        let id = f.file_stem().unwrap().to_string_lossy().to_string();
+        if sessions.contains_key(&id) {
+            continue;
+        }
+
         let info = if let Some(info) = DesktopAppInfo::from_filename(&f) {
             info
         } else {
             g_warning!("session", "Unable to parse session file {:?}", f);
             continue;
         };
-        // Use the Name= entry as key for de-duplication.
-        let name = info.name();
-        if sessions.contains_key(name.as_str()) {
-            continue;
-        }
         sessions.insert(
-            name.to_string(),
+            id.clone(),
             SessionObject::new(
-                &name,
+                &id,
+                &info.name().to_string(),
                 session_type,
                 &info
                     .commandline()

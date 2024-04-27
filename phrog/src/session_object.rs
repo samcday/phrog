@@ -6,8 +6,9 @@ glib::wrapper! {
 }
 
 impl SessionObject {
-    pub fn new(name: &str, session_type: &str, command: &str, desktop_names: &str) -> Self {
+    pub fn new(id: &str, name: &str, session_type: &str, command: &str, desktop_names: &str) -> Self {
         Object::builder()
+            .property("id", id.to_string())
             .property("name", name.to_string())
             .property("session-type", session_type.to_string())
             .property("command", command.to_string())
@@ -26,6 +27,8 @@ mod imp {
     #[derive(Properties, Default)]
     #[properties(wrapper_type = super::SessionObject)]
     pub struct SessionObject {
+        #[property(get, set)]
+        id: OnceCell<String>,
         #[property(get, set)]
         name: OnceCell<String>,
         #[property(get, set)]
