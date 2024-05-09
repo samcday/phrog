@@ -212,6 +212,7 @@ const RUST_LAYOUTS: &[(&str, Layout)] = &[
     ("PhoshLockscreen", Layout {size: size_of::<PhoshLockscreen>(), alignment: align_of::<PhoshLockscreen>()}),
     ("PhoshLockscreenClass", Layout {size: size_of::<PhoshLockscreenClass>(), alignment: align_of::<PhoshLockscreenClass>()}),
     ("PhoshLockscreenPage", Layout {size: size_of::<PhoshLockscreenPage>(), alignment: align_of::<PhoshLockscreenPage>()}),
+    ("PhoshShell", Layout {size: size_of::<PhoshShell>(), alignment: align_of::<PhoshShell>()}),
     ("PhoshShellClass", Layout {size: size_of::<PhoshShellClass>(), alignment: align_of::<PhoshShellClass>()}),
 ];
 

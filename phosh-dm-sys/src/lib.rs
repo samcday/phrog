@@ -103,15 +103,16 @@ impl ::std::fmt::Debug for PhoshLockscreen {
     }
 }
 
+#[derive(Copy, Clone)]
 #[repr(C)]
 pub struct PhoshShell {
-    _data: [u8; 0],
-    _marker: core::marker::PhantomData<(*mut u8, core::marker::PhantomPinned)>,
+    pub parent_instance: gobject::GObject,
 }
 
 impl ::std::fmt::Debug for PhoshShell {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.debug_struct(&format!("PhoshShell @ {self:p}"))
+         .field("parent_instance", &self.parent_instance)
          .finish()
     }
 }
@@ -137,6 +138,8 @@ extern "C" {
     //=========================================================================
     pub fn phosh_shell_get_type() -> GType;
     pub fn phosh_shell_get_default() -> *mut PhoshShell;
+    pub fn phosh_shell_get_locked(self_: *mut PhoshShell) -> gboolean;
+    pub fn phosh_shell_set_default(self_: *mut PhoshShell);
     pub fn phosh_shell_set_locked(self_: *mut PhoshShell, locked: gboolean);
 
 }

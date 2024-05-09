@@ -13,6 +13,7 @@ int main() {
     printf("%s;%zu;%zu\n", "PhoshLockscreen", sizeof(PhoshLockscreen), alignof(PhoshLockscreen));
     printf("%s;%zu;%zu\n", "PhoshLockscreenClass", sizeof(PhoshLockscreenClass), alignof(PhoshLockscreenClass));
     printf("%s;%zu;%zu\n", "PhoshLockscreenPage", sizeof(PhoshLockscreenPage), alignof(PhoshLockscreenPage));
+    printf("%s;%zu;%zu\n", "PhoshShell", sizeof(PhoshShell), alignof(PhoshShell));
     printf("%s;%zu;%zu\n", "PhoshShellClass", sizeof(PhoshShellClass), alignof(PhoshShellClass));
     return 0;
 }

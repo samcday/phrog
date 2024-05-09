@@ -21,14 +21,14 @@ and/or use gtk-doc annotations.  -->
            glib:type-name="PhoshLayerSurface"
            glib:get-type="phosh_layer_surface_get_type"
            glib:type-struct="LayerSurfaceClass">
-      <source-position filename="src/layersurface.h" line="31"/>
+      <source-position filename="src/core-layersurface.h" line="29"/>
       <implements name="Atk.ImplementorIface"/>
       <implements name="Gtk.Buildable"/>
       <virtual-method name="configured">
         <doc xml:space="preserve"
-             filename="src/layersurface.h"
-             line="22">invoked when layer surface is configured</doc>
-        <source-position filename="src/layersurface.h" line="30"/>
+             filename="src/core-layersurface.h"
+             line="20">invoked when layer surface is configured</doc>
+        <source-position filename="src/core-layersurface.h" line="28"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
         </return-value>
@@ -129,19 +129,19 @@ and/or use gtk-doc annotations.  -->
     <record name="LayerSurfaceClass"
             c:type="PhoshLayerSurfaceClass"
             glib:is-gtype-struct-for="LayerSurface">
-      <source-position filename="src/layersurface.h" line="31"/>
+      <source-position filename="src/core-layersurface.h" line="29"/>
       <field name="parent_class">
         <doc xml:space="preserve"
-             filename="src/layersurface.h"
-             line="21">The parent class</doc>
+             filename="src/core-layersurface.h"
+             line="19">The parent class</doc>
         <type name="Gtk.WindowClass" c:type="GtkWindowClass"/>
       </field>
       <field name="configured">
         <doc xml:space="preserve"
-             filename="src/layersurface.h"
-             line="22">invoked when layer surface is configured</doc>
+             filename="src/core-layersurface.h"
+             line="20">invoked when layer surface is configured</doc>
         <callback name="configured">
-          <source-position filename="src/layersurface.h" line="30"/>
+          <source-position filename="src/core-layersurface.h" line="28"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -292,36 +292,51 @@ AcceleratorActivated events over DBus</doc>
            glib:type-struct="ShellClass">
       <doc xml:space="preserve"
            filename="src/shell.c"
-           line="96">The shell singleton
+           line="97">The shell singleton
 
 #PhoshShell is responsible for instantiating the GUI
 parts of the shell#PhoshTopPanel, #PhoshHome,… and the managers that
 interface with DBus #PhoshMonitorManager, #PhoshFeedbackManager, …
 and coordinates between them.</doc>
-      <source-position filename="src/plugin-shell.h" line="18"/>
+      <source-position filename="src/core-shell.h" line="19"/>
       <implements name="Gio.ActionGroup"/>
       <implements name="Gio.ActionMap"/>
       <function name="get_default" c:identifier="phosh_shell_get_default">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="2040">Get the shell singleton</doc>
-        <source-position filename="src/plugin-shell.h" line="20"/>
+             line="2057">Get the shell singleton</doc>
+        <source-position filename="src/core-shell.h" line="22"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="2045">The shell singleton</doc>
+               line="2062">The shell singleton</doc>
           <type name="Shell" c:type="PhoshShell*"/>
         </return-value>
       </function>
-      <method name="set_locked"
-              c:identifier="phosh_shell_set_locked"
-              glib:set-property="locked">
+      <method name="get_locked"
+              c:identifier="phosh_shell_get_locked"
+              glib:get-property="locked">
+        <source-position filename="src/core-shell.h" line="24"/>
+        <return-value transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="src/shell.c"
+               line="2332">%TRUE if the shell is currently locked, otherwise %FALSE.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <doc xml:space="preserve"
+                 filename="src/shell.c"
+                 line="2330">The #PhoshShell singleton</doc>
+            <type name="Shell" c:type="PhoshShell*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="set_default" c:identifier="phosh_shell_set_default">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="2315">Lock the shell. We proxy to lockscreen-manager to avoid
-that other parts of the shell need to care about this
-abstraction.</doc>
-        <source-position filename="src/plugin-shell.h" line="28"/>
+             line="2074">Set the PhoshShell singleton that is returned by `phosh_shell_get_default()`</doc>
+        <source-position filename="src/core-shell.h" line="21"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
         </return-value>
@@ -329,13 +344,34 @@ abstraction.</doc>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2317">The #PhoshShell singleton</doc>
+                 line="2076">The shell to use</doc>
+            <type name="Shell" c:type="PhoshShell*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="set_locked"
+              c:identifier="phosh_shell_set_locked"
+              glib:set-property="locked">
+        <doc xml:space="preserve"
+             filename="src/shell.c"
+             line="2345">Lock the shell. We proxy to lockscreen-manager to avoid
+that other parts of the shell need to care about this
+abstraction.</doc>
+        <source-position filename="src/core-shell.h" line="23"/>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <doc xml:space="preserve"
+                 filename="src/shell.c"
+                 line="2347">The #PhoshShell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
           <parameter name="locked" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2318">%TRUE to lock the shell</doc>
+                 line="2348">%TRUE to lock the shell</doc>
             <type name="gboolean" c:type="gboolean"/>
           </parameter>
         </parameters>
@@ -345,7 +381,7 @@ abstraction.</doc>
                 transfer-ownership="none">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1187">The built in monitor. This is a hardware property and hence can
+             line="1202">The built in monitor. This is a hardware property and hence can
 only be read. It can be %NULL when not present or disabled.</doc>
         <type/>
       </property>
@@ -355,7 +391,7 @@ only be read. It can be %NULL when not present or disabled.</doc>
                 default-value="FALSE">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1176">Whether the device is currently docked. This mirrors the property
+             line="1191">Whether the device is currently docked. This mirrors the property
 from #PhoshDockedManager for easier access.</doc>
         <type name="gboolean" c:type="gboolean"/>
       </property>
@@ -363,10 +399,11 @@ from #PhoshDockedManager for easier access.</doc>
                 writable="1"
                 transfer-ownership="none"
                 setter="set_locked"
+                getter="get_locked"
                 default-value="FALSE">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1166">Whether the screen is currently locked. This mirrors the property
+             line="1181">Whether the screen is currently locked. This mirrors the property
 from #PhoshLockscreenManager for easier access.</doc>
         <type name="gboolean" c:type="gboolean"/>
       </property>
@@ -376,7 +413,7 @@ from #PhoshLockscreenManager for easier access.</doc>
                 transfer-ownership="none">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1199">The primary monitor that has the panels, lock screen etc.</doc>
+             line="1214">The primary monitor that has the panels, lock screen etc.</doc>
         <type/>
       </property>
       <property name="shell-state"
@@ -385,6 +422,9 @@ from #PhoshLockscreenManager for easier access.</doc>
                 default-value="PHOSH_STATE_NONE">
         <type/>
       </property>
+      <field name="parent_instance">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
       <glib:signal name="ready" when="last">
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
@@ -394,7 +434,7 @@ from #PhoshLockscreenManager for easier access.</doc>
     <record name="ShellClass"
             c:type="PhoshShellClass"
             glib:is-gtype-struct-for="Shell">
-      <source-position filename="src/plugin-shell.h" line="18"/>
+      <source-position filename="src/core-shell.h" line="19"/>
       <field name="parent_class">
         <type name="GObject.ObjectClass" c:type="GObjectClass"/>
       </field>

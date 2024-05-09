@@ -18,4 +18,5 @@ pub use self::enums::LockscreenPage;
 pub(crate) mod traits {
     pub use super::layer_surface::LayerSurfaceExt;
     pub use super::lockscreen::LockscreenExt;
+    pub use super::shell::ShellExt;
 }
