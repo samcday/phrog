@@ -64,12 +64,32 @@ impl ::std::fmt::Debug for PhoshLockscreenClass {
 #[repr(C)]
 pub struct PhoshShellClass {
     pub parent_class: gobject::GObjectClass,
+    pub get_lockscreen_type: Option<unsafe extern "C" fn(*mut PhoshShell) -> GType>,
 }
 
 impl ::std::fmt::Debug for PhoshShellClass {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.debug_struct(&format!("PhoshShellClass @ {self:p}"))
          .field("parent_class", &self.parent_class)
+         .field("get_lockscreen_type", &self.get_lockscreen_type)
+         .finish()
+    }
+}
+
+#[derive(Copy, Clone)]
+#[repr(C)]
+pub struct PhoshWallClockClass {
+    pub parent_class: gobject::GObjectClass,
+    pub get_clock: Option<unsafe extern "C" fn(*mut PhoshWallClock, gboolean) -> *const c_char>,
+    pub get_time_t: Option<unsafe extern "C" fn(*mut PhoshWallClock) -> i64>,
+}
+
+impl ::std::fmt::Debug for PhoshWallClockClass {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        f.debug_struct(&format!("PhoshWallClockClass @ {self:p}"))
+         .field("parent_class", &self.parent_class)
+         .field("get_clock", &self.get_clock)
+         .field("get_time_t", &self.get_time_t)
          .finish()
     }
 }
@@ -117,6 +137,20 @@ impl ::std::fmt::Debug for PhoshShell {
     }
 }
 
+#[derive(Copy, Clone)]
+#[repr(C)]
+pub struct PhoshWallClock {
+    pub parent_instance: gobject::GObject,
+}
+
+impl ::std::fmt::Debug for PhoshWallClock {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        f.debug_struct(&format!("PhoshWallClock @ {self:p}"))
+         .field("parent_instance", &self.parent_instance)
+         .finish()
+    }
+}
+
 #[link(name = "phosh")]
 extern "C" {
 
@@ -139,7 +173,16 @@ extern "C" {
     pub fn phosh_shell_get_type() -> GType;
     pub fn phosh_shell_get_default() -> *mut PhoshShell;
     pub fn phosh_shell_get_locked(self_: *mut PhoshShell) -> gboolean;
+    pub fn phosh_shell_get_lockscreen_type(self_: *mut PhoshShell) -> GType;
     pub fn phosh_shell_set_default(self_: *mut PhoshShell);
     pub fn phosh_shell_set_locked(self_: *mut PhoshShell, locked: gboolean);
+
+    //=========================================================================
+    // PhoshWallClock
+    //=========================================================================
+    pub fn phosh_wall_clock_get_type() -> GType;
+    pub fn phosh_wall_clock_new() -> *mut PhoshWallClock;
+    pub fn phosh_wall_clock_get_default() -> *mut PhoshWallClock;
+    pub fn phosh_wall_clock_set_default(self_: *mut PhoshWallClock);
 
 }

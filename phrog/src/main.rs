@@ -8,7 +8,7 @@ mod users;
 use crate::lockscreen::Lockscreen;
 use gtk::glib::StaticType;
 use std::ffi::{c_char, c_int, CString};
-use phosh_dm::ShellExt;
+use phosh_dm::{ShellExt, WallClock, WallClockExt};
 use crate::shell::Shell;
 
 extern "C" {
@@ -28,6 +28,8 @@ fn main() {
     // phosh_lockscreen_new
     let _ = Lockscreen::static_type();
 
+    let wall_clock = WallClock::new();
+    wall_clock.set_default();
 
     unsafe {
         let loglevel =

@@ -15,5 +15,7 @@ int main() {
     printf("%s;%zu;%zu\n", "PhoshLockscreenPage", sizeof(PhoshLockscreenPage), alignof(PhoshLockscreenPage));
     printf("%s;%zu;%zu\n", "PhoshShell", sizeof(PhoshShell), alignof(PhoshShell));
     printf("%s;%zu;%zu\n", "PhoshShellClass", sizeof(PhoshShellClass), alignof(PhoshShellClass));
+    printf("%s;%zu;%zu\n", "PhoshWallClock", sizeof(PhoshWallClock), alignof(PhoshWallClock));
+    printf("%s;%zu;%zu\n", "PhoshWallClockClass", sizeof(PhoshWallClockClass), alignof(PhoshWallClockClass));
     return 0;
 }

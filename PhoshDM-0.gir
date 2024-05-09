@@ -298,36 +298,59 @@ AcceleratorActivated events over DBus</doc>
 parts of the shell#PhoshTopPanel, #PhoshHome,… and the managers that
 interface with DBus #PhoshMonitorManager, #PhoshFeedbackManager, …
 and coordinates between them.</doc>
-      <source-position filename="src/core-shell.h" line="19"/>
+      <source-position filename="src/core-shell.h" line="20"/>
       <implements name="Gio.ActionGroup"/>
       <implements name="Gio.ActionMap"/>
       <function name="get_default" c:identifier="phosh_shell_get_default">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="2057">Get the shell singleton</doc>
-        <source-position filename="src/core-shell.h" line="22"/>
+             line="2066">Get the shell singleton</doc>
+        <source-position filename="src/core-shell.h" line="23"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="2062">The shell singleton</doc>
+               line="2071">The shell singleton</doc>
           <type name="Shell" c:type="PhoshShell*"/>
         </return-value>
       </function>
+      <virtual-method name="get_lockscreen_type" invoker="get_lockscreen_type">
+        <source-position filename="src/core-shell.h" line="19"/>
+        <return-value transfer-ownership="none">
+          <type name="GType" c:type="GType"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Shell" c:type="PhoshShell*"/>
+          </instance-parameter>
+        </parameters>
+      </virtual-method>
       <method name="get_locked"
               c:identifier="phosh_shell_get_locked"
               glib:get-property="locked">
-        <source-position filename="src/core-shell.h" line="24"/>
+        <source-position filename="src/core-shell.h" line="25"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="2332">%TRUE if the shell is currently locked, otherwise %FALSE.</doc>
+               line="2341">%TRUE if the shell is currently locked, otherwise %FALSE.</doc>
           <type name="gboolean" c:type="gboolean"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2330">The #PhoshShell singleton</doc>
+                 line="2339">The #PhoshShell singleton</doc>
+            <type name="Shell" c:type="PhoshShell*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="get_lockscreen_type"
+              c:identifier="phosh_shell_get_lockscreen_type">
+        <source-position filename="src/core-shell.h" line="26"/>
+        <return-value transfer-ownership="none">
+          <type name="GType" c:type="GType"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -335,8 +358,8 @@ and coordinates between them.</doc>
       <method name="set_default" c:identifier="phosh_shell_set_default">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="2074">Set the PhoshShell singleton that is returned by `phosh_shell_get_default()`</doc>
-        <source-position filename="src/core-shell.h" line="21"/>
+             line="2083">Set the PhoshShell singleton that is returned by `phosh_shell_get_default()`</doc>
+        <source-position filename="src/core-shell.h" line="22"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
         </return-value>
@@ -344,7 +367,7 @@ and coordinates between them.</doc>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2076">The shell to use</doc>
+                 line="2085">The shell to use</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -354,10 +377,10 @@ and coordinates between them.</doc>
               glib:set-property="locked">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="2345">Lock the shell. We proxy to lockscreen-manager to avoid
+             line="2354">Lock the shell. We proxy to lockscreen-manager to avoid
 that other parts of the shell need to care about this
 abstraction.</doc>
-        <source-position filename="src/core-shell.h" line="23"/>
+        <source-position filename="src/core-shell.h" line="24"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
         </return-value>
@@ -365,13 +388,13 @@ abstraction.</doc>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2347">The #PhoshShell singleton</doc>
+                 line="2356">The #PhoshShell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
           <parameter name="locked" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2348">%TRUE to lock the shell</doc>
+                 line="2357">%TRUE to lock the shell</doc>
             <type name="gboolean" c:type="gboolean"/>
           </parameter>
         </parameters>
@@ -381,7 +404,7 @@ abstraction.</doc>
                 transfer-ownership="none">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1202">The built in monitor. This is a hardware property and hence can
+             line="1211">The built in monitor. This is a hardware property and hence can
 only be read. It can be %NULL when not present or disabled.</doc>
         <type/>
       </property>
@@ -391,7 +414,7 @@ only be read. It can be %NULL when not present or disabled.</doc>
                 default-value="FALSE">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1191">Whether the device is currently docked. This mirrors the property
+             line="1200">Whether the device is currently docked. This mirrors the property
 from #PhoshDockedManager for easier access.</doc>
         <type name="gboolean" c:type="gboolean"/>
       </property>
@@ -403,7 +426,7 @@ from #PhoshDockedManager for easier access.</doc>
                 default-value="FALSE">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1181">Whether the screen is currently locked. This mirrors the property
+             line="1190">Whether the screen is currently locked. This mirrors the property
 from #PhoshLockscreenManager for easier access.</doc>
         <type name="gboolean" c:type="gboolean"/>
       </property>
@@ -413,7 +436,7 @@ from #PhoshLockscreenManager for easier access.</doc>
                 transfer-ownership="none">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1214">The primary monitor that has the panels, lock screen etc.</doc>
+             line="1223">The primary monitor that has the panels, lock screen etc.</doc>
         <type/>
       </property>
       <property name="shell-state"
@@ -434,9 +457,140 @@ from #PhoshLockscreenManager for easier access.</doc>
     <record name="ShellClass"
             c:type="PhoshShellClass"
             glib:is-gtype-struct-for="Shell">
-      <source-position filename="src/core-shell.h" line="19"/>
+      <source-position filename="src/core-shell.h" line="20"/>
       <field name="parent_class">
         <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="get_lockscreen_type">
+        <callback name="get_lockscreen_type">
+          <source-position filename="src/core-shell.h" line="19"/>
+          <return-value transfer-ownership="none">
+            <type name="GType" c:type="GType"/>
+          </return-value>
+          <parameters>
+            <parameter name="self" transfer-ownership="none">
+              <type name="Shell" c:type="PhoshShell*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+    </record>
+    <class name="WallClock"
+           c:symbol-prefix="wall_clock"
+           c:type="PhoshWallClock"
+           parent="GObject.Object"
+           glib:type-name="PhoshWallClock"
+           glib:get-type="phosh_wall_clock_get_type"
+           glib:type-struct="WallClockClass">
+      <source-position filename="src/core-wall-clock.h" line="24"/>
+      <constructor name="new" c:identifier="phosh_wall_clock_new">
+        <source-position filename="src/core-wall-clock.h" line="27"/>
+        <return-value transfer-ownership="full">
+          <type name="WallClock" c:type="PhoshWallClock*"/>
+        </return-value>
+      </constructor>
+      <function name="get_default" c:identifier="phosh_wall_clock_get_default">
+        <doc xml:space="preserve"
+             filename="src/wall-clock.c"
+             line="165">Get the wall clock singleton</doc>
+        <source-position filename="src/core-wall-clock.h" line="29"/>
+        <return-value transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="src/wall-clock.c"
+               line="170">The wall clock singleton</doc>
+          <type name="WallClock" c:type="PhoshWallClock*"/>
+        </return-value>
+      </function>
+      <virtual-method name="get_clock">
+        <source-position filename="src/core-wall-clock.h" line="22"/>
+        <return-value transfer-ownership="none">
+          <type name="utf8" c:type="const char*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="WallClock" c:type="PhoshWallClock*"/>
+          </instance-parameter>
+          <parameter name="time_only" transfer-ownership="none">
+            <type name="gboolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="get_time_t">
+        <source-position filename="src/core-wall-clock.h" line="23"/>
+        <return-value transfer-ownership="none">
+          <type name="gint64" c:type="gint64"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="WallClock" c:type="PhoshWallClock*"/>
+          </instance-parameter>
+        </parameters>
+      </virtual-method>
+      <method name="set_default" c:identifier="phosh_wall_clock_set_default">
+        <doc xml:space="preserve"
+             filename="src/wall-clock.c"
+             line="147">Set the wall clock singleton. This sets the singleton returned by
+`phosh_wall_clock_get_default()`.</doc>
+        <source-position filename="src/core-wall-clock.h" line="28"/>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <doc xml:space="preserve"
+                 filename="src/wall-clock.c"
+                 line="149">The clock to use</doc>
+            <type name="WallClock" c:type="PhoshWallClock*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <property name="date-time"
+                transfer-ownership="none"
+                default-value="NULL">
+        <type name="utf8" c:type="gchar*"/>
+      </property>
+      <property name="time" transfer-ownership="none" default-value="NULL">
+        <type name="utf8" c:type="gchar*"/>
+      </property>
+      <field name="parent_instance">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+    </class>
+    <record name="WallClockClass"
+            c:type="PhoshWallClockClass"
+            glib:is-gtype-struct-for="WallClock">
+      <source-position filename="src/core-wall-clock.h" line="24"/>
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="get_clock">
+        <callback name="get_clock">
+          <source-position filename="src/core-wall-clock.h" line="22"/>
+          <return-value transfer-ownership="none">
+            <type name="utf8" c:type="const char*"/>
+          </return-value>
+          <parameters>
+            <parameter name="self" transfer-ownership="none">
+              <type name="WallClock" c:type="PhoshWallClock*"/>
+            </parameter>
+            <parameter name="time_only" transfer-ownership="none">
+              <type name="gboolean" c:type="gboolean"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_time_t">
+        <callback name="get_time_t">
+          <source-position filename="src/core-wall-clock.h" line="23"/>
+          <return-value transfer-ownership="none">
+            <type name="gint64" c:type="gint64"/>
+          </return-value>
+          <parameters>
+            <parameter name="self" transfer-ownership="none">
+              <type name="WallClock" c:type="PhoshWallClock*"/>
+            </parameter>
+          </parameters>
+        </callback>
       </field>
     </record>
   </namespace>

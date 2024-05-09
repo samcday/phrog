@@ -43,6 +43,14 @@ pub trait ShellExt: IsA<Shell> + sealed::Sealed + 'static {
         }
     }
 
+    #[doc(alias = "phosh_shell_get_lockscreen_type")]
+    #[doc(alias = "get_lockscreen_type")]
+    fn lockscreen_type(&self) -> glib::types::Type {
+        unsafe {
+            from_glib(ffi::phosh_shell_get_lockscreen_type(self.as_ref().to_glib_none().0))
+        }
+    }
+
     #[doc(alias = "phosh_shell_set_default")]
     fn set_default(&self) {
         unsafe {

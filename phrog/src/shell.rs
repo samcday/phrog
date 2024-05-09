@@ -20,8 +20,11 @@ impl Default for Shell {
 
 mod imp {
     use gtk::glib;
+    use gtk::glib::Type;
+    use gtk::prelude::StaticType;
     use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass};
     use phosh_dm::subclass::shell::ShellImpl;
+    use crate::lockscreen::Lockscreen;
 
     #[derive(Default)]
     pub struct Shell;
@@ -38,5 +41,8 @@ mod imp {
     }
 
     impl ShellImpl for Shell {
+        fn get_lockscreen_type(&self) -> Type {
+            Lockscreen::static_type()
+        }
     }
 }

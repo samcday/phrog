@@ -14,6 +14,7 @@ generate = [
     "PhoshDM.Lockscreen",
     "PhoshDM.LockscreenPage",
     "PhoshDM.Shell",
+    "PhoshDM.WallClock",
 ]
 
 manual = [
