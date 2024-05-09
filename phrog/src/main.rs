@@ -1,4 +1,5 @@
 mod lockscreen;
+mod shell;
 mod session_object;
 mod sessions;
 mod user_session_page;
@@ -7,6 +8,8 @@ mod users;
 use crate::lockscreen::Lockscreen;
 use gtk::glib::StaticType;
 use std::ffi::{c_char, c_int, CString};
+use phosh_dm::ShellExt;
+use crate::shell::Shell;
 
 extern "C" {
     fn phosh_log_set_log_domains(domains: *const c_char);
@@ -25,6 +28,7 @@ fn main() {
     // phosh_lockscreen_new
     let _ = Lockscreen::static_type();
 
+
     unsafe {
         let loglevel =
             CString::new(std::env::var("G_MESSAGES_DEBUG").unwrap_or("".to_string())).unwrap();
@@ -33,7 +37,8 @@ fn main() {
         cui_init(1);
     }
 
-    let shell = phosh_dm::Shell::default().unwrap();
+    let shell = Shell::new();
+    shell.set_default();
 
     shell.connect_ready(|_| {
         println!("Shell is ready");
