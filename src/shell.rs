@@ -3,7 +3,7 @@ use gtk::glib;
 
 glib::wrapper! {
     pub struct Shell(ObjectSubclass<imp::Shell>)
-        @extends phosh_dm::Shell;
+        @extends libphosh::Shell;
 }
 
 impl Shell {
@@ -23,7 +23,7 @@ mod imp {
     use gtk::glib::Type;
     use gtk::prelude::StaticType;
     use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass};
-    use phosh_dm::subclass::shell::ShellImpl;
+    use libphosh::subclass::shell::ShellImpl;
     use crate::lockscreen::Lockscreen;
 
     #[derive(Default)]
@@ -33,7 +33,7 @@ mod imp {
     impl ObjectSubclass for Shell {
         const NAME: &'static str = "PhrogShell";
         type Type = super::Shell;
-        type ParentType = phosh_dm::Shell;
+        type ParentType = libphosh::Shell;
     }
 
     impl ObjectImpl for Shell {

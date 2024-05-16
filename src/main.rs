@@ -8,11 +8,11 @@ mod users;
 use crate::lockscreen::Lockscreen;
 use gtk::glib::StaticType;
 use std::ffi::{c_char, c_int, CString};
-use phosh_dm::{ShellExt, WallClock, WallClockExt};
+use libphosh::WallClock;
+use libphosh::prelude::*;
 use crate::shell::Shell;
 
 extern "C" {
-    fn phosh_log_set_log_domains(domains: *const c_char);
     fn hdy_init();
     fn cui_init(v: c_int);
 }
@@ -34,9 +34,9 @@ fn main() {
     unsafe {
         let loglevel =
             CString::new(std::env::var("G_MESSAGES_DEBUG").unwrap_or("".to_string())).unwrap();
-        phosh_log_set_log_domains(loglevel.as_ptr());
+        // phosh_log_set_log_domains(loglevel.as_ptr());
         hdy_init();
-        cui_init(1);
+        // cui_init(1);
     }
 
     let shell = Shell::new();

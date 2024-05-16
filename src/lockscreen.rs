@@ -3,7 +3,7 @@ use gtk::glib;
 
 glib::wrapper! {
     pub struct Lockscreen(ObjectSubclass<imp::Lockscreen>)
-        @extends phosh_dm::Lockscreen, gtk::Widget;
+        @extends libphosh::Lockscreen, gtk::Widget;
 }
 
 impl Lockscreen {
@@ -19,7 +19,6 @@ impl Default for Lockscreen {
 }
 
 mod imp {
-    use crate::session_object::SessionObject;
     use crate::user_session_page::UserSessionPage;
     use async_channel::{Receiver, Sender};
     use greetd_ipc::codec::SyncCodec;
@@ -28,14 +27,14 @@ mod imp {
     use gtk::subclass::prelude::{ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt};
     use gtk::subclass::widget::WidgetImpl;
     use gtk::{gio, glib, Widget};
-    use phosh_dm::subclass::layer_surface::LayerSurfaceImpl;
-    use phosh_dm::subclass::lockscreen::LockscreenImpl;
-    use phosh_dm::{LockscreenExt, LockscreenPage};
+    use libphosh::subclass::lockscreen::LockscreenImpl;
+    use libphosh::prelude::*;
     use std::cell::{Cell, OnceCell, RefCell};
     use std::os::unix::net::UnixStream;
     use std::process;
     use anyhow::{anyhow, Context};
     use gtk::traits::{ContainerExt, EditableExt, LabelExt, WidgetExt, EntryExt};
+    use libphosh::LockscreenPage;
 
     #[derive(Default)]
     pub struct Lockscreen {
@@ -49,7 +48,7 @@ mod imp {
     impl ObjectSubclass for Lockscreen {
         const NAME: &'static str = "PhoshDMLockscreen";
         type Type = super::Lockscreen;
-        type ParentType = phosh_dm::Lockscreen;
+        type ParentType = libphosh::Lockscreen;
     }
 
     fn run_greetd() -> (Sender<Request>, Receiver<Response>) {
@@ -166,7 +165,7 @@ mod imp {
                 self.obj().lbl_unlock_status().unwrap().set_label(&auth_message);
             }
             self.obj().entry_pin().unwrap().delete_text(0, -1);
-            self.obj().upcast_ref::<phosh_dm::Lockscreen>().set_page(LockscreenPage::Unlock);
+            self.obj().upcast_ref::<libphosh::Lockscreen>().set_page(LockscreenPage::Unlock);
         }
 
         async fn greetd_req(&self, req: Request) -> anyhow::Result<Response> {
@@ -180,7 +179,6 @@ mod imp {
         }
     }
 
-    impl LayerSurfaceImpl for Lockscreen {}
     impl WidgetImpl for Lockscreen {}
     impl LockscreenImpl for Lockscreen {
         fn unlock_submit_cb(&self) {
@@ -205,7 +203,7 @@ mod imp {
                     Response::Error { error_type: ErrorType::AuthError, description } => {
                         this.obj().lbl_unlock_status().unwrap().set_label(&description);
                         // shake_label will re-enable self when finished
-                        this.obj().upcast_ref::<phosh_dm::Lockscreen>().shake_label();
+                        this.obj().upcast_ref::<libphosh::Lockscreen>().shake_label();
                         glib::timeout_future_seconds(1).await;
 
                         if let Err(err) = this.start_login().await {
