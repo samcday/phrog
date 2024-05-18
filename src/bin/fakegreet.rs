@@ -1,4 +1,5 @@
-mod error;
+/// This was pulled from greetd sources. It's modified to only prompt for a password,
+/// and the password is expected to be "0".
 
 use std::{cell::RefCell, env, rc::Rc, time::Duration};
 
@@ -61,10 +62,8 @@ impl Context {
             Ok(None)
         } else if s.user.is_none() {
             Ok(Some((AuthMessageType::Visible, "User:".to_string())))
-        } else if s.password.is_none() {
-            Ok(Some((AuthMessageType::Secret, "Password:".to_string())))
         } else {
-            Ok(Some((AuthMessageType::Visible, "7 + 2:".to_string())))
+            Ok(Some((AuthMessageType::Secret, "Password:".to_string())))
         }
     }
 
@@ -75,12 +74,9 @@ impl Context {
         }
         if s.user.is_none() {
             s.user = response;
-        } else if s.password.is_none() {
-            s.password = response;
         } else {
             if s.user != Some("user".to_string())
-                || s.password != Some("0".to_string())
-                || response != Some("9".to_string())
+                || response != Some("0".to_string())
             {
                 sleep(Duration::from_millis(2000)).await;
                 return Err(Error::AuthError("nope".to_string()));
@@ -94,7 +90,6 @@ impl Context {
         if !self.inner.borrow().ok {
             return Err(Error::Error("not yet dammit".to_string()));
         }
-        sleep(Duration::from_millis(5000)).await;
         Ok(())
     }
 
@@ -192,5 +187,64 @@ async fn main() {
         .await;
     if let Err(e) = res {
         eprintln!("error: {}", e);
+    }
+}
+
+mod error {
+    use std::convert::From;
+
+    use serde::{Deserialize, Serialize};
+    use thiserror::Error as ThisError;
+
+    #[derive(Debug, ThisError, Clone, Deserialize, Serialize)]
+    pub enum Error {
+        #[error("{0}")]
+        Error(String),
+
+        #[error("authentication error: {0}")]
+        AuthError(String),
+
+        #[error("protocol error: {0}")]
+        ProtocolError(String),
+
+        #[error("i/o error: {0}")]
+        Io(String),
+
+        #[error("configuration error: {0}")]
+        ConfigError(String),
+    }
+
+    impl From<Box<dyn std::error::Error>> for Error {
+        fn from(error: Box<dyn std::error::Error>) -> Self {
+            Error::Error(format!("{}", error))
+        }
+    }
+
+    impl From<std::io::Error> for Error {
+        fn from(error: std::io::Error) -> Self {
+            Error::Io(format!("{}", error))
+        }
+    }
+
+    impl From<greetd_ipc::codec::Error> for Error {
+        fn from(error: greetd_ipc::codec::Error) -> Self {
+            match error {
+                greetd_ipc::codec::Error::Serialization(s) => Error::ProtocolError(s),
+                greetd_ipc::codec::Error::Io(s) => Error::Io(s),
+                greetd_ipc::codec::Error::Eof => Error::Io("EOF".to_string()),
+            }
+        }
+    }
+
+    impl From<String> for Error {
+        fn from(error: String) -> Self {
+            Error::Error(error)
+        }
+    }
+
+    impl From<&str> for Error {
+        fn from(error: &str) -> Self {
+            Error::Error(error.to_string())
+        }
     }
 }

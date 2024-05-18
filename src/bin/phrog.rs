@@ -1,16 +1,10 @@
-mod lockscreen;
-mod shell;
-mod session_object;
-mod sessions;
-mod user_session_page;
-mod users;
 
-use crate::lockscreen::Lockscreen;
+use phrog::lockscreen::Lockscreen;
 use gtk::glib::StaticType;
-use std::ffi::{c_char, c_int, CString};
+use std::ffi::{c_int, CString};
 use libphosh::WallClock;
 use libphosh::prelude::*;
-use crate::shell::Shell;
+use phrog::shell::Shell;
 
 extern "C" {
     fn hdy_init();
@@ -32,8 +26,8 @@ fn main() {
     wall_clock.set_default();
 
     unsafe {
-        let loglevel =
-            CString::new(std::env::var("G_MESSAGES_DEBUG").unwrap_or("".to_string())).unwrap();
+        // let loglevel =
+        //     CString::new(std::env::var("G_MESSAGES_DEBUG").unwrap_or("".to_string())).unwrap();
         // phosh_log_set_log_domains(loglevel.as_ptr());
         hdy_init();
         // cui_init(1);

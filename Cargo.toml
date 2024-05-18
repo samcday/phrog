@@ -5,11 +5,16 @@ edition = "2021"
 
 [dependencies]
 glob = "0.3.1"
-greetd_ipc = { version = "0.10.0", features = ["sync-codec"] }
+greetd_ipc = { version = "0.10.0", features = ["sync-codec", "tokio-codec"] }
 uzers = { git = "https://github.com/rustadopt/uzers-rs", rev = "8fb29db" }
 async-channel = "2.2.1"
 anyhow = "1.0.82"
 libphosh = { path = "libphosh-rs/libphosh" }
+
+# for fakegreet
+thiserror = "1.0"
+tokio = { version = "1.5", features = ["process", "macros", "time", "net", "rt"] }
+serde = { version = "1.0", features = ["derive"] }
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

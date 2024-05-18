@@ -79,17 +79,17 @@ mod imp {
             self.parent_constructed();
 
             for user in users::users() {
-                self.box_users.add(
-                    &ActionRow::builder()
+                let row = ActionRow::builder()
                         .title(user.1)
                         .subtitle(user.0)
                         .activatable(true)
-                        .build(),
-                );
+                        .build();
+                self.box_users.add(&row);
             }
+            self.box_users.select_row(self.box_users.row_at_index(0).as_ref());
             self.box_users.show_all();
 
-            self.box_users.connect_row_activated(clone!(@weak self as this => move |_, row| {
+            self.box_users.connect_row_activated(clone!(@weak self as this => move |_, _| {
                 this.obj().emit_by_name::<()>("login", &[]);
             }));
 

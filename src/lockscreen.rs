@@ -28,12 +28,12 @@ mod imp {
     use gtk::subclass::widget::WidgetImpl;
     use gtk::{gio, glib, Widget};
     use libphosh::subclass::lockscreen::LockscreenImpl;
-    use libphosh::prelude::*;
-    use std::cell::{Cell, OnceCell, RefCell};
+    use std::cell::OnceCell;
     use std::os::unix::net::UnixStream;
     use std::process;
     use anyhow::{anyhow, Context};
-    use gtk::traits::{ContainerExt, EditableExt, LabelExt, WidgetExt, EntryExt};
+    use gtk::traits::WidgetExt;
+    use libphosh::prelude::*;
     use libphosh::LockscreenPage;
 
     #[derive(Default)]
@@ -46,7 +46,7 @@ mod imp {
 
     #[glib::object_subclass]
     impl ObjectSubclass for Lockscreen {
-        const NAME: &'static str = "PhoshDMLockscreen";
+        const NAME: &'static str = "PhrogLockscreen";
         type Type = super::Lockscreen;
         type ParentType = libphosh::Lockscreen;
     }
@@ -87,13 +87,8 @@ mod imp {
 
             self.user_session_page.set(UserSessionPage::new()).unwrap();
 
-            if let Some(c) = self.obj().carousel() {
-                // Remove the first page from the default lockscreen (info widget)
-                c.remove(c.children().first().unwrap());
-
-                // Replace it with the user+session selection page.
-                c.prepend(self.user_session_page.get().unwrap())
-            }
+            self.obj().add_extra_page(self.user_session_page.get().unwrap());
+            self.obj().set_default_page(LockscreenPage::Extra);
 
             let (greetd_sender, greetd_receiver) = run_greetd();
 
@@ -105,42 +100,13 @@ mod imp {
                     let this = if let Some(this) = this { this } else {
                         return;
                     };
-
-                    this.obj().upcast_ref::<Widget>().set_sensitive(false);
-                    glib::spawn_future_local(clone!(@strong greetd_sender, @strong greetd_receiver => async move {
-                        if let Err(err) = this.start_login().await {
-                            // TODO: visual thing here (shake the user list view? pop a modal?)
-                            panic!("failed to create greetd session: {}", err);
-                        }
-                        this.obj().upcast_ref::<Widget>().set_sensitive(true);
-                    }));
+                    this.obj().set_page(LockscreenPage::Unlock);
             }));
         }
     }
 
     impl Lockscreen {
-        async fn start_login(&self) -> anyhow::Result<()> {
-            let req = Request::CreateSession {
-                username: self.user_session_page.get().unwrap().username().unwrap(),
-            };
-
-            match self.greetd_req(req).await? {
-                Response::AuthMessage { auth_message_type, auth_message} => {
-                    self.greetd_auth_msg(auth_message_type, auth_message);
-                    Ok(())
-                }
-                Response::Success => {
-                    // Some kind of PAM autologin madness? Just roll with it.
-                    self.start_session().await?;
-                    Ok(())
-                }
-                v => Err(anyhow!("unexpected response to start session: {:?}", v))
-            }
-        }
-
         async fn start_session(&self) -> anyhow::Result<()> {
-            self.obj().lbl_unlock_status().unwrap().set_label("Logging in...");
-
             let session = self.user_session_page.get().unwrap().session();
 
             self.greetd_req(Request::StartSession {
@@ -154,18 +120,6 @@ mod imp {
             }).await.context("start session")?;
 
             process::exit(0);
-
-            Ok(())
-        }
-
-        fn greetd_auth_msg(&self, auth_message_type: AuthMessageType, auth_message: String) {
-            if auth_message == "Password:" {
-                self.obj().lbl_unlock_status().unwrap().set_label("Enter Passcode");
-            } else {
-                self.obj().lbl_unlock_status().unwrap().set_label(&auth_message);
-            }
-            self.obj().entry_pin().unwrap().delete_text(0, -1);
-            self.obj().upcast_ref::<libphosh::Lockscreen>().set_page(LockscreenPage::Unlock);
         }
 
         async fn greetd_req(&self, req: Request) -> anyhow::Result<Response> {
@@ -177,6 +131,45 @@ mod imp {
                 resp => Ok(resp)
             }
         }
+
+        async fn login(&self) -> anyhow::Result<()> {
+            let req = Request::CreateSession {
+                username: self.user_session_page.get().unwrap().username().unwrap(),
+            };
+            match self.greetd_req(req).await? {
+                Response::AuthMessage { auth_message_type, auth_message} => {
+                    if auth_message != "Password:" {
+                        // In future we might want to properly handle more complicated PAM
+                        // conversations. For now, we only support simple password auth.
+                        return Err(anyhow!("Unexpected auth message {}", auth_message));
+                    }
+                }
+                Response::Success => {
+                    // Some kind of PAM autologin madness? Just roll with it.
+                    self.start_session().await?;
+                }
+                v => return Err(anyhow!("unexpected response to start session: {:?}", v))
+            }
+
+            let resp = self.greetd_req(Request::PostAuthMessageResponse {
+                response: Some(self.obj().pin_entry().to_string())
+            }).await?;
+
+            match resp {
+                Response::AuthMessage { auth_message_type: _, auth_message} => {
+                    // Same deal as previously noted: we're only expecting a simplistic PAM
+                    // conversation that asks for password and that's it.
+                    return Err(anyhow!("Unexpected auth message {}", auth_message));
+                }
+                Response::Error { error_type: ErrorType::AuthError, description } => {
+                    return Ok(())
+                }
+                Response::Success => self.start_session().await.unwrap(),
+                v => return Err(anyhow!("unexpected response to start session: {:?}", v))
+            }
+
+            Ok(())
+        }
     }
 
     impl WidgetImpl for Lockscreen {}
@@ -184,37 +177,14 @@ mod imp {
         fn unlock_submit_cb(&self) {
             glib::spawn_future_local(clone!(@weak self as this => async move {
                 this.obj().upcast_ref::<Widget>().set_sensitive(false);
-                this.obj().lbl_unlock_status().unwrap().set_label("Checking...");
-
-                let resp = this.greetd_req(Request::PostAuthMessageResponse {
-                    response: Some(this.obj().entry_pin().unwrap().text().to_string())
-                }).await;
-
-                if let Err(err) = resp {
-                    // TODO: what to do here?
-                    panic!("greetd error: {:?}", err);
+                if let Err(err) = this.login().await {
+                    g_warning!("lockscreen", "Login failed: {}", err);
                 }
-
-                match resp.unwrap() {
-                    Response::AuthMessage { auth_message_type, auth_message} => {
-                        this.greetd_auth_msg(auth_message_type, auth_message);
-                        this.obj().upcast_ref::<Widget>().set_sensitive(true);
-                    }
-                    Response::Error { error_type: ErrorType::AuthError, description } => {
-                        this.obj().lbl_unlock_status().unwrap().set_label(&description);
-                        // shake_label will re-enable self when finished
-                        this.obj().upcast_ref::<libphosh::Lockscreen>().shake_label();
-                        glib::timeout_future_seconds(1).await;
-
-                        if let Err(err) = this.start_login().await {
-                            // TODO: what to do here?
-                            panic!("failed to restart greetd session: {:?}", err);
-                        }
-                    }
-                    Response::Success => this.start_session().await.unwrap(),
-                    v => panic!("unexpected greetd response: {:?}", v)
-                };
-
+                // If we got here, the login failed in some way.
+                // For now the best we can do is visually indicate this to the user.
+                // shake_pin_entry will set the lockscreen as sensitive again when
+                // animation completes.
+                this.obj().shake_pin_entry();
             }));
         }
     }
