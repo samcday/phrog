@@ -24,6 +24,7 @@ external_libraries = [
 generate = [
   "Phosh.Lockscreen",
   "Phosh.WallClock",
+  "Phosh.LockscreenPage",
 ]
 
 manual = [
@@ -31,6 +32,7 @@ manual = [
   "Gio.AsyncReadyCallback",
   "Gio.AsyncResult",
   "Gio.Cancellable",
+  "Gtk.Widget",
 ]
 
 ignore = [

@@ -12,6 +12,9 @@ pub use self::shell::Shell;
 mod wall_clock;
 pub use self::wall_clock::WallClock;
 
+mod enums;
+pub use self::enums::LockscreenPage;
+
 pub(crate) mod traits {
     pub use super::lockscreen::LockscreenExt;
     pub use super::shell::ShellExt;
