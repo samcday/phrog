@@ -1,0 +1,56 @@
+[library]
+version = "@VERSION@"
+description = "Call-UI interface elements"
+authors = "Purism SPC"
+license = "LGPL-2.1-or-later"
+browse_url = "https://gitlab.gnome.org/World/Phosh/libcall-ui/"
+repository_url = "https://gitlab.gnome.org/World/Phosh/libcall-ui.git"
+website_url = "https://gitlab.gnome.org/World/Phosh/libcall-ui"
+dependencies = [
+  "GObject-2.0",
+  "Gtk-3.0",
+  "Handy-1",
+]
+devhelp = true
+search_index = true
+
+[dependencies."GObject-2.0"]
+name = "GObject"
+description = "The base type system library"
+docs_url = "https://developer.gnome.org/gobject/stable"
+
+[dependencies."Gtk-3.0"]
+name = "GTK"
+description = "The GTK toolkit"
+docs_url = "https://docs.gtk.org/gtk3/"
+
+[dependencies."Handy-1"]
+name = "libhandy"
+description = "UI library for mobile devices"
+docs_url = "https://gnome.pages.gitlab.gnome.org/libhandy/doc/1-latest/"
+
+[dependencies."libcallaudio-0"]
+name = "libcallaudio"
+description = "library for audio routing during voice calls"
+docs_url = "https://gitlab.com/mobian1/callaudiod"
+
+[theme]
+name = "basic"
+show_index_summary = true
+show_class_hierarchy = true
+
+[source-location]
+# The base URL for the web UI
+base_url = "https://gitlab.gnome.org/World/Phosh/libcall-ui/-/blob/main/"
+# The format for links, using "filename" and "line" for the format
+file_format = "{filename}#L{line}"
+
+[extra]
+content_files = [
+  "build-howto.md",
+  "visual-index.md",
+]
+content_images = [
+  "images/cui-call-display.png",
+]
+

@@ -1,0 +1,148 @@
+# Ukrainian translation for libcall-ui.
+# Copyright (C) 2021 libcall-ui's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libcall-ui package.
+#
+# Yuri Chornoivan <yurchor@ukr.net>, 2021, 2022.
+msgid ""
+msgstr ""
+"Project-Id-Version: libcall-ui main\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/World/Phosh/libcall-ui/issues/"
+"\n"
+"POT-Creation-Date: 2022-09-02 10:56+0000\n"
+"PO-Revision-Date: 2022-09-02 15:04+0300\n"
+"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
+"Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
+"Language: uk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
+"%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Lokalize 20.12.0\n"
+
+#: src/cui-call.c:310
+msgid "Call active"
+msgstr "Виклик активний"
+
+#: src/cui-call.c:312
+msgid "Call held"
+msgstr "Виклик призупинено"
+
+#. Deprecated
+#: src/cui-call.c:315
+msgid "Calling…"
+msgstr "Виклик…"
+
+#. Deprecated
+#: src/cui-call.c:318
+msgid "Incoming call"
+msgstr "Вхідний виклик"
+
+#: src/cui-call.c:320
+msgid "Call ended"
+msgstr "Виклик завершено"
+
+#: src/cui-call.c:323 src/cui-call-display.c:319
+msgid "Unknown"
+msgstr "Невідомо"
+
+#: src/cui-call-display.c:100
+msgid "Accepting call…"
+msgstr "Приймаємо виклик…"
+
+#: src/cui-call-display.c:115
+msgid "Hanging up…"
+msgstr "Завершуємо виклик…"
+
+#: src/cui-call-display.ui:35
+msgid "Incoming phone call"
+msgstr "Вхідний телефонний дзвінок"
+
+#: src/cui-call-display.ui:126
+msgid "Mute"
+msgstr "Вимкнути звук"
+
+#: src/cui-call-display.ui:159
+msgid "Speaker"
+msgstr "Динамік"
+
+#: src/cui-call-display.ui:191
+msgid "Add call"
+msgstr "Додати дзвінок"
+
+#: src/cui-call-display.ui:231
+msgid "Hold"
+msgstr "Утримання"
+
+#: src/cui-call-display.ui:263
+msgid "Dial Pad"
+msgstr "Панель набору"
+
+#: src/cui-call-display.ui:311
+msgid "Hang up"
+msgstr "Покласти трубку"
+
+#: src/cui-call-display.ui:340
+msgid "Answer"
+msgstr "Відповісти"
+
+#: src/cui-call-display.ui:415
+msgid "Hide the dial pad"
+msgstr "Приховати панель набору"
+
+#: src/cui-dialpad.ui:24
+msgid "Enter a number"
+msgstr "Введіть число"
+
+#: src/cui-dialpad.ui:25
+#| msgid "Enter a number"
+msgid "Type a phone number"
+msgstr "Введіть номер телефону"
+
+#: src/cui-dialpad.ui:49
+msgid "Call that phone number"
+msgstr "Викликати цей номер телефону"
+
+#: src/cui-encryption-indicator.ui:20
+msgid "This call is not encrypted"
+msgstr "Цей дзвінок не зашифровано"
+
+#: src/cui-encryption-indicator.ui:40
+msgid "This call is encrypted"
+msgstr "Цей дзвінок зашифровано"
+
+#~ msgid "Call-UI Demo"
+#~ msgstr "Демонстрація Call-UI"
+
+#~ msgid "Back"
+#~ msgstr "Назад"
+
+#~ msgid "Welcome to Call-UI Demo"
+#~ msgstr "Вітаємо у демонстрації Call-UI"
+
+#~ msgid "This is a tour of the features the library has to offer."
+#~ msgstr "Це путівник можливостями, які пропонує бібліотека."
+
+#~ msgid "Welcome"
+#~ msgstr "Вітаємо"
+
+#~ msgid "Call Display"
+#~ msgstr "Показ виклику"
+
+#~ msgid "A simple dial pad to enter phone numbers."
+#~ msgstr "Проста клавіатура для введення номерів телефонів."
+
+#~ msgid "Keypad"
+#~ msgstr "Цифрова клавіатура"
+
+#~ msgid "A number keypad."
+#~ msgstr "Цифрова клавіатура."
+
+#~ msgid "Show letters"
+#~ msgstr "Показати літери"
+
+#~ msgid "Show symbols"
+#~ msgstr "Показати символи"
+
+#~ msgid "Key pad"
+#~ msgstr "Клавіатура"

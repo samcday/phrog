@@ -1,0 +1,102 @@
+# Greek translation for libcall-ui.
+# Copyright (C) 2022 libcall-ui's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libcall-ui package.
+# Efstathios Iosifidis <eiosifidis@gnome.org>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libcall-ui main\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/World/Phosh/libcall-ui/"
+"issues/\n"
+"POT-Creation-Date: 2022-07-08 20:58+0000\n"
+"PO-Revision-Date: 2022-07-11 23:09+0300\n"
+"Last-Translator: Efstathios Iosifidis <eiosifidis@gnome.org>\n"
+"Language-Team: Greek <gnome-el-list@gnome.org>\n"
+"Language: el\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.1\n"
+
+#: src/cui-call.c:310
+msgid "Call active"
+msgstr "Ενεργός κλήση"
+
+#: src/cui-call.c:312
+msgid "Call held"
+msgstr "Η κλήση πραγματοποιήθηκε"
+
+#. Deprecated
+#: src/cui-call.c:315
+msgid "Calling…"
+msgstr "Γίνεται κλήση…"
+
+#. Deprecated
+#: src/cui-call.c:318
+msgid "Incoming call"
+msgstr "Εισερχόμενη κλήση"
+
+#: src/cui-call.c:320
+msgid "Call ended"
+msgstr "Η κλήση τερματίστηκε"
+
+#: src/cui-call.c:323 src/cui-call-display.c:319
+msgid "Unknown"
+msgstr "'Αγνωστο"
+
+#: src/cui-call-display.c:100
+msgid "Accepting call…"
+msgstr "Αποδοχή κλήσεων…"
+
+#: src/cui-call-display.c:115
+msgid "Hanging up…"
+msgstr "Γίνεται τερματισμός κλήσης…"
+
+#: src/cui-call-display.ui:39
+msgid "Incoming phone call"
+msgstr "Εισερχόμενη κλήση"
+
+#: src/cui-call-display.ui:140
+msgid "Mute"
+msgstr "Σίγαση"
+
+#: src/cui-call-display.ui:177
+msgid "Speaker"
+msgstr "Ηχείο"
+
+#: src/cui-call-display.ui:213
+msgid "Add call"
+msgstr "Προσθήκη κλήσης"
+
+#: src/cui-call-display.ui:258
+msgid "Hold"
+msgstr "Αναμονή"
+
+#: src/cui-call-display.ui:294
+msgid "Dial Pad"
+msgstr "Πληκτρολόγιο κλήσης"
+
+#: src/cui-call-display.ui:346
+msgid "Hang up"
+msgstr "Τερματισμός κλήσης"
+
+#: src/cui-call-display.ui:377
+msgid "Answer"
+msgstr "Απάντηση"
+
+#: src/cui-call-display.ui:459
+msgid "Hide the dial pad"
+msgstr "Απόκρυψη πληκτρολογίου κλήσης"
+
+#: src/cui-dialpad.ui:24
+msgid "Enter a number"
+msgstr "Πληκτρολογήστε έναν αριθμό"
+
+#: src/cui-encryption-indicator.ui:23
+msgid "This call is not encrypted"
+msgstr "Η κλήση δεν είναι κρυπτογραφημένη"
+
+#: src/cui-encryption-indicator.ui:45
+msgid "This call is encrypted"
+msgstr "Η κλήση είναι κρυπτογραφημένη"

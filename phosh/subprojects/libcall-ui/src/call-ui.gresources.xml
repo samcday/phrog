@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/gnome/CallUI">
+    <file preprocess="xml-stripblanks">icons/scalable/actions/new-call-symbolic.svg</file>
+    <file compressed="true">style.css</file>
+  </gresource>
+  <gresource prefix="/org/gnome/CallUI/ui">
+    <file preprocess="xml-stripblanks">cui-call-display.ui</file>
+    <file preprocess="xml-stripblanks">cui-encryption-indicator.ui</file>
+    <file preprocess="xml-stripblanks">cui-dialpad.ui</file>
+    <file preprocess="xml-stripblanks">cui-keypad.ui</file>
+    <file preprocess="xml-stripblanks">cui-keypad-button.ui</file>
+  </gresource>
+</gresources>
