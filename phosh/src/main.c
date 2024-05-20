@@ -140,7 +140,8 @@ int main(int argc, char *argv[])
   phosh_wall_clock_set_default (wall_clock);
   wl = phosh_wayland_get_default ();
   background_cache = phosh_background_cache_get_default ();
-  shell = phosh_shell_get_default ();
+  shell = phosh_shell_new ();
+  phosh_shell_set_default (shell);
 
   g_signal_connect (shell, "ready", G_CALLBACK (on_shell_ready), timer);
 
