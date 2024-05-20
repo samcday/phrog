@@ -1,0 +1,14 @@
+/*
+ * Copyright (C) 2022 Guido Günther
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Author: Guido Günther <agx@sigxcpu.org>
+ */
+
+#pragma once
+
+#mesondefine PHOSH_PLUGIN_EXTENSION_POINT_LOCKSCREEN_WIDGET
+#mesondefine PHOSH_PLUGIN_EXTENSION_POINT_LOCKSCREEN_WIDGET_PREFS
+#mesondefine PHOSH_PLUGIN_EXTENSION_POINT_QUICK_SETTING_WIDGET
+#mesondefine PHOSH_PLUGIN_EXTENSION_POINT_QUICK_SETTING_WIDGET_PREFS

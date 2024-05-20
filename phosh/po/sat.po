@@ -1,0 +1,782 @@
+# Santali translation for phosh.
+# Copyright (C) 2022 phosh's COPYRIGHT HOLDER
+# This file is distributed under the same license as the phosh package.
+# Prasanta Hembram <prasantahembram720@gmail.com>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: phosh main\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/World/Phosh/phosh/issues\n"
+"POT-Creation-Date: 2023-05-18 11:35+0000\n"
+"PO-Revision-Date: 2022-03-13 19:47+0530\n"
+"Last-Translator: Prasanta Hembram <prasantahembram720@gmail.com>\n"
+"Language-Team: Santali <sat@li.org>\n"
+"Language: sat\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n==2 ? 1 : 2;\n"
+"X-Generator: Poedit 3.0.1\n"
+
+#. Translators: this is the session name, no need to translate it
+#: data/phosh.session.desktop.in.in:4 data/wayland-sessions/phosh.desktop:3
+msgid "Phosh"
+msgstr "Phosh"
+
+#: data/sm.puri.Phosh.desktop.in.in:4 data/wayland-sessions/phosh.desktop:4
+msgid "Phone Shell"
+msgstr "ᱯᱷᱚᱱ ᱪᱚᱠᱟᱜ"
+
+#: data/sm.puri.Phosh.desktop.in.in:5
+msgid "Window management and application launching for mobile"
+msgstr "ᱢᱳᱵᱟᱭᱤᱞ ᱞᱟᱹᱜᱤᱫ ᱣᱤᱱᱰᱚ ᱢᱮᱱᱮᱡᱽᱢᱮᱸᱱᱴ ᱟᱨ ᱮᱯᱞᱤᱠᱮᱥᱚᱱ"
+
+#: data/wayland-sessions/phosh.desktop:5
+msgid "This session logs you into Phosh"
+msgstr "ᱱᱚᱶᱟ ᱠᱟᱹᱢᱤᱦᱚᱨᱟ ᱫᱚ Phosh ᱛᱮ ᱤᱫᱤ ᱢᱮᱭᱟᱭ"
+
+#: plugins/calendar/calendar.desktop.in.in:5
+msgid "Calendar"
+msgstr "ᱢᱟᱦᱮᱛᱟ"
+
+#: plugins/calendar/calendar.desktop.in.in:6
+msgid "A simple calendar widget"
+msgstr "ᱢᱤᱫ ᱥᱟᱫᱷᱟᱨᱚᱬ ᱢᱟᱦᱮᱛᱟ ᱣᱤᱡᱮᱴ"
+
+#: plugins/ticket-box/ticket-box.desktop.in.in:4
+#: plugins/ticket-box/ticket-box.ui:14
+msgid "Ticket Box"
+msgstr "ᱴᱤᱠᱮᱴ ᱵᱟᱜᱥᱟ"
+
+#: plugins/ticket-box/ticket-box.desktop.in.in:5
+msgid "Show PDFs on the lock screen. <b>This plugin is experimental.</b>"
+msgstr "ᱠᱩᱞᱩᱯ ᱥᱠᱨᱤᱱ ᱨᱮ PDF ᱠᱚ ᱩᱫᱩᱜ ᱢᱮ ᱾ <b>ᱱᱚᱶᱟ ᱯᱞᱚᱜᱤᱱ ᱫᱚ ᱮᱠᱥᱯᱮᱨᱤᱢᱮᱱᱴᱟᱞ ᱜᱮᱭᱟ ᱾</b>"
+
+#: plugins/upcoming-events/upcoming-events.desktop.in.in:4
+msgid "Upcoming Events"
+msgstr "ᱦᱟᱹᱡᱩᱜ ᱠᱟᱱ ᱜᱚᱴᱱᱟᱠᱚ"
+
+#: plugins/upcoming-events/upcoming-events.desktop.in.in:5
+msgid "Show upcoming calendar events"
+msgstr "ᱦᱟᱹᱡᱩᱜ ᱠᱟᱱ ᱠᱮᱞᱮᱱᱰᱟᱨ ᱜᱚᱴᱱᱟᱠᱚ ᱩᱫᱩᱜᱽ ᱢᱮ"
+
+#: src/app-grid-button.c:529
+msgid "Application"
+msgstr "ᱮᱯᱞᱤᱠᱮᱥᱚᱱ"
+
+#: src/app-grid.c:137
+msgid "Show All Apps"
+msgstr "ᱡᱷᱚᱛᱚ ᱮᱯ ᱫᱮᱠᱷᱟᱣ ᱢᱮ"
+
+#: src/app-grid.c:140
+msgid "Show Only Mobile Friendly Apps"
+msgstr "ᱠᱷᱟᱹᱞᱤ ᱢᱳᱵᱟᱭᱤᱞ ᱡᱚᱲᱟᱣ ᱮᱯ ᱠᱚ ᱫᱮᱠᱷᱟᱣ ᱢᱮ"
+
+#: src/bt-info.c:92
+#, -ERR:PROP-NOT-FOUND-
+#| msgid "On"
+msgctxt "bluetooth:enabled"
+msgid "On"
+msgstr "ᱮᱢ ᱪᱷᱚ"
+
+#: src/bt-info.c:94
+msgid "Bluetooth"
+msgstr "ᱵᱞᱩᱴᱩᱛᱷ"
+
+#: src/docked-info.c:81
+msgid "Docked"
+msgstr "ᱰᱚᱠ ᱮᱱᱟ"
+
+#: src/docked-info.c:81 src/docked-info.c:199
+msgid "Undocked"
+msgstr "ᱰᱚᱠ ᱚᱪᱚᱜᱽ ᱮᱱᱟ"
+
+#: src/emergency-menu.c:97 src/ui/app-auth-prompt.ui:71
+#: src/ui/end-session-dialog.ui:71
+msgid "Ok"
+msgstr "ᱴᱷᱤᱠ"
+
+#: src/emergency-menu.c:100
+msgid "Unable to place emergency call"
+msgstr "ᱮᱢᱚᱨᱡᱮᱱᱥᱤ ᱠᱚᱞ ᱠᱚᱨᱟᱣ ᱵᱟᱭ ᱜᱟᱱ ᱞᱮᱱᱟ"
+
+#: src/emergency-menu.c:105
+msgid "Internal error"
+msgstr "ᱵᱷᱤᱛᱨᱤ ᱵᱷᱩᱞ"
+
+#: src/end-session-dialog.c:163
+msgid "Log Out"
+msgstr "ᱵᱟᱦᱨᱮ ᱛᱮ ᱚᱰᱚᱠ"
+
+#: src/end-session-dialog.c:166
+#, c-format
+msgid "%s will be logged out automatically in %d second."
+msgid_plural "%s will be logged out automatically in %d seconds."
+msgstr[0] "%s ᱫᱚ %d ᱨᱤᱡ ᱨᱮ ᱵᱟᱦᱨᱮ ᱚᱰᱚᱠᱚᱜᱼᱟᱢ ᱾"
+msgstr[1] "%s ᱫᱚ %d ᱨᱤᱡ ᱨᱮ ᱵᱟᱦᱨᱮ ᱚᱰᱚᱠᱚᱜᱼᱟᱢ ᱾"
+msgstr[2] "%s ᱫᱚ %d ᱨᱤᱡ ᱨᱮ ᱵᱟᱦᱨᱮ ᱚᱰᱚᱠᱚᱜᱼᱟᱢ ᱾"
+
+#: src/end-session-dialog.c:172
+msgid "Power Off"
+msgstr "ᱯᱟᱣᱟᱨ ᱵᱚᱸᱫᱽ"
+
+#: src/end-session-dialog.c:173
+#, c-format
+msgid "The system will power off automatically in %d second."
+msgid_plural "The system will power off automatically in %d seconds."
+msgstr[0] "ᱥᱭᱥᱴᱚᱢ ᱫᱚ %d ᱴᱤᱡ ᱨᱮ ᱟᱡ ᱛᱮ ᱵᱚᱸᱫᱚᱜᱼᱟ ᱾"
+msgstr[1] "ᱥᱭᱥᱴᱚᱢ ᱫᱚ %d ᱴᱤᱡ ᱨᱮ ᱟᱡ ᱛᱮ ᱵᱚᱸᱫᱚᱜᱼᱟ ᱾"
+msgstr[2] "ᱥᱭᱥᱴᱚᱢ ᱫᱚ %d ᱴᱤᱡ ᱨᱮ ᱟᱡ ᱛᱮ ᱵᱚᱸᱫᱚᱜᱼᱟ ᱾"
+
+#: src/end-session-dialog.c:179
+msgid "Restart"
+msgstr "ᱫᱚᱦᱲᱟ ᱮᱦᱚᱵ"
+
+#: src/end-session-dialog.c:180
+#, c-format
+msgid "The system will restart automatically in %d second."
+msgid_plural "The system will restart automatically in %d seconds."
+msgstr[0] "ᱥᱭᱥᱴᱚᱢ ᱫᱚ %d ᱴᱤᱡ ᱨᱮ ᱟᱡ ᱛᱮ ᱫᱩᱦᱲᱟᱹ ᱮᱛᱦᱚᱵᱚᱜᱼᱟ ᱾"
+msgstr[1] "ᱥᱭᱥᱴᱚᱢ ᱫᱚ %d ᱴᱤᱡ ᱨᱮ ᱟᱡ ᱛᱮ ᱫᱩᱦᱲᱟᱹ ᱮᱛᱦᱚᱵᱚᱜᱼᱟ ᱾"
+msgstr[2] "ᱥᱭᱥᱴᱚᱢ ᱫᱚ %d ᱴᱤᱡ ᱨᱮ ᱟᱡ ᱛᱮ ᱫᱩᱦᱲᱟᱹ ᱮᱛᱦᱚᱵᱚᱜᱼᱟ ᱾"
+
+#: src/end-session-dialog.c:270
+msgid "Unknown application"
+msgstr "ᱵᱟᱝ ᱵᱟᱰᱟᱭ ᱮᱯᱞᱤᱠᱮᱥᱚᱱ"
+
+#. Translators: quiet and silent are fbd profiles names:
+#. see https://source.puri.sm/Librem5/feedbackd#profiles
+#. for details
+#: src/feedbackinfo.c:97
+msgid "Quiet"
+msgstr "ᱥᱟᱸᱛ"
+
+#. Translators: quiet and silent are fbd profiles names:
+#. see https://source.puri.sm/Librem5/feedbackd#profiles
+#. for details
+#: src/feedbackinfo.c:104
+msgid "Silent"
+msgstr "ᱪᱩᱯ"
+
+#. Translators: Enable LED, haptic and audio feedback
+#: src/feedbackinfo.c:108
+#, -ERR:PROP-NOT-FOUND-
+#| msgid "On"
+msgctxt "feedback:enabled"
+msgid "On"
+msgstr "ᱮᱢ ᱪᱷᱚ"
+
+#: src/location-manager.c:268
+#, c-format
+msgid "Allow '%s' to access your location information?"
+msgstr "ᱟᱢᱟᱜ ᱡᱟᱭᱜᱟ ᱟᱫᱮᱨ ᱪᱷᱚ ᱞᱟᱹᱜᱤᱫ '%s' ᱟᱫᱮᱨ ᱪᱷᱚᱭᱮᱢ?"
+
+#: src/location-manager.c:273
+msgid "Geolocation"
+msgstr "ᱡᱤᱭᱚ ᱡᱟᱭᱜᱟ"
+
+#: src/location-manager.c:274
+msgid "Yes"
+msgstr "ᱦᱚᱭ"
+
+#: src/location-manager.c:274
+msgid "No"
+msgstr "ᱵᱟᱝ"
+
+#: src/lockscreen.c:170 src/ui/lockscreen.ui:221
+msgid "Enter Passcode"
+msgstr "ᱯᱟᱥᱠᱳᱰ ᱟᱫᱮᱨ ᱢᱮ"
+
+#: src/lockscreen.c:393
+msgid "Checking…"
+msgstr "ᱧᱮᱞ ᱵᱤᱰᱟᱹᱣᱜ ᱠᱟᱱᱟ ..."
+
+#: src/screenshot-manager.c:212
+msgid "Screenshot"
+msgstr "ᱥᱠᱨᱤᱱᱥᱚᱴ"
+
+#: src/screenshot-manager.c:213
+msgid "Screenshot copied to clipboard"
+msgstr "ᱠᱞᱤᱯᱵᱳᱨᱰ ᱨᱮ ᱥᱠᱨᱤᱱ ᱪᱤᱛᱟᱹᱨ ᱠᱚ ᱱᱚᱠᱚᱞ ᱟᱠᱟᱱᱟ"
+
+#. Translators: Used when the title of a song is unknown
+#: src/media-player.c:322 src/ui/media-player.ui:182
+msgid "Unknown Title"
+msgstr "ᱵᱟᱝ ᱵᱟᱰᱟᱭᱟᱜ ᱧᱩᱛᱩᱢ"
+
+#. Translators: Used when the artist of a song is unknown
+#: src/media-player.c:330 src/ui/media-player.ui:165
+msgid "Unknown Artist"
+msgstr "ᱵᱟᱝ ᱵᱟᱰᱟᱭᱟᱜ ᱟᱴᱤᱥᱴ"
+
+#: src/monitor-manager.c:119
+msgid "Built-in display"
+msgstr "ᱢᱟᱲᱟᱝ ᱛᱮᱭᱟᱜ ᱫᱮᱠᱷᱟᱣ"
+
+#: src/monitor-manager.c:137
+#, c-format
+msgctxt ""
+"This is a monitor vendor name, followed by a size in inches, like 'Dell 15\"'"
+msgid "%s %s"
+msgstr "%s %s"
+
+#: src/monitor-manager.c:144
+#, c-format
+msgctxt ""
+"This is a monitor vendor name followed by product/model name where size in "
+"inches could not be calculated, e.g. Dell U2414H"
+msgid "%s %s"
+msgstr "%s %s"
+
+#. Translators: An unknown monitor type
+#: src/monitor-manager.c:153
+msgid "Unknown"
+msgstr "ᱵᱟᱝ ᱵᱟᱰᱟᱭᱟᱜ"
+
+#: src/network-auth-prompt.c:201
+#, c-format
+msgid "Authentication type of wifi network “%s” not supported"
+msgstr "ᱟᱫᱮᱨ ᱞᱮᱠᱷᱟ ᱣᱟᱭᱯᱷᱟᱭ ᱱᱮᱴᱣᱟᱨᱠ “%s” ᱫᱚ ᱵᱟᱝ ᱥᱟᱹᱯᱚᱴ ᱠᱟᱱᱟ"
+
+#: src/network-auth-prompt.c:206
+#, c-format
+msgid "Enter password for the wifi network “%s”"
+msgstr "ᱣᱟᱭᱯᱷᱟᱭ ᱱᱮᱴᱣᱟᱨᱠ “%s” ᱞᱟᱹᱜᱤᱫ ᱫᱟᱱᱟᱝ ᱥᱟᱵᱟᱫ ᱟᱫᱮᱨ ᱢᱮ"
+
+#: src/notifications/mount-notification.c:121
+msgid "Open"
+msgstr "ᱠᱷᱩᱞᱟᱹ"
+
+#: src/notifications/notification.c:383 src/notifications/notification.c:654
+msgid "Notification"
+msgstr "ᱠᱷᱚᱵᱚᱨ"
+
+#. Translators: Timestamp seconds suffix
+#: src/notifications/timestamp-label.c:84
+msgctxt "timestamp-suffix-seconds"
+msgid "s"
+msgstr "ᱴᱤᱡ"
+
+#. Translators: Timestamp minute suffix
+#: src/notifications/timestamp-label.c:86
+msgctxt "timestamp-suffix-minute"
+msgid "m"
+msgstr "ᱴᱤᱯᱤᱡ"
+
+#. Translators: Timestamp minutes suffix
+#: src/notifications/timestamp-label.c:88
+msgctxt "timestamp-suffix-minutes"
+msgid "m"
+msgstr "ᱴᱤᱯᱤᱡ"
+
+#. Translators: Timestamp hour suffix
+#: src/notifications/timestamp-label.c:90
+msgctxt "timestamp-suffix-hour"
+msgid "h"
+msgstr "ᱴᱟᱲᱟᱝ"
+
+#. Translators: Timestamp hours suffix
+#: src/notifications/timestamp-label.c:92
+msgctxt "timestamp-suffix-hours"
+msgid "h"
+msgstr "ᱴᱟᱲᱟᱝ"
+
+#. Translators: Timestamp day suffix
+#: src/notifications/timestamp-label.c:94
+msgctxt "timestamp-suffix-day"
+msgid "d"
+msgstr "ᱫᱤᱱ"
+
+#. Translators: Timestamp days suffix
+#: src/notifications/timestamp-label.c:96
+msgctxt "timestamp-suffix-days"
+msgid "d"
+msgstr "ᱫᱤᱱ"
+
+#. Translators: Timestamp month suffix
+#: src/notifications/timestamp-label.c:98
+msgctxt "timestamp-suffix-month"
+msgid "mo"
+msgstr "ᱢᱟᱦᱟᱸ"
+
+#. Translators: Timestamp months suffix
+#: src/notifications/timestamp-label.c:100
+msgctxt "timestamp-suffix-months"
+msgid "mos"
+msgstr "ᱢᱟᱦᱟᱸ"
+
+#. Translators: Timestamp year suffix
+#: src/notifications/timestamp-label.c:102
+msgctxt "timestamp-suffix-year"
+msgid "y"
+msgstr "ᱥᱮᱨᱢᱟ"
+
+#. Translators: Timestamp years suffix
+#: src/notifications/timestamp-label.c:104
+msgctxt "timestamp-suffix-years"
+msgid "y"
+msgstr "ᱥᱮᱨᱢᱟ"
+
+#: src/notifications/timestamp-label.c:121
+msgid "now"
+msgstr "ᱱᱤᱛᱚᱜ"
+
+#. Translators: time difference "Over 5 years"
+#: src/notifications/timestamp-label.c:189
+#, c-format
+msgid "Over %dy"
+msgstr "%dᱥᱮᱨᱢᱟ ᱫᱷᱟᱹᱵᱤᱡ"
+
+#. Translators: time difference "almost 5 years"
+#: src/notifications/timestamp-label.c:193
+#, c-format
+msgid "Almost %dy"
+msgstr "%dᱥᱮᱨᱢᱟ ᱜᱟᱱ"
+
+#. Translators: a time difference like '<5m', if in doubt leave untranslated
+#: src/notifications/timestamp-label.c:200
+#, c-format
+msgid "%s%d%s"
+msgstr "%s%d%s"
+
+#: src/polkit-auth-agent.c:228
+msgid "Authentication dialog was dismissed by the user"
+msgstr "ᱵᱮᱵᱷᱟᱨᱤᱭᱟᱹ ᱫᱚ ᱟᱫᱮᱨ ᱠᱷᱚᱵᱚᱨ ᱵᱚᱸᱫ ᱠᱮᱜᱼᱟᱭ"
+
+#: src/polkit-auth-prompt.c:278 src/ui/gtk-mount-prompt.ui:20
+#: src/ui/network-auth-prompt.ui:82 src/ui/polkit-auth-prompt.ui:56
+#: src/ui/system-prompt.ui:32
+msgid "Password:"
+msgstr "ᱫᱟᱱᱟᱲ ᱥᱟᱵᱟᱫ :"
+
+#: src/polkit-auth-prompt.c:325
+msgid "Sorry, that didn’t work. Please try again."
+msgstr "ᱤᱠᱟᱹ , ᱚᱱᱟ ᱫᱚ ᱵᱟᱭ ᱠᱟᱹᱢᱤ ᱞᱮᱫᱟᱭ ᱾ ᱫᱟᱭᱟᱠᱟᱛᱮ ᱫᱩᱦᱲᱟᱹ ᱠᱩᱨᱩᱢᱩᱴᱩᱭ ᱢᱮ ᱾"
+
+#: src/rotateinfo.c:102
+msgid "Portrait"
+msgstr "ᱥᱤᱫᱷ"
+
+#: src/rotateinfo.c:105
+msgid "Landscape"
+msgstr "ᱩᱞᱴᱟᱹ ᱞᱮᱱᱰᱥᱠᱮᱯ"
+
+#: src/rotateinfo.c:125 src/rotateinfo.c:230
+#, -ERR:PROP-NOT-FOUND-
+#| msgid "Off"
+msgctxt "automatic-screen-rotation-disabled"
+msgid "Off"
+msgstr "ᱵᱚᱸᱫᱽ"
+
+#: src/rotateinfo.c:126
+#, -ERR:PROP-NOT-FOUND-
+#| msgid "On"
+msgctxt "automatic-screen-rotation-enabled"
+msgid "On"
+msgstr "ᱮᱢ ᱪᱷᱚ"
+
+#: src/run-command-dialog.c:129
+msgid "Press ESC to close"
+msgstr "ᱵᱚᱸᱫ ᱞᱟᱹᱜᱤᱫ ESC ᱚᱛᱟᱭ ᱢᱮ"
+
+#: src/run-command-manager.c:95
+#, c-format
+msgid "Running '%s' failed"
+msgstr "'%s' ᱫᱟᱹᱲ ᱪᱷᱚ ᱨᱮ ᱰᱤᱜᱟᱹᱣ ᱮᱱᱟ"
+
+#: src/system-prompt.c:365
+msgid "Passwords do not match."
+msgstr "ᱫᱟᱱᱟᱝ ᱥᱟᱵᱟᱫ ᱫᱚ ᱵᱟᱭ ᱢᱮᱲᱟᱣ ᱞᱮᱱᱟ ᱾"
+
+#: src/system-prompt.c:372
+msgid "Password cannot be blank"
+msgstr "ᱫᱟᱱᱟᱝ ᱥᱟᱵᱟᱫ ᱫᱚ ᱠᱷᱟᱹᱞᱤ ᱵᱟᱭ ᱛᱟᱦᱮᱸᱱᱟ"
+
+#: src/torch-info.c:80
+msgid "Torch"
+msgstr "ᱴᱚᱨᱪ"
+
+#: src/ui/app-auth-prompt.ui:49
+msgid "Remember decision"
+msgstr "ᱱᱚᱶᱟ ᱴᱷᱟᱹᱣᱠᱟᱹ ᱢᱚᱱᱮ ᱫᱚᱦᱚ ᱠᱟᱜ ᱢᱮ"
+
+#: src/ui/app-auth-prompt.ui:62 src/ui/end-session-dialog.ui:62
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:29
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:289
+msgid "Cancel"
+msgstr "ᱵᱟᱹᱰᱨᱟᱹ"
+
+#: src/ui/app-grid-button.ui:55
+msgid "App"
+msgstr "ᱮᱯ"
+
+#: src/ui/app-grid-button.ui:79
+msgid "Remove from _Favorites"
+msgstr "ᱠᱩᱥᱤᱭᱟᱜ ᱠᱷᱚᱱ ᱚᱪᱮᱜᱽ ᱢᱮ"
+
+#: src/ui/app-grid-button.ui:84
+msgid "Add to _Favorites"
+msgstr "ᱠᱩᱥᱤᱭᱟᱜ ᱠᱚᱨᱮ ᱥᱮᱞᱮᱫᱽ ᱢᱮ"
+
+#: src/ui/app-grid-button.ui:89
+msgid "View _Details"
+msgstr "ᱵᱤᱵᱨᱚᱬ ᱠᱚ ᱧᱮᱞ ᱢᱮ"
+
+#: src/ui/app-grid.ui:21
+msgid "Search apps…"
+msgstr "ᱮᱯᱠᱚ ᱥᱮᱸᱫᱽᱨᱟᱭ ᱢᱮ ..."
+
+#: src/ui/emergency-menu.ui:26
+msgid "Close the emergency call dialog"
+msgstr "ᱮᱢᱚᱨᱡᱮᱱᱥᱤ ᱠᱚᱞ ᱰᱟᱭᱞᱚᱜᱽ ᱵᱚᱸᱫᱚᱭ ᱢᱮ"
+
+#: src/ui/emergency-menu.ui:52
+#, -ERR:PROP-NOT-FOUND-
+#| msgid "Emergency"
+msgid "Emergency _Contacts"
+msgstr "ᱮᱢᱚᱨᱡᱮᱱᱥᱤ ᱥᱚᱢᱯᱚᱨᱠ ᱠᱚ"
+
+#: src/ui/emergency-menu.ui:59
+msgid "Go to the emergency contacts page"
+msgstr "ᱮᱢᱟᱨᱡᱮᱱᱥᱤ ᱠᱚᱱᱴᱟᱠᱴ ᱥᱟᱦᱴᱟ ᱨᱮ ᱥᱮᱱᱚᱜ ᱢᱮ"
+
+#: src/ui/emergency-menu.ui:83
+msgid "Go back to the emergency dialpad page"
+msgstr "ᱮᱢᱚᱨᱡᱮᱱᱥᱤ ᱰᱟᱭᱞᱯᱮᱰ ᱥᱟᱦᱴᱟ ᱛᱮ ᱥᱮᱱᱚᱜ ᱢᱮ"
+
+#: src/ui/emergency-menu.ui:106
+#, -ERR:PROP-NOT-FOUND-
+#| msgid "Unknown"
+msgid "Owner unknown"
+msgstr "ᱵᱟᱝ ᱵᱟᱰᱟᱭᱤᱡ ᱢᱟᱞᱤᱠ"
+
+#: src/ui/emergency-menu.ui:124 plugins/emergency-info/emergency-info.ui:195
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:230
+#, -ERR:PROP-NOT-FOUND-
+#| msgid "Emergency"
+msgid "Emergency Contacts"
+msgstr "ᱮᱢᱚᱨᱡᱮᱱᱥᱤ ᱥᱚᱢᱯᱚᱨᱠ ᱠᱚ"
+
+#: src/ui/emergency-menu.ui:142
+msgid "No emergency contacts available."
+msgstr "ᱮᱢᱚᱨᱡᱮᱱᱥᱤ ᱥᱚᱢᱯᱚᱨᱠ ᱠᱚ ᱵᱟᱹᱱᱩᱜᱼᱟ ᱾"
+
+#: src/ui/end-session-dialog.ui:31
+msgid "Some applications are busy or have unsaved work"
+msgstr "ᱛᱤᱱᱟᱹᱜ ᱜᱟᱱ ᱮᱯᱞᱤᱠᱮᱥᱚᱱ ᱠᱚᱫᱚ ᱵᱡᱤ ᱜᱮᱭᱟ ᱵᱟᱝᱠᱷᱟᱱ ᱠᱟᱹᱢᱤ ᱵᱟᱝ ᱥᱟᱺᱧᱟᱣ ᱠᱟᱱᱟ"
+
+#: src/ui/gtk-mount-prompt.ui:94
+msgid "User:"
+msgstr "ᱵᱮᱵᱷᱟᱨᱤᱭᱟᱹ :"
+
+#: src/ui/gtk-mount-prompt.ui:117
+msgid "Domain:"
+msgstr "ᱰᱳᱢᱮᱱ :"
+
+#: src/ui/gtk-mount-prompt.ui:150
+msgid "Co_nnect"
+msgstr "ᱡᱩᱲᱟᱹᱣ"
+
+#: src/ui/lockscreen.ui:39 src/ui/lockscreen.ui:310
+msgid "Back"
+msgstr "ᱛᱟᱭᱟᱢ"
+
+#: src/ui/lockscreen.ui:90
+msgid "Slide up to unlock"
+msgstr "ᱠᱷᱩᱞᱟᱹ ᱞᱟᱹᱜᱤᱫ ᱪᱮᱛᱟᱱ ᱥᱮᱫ ᱴᱷᱮᱞᱟᱣ ᱢᱮ"
+
+#: src/ui/lockscreen.ui:273
+msgid "Unlock"
+msgstr "ᱠᱷᱩᱞᱟᱹ"
+
+#: src/ui/network-auth-prompt.ui:5 src/ui/polkit-auth-prompt.ui:6
+msgid "Authentication required"
+msgstr "ᱟᱫᱮᱨ ᱫᱚᱨᱠᱟᱨ ᱠᱟᱱᱟ"
+
+#: src/ui/network-auth-prompt.ui:40
+#: plugins/ticket-box/prefs/ticket-box-prefs.c:90
+msgid "_Cancel"
+msgstr "ᱵᱟᱹᱰᱨᱟᱹ"
+
+#: src/ui/network-auth-prompt.ui:58
+msgid "C_onnect"
+msgstr "ᱡᱩᱲᱟᱹᱣ"
+
+#: src/ui/polkit-auth-prompt.ui:122
+msgid "Authenticate"
+msgstr "ᱟᱫᱮᱨ"
+
+#: src/ui/power-menu.ui:69
+#, -ERR:PROP-NOT-FOUND-
+#| msgid "Power Off"
+msgid "_Power Off"
+msgstr "ᱯᱟᱣᱟᱨ ᱵᱚᱸᱫᱽ"
+
+#: src/ui/power-menu.ui:110
+msgid "_Lock"
+msgstr "ᱠᱩᱞᱩᱯ"
+
+#: src/ui/power-menu.ui:151
+msgid "_Screenshot"
+msgstr "ᱥᱠᱨᱤᱱᱥᱚᱴ"
+
+#: src/ui/power-menu.ui:192
+#, -ERR:PROP-NOT-FOUND-
+#| msgid "Emergency"
+msgid "_Emergency"
+msgstr "ᱟᱹᱯᱟᱹᱛᱠᱟᱹᱞ"
+
+#: src/ui/run-command-dialog.ui:6
+msgid "Run Command"
+msgstr "ᱟᱫᱮᱥ ᱫᱟᱹᱲ ᱪᱷᱚ"
+
+#: src/ui/settings.ui:320
+#, -ERR:PROP-NOT-FOUND-
+#| msgid "Notification"
+msgid "No notifications"
+msgstr "ᱠᱷᱚᱵᱚᱨ"
+
+#: src/ui/settings.ui:360
+msgid "Clear all"
+msgstr "ᱡᱷᱚᱛᱚ ᱯᱷᱟᱨᱪᱟᱭ ᱢᱮ"
+
+#: src/ui/system-prompt.ui:62
+msgid "Confirm:"
+msgstr "ᱴᱷᱟᱹᱣᱠᱟᱹ :"
+
+#: src/ui/top-panel.ui:32
+#, -ERR:PROP-NOT-FOUND-
+#| msgid "Power Off"
+msgid "_Power Off…"
+msgstr "ᱯᱟᱣᱟᱨ ᱵᱚᱸᱫᱽ"
+
+#: src/ui/top-panel.ui:60
+#, -ERR:PROP-NOT-FOUND-
+#| msgid "Restart"
+msgid "_Restart…"
+msgstr "ᱫᱚᱦᱲᱟ ᱮᱦᱚᱵ"
+
+#: src/ui/top-panel.ui:88
+#, -ERR:PROP-NOT-FOUND-
+#| msgid "Log Out"
+msgid "_Log Out…"
+msgstr "ᱵᱟᱦᱨᱮ ᱛᱮ ᱚᱰᱚᱠ"
+
+#. Translators: This is a time format for a date in
+#. long format
+#: src/util.c:339
+msgid "%A, %B %-e"
+msgstr "%A, %B %-e"
+
+#: src/vpn-info.c:89
+msgid "VPN"
+msgstr "VPN"
+
+#: src/widget-box.c:54
+msgid "Plugin not found"
+msgstr "ᱯᱞᱩᱡᱤᱱ ᱵᱟᱝ ᱧᱟᱢ ᱞᱮᱱᱟ"
+
+#: src/widget-box.c:57
+#, c-format
+msgid "The plugin '%s' could not be loaded."
+msgstr "ᱯᱞᱚᱜᱤᱱ '%s' ᱫᱚ ᱞᱟᱫᱮ ᱵᱟᱭ ᱜᱟᱱ ᱞᱮᱱᱟ ᱾"
+
+#: src/wifiinfo.c:90
+msgid "Wi-Fi"
+msgstr "Wi-Fi"
+
+#. Translators: Refers to the cellular wireless network
+#: src/wwan-info.c:210
+msgid "Cellular"
+msgstr "ᱯᱷᱚᱱ ᱠᱚᱛᱮ"
+
+#: plugins/emergency-info/emergency-info.ui:39
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:70
+msgid "Personal Information"
+msgstr "ᱱᱤᱡᱚᱨ ᱵᱚᱵᱚᱛ"
+
+#: plugins/emergency-info/emergency-info.ui:47
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:88
+msgid "Date of Birth"
+msgstr "ᱡᱟᱱᱟᱢ ᱢᱟᱦᱟᱸ"
+
+#: plugins/emergency-info/emergency-info.ui:65
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:100
+msgid "Preferred Language"
+msgstr "ᱠᱩᱥᱤ ᱯᱟᱹᱨᱥᱤᱠᱚ"
+
+#: plugins/emergency-info/emergency-info.ui:83
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:112
+msgid "Home Address"
+msgstr "ᱚᱲᱟᱜ ᱴᱷᱤᱠᱬᱟᱹ"
+
+#: plugins/emergency-info/emergency-info.ui:91
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:129
+msgid "Medical Information"
+msgstr "ᱢᱮᱰᱤᱠᱟᱞ ᱤᱱᱯᱷᱚᱨᱢᱮᱥᱚᱱ"
+
+#: plugins/emergency-info/emergency-info.ui:99
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:135
+msgid "Age"
+msgstr "ᱩᱢᱚᱨ"
+
+#: plugins/emergency-info/emergency-info.ui:117
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:147
+msgid "Blood Type"
+msgstr "ᱢᱟᱭᱟᱢ ᱯᱨᱚᱠᱟᱨ"
+
+#: plugins/emergency-info/emergency-info.ui:135
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:159
+msgid "Height"
+msgstr "ᱩᱥᱩᱞ "
+
+#: plugins/emergency-info/emergency-info.ui:153
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:171
+msgid "Weight"
+msgstr "ᱦᱟᱢᱟᱞ"
+
+#: plugins/emergency-info/emergency-info.ui:171
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:183
+msgid "Allergies"
+msgstr "ᱟᱞᱮᱨᱡᱤ"
+
+#: plugins/emergency-info/emergency-info.ui:179
+msgid "Medications & Conditions"
+msgstr "ᱢᱮᱰᱤᱠᱟᱞ ᱟᱨ ᱠᱚᱱᱰᱤᱥᱚᱱ"
+
+#: plugins/emergency-info/emergency-info.ui:187
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:213
+msgid "Other Information"
+msgstr "ᱮᱴᱟᱜ ᱡᱚᱱᱤᱥ"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:6
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:19
+msgid "Emergency Info Preferences"
+msgstr "ᱮᱢᱚᱨᱡᱮᱱᱥᱤ ᱵᱤᱵᱨᱚᱬ ᱠᱩᱥᱤᱠᱚ"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:40
+msgid "Done"
+msgstr "ᱦᱩᱭᱮᱱᱟ"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:76
+msgid "Owner Name"
+msgstr "ᱢᱟᱞᱤᱠ ᱧᱩᱱᱩᱢ"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:198
+msgid "Medications and Conditions"
+msgstr "ᱵᱮᱰᱟᱠ ᱟᱨ ᱵᱮᱰᱟᱠ"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:239
+msgid "Add Contact"
+msgstr "ᱥᱟᱸᱜᱷᱟᱨ ᱥᱮᱞᱮᱫᱽ ᱢᱮ"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:284
+msgid "Add New Contact"
+msgstr "ᱱᱟᱶᱟ ᱥᱚᱢᱯᱚᱨᱠ"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:294
+msgid "Add"
+msgstr "ᱥᱮᱞᱮᱫ ᱢᱮ"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:312
+msgid "New Contact Name"
+msgstr "ᱱᱟᱶᱟ ᱥᱚᱢᱯᱚᱨᱠ ᱧᱩᱛᱩᱢ"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:326
+#, -ERR:PROP-NOT-FOUND-
+#| msgid "Geolocation"
+msgid "Relationship"
+msgstr "ᱥᱟᱹᱜᱟᱹᱭ"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:339
+msgid "Number"
+msgstr "ᱱᱚᱢᱵᱚᱨ"
+
+#: plugins/ticket-box/ticket-box.ui:15
+msgid "No documents to display"
+msgstr "ᱫᱮᱠᱷᱟᱣ ᱞᱟᱹᱜᱤᱫ ᱫᱚᱞᱤᱞ ᱵᱟᱹᱱᱩᱜᱼᱟ"
+
+#: plugins/ticket-box/ticket-box.ui:83
+msgid "Tickets"
+msgstr "ᱴᱤᱠᱮᱴ ᱠᱚ"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.c:86
+msgid "Choose Folder"
+msgstr "ᱯᱚᱴᱚᱢ ᱵᱟᱪᱷᱟᱣ ᱢᱮ …"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.c:89
+#, -ERR:PROP-NOT-FOUND-
+#| msgid "Open"
+msgid "_Open"
+msgstr "ᱠᱷᱩᱞᱟᱹ"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:6
+msgid "Ticket Box Preferences"
+msgstr "ᱴᱤᱠᱮᱴ ᱵᱚᱠᱥ ᱠᱩᱥᱤᱭᱟᱜ ᱠᱚ"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:13
+msgid "Paths"
+msgstr "ᱦᱚᱨ ᱠᱚ"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:18
+msgid "Folder Settings"
+msgstr "ᱯᱚᱴᱚᱢ ᱥᱟᱡᱟᱣ ᱠᱚ"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:19
+msgid "Where Phosh looks for your tickets"
+msgstr "ᱡᱟᱦᱟᱸᱨᱮ Phosh ᱟᱢᱟᱜ ᱴᱤᱠᱮᱴ ᱮ ᱯᱟᱱᱛᱮ ᱵᱟᱲᱟᱭᱟᱭ"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:22
+msgid "Ticket Folder"
+msgstr "ᱴᱤᱠᱮᱴ ᱯᱚᱴᱚᱢ"
+
+#: plugins/upcoming-events/event-list.c:142
+msgid "Today"
+msgstr "ᱛᱮᱦᱮᱸᱧ"
+
+#: plugins/upcoming-events/event-list.c:144
+msgid "Tomorrow"
+msgstr "ᱜᱟᱯᱟ"
+
+#: plugins/upcoming-events/event-list.c:150
+#, c-format
+msgid "In %d day"
+msgid_plural "In %d days"
+msgstr[0] " %d ᱫᱤᱱ ᱨᱮ"
+msgstr[1] " %d ᱫᱤᱱ ᱨᱮ"
+msgstr[2] " %d ᱫᱤᱱ ᱨᱮ"
+
+#: plugins/upcoming-events/event-list.ui:26
+msgid "No events"
+msgstr "ᱡᱟᱦᱟᱱ ᱠᱷᱚᱵᱚᱨ ᱠᱚ ᱵᱟ.ᱱᱩᱜᱼᱟ"
+
+#. Translators: This is the time format used in 24-hour mode.
+#: plugins/upcoming-events/upcoming-event.c:56
+msgid "%R"
+msgstr "%R"
+
+#. Translators: This is the time format used in 12-hour mode.
+#: plugins/upcoming-events/upcoming-event.c:59
+msgid "%l:%M %p"
+msgstr "%l:%M %p"
+
+#. Translators: An all day event
+#: plugins/upcoming-events/upcoming-event.c:122
+#: plugins/upcoming-events/upcoming-event.c:159
+msgid "All day"
+msgstr "ᱡᱷᱚᱛᱚ ᱫᱤᱱ"
+
+#. Translators: When the event ends: Ends\r16:00
+#: plugins/upcoming-events/upcoming-event.c:148
+msgid "Ends"
+msgstr "ᱢᱩᱪᱟᱹᱫ"
+
+#: plugins/upcoming-events/upcoming-event.c:398
+msgid "Untitled event"
+msgstr "ᱵᱟᱝᱧᱩᱛᱩᱢ ᱜᱚᱴᱱᱟ"
+
+#~ msgid "Lock Screen"
+#~ msgstr "ᱠᱩᱞᱩᱯ ᱥᱠᱨᱤᱱ"
+
+#~ msgid "Logout"
+#~ msgstr "ᱵᱟᱦᱨᱮ ᱛᱮ ᱚᱰᱚᱠ"
