@@ -1,6 +1,3 @@
-[submodule "phosh"]
-	path = phosh
-	url = https://gitlab.gnome.org/samcday/phosh.git
 [submodule "libphosh-rs"]
 	path = libphosh-rs
 	url = https://gitlab.gnome.org/samcday/libphosh-rs.git
