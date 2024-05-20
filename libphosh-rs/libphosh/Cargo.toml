@@ -1,0 +1,48 @@
+[package]
+name = "libphosh"
+version = "0.0.1"
+authors = ["Guido Günther <agx@sigxcpu.org>"]
+edition = "2021"
+readme = "../README.md"
+homepage = "https://guidog.pages.gitlab.gnome.org/libphosh-rs/"
+description = "Rust bindings for libphosh"
+license = "MIT"
+repository = "https://guidog.pages.gitlab.gnome.org/libphosh-rs/"
+categories = ["api-bindings"]
+keywords = ["phosh", "gnome"]
+
+[lib]
+name = "libphosh"
+
+[features]
+
+[package.metadata.docs.rs]
+all-features = true
+rustc-args = ["--cfg", "docsrs"]
+rustdoc-args = ["--cfg", "docsrs"]
+
+[dependencies]
+libc = '0.2'
+
+[dependencies.glib]
+version = "0.18"
+branch = "0.18"
+git = "https://github.com/gtk-rs/gtk-rs-core"
+features = [ "v2_66" ]
+
+[dependencies.gio]
+version = "0.18"
+branch = "0.18"
+git = "https://github.com/gtk-rs/gtk-rs-core"
+features = [ "v2_70" ]
+
+[dependencies.gtk]
+version = "0.18"
+branch = "0.18"
+git = "https://github.com/gtk-rs/gtk3-rs.git"
+features = ["v3_24"]
+
+[dependencies.ffi]
+package = "libphosh-sys"
+path = './sys'
+version = "0.0.1"
