@@ -8,10 +8,7 @@
 
 #define G_LOG_DOMAIN "phosh-lockscreen"
 
-#include "phosh-config.h"
-
 #include "auth.h"
-#include "bt-info.h"
 #include "call-notification.h"
 #include "calls-manager.h"
 #include "keypad.h"
@@ -28,7 +25,6 @@
 #include <string.h>
 #include <glib/gi18n.h>
 #include <math.h>
-#include <time.h>
 
 #include <handy.h>
 #include <cui-call-display.h>
@@ -53,11 +49,6 @@
  */
 
 
-typedef enum {
-  POS_OVERVIEW = 0,
-  POS_UNLOCK   = 1,
-} PhoshLocksreenPos;
-
 enum {
   PROP_0,
   PROP_CALLS_MANAGER,
@@ -72,15 +63,10 @@ enum {
 };
 static guint signals[N_SIGNALS] = { 0 };
 
-typedef struct _PhoshLockscreen
-{
-  PhoshLayerSurface parent;
-} PhoshLockscreen;
-
-
 typedef struct {
-  HdyDeck           *deck;
-  GtkWidget         *carousel;
+  HdyDeck            *deck;
+  GtkWidget          *carousel;
+  PhoshLockscreenPage default_page;
 
   /* info page */
   GtkWidget         *box_info;
@@ -108,6 +94,9 @@ typedef struct {
   gint64             last_input;
   PhoshAuth         *auth;
   GSettings         *lockscreen_settings;
+
+  /* extra page */
+  GtkWidget *extra_page;
 
   /* widget box */
   GtkWidget         *widget_box;
@@ -176,17 +165,6 @@ clear_input (PhoshLockscreen *self, gboolean clear_all)
   }
 }
 
-static void
-show_info_page (PhoshLockscreen *self)
-{
-  PhoshLockscreenPrivate *priv = phosh_lockscreen_get_instance_private (self);
-
-  if (hdy_carousel_get_position (HDY_CAROUSEL (priv->carousel)) <= 0)
-    return;
-
-  hdy_carousel_scroll_to (HDY_CAROUSEL (priv->carousel), priv->box_info);
-}
-
 
 static gboolean
 keypad_check_idle (PhoshLockscreen *self)
@@ -196,7 +174,7 @@ keypad_check_idle (PhoshLockscreen *self)
 
   g_assert (PHOSH_IS_LOCKSCREEN (self));
   if (priv->auth == NULL && now - priv->last_input > LOCKSCREEN_IDLE_SECONDS * 1000 * 1000) {
-    show_info_page (self);
+    phosh_lockscreen_set_page (self, priv->default_page);
     priv->idle_timer = 0;
     return G_SOURCE_REMOVE;
   }
@@ -207,13 +185,7 @@ keypad_check_idle (PhoshLockscreen *self)
 static void
 show_unlock_page (PhoshLockscreen *self)
 {
-  PhoshLockscreenPrivate *priv = phosh_lockscreen_get_instance_private (self);
-
-  if (hdy_carousel_get_position (HDY_CAROUSEL (priv->carousel)) >= POS_UNLOCK)
-    return;
-
-  hdy_carousel_scroll_to (HDY_CAROUSEL (priv->carousel), priv->box_unlock);
-
+  phosh_lockscreen_set_page (self, PHOSH_LOCKSCREEN_PAGE_UNLOCK);
   /* skip signal on init */
   if (signals[WAKEUP_OUTPUT])
     g_signal_emit (self, signals[WAKEUP_OUTPUT], 0);
@@ -221,7 +193,7 @@ show_unlock_page (PhoshLockscreen *self)
 
 
 static gboolean
-finish_shake_label (PhoshLockscreen *self)
+finish_shake_entry (PhoshLockscreen *self)
 {
   clear_input (self, TRUE);
   gtk_widget_set_sensitive (GTK_WIDGET (self), TRUE);
@@ -230,7 +202,7 @@ finish_shake_label (PhoshLockscreen *self)
 
 
 static gboolean
-shake_label (GtkWidget     *widget,
+shake_entry (GtkWidget     *widget,
              GdkFrameClock *frame_clock,
              gpointer       data)
 {
@@ -249,8 +221,8 @@ shake_label (GtkWidget     *widget,
       guint id;
 
       gtk_entry_set_alignment (GTK_ENTRY (priv->entry_pin), 0.5);
-      id = g_timeout_add (400, (GSourceFunc) finish_shake_label, self);
-      g_source_set_name_by_id (id, "[PhoshLockscreen] shake label");
+      id = g_timeout_add (400, (GSourceFunc) finish_shake_entry, self);
+      g_source_set_name_by_id (id, "[PhoshLockscreen] shake PIN entry");
       return FALSE;
     }
   }
@@ -291,15 +263,8 @@ auth_async_cb (PhoshAuth *auth, GAsyncResult *result, PhoshLockscreen *self)
   if (authenticated) {
     g_signal_emit (self, signals[LOCKSCREEN_UNLOCK], 0);
   } else {
-    GdkFrameClock *clock;
-    gint64 now;
     /* give visual feedback on error */
-    clock = gtk_widget_get_frame_clock (priv->entry_pin);
-    now = gdk_frame_clock_get_frame_time (clock);
-    gtk_widget_add_tick_callback (GTK_WIDGET (self),
-                                  shake_label,
-                                  g_variant_ref_sink (g_variant_new_int64 (now)),
-                                  (GDestroyNotify) g_variant_unref);
+    phosh_lockscreen_shake_pin_entry (self);
     phosh_keypad_distribute (PHOSH_KEYPAD (priv->keypad));
   }
   g_clear_object (&priv->auth);
@@ -379,32 +344,10 @@ input_changed_cb (PhoshLockscreen *self)
 static void
 submit_cb (PhoshLockscreen *self)
 {
-  PhoshLockscreenPrivate *priv;
-  const char *input;
-  guint16 length;
+  PhoshLockscreenClass *klass = PHOSH_LOCKSCREEN_GET_CLASS (self);
 
-  g_assert (PHOSH_IS_LOCKSCREEN (self));
-
-  priv = phosh_lockscreen_get_instance_private (self);
-  priv->last_input = g_get_monotonic_time ();
-
-  length = gtk_entry_get_text_length (GTK_ENTRY (priv->entry_pin));
-  if (length == 0) {
-    return;
-  }
-
-  input = gtk_entry_get_text (GTK_ENTRY (priv->entry_pin));
-
-  gtk_label_set_label (GTK_LABEL (priv->lbl_unlock_status), _("Checking…"));
-  gtk_widget_set_sensitive (GTK_WIDGET (self), FALSE);
-
-  if (priv->auth == NULL)
-    priv->auth = PHOSH_AUTH (phosh_auth_new ());
-  phosh_auth_authenticate_async_start (priv->auth,
-                                       input,
-                                       NULL,
-                                       (GAsyncReadyCallback)auth_async_cb,
-                                       g_object_ref (self));
+  if (klass->unlock_submit_cb)
+    klass->unlock_submit_cb (self);
 }
 
 
@@ -414,14 +357,11 @@ key_press_event_cb (PhoshLockscreen *self, GdkEventKey *event, gpointer data)
   PhoshLockscreenPrivate *priv;
   gboolean handled = FALSE;
   gboolean on_unlock_page, with_control;
-  double position;
 
   g_assert (PHOSH_IS_LOCKSCREEN (self));
   priv = phosh_lockscreen_get_instance_private (self);
 
-  position = hdy_carousel_get_position (HDY_CAROUSEL (priv->carousel));
-  /* Round to nearest page so we already accept keyboard input before animation ends */
-  on_unlock_page = (int)round(position) == POS_UNLOCK;
+  on_unlock_page = phosh_lockscreen_get_page (self) == PHOSH_LOCKSCREEN_PAGE_UNLOCK;
   with_control = event->state & GDK_CONTROL_MASK;
 
   if (gtk_entry_im_context_filter_keypress (GTK_ENTRY (priv->entry_pin), event)) {
@@ -435,7 +375,7 @@ key_press_event_cb (PhoshLockscreen *self, GdkEventKey *event, gpointer data)
       break;
     case GDK_KEY_Escape:
       clear_input (self, TRUE);
-      show_info_page (self);
+      phosh_lockscreen_set_page (self, priv->default_page);
       handled = TRUE;
       break;
     case GDK_KEY_Delete:
@@ -519,13 +459,6 @@ carousel_position_notified_cb (PhoshLockscreen *self,
                                HdyCarousel     *carousel)
 {
   PhoshLockscreenPrivate *priv = phosh_lockscreen_get_instance_private (self);
-  double position;
-
-  position = hdy_carousel_get_position (HDY_CAROUSEL (priv->carousel));
-
-  if (position <= POS_OVERVIEW || position >= POS_UNLOCK)
-    return;
-
   g_clear_handle_id (&priv->idle_timer, g_source_remove);
 }
 
@@ -538,11 +471,9 @@ carousel_page_changed_cb (PhoshLockscreen *self,
   PhoshShell *shell = phosh_shell_get_default ();
   PhoshOskManager *osk_manager = phosh_shell_get_osk_manager (shell);
   gboolean osk_visible = phosh_osk_manager_get_visible (osk_manager);
+  PhoshLockscreenPage page = phosh_lockscreen_get_page (self);
 
-  if (index == POS_OVERVIEW) {
-    gtk_widget_set_sensitive (priv->entry_pin, FALSE);
-    clear_input (self, TRUE);
-  } else if (index == POS_UNLOCK) {
+  if (page == PHOSH_LOCKSCREEN_PAGE_UNLOCK) {
     focus_pin_entry (self, osk_visible);
 
     if (!priv->idle_timer) {
@@ -553,7 +484,8 @@ carousel_page_changed_cb (PhoshLockscreen *self,
       g_source_set_name_by_id (priv->idle_timer, "[PhoshLockscreen] keypad check");
     }
   } else {
-    g_assert_not_reached ();
+    gtk_widget_set_sensitive (priv->entry_pin, FALSE);
+    clear_input (self, TRUE);
   }
 }
 
@@ -771,6 +703,16 @@ on_notification_items_changed (PhoshLockscreen *self,
 
 
 static void
+on_show (PhoshLockscreen *self, gpointer userdata)
+{
+  PhoshLockscreenPrivate *priv;
+  g_return_if_fail (PHOSH_IS_LOCKSCREEN (self));
+  priv = phosh_lockscreen_get_instance_private (self);
+  phosh_lockscreen_set_page (self, priv->default_page);
+}
+
+
+static void
 phosh_lockscreen_constructed (GObject *object)
 {
   PhoshLockscreen *self = PHOSH_LOCKSCREEN (object);
@@ -793,6 +735,10 @@ phosh_lockscreen_constructed (GObject *object)
   g_signal_connect (G_OBJECT (self),
                     "key_press_event",
                     G_CALLBACK (key_press_event_cb),
+                    NULL);
+  g_signal_connect (G_OBJECT (self),
+                    "show",
+                    G_CALLBACK (on_show),
                     NULL);
 
   g_signal_connect_object (wall_clock,
@@ -928,6 +874,38 @@ phosh_lockscreen_configured (PhoshLayerSurface *layer_surface)
 
 
 static void
+unlock_submit_cb (PhoshLockscreen *self)
+{
+  PhoshLockscreenPrivate *priv;
+  const char *input;
+  guint16 length;
+
+  g_assert (PHOSH_IS_LOCKSCREEN (self));
+
+  priv = phosh_lockscreen_get_instance_private (self);
+  priv->last_input = g_get_monotonic_time ();
+
+  length = gtk_entry_get_text_length (GTK_ENTRY (priv->entry_pin));
+  if (length == 0) {
+    return;
+  }
+
+  input = gtk_entry_get_text (GTK_ENTRY (priv->entry_pin));
+
+  gtk_label_set_label (GTK_LABEL (priv->lbl_unlock_status), _("Checking…"));
+  gtk_widget_set_sensitive (GTK_WIDGET (self), FALSE);
+
+  if (priv->auth == NULL)
+    priv->auth = PHOSH_AUTH (phosh_auth_new ());
+  phosh_auth_authenticate_async_start (priv->auth,
+                                       input,
+                                       NULL,
+                                       (GAsyncReadyCallback)auth_async_cb,
+                                       g_object_ref (self));
+}
+
+
+static void
 phosh_lockscreen_class_init (PhoshLockscreenClass *klass)
 {
   GObjectClass *object_class = (GObjectClass *)klass;
@@ -941,6 +919,8 @@ phosh_lockscreen_class_init (PhoshLockscreenClass *klass)
   object_class->get_property = phosh_lockscreen_get_property;
 
   layer_surface_class->configured = phosh_lockscreen_configured;
+
+  klass->unlock_submit_cb = unlock_submit_cb;
 
   props[PROP_CALLS_MANAGER] =
     g_param_spec_object ("calls-manager",
@@ -1033,11 +1013,13 @@ phosh_lockscreen_init (PhoshLockscreen *self)
 
 
 GtkWidget *
-phosh_lockscreen_new (gpointer layer_shell,
+phosh_lockscreen_new (GType lockscreen_type,
+                      gpointer layer_shell,
                       gpointer wl_output,
                       PhoshCallsManager *calls_manager)
 {
-  return g_object_new (PHOSH_TYPE_LOCKSCREEN,
+  g_assert (g_type_is_a (lockscreen_type, phosh_lockscreen_get_type ()));
+  return g_object_new (lockscreen_type,
                        "layer-shell", layer_shell,
                        "wl-output", wl_output,
                        "anchor", ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP |
@@ -1062,16 +1044,24 @@ PhoshLockscreenPage
 phosh_lockscreen_get_page (PhoshLockscreen *self)
 {
   PhoshLockscreenPrivate *priv;
-  gdouble position;
+  guint position;
 
-  g_return_val_if_fail (PHOSH_IS_LOCKSCREEN (self), PHOSH_LOCKSCREEN_PAGE_DEFAULT);
+  g_return_val_if_fail (PHOSH_IS_LOCKSCREEN (self), PHOSH_LOCKSCREEN_PAGE_INFO);
   priv = phosh_lockscreen_get_instance_private (self);
-  position = hdy_carousel_get_position (HDY_CAROUSEL (priv->carousel));
 
-  if (position <= 0)
-    return PHOSH_LOCKSCREEN_PAGE_DEFAULT;
-  else
-    return PHOSH_LOCKSCREEN_PAGE_UNLOCK;
+  /* Round to nearest page - the "current" page is a somewhat arbitrary concept if the carousel
+   * is animating (or being manually swiped) from one page to another. By rounding like this, the
+   * key_press_event_cb starts accepting input as soon as at least half the unlock page has swiped
+   * in. */
+  position = round (hdy_carousel_get_position (HDY_CAROUSEL (priv->carousel)));
+
+  if (position == 0)
+    return PHOSH_LOCKSCREEN_PAGE_INFO;
+
+  if (position == 1 && priv->extra_page)
+    return PHOSH_LOCKSCREEN_PAGE_EXTRA;
+
+  return PHOSH_LOCKSCREEN_PAGE_UNLOCK;
 }
 
 /*
@@ -1090,7 +1080,114 @@ phosh_lockscreen_set_page (PhoshLockscreen *self, PhoshLockscreenPage page)
   g_return_if_fail (PHOSH_IS_LOCKSCREEN (self));
   priv = phosh_lockscreen_get_instance_private (self);
 
-  scroll_to = (page == PHOSH_LOCKSCREEN_PAGE_UNLOCK) ? priv->box_unlock : priv->box_info;
+  switch (page) {
+  case PHOSH_LOCKSCREEN_PAGE_EXTRA:
+    scroll_to = priv->extra_page;
+    if (scroll_to)
+      break;
+    /* there's no extra page set, so ... */
+    /* fall through */
+  case PHOSH_LOCKSCREEN_PAGE_INFO:
+    scroll_to = priv->box_info;
+    break;
+  case PHOSH_LOCKSCREEN_PAGE_UNLOCK:
+    scroll_to = priv->box_unlock;
+    break;
+  default:
+    scroll_to = priv->box_info;
+    break;
+  }
 
   hdy_carousel_scroll_to (HDY_CAROUSEL (priv->carousel), scroll_to);
+}
+
+/*
+ * phosh_lockscreen_set_default_page
+ * @self: The #PhoshLockscreen
+ * PhoshLockscreenPage: the page to show by default
+ *
+ * Specifies which page should be shown by default when the lockscreen is made visible. This will
+ * also be the page that is shown when the keypad idle timer is reached.
+ */
+void
+phosh_lockscreen_set_default_page (PhoshLockscreen *self, PhoshLockscreenPage page)
+{
+  PhoshLockscreenPrivate *priv;
+  g_return_if_fail (PHOSH_IS_LOCKSCREEN (self));
+  priv = phosh_lockscreen_get_instance_private (self);
+  priv->default_page = page;
+}
+
+/*
+ * phosh_lockscreen_get_pin_entry
+ * @self: The #PhoshLockscreen
+ *
+ * Returns: the current contents of the keypad PIN entry buffer
+ */
+const gchar*
+phosh_lockscreen_get_pin_entry (PhoshLockscreen *self)
+{
+  PhoshLockscreenPrivate *priv;
+  g_return_val_if_fail (PHOSH_IS_LOCKSCREEN (self), "");
+  priv = phosh_lockscreen_get_instance_private (self);
+  return gtk_entry_get_text (GTK_ENTRY (priv->entry_pin));
+}
+
+/*
+ * phosh_lockscreen_clear_pin_entry
+ * @self: The #PhoshLockscreen
+ *
+ * Clears the current contents of the keypad PIN entry buffer
+ */
+void
+phosh_lockscreen_clear_pin_entry (PhoshLockscreen *self)
+{
+  PhoshLockscreenPrivate *priv;
+  g_return_if_fail (PHOSH_IS_LOCKSCREEN (self));
+  priv = phosh_lockscreen_get_instance_private (self);
+  gtk_editable_delete_text (GTK_EDITABLE (priv->entry_pin), 0, -1);
+}
+
+/*
+ * phosh_lockscreen_shake_pin_entry
+ * @self: The #PhoshLockscreen
+ *
+ * Triggers an animation that shakes the PIN entry left and right for a brief period.
+ * After the animation is complete, the PIN entry buffer is cleared. Used to visually indicate
+ * authentication errors.
+ */
+void phosh_lockscreen_shake_pin_entry (PhoshLockscreen *self)
+{
+  PhoshLockscreenPrivate *priv;
+  GdkFrameClock *clock;
+  gint64 now;
+
+  g_return_if_fail (PHOSH_IS_LOCKSCREEN (self));
+  priv = phosh_lockscreen_get_instance_private (self);
+  clock = gtk_widget_get_frame_clock (priv->entry_pin);
+  now = gdk_frame_clock_get_frame_time (clock);
+  gtk_widget_add_tick_callback (GTK_WIDGET (self),
+                                shake_entry,
+                                g_variant_ref_sink (g_variant_new_int64 (now)),
+                                (GDestroyNotify) g_variant_unref);
+}
+
+/*
+ * phosh_lockscreen_add_extra_page
+ * @self: The #PhoshLockscreen
+ * @widget: The extra #GtkWidget to insert into the lockscreen carousel
+ *
+ * Inserts a custom widget into the "extra" page of the lockscreen. This page sits in-between the
+ * info page and the keypad page. By default, this page does not exist and is not used. Once an
+ * extra page is added, it can be navigated to by swiping and also via calls to
+ * phosh_lockscreen_set_default_page.
+ */
+void phosh_lockscreen_add_extra_page (PhoshLockscreen *self, GtkWidget *widget)
+{
+  PhoshLockscreenPrivate *priv;
+  g_return_if_fail (PHOSH_IS_LOCKSCREEN (self));
+  priv = phosh_lockscreen_get_instance_private (self);
+
+  priv->extra_page = widget;
+  hdy_carousel_insert (HDY_CAROUSEL (priv->carousel), priv->extra_page, 1);
 }
