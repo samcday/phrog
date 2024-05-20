@@ -1,0 +1,643 @@
+# Croatian translation for phosh.
+# Copyright (C) 2020 phosh's COPYRIGHT HOLDER
+# This file is distributed under the same license as the phosh package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: phosh master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/World/Phosh/phosh/issues\n"
+"POT-Creation-Date: 2023-01-11 20:25+0000\n"
+"PO-Revision-Date: 2023-01-13 12:26+0100\n"
+"Last-Translator: gogo <trebelnik2@gmail.com>\n"
+"Language-Team: Croatian <hr@li.org>\n"
+"Language: hr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 3.2.2\n"
+
+#. Translators: this is the session name, no need to translate it
+#: data/phosh.session.desktop.in.in:4
+msgid "Phosh"
+msgstr "Phosh"
+
+#: data/sm.puri.Phosh.desktop.in.in:4
+msgid "Phone Shell"
+msgstr "Telefonska ljuska"
+
+#: data/sm.puri.Phosh.desktop.in.in:5
+msgid "Window management and application launching for mobile"
+msgstr "Upravljanje prozorima i aplikacijama na mobilnim telefonima"
+
+#: plugins/calendar/calendar.desktop.in.in:5
+msgid "Calendar"
+msgstr "Kalendar"
+
+#: plugins/calendar/calendar.desktop.in.in:6
+msgid "A simple calendar widget"
+msgstr "Jednostavna aplikacija kalendara"
+
+#: plugins/ticket-box/ticket-box.desktop.in.in:4
+#: plugins/ticket-box/ticket-box.ui:14
+msgid "Ticket Box"
+msgstr "Kutija za karte"
+
+#: plugins/ticket-box/ticket-box.desktop.in.in:5
+msgid "Show PDFs on the lock screen. <b>This plugin is experimental.</b>"
+msgstr ""
+"Prikaži PDF-ove na zaključanom zaslonu. <b>Ovaj priključak je "
+"eksperimentalan.</b>"
+
+#: plugins/upcoming-events/upcoming-events.desktop.in.in:4
+msgid "Upcoming Events"
+msgstr "Nadolazeći događaji"
+
+#: plugins/upcoming-events/upcoming-events.desktop.in.in:5
+msgid "Show upcoming calendar events"
+msgstr "Prikaži nadolazeće događaje"
+
+#: src/app-grid-button.c:529
+msgid "Application"
+msgstr "Aplikacije"
+
+#: src/app-grid.c:137
+msgid "Show All Apps"
+msgstr "Prikaži sve aplikacije"
+
+#: src/app-grid.c:140
+msgid "Show Only Mobile Friendly Apps"
+msgstr "Prikaži samo mobilne aplikacije"
+
+#: src/bt-info.c:92
+msgctxt "bluetooth:enabled"
+msgid "On"
+msgstr "Uključeno"
+
+#: src/bt-info.c:94
+msgid "Bluetooth"
+msgstr "Bluetooth"
+
+#: src/docked-info.c:81
+msgid "Docked"
+msgstr "Pričvršećeno"
+
+#: src/docked-info.c:81 src/docked-info.c:199
+msgid "Undocked"
+msgstr "Nije pričvršećeno"
+
+#: src/end-session-dialog.c:162
+msgid "Log Out"
+msgstr "Odjava"
+
+#: src/end-session-dialog.c:165
+#, c-format
+msgid "%s will be logged out automatically in %d second."
+msgid_plural "%s will be logged out automatically in %d seconds."
+msgstr[0] "%s će se automatski odjaviti za %d sekundu."
+msgstr[1] "%s će se automatski odjaviti za %d sekunde."
+msgstr[2] "%s će se automatski odjaviti za %d sekundi."
+
+#: src/end-session-dialog.c:171 src/ui/top-panel.ui:36
+msgid "Power Off"
+msgstr "Isključi"
+
+#: src/end-session-dialog.c:172
+#, c-format
+msgid "The system will power off automatically in %d second."
+msgid_plural "The system will power off automatically in %d seconds."
+msgstr[0] "Sustav će se automatski isključiti za %d sekundu."
+msgstr[1] "Sustav će se automatski isključiti za %d sekunde."
+msgstr[2] "Sustav će se automatski isključiti za %d sekundi."
+
+#: src/end-session-dialog.c:178 src/ui/top-panel.ui:29
+msgid "Restart"
+msgstr "Ponovno pokreni"
+
+#: src/end-session-dialog.c:179
+#, c-format
+msgid "The system will restart automatically in %d second."
+msgid_plural "The system will restart automatically in %d seconds."
+msgstr[0] "Sustav će se automatski ponovno pokrenuti za %d sekundu."
+msgstr[1] "Sustav će se automatski ponovno pokrenuti za %d sekunde."
+msgstr[2] "Sustav će se automatski ponovno pokrenuti za %d sekundi."
+
+#: src/end-session-dialog.c:269
+msgid "Unknown application"
+msgstr "Nepoznata aplikacija"
+
+#. Translators: quiet and silent are fbd profiles names:
+#. see https://source.puri.sm/Librem5/feedbackd#profiles
+#. for details
+#: src/feedbackinfo.c:91
+msgid "Quiet"
+msgstr "Neprimjetno"
+
+#. Translators: quiet and silent are fbd profiles names:
+#. see https://source.puri.sm/Librem5/feedbackd#profiles
+#. for details
+#: src/feedbackinfo.c:97
+msgid "Silent"
+msgstr "Utišano"
+
+#. Translators: Enable LED, haptic and audio feedback
+#: src/feedbackinfo.c:101
+msgctxt "feedback:enabled"
+msgid "On"
+msgstr "Uključeno"
+
+#: src/location-manager.c:268
+#, c-format
+msgid "Allow '%s' to access your location information?"
+msgstr "Dopustite da '%s' pristupi vašim informacijama lokacije?"
+
+#: src/location-manager.c:273
+msgid "Geolocation"
+msgstr "Geolokacija"
+
+#: src/location-manager.c:274
+msgid "Yes"
+msgstr "Da"
+
+#: src/location-manager.c:274
+msgid "No"
+msgstr "Ne"
+
+#: src/lockscreen.c:169 src/ui/lockscreen.ui:232
+msgid "Enter Passcode"
+msgstr "Upiši lozinku"
+
+#: src/lockscreen.c:393
+msgid "Checking…"
+msgstr "Provjeravanje…"
+
+#. Translators: Used when the title of a song is unknown
+#: src/media-player.c:322 src/ui/media-player.ui:182
+msgid "Unknown Title"
+msgstr "Nepoznati naslov"
+
+#. Translators: Used when the artist of a song is unknown
+#: src/media-player.c:330 src/ui/media-player.ui:165
+msgid "Unknown Artist"
+msgstr "Nepoznati izvođač"
+
+#: src/monitor-manager.c:119
+msgid "Built-in display"
+msgstr "Ugrađeni zaslon"
+
+#: src/monitor-manager.c:137
+#, c-format
+msgctxt ""
+"This is a monitor vendor name, followed by a size in inches, like 'Dell 15\"'"
+msgid "%s %s"
+msgstr "%s %s"
+
+#: src/monitor-manager.c:144
+#, c-format
+msgctxt ""
+"This is a monitor vendor name followed by product/model name where size in "
+"inches could not be calculated, e.g. Dell U2414H"
+msgid "%s %s"
+msgstr "%s %s"
+
+#. Translators: An unknown monitor type
+#: src/monitor-manager.c:153
+msgid "Unknown"
+msgstr "Nepoznat"
+
+#: src/network-auth-prompt.c:201
+#, c-format
+msgid "Authentication type of wifi network “%s” not supported"
+msgstr "Vrsta ovjere bežične mreže “%s” nije podržana"
+
+#: src/network-auth-prompt.c:206
+#, c-format
+msgid "Enter password for the wifi network “%s”"
+msgstr "Upišite lozinku za bežičnu mrežu “%s”"
+
+#: src/notifications/mount-notification.c:122
+msgid "Open"
+msgstr "Otvori"
+
+#: src/notifications/notification.c:383 src/notifications/notification.c:639
+msgid "Notification"
+msgstr "Obavijest"
+
+#. Translators: Timestamp seconds suffix
+#: src/notifications/timestamp-label.c:84
+msgctxt "timestamp-suffix-seconds"
+msgid "s"
+msgstr "sek"
+
+#. Translators: Timestamp minute suffix
+#: src/notifications/timestamp-label.c:86
+msgctxt "timestamp-suffix-minute"
+msgid "m"
+msgstr "min"
+
+#. Translators: Timestamp minutes suffix
+#: src/notifications/timestamp-label.c:88
+msgctxt "timestamp-suffix-minutes"
+msgid "m"
+msgstr "min"
+
+#. Translators: Timestamp hour suffix
+#: src/notifications/timestamp-label.c:90
+msgctxt "timestamp-suffix-hour"
+msgid "h"
+msgstr "sat"
+
+#. Translators: Timestamp hours suffix
+#: src/notifications/timestamp-label.c:92
+msgctxt "timestamp-suffix-hours"
+msgid "h"
+msgstr "sata"
+
+#. Translators: Timestamp day suffix
+#: src/notifications/timestamp-label.c:94
+msgctxt "timestamp-suffix-day"
+msgid "d"
+msgstr "dan"
+
+#. Translators: Timestamp days suffix
+#: src/notifications/timestamp-label.c:96
+msgctxt "timestamp-suffix-days"
+msgid "d"
+msgstr "dana"
+
+#. Translators: Timestamp month suffix
+#: src/notifications/timestamp-label.c:98
+msgctxt "timestamp-suffix-month"
+msgid "mo"
+msgstr "mje"
+
+#. Translators: Timestamp months suffix
+#: src/notifications/timestamp-label.c:100
+msgctxt "timestamp-suffix-months"
+msgid "mos"
+msgstr "mje"
+
+#. Translators: Timestamp year suffix
+#: src/notifications/timestamp-label.c:102
+msgctxt "timestamp-suffix-year"
+msgid "y"
+msgstr "god"
+
+#. Translators: Timestamp years suffix
+#: src/notifications/timestamp-label.c:104
+msgctxt "timestamp-suffix-years"
+msgid "y"
+msgstr "god"
+
+#: src/notifications/timestamp-label.c:121
+msgid "now"
+msgstr "sada"
+
+#. Translators: time difference "Over 5 years"
+#: src/notifications/timestamp-label.c:189
+#, c-format
+msgid "Over %dy"
+msgstr "Preko %dgod"
+
+#. Translators: time difference "almost 5 years"
+#: src/notifications/timestamp-label.c:193
+#, c-format
+msgid "Almost %dy"
+msgstr "Zamalo %dgod"
+
+#. Translators: a time difference like '<5m', if in doubt leave untranslated
+#: src/notifications/timestamp-label.c:200
+#, c-format
+msgid "%s%d%s"
+msgstr "%s%d%s"
+
+#: src/polkit-auth-agent.c:228
+msgid "Authentication dialog was dismissed by the user"
+msgstr "Dijalog ovjere je prekinut od strane korisnika"
+
+#: src/polkit-auth-prompt.c:278 src/ui/gtk-mount-prompt.ui:20
+#: src/ui/network-auth-prompt.ui:82 src/ui/polkit-auth-prompt.ui:56
+#: src/ui/system-prompt.ui:32
+msgid "Password:"
+msgstr "Lozinka:"
+
+#: src/polkit-auth-prompt.c:325
+msgid "Sorry, that didn’t work. Please try again."
+msgstr "Nažalost, to ne radi. Pokušajte ponovno."
+
+#: src/rotateinfo.c:81
+msgid "Portrait"
+msgstr "Uspravno"
+
+#: src/rotateinfo.c:84
+msgid "Landscape"
+msgstr "Položeno"
+
+#: src/rotateinfo.c:104 src/rotateinfo.c:188
+msgctxt "automatic-screen-rotation-disabled"
+msgid "Off"
+msgstr "Isključeno"
+
+#: src/rotateinfo.c:105
+msgctxt "automatic-screen-rotation-enabled"
+msgid "On"
+msgstr "Uključeno"
+
+#: src/run-command-dialog.c:129
+msgid "Press ESC to close"
+msgstr "Pritisni ESC za zatvaranje"
+
+#: src/run-command-manager.c:95
+#, c-format
+msgid "Running '%s' failed"
+msgstr "Pokretanje naredbe '%s' neuspjelo"
+
+#: src/system-prompt.c:365
+msgid "Passwords do not match."
+msgstr "Lozinke se ne podudaraju."
+
+#: src/system-prompt.c:372
+msgid "Password cannot be blank"
+msgstr "Lozinka ne može biti prazna"
+
+#: src/torch-info.c:80
+msgid "Torch"
+msgstr "Svjetlo"
+
+#: src/ui/app-auth-prompt.ui:49
+msgid "Remember decision"
+msgstr "Zapamti odabir"
+
+#: src/ui/app-auth-prompt.ui:62 src/ui/end-session-dialog.ui:53
+msgid "Cancel"
+msgstr "Odustani"
+
+#: src/ui/app-auth-prompt.ui:71 src/ui/end-session-dialog.ui:62
+msgid "Ok"
+msgstr "U redu"
+
+#: src/ui/app-grid-button.ui:55
+msgid "App"
+msgstr "Aplikacija"
+
+#: src/ui/app-grid-button.ui:79
+msgid "Remove from _Favorites"
+msgstr "Ukloni iz _omiljenih"
+
+#: src/ui/app-grid-button.ui:84
+msgid "Add to _Favorites"
+msgstr "Dodaj u _omiljene"
+
+#: src/ui/app-grid-button.ui:89
+msgid "View _Details"
+msgstr "Pogledaj _pojedinosti"
+
+#: src/ui/app-grid.ui:21
+msgid "Search apps…"
+msgstr "Pretraži aplikacije…"
+
+#: src/ui/end-session-dialog.ui:31
+msgid "Some applications are busy or have unsaved work"
+msgstr "Neke aplikacije su zauzete ili imaju nespremljeni rad"
+
+#: src/ui/gtk-mount-prompt.ui:94
+msgid "User:"
+msgstr "Korisnik:"
+
+#: src/ui/gtk-mount-prompt.ui:117
+msgid "Domain:"
+msgstr "Domena:"
+
+#: src/ui/gtk-mount-prompt.ui:150
+msgid "Co_nnect"
+msgstr "Po_veži se"
+
+#: src/ui/lockscreen.ui:39 src/ui/lockscreen.ui:340
+msgid "Back"
+msgstr "Natrag"
+
+#: src/ui/lockscreen.ui:93
+msgid "Slide up to unlock"
+msgstr "Povuci za otključavanje"
+
+#: src/ui/lockscreen.ui:282
+msgid "Emergency"
+msgstr "Hitno"
+
+#: src/ui/lockscreen.ui:298
+msgid "Unlock"
+msgstr "Otključaj"
+
+#: src/ui/network-auth-prompt.ui:5 src/ui/polkit-auth-prompt.ui:6
+msgid "Authentication required"
+msgstr "Potrebna je ovjera"
+
+#: src/ui/network-auth-prompt.ui:40
+#: plugins/ticket-box/prefs/ticket-box-prefs.c:84
+msgid "_Cancel"
+msgstr "_Odustani"
+
+#: src/ui/network-auth-prompt.ui:58
+msgid "C_onnect"
+msgstr "P_oveži se"
+
+#: src/ui/polkit-auth-prompt.ui:122
+msgid "Authenticate"
+msgstr "Ovjera"
+
+#: src/ui/run-command-dialog.ui:6
+msgid "Run Command"
+msgstr "Pokreni naredbu"
+
+#: src/ui/settings.ui:302
+msgid "No notifications"
+msgstr "Nema obavijesti"
+
+#: src/ui/settings.ui:343
+msgid "Clear all"
+msgstr "Ukloni sve"
+
+#: src/ui/system-prompt.ui:62
+msgid "Confirm:"
+msgstr "Potvrdi:"
+
+#: src/ui/top-panel.ui:15
+msgid "Lock Screen"
+msgstr "Zaključavanje zaslona"
+
+#: src/ui/top-panel.ui:22
+msgid "Logout"
+msgstr "Odjava"
+
+#. Translators: This is a time format for a date in
+#. long format
+#: src/util.c:319
+msgid "%A, %B %-e"
+msgstr "%A, %-d. %B"
+
+#: src/vpn-info.c:89
+msgid "VPN"
+msgstr "VPN"
+
+#: src/widget-box.c:54
+msgid "Plugin not found"
+msgstr "Priključak nije pronađen"
+
+#: src/widget-box.c:57
+#, c-format
+msgid "The plugin '%s' could not be loaded."
+msgstr "Priključak '%s' se ne može učitati."
+
+#: src/wifiinfo.c:90
+msgid "Wi-Fi"
+msgstr "Bežična mreža"
+
+#. Translators: Refers to the cellular wireless network
+#: src/wwan-info.c:200
+msgid "Cellular"
+msgstr "Mobitel"
+
+#: plugins/emergency-info/emergency-info.ui:39
+msgid "Personal Information"
+msgstr "Osobne informacije"
+
+#: plugins/emergency-info/emergency-info.ui:47
+msgid "Date of Birth"
+msgstr "Datum rođenja"
+
+#: plugins/emergency-info/emergency-info.ui:65
+msgid "Preferred Language"
+msgstr "Željeni jezik"
+
+#: plugins/emergency-info/emergency-info.ui:83
+msgid "Home Address"
+msgstr "Kućna adresa"
+
+#: plugins/emergency-info/emergency-info.ui:91
+msgid "Medical Information"
+msgstr "Medicinske informacje"
+
+#: plugins/emergency-info/emergency-info.ui:99
+msgid "Age"
+msgstr "Dob"
+
+#: plugins/emergency-info/emergency-info.ui:117
+msgid "Blood Type"
+msgstr "Krvna grupa"
+
+#: plugins/emergency-info/emergency-info.ui:135
+msgid "Height"
+msgstr "Visina"
+
+#: plugins/emergency-info/emergency-info.ui:153
+msgid "Weight"
+msgstr "Težina"
+
+#: plugins/emergency-info/emergency-info.ui:171
+msgid "Allergies"
+msgstr "Alergije"
+
+#: plugins/emergency-info/emergency-info.ui:179
+msgid "Medications & Conditions"
+msgstr "Lijekovi i bolesti"
+
+#: plugins/emergency-info/emergency-info.ui:187
+msgid "Other Information"
+msgstr "Ostale informacije"
+
+#: plugins/emergency-info/emergency-info.ui:195
+msgid "Emergency Contacts"
+msgstr "Hitni kontakt"
+
+#: plugins/ticket-box/ticket-box.ui:15
+msgid "No documents to display"
+msgstr "Nema dokumenata za prikaz"
+
+#: plugins/ticket-box/ticket-box.ui:83
+msgid "Tickets"
+msgstr "Kartice"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.c:81
+msgid "Choose Folder"
+msgstr "Odaberi mapu"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.c:85
+msgid "_Open"
+msgstr "_Otvori"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:6
+msgid "Ticket Box Preferences"
+msgstr "Osobitosti kutija za karte"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:13
+msgid "Paths"
+msgstr "Putanje"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:18
+msgid "Folder Settings"
+msgstr "Postavke mape"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:19
+msgid "Where Phosh looks for your tickets"
+msgstr "Gdje Phosh traži vaše karte"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:22
+msgid "Ticket Folder"
+msgstr "Mapa karta"
+
+#: plugins/upcoming-events/event-list.c:142
+msgid "Today"
+msgstr "Danas"
+
+#: plugins/upcoming-events/event-list.c:144
+msgid "Tomorrow"
+msgstr "Sutra"
+
+#: plugins/upcoming-events/event-list.c:150
+#, c-format
+msgid "In %d day"
+msgid_plural "In %d days"
+msgstr[0] "Za %d dan"
+msgstr[1] "Za %d dana"
+msgstr[2] "Za %d dana"
+
+#: plugins/upcoming-events/event-list.ui:26
+msgid "No events"
+msgstr "Nema događaja"
+
+#. Translators: This is the time format used in 24-hour mode.
+#: plugins/upcoming-events/upcoming-event.c:56
+msgid "%R"
+msgstr "%R"
+
+#. Translators: This is the time format used in 12-hour mode.
+#: plugins/upcoming-events/upcoming-event.c:59
+msgid "%l:%M %p"
+msgstr "%l:%M %p"
+
+#. Translators: An all day event
+#: plugins/upcoming-events/upcoming-event.c:122
+#: plugins/upcoming-events/upcoming-event.c:159
+msgid "All day"
+msgstr "Cijeli dan"
+
+#. Translators: When the event ends: Ends\r16:00
+#: plugins/upcoming-events/upcoming-event.c:148
+msgid "Ends"
+msgstr "Završava u"
+
+#: plugins/upcoming-events/upcoming-event.c:398
+msgid "Untitled event"
+msgstr "Bezimeni događaj"
+
+#, c-format
+#~ msgid "On %A"
+#~ msgstr "U %A"
+
+#~ msgid "Show only adaptive apps"
+#~ msgstr "Prikaži samo adaptivne aplikacije"
+
+#~ msgid "Suspend"
+#~ msgstr "Suspenzija"

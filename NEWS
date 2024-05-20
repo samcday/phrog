@@ -1,0 +1,848 @@
+phosh 0.39.0
+------------
+Released May 2024
+* Support folders to organize apps in the overview
+* Optional night light quick setting
+* Lots of introspection/documentation fixups in preparation for the Rust bindings
+* Test suite improvements (stable clock, use shell state instead of
+  timeouts to track state changes, mpris metadata, …)
+* Split generated headers and sources to speed up build and save CI resources
+* Improve translatability of timestamp labels
+* Issues fixed:
+    * https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1042
+    * https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1056
+    * https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1058
+    * https://gitlab.gnome.org/World/Phosh/phosh/-/issues/785
+    * https://gitlab.gnome.org/World/Phosh/phosh/-/issues/868
+* Contributors:
+    * Arun Mani J
+    * Guido Günther
+    * Sam Day
+* UI translations:
+    * Anders Jonsson (sv)
+    * Andi Chandler (en_GB)
+    * Andika Triwidada (id)
+    * Artur S0 (ru)
+    * Danial Behzadi (fa)
+    * Daniel Rusek (cs)
+    * Daniel Șerbănescu (ro)
+    * Ekaterine Papava (ka)
+    * Jordi Mas i Hernandez (ca)
+    * Martin (sl)
+    * Quentin PAGÈS (oc)
+    * Sabri Ünal (tr)
+    * Scrambled 777 (hi)
+    * Yaron Shahrabani (he)
+    * Yuri Chornoivan (uk)
+
+phosh 0.38.0
+------------
+Released April 2024
+* Allow launcher entries to display count and progress
+* Better handle devices with rounded corners
+* Handle data: URIs in the media-player
+* OSD improvements in case there's no level
+* Fix some background scaling related issued introdueced in 0.37.0
+* Fix session startup with gnome-session 46
+* Issues fixed:
+  * https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1035
+* Contributors:
+    * Daniel Rusek
+    * Guido Günther
+    * Jesús Higueras
+* UI translations:
+    * Anders Jonsson (sv)
+    * Artur S0 (ru)
+    * Danial Behzadi (fa)
+    * Daniel Rusek (cs)
+    * Daniel Șerbănescu (ro)
+    * Ekaterine Papava (ka)
+    * Jiri Grönroos (fi)
+    * Jordi Mas i Hernandez (ca)
+    * Jürgen Benvenuti (de)
+    * Martin (sl)
+    * Sabri Ünal (tr)
+    * Vittorio Monti (it)
+    * Yuri Chornoivan (uk)
+
+phosh 0.37.0
+------------
+Released March 2024
+* Allow to select Wi-Fi network via quick setting
+* Allow plugins to implement quick settings
+* Allow plugins to use selected phosh internals
+* Load background images async
+* Add caffeine quick setting
+* More bug, keyboard navigation and style fixes
+* Issues fixed:
+  * https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1025
+  * https://gitlab.gnome.org/World/Phosh/phosh/-/issues/447
+  * https://gitlab.gnome.org/World/Phosh/phosh/-/issues/910
+  * https://gitlab.gnome.org/World/Phosh/phosh/-/issues/743
+  * https://gitlab.gnome.org/World/Phosh/phosh/-/issues/829
+* Contributors:
+    * Arun Mani J
+    * Guido Günther
+    * Rodney Lorrimar
+    * Sicelo A. Mhlongo
+* UI translations:
+    * Anders Jonsson (sv)
+    * Artur S0 (ru)
+    * Danial Behzadi (fa)
+    * Daniel Rusek (cs)
+    * Ekaterine Papava (ka)
+    * Florentina Mușat (ro)
+    * Jiri Grönroos (fi)
+    * Jordi Mas i Hernandez (ca)
+    * Jürgen Benvenuti (de)
+    * Pablo Barciela (es)
+    * Sabri Ünal (tr)
+    * Vittorio Monti (it)
+    * Yosef Or Boczko (he)
+    * Yuri Chornoivan (uk)
+
+phosh 0.36.0
+------------
+Released February 2024
+* Allow to tweak home bars's osk long press delay
+* Drop home bar's animated arrow
+* Improve app-id mappings
+* Don't hard code Cantarell Font
+* Pick up night light on newly plugged screens
+* Unbreak service file with newer systemd
+* More bug fixes and cleanups
+* Issues fixed:
+  - https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1016
+  - https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1019
+* Contributors:
+    * Anna “CyberTailor”
+    * Bardia Moshiri
+    * Guido Günther
+    * Kai Lüke
+    * Sertonix
+* UI translations:
+    * Martin (sl)
+    * Pierre Michel Augustin (ht)
+
+phosh 0.35.0
+------------
+Released January 2024
+* Make home bar smaller. OSK opens via long press on pill.
+* Indicate 5G when detected
+* Fix suspend-inhibitor when hotspot is on
+* Fix swipe back when lockscreen widget box is open
+* Issues fixed:
+  - https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1010
+  - https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1001
+  - https:// gitlab.gnome.org/World/Phosh/phosh/-/issues/380
+* Contributors:
+    * Bardia Moshiri
+    * Guido Günther
+    * mathew-dennis
+* UI translations:
+    * Artur S0 (ru)
+    * Danial Behzadi (fa)
+    * Daniel Rusek (cs)
+    * Yosef Or Boczko (he)
+
+phosh 0.34.0
+------------
+Released December 2023
+* End session dialog improvements
+* Bring back night light
+* Use ext-idle-notify-v1 Wayland protocol (requires phoc >= 0.33.0)
+* Bump dependencies: Switch to gmobile 0.0.4 and libcall-ui 0.1.1
+* Small UI improvements
+* CI improvements: Check coding style, improve ci-fairy checks
+* Issues fixed:
+  - https://gitlab.gnome.org/World/Phosh/phosh/-/issues/994
+  - https://gitlab.gnome.org/World/Phosh/phosh/-/issues/875
+  - https://source.puri.sm/Librem5/OS-issues/-/issues/343
+* Contributors:
+    * Arun Mani J
+    * Guido Günther
+* UI translations:
+    * Artur S0 (ru)
+    * Jordi Mas i Hernandez (ca)
+    * Juliano de Souza Camargo (pt_BR)
+    * Vittorio Monti (it)
+
+phosh 0.33.0
+------------
+Released November 2023
+* Add launcher lock screen plugin
+* Allow to show password in all system modal prompts
+* Issues fixed:
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/848
+* Contributors:
+    * Guido Günther
+    * pseudorandom-x
+* UI translations:
+    * Anders Jonsson (sv)
+    * Emin Tufan Çetin (tr)
+    * Florentina Mușat (ro)
+    * Sabri Ünal (tr)
+    * Yuri Chornoivan (uk)
+
+phosh 0.32.0
+------------
+Released October 2023
+* Allow apps to suppress notification feedback
+* Hide separator when there are no favorites
+* Feedback robustness
+* Doc updates
+* Officially deprecate reading `rootston.ini`
+* Issues fixed:
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/730
+* Contributors:
+    * Guido Günther
+    * Keegan Sabo
+* UI translations:
+    * Tjipke van der Heide (fy)
+    * Vasil Pupkin (be)
+
+phosh 0.31.1
+------------
+Released September 2023
+* Fix version in meson file
+* Contributors:
+    * Guido Günther
+
+phosh 0.31.0
+------------
+Released September 2023
+* Ship portal configuration for xdg-desktop-portal
+* Handle tablet-mode-switch of convertibles
+* Contributors:
+    * Guido Günther
+    * Simon McVittie
+* UI translations:
+    * Artur S0 (ru)
+    * Asier Sarasua Garmendia (eu)
+    * Boyuan Yang (zh_CN)
+    * Efstathios Iosifidis (el)
+    * Fran Dieguez (gl)
+    * Jürgen Benvenuti (de)
+    * Martin (sl)
+    * Nathan Follens (nl)
+    * Sabri Ünal (tr)
+
+phosh 0.30.0
+------------
+Released August 2023
+* Save screenshots at full resolution
+* Fix missing icon when e.g. connecting to a car's audio unit via BT
+* Improve ongoing call notification.
+* Update gvc submodule fixing a crash when restart pw-pulse
+* Don't require gsd-xsettings in the session. No need to spawn
+  XWayland for that.
+* Update gmobile to support more notches (Poco F1 and FF4)
+* Issues fixed:
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/968
+* Contributors:
+    * anteater
+    * Guido Günther
+* UI translations:
+    * Balázs Úr (hu)
+    * Daniel Rusek (cs)
+    * Daniel Șerbănescu (ro)
+    * Jürgen Benvenuti (de)
+    * Martin (sl)
+    * Piotr Drąg (pl)
+    * Yosef Or Boczko (he)
+
+phosh 0.29.0
+------------
+Released July 2023
+* Add audio device details and selection to settings
+* Use animation with automatic HighContrast to indicate what is
+  happening
+* Automatically avoid notches when device information is available
+* Add lockscreen notification about ongoing calls
+* Allow lockscreen notifications to take more vertical space
+* Allow to suspend from system menu
+  ([when enabled](https://gitlab.gnome.org/World/Phosh/phosh/-/wikis/Configuration))
+* Fade out system modal dialogs
+* Emergency info preferences plugin robustness
+* Robustness fixes around notifications and feedback
+* Make ASAN tests more useful again
+* Issues fixed:
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/591
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/593
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/890
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/922
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/951
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/955
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/957
+* Contributors:
+    * Guido Günther
+    * Sam Hewitt
+    * undef
+* UI translations:
+    * Anders Jonsson (sv)
+    * Danial Behzadi (fa)
+    * Daniel Șerbănescu (ro)
+    * Ekaterine Papava (ka)
+    * Jiri Grönroos (fi)
+    * Jordi Mas i Hernandez (ca)
+    * Martin (sl)
+    * Piotr Drąg (pl)
+    * Prasanta Hembram (sat)
+    * Yosef Or Boczko (he)
+    * Yuri Chornoivan (uk)
+
+phosh 0.28.0
+------------
+Released May 2023
+* Allow notifications to wake up the screen. Can be configured by
+  category and urgency.
+* Allow lockscreen to work on smaller displays
+* Allow to reboot / log out from the settings power menu
+* Styling improvements in several places
+* Smoothen transition from splash to application
+* Handle super key to open overview
+* Handle auto repeat on grabbed keys (e.g. volume keys)
+* Update to libcall-ui 0.1.0
+* Bump minimal supported GNOME versions to 42 and glib to 2.72
+* Issues fixed:
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/525
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/934
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/563
+* Contributors:
+    * Alistair Francis
+    * Eugenio Paolantonio (g7)
+    * Evangelos Ribeiro Tzaras
+    * Guido Günther
+    * Sam Hewitt
+    * Suraj Kumar Mahto
+    * Thomas Booker
+* UI translations:
+    * Danial Behzadi (fa)
+    * Daniel Rusek (cs)
+    * Daniel Șerbănescu (ro)
+    * Ekaterine Papava (ka)
+    * Emin Tufan Çetin (tr)
+    * Jordi Mas i Hernandez (ca)
+    * Michael Oppliger (de)
+    * Pablo Correa Gómez (es)
+    * Piotr Drąg (pl)
+    * Vittorio Monti (it)
+    * Yosef Or Boczko (he)
+    * Yuri Chornoivan (uk)
+
+phosh 0.27.0
+------------
+Released May 2023
+* Initial emergency call support (needs to be enabled via GSetting)
+* New menu on power button long press
+* Allow to take fullscreen screenshots without external tools
+* Honor applications feedback level for notifications
+* Styling and layout improvements for system modal dialog
+* Issues Fixed:
+  https://gitlab.gnome.org/GNOME/calls/-/issues/30
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/671
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/914
+* Contributors:
+    * CoderThomasB
+    * Guido Günther
+    * Sam Hewitt
+* UI translations:
+    * Aleksandr Melman (ru)
+    * Anders Jonsson (sv)
+    * Danial Behzadi (fa)
+    * Ekaterine Papava (ka)
+    * Emin Tufan Çetin (tr)
+    * Fran Dieguez (gl)
+    * Jiri Grönroos (fi)
+    * Martin (sl)
+    * Piotr Drąg (pl)
+    * Yosef Or Boczko (he)
+    * Yuri Chornoivan (uk)
+    * Мирослав Николић (sr)
+
+phosh 0.26.0
+------------
+Released April 2023
+* Inhibit suspend when WiFi hotspot is active
+* Test suite improvements
+* Power button handling improvements
+* Avoid deprecations with GTK 4.10 in preferences plugins
+* Make sure quick settings take enough vertical
+  space on the lock screen to avoid a needless scrollbar
+* Issues Fixed:
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/903
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/907
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/909
+  https://gitlab.gnome.org/World/Phosh/phosh/-/issues/911
+* Contributors:
+    * Guido Günther
+    * Sam Hewitt
+    * Newbyte
+* UI translations:
+    * Aleksandr Melman (ru)
+    * Anders Jonsson (sv)
+    * Asier Sarasua Garmendia (eu)
+    * Balázs Úr (hu)
+    * Danial Behzadi (fa)
+    * Daniel Șerbănescu (ro)
+    * Hugo Carvalho (pt)
+    * Jiri Grönroos (fi)
+    * Jürgen Benvenuti (de)
+    * Martin (sl)
+    * Piotr Drąg (pl)
+    * Sabri Ünal (tr)
+    * Yosef Or Boczko (he)
+    * Yuri Chornoivan (uk)
+    * Nathan Follens (nl)
+
+phosh 0.25.1
+------------
+Released March 2023
+* Avoid race that might end up with two overlaying lock screens
+  e.g. after suspend (#838)
+* Limit slider width in settings (#898)
+* Contributors:
+    * Guido Günther
+    * Newbyte
+    * Sam Hewitt
+
+phosh 0.25.0
+------------
+Released March 2023
+* New plugin to configure emergency contact preferences
+* Quick Settings menu style refresh
+* Separate locking from blanking
+* Animate status icon transitions
+* Improve settings menu usability in landscape
+* Lots of internal cleanups
+* Contributors:
+    * Cédric Bellegarde
+    * Chris Talbot
+    * Guido Günther
+    * Sam Hewitt
+* UI translations:
+    * Anders Jonsson (sv)
+    * Danial Behzadi (fa)
+    * Daniel Șerbănescu (ro)
+    * Ekaterine Papava (ka)
+    * Emin Tufan Çetin (tr)
+    * Hemish (hi)
+    * Jürgen Benvenuti (de)
+    * Martin (sl)
+    * Yosef Or Boczko (he)
+    * Yuri Chornoivan (uk)
+
+phosh 0.24.0
+------------
+Released January 2023
+* Add manpages
+* Various stability fixes
+* Better detect logind session (to unbreak `loginctl (un)lock-session`)
+* Testsuite improvements
+* Update to gmobile 0.0.1
+* Honor stricter protocol implementation in wlroots 0.16.0
+* Contributors:
+    * Andrey Skvortsov
+    * Guido Günther
+* UI translations:
+    * Aleksandr Melman (ru)
+    * Anders Jonsson (sv)
+    * Daniel Șerbănescu (ro)
+    * Ekaterine Papava (ka)
+    * Emin Tufan Çetin (tr)
+    * Goran Vidović (hr)
+    * Hemish (hi)
+    * Hugo Carvalho (pt)
+    * Jürgen Benvenuti (de)
+    * Martin (sl)
+    * Yuri Chornoivan (uk)
+
+phosh 0.23.0
+------------
+Released December 2022
+* New lockscreen plugin for personal/emergency information
+* Allow plugins to have UI to set preferences
+* Ease creating plugin by better examples, improved helpers
+  and less duplication.
+* Switch docs to gi-docgen
+* Contributors:
+	Chris Talbot
+	Evangelos Ribeiro Tzaras
+	Guido Günther
+* UI translations:
+	Aleksandr Melman (ru)
+	Hugo Carvalho (pt)
+	Martin (sl)
+	Yosef Or Boczko (he)
+	Zurab Kargareteli (ka)
+
+phosh 0.22.0
+------------
+Released October 2022
+* Use 10% steps for battery info icon
+* Honor suspend time in upcoming events refresh
+* Allow notifications to have actions on the lock screen
+* Activity close-button style refresh
+* Contributors:
+	codewood
+	Guido Günther
+	Sam Hewitt
+* UI translations:
+	Anders Jonsson (sv)
+	Balázs Úr (hu)
+	Daniel Șerbănescu (ro)
+	Hugo Carvalho (pt)
+	Nathan Follens (nl)
+	Vittorio Monti (it)
+	Vojtěch Vengrin (cs)
+	Yuri Chornoivan (uk)
+	Zurab Kargareteli (ka)
+	Danial Behzadi
+	Balázs Úr
+
+phosh 0.21.1
+------------
+Released September 2022
+* Bug fixes and cleanups (also to catch up with glib 2.74)
+* Update to libcall-ui 0.0.5
+* Lots of translation updates
+* Contributors:
+	Evangelos Ribeiro Tzaras
+	Fiona Klute
+	Guido Günther
+	Sam Hewitt
+* UI translations:
+	Aleksandr Melman (ru)
+	Anders Jonsson (sv)
+	Danial Behzadi (fa)
+	Daniel Șerbănescu (ro)
+	Emin Tufan Çetin (tr)
+	Goran Vidović (hr)
+	Jiri Grönroos (fi)
+	Jürgen Benvenuti (de)
+	Martin (sl)
+	Piotr Drąg (pl)
+	Rūdolfs Mazurs (lv)
+	Vittorio Monti (it)
+	Yosef Or Boczko (he)
+	Yuri Chornoivan (uk)
+	Zurab Kargareteli (ka)
+	Марко Костић (sr)
+
+phosh 0.21.0
+------------
+Released September 2022
+* Add (experimental) upcoming-events lock screen
+  widget
+* Allow to disable GTK animations again
+* Improve screenshot support
+* Report a version via DBus
+* Update libcall-ui to 0.0.4
+* More bug fixes
+* Contributors:
+	Evangelos Ribeiro Tzaras
+	Guido Günther
+	Sebastian Krzyszkowiak
+* UI translations:
+	Balázs Úr (hu)
+	Emin Tufan Çetin (tr)
+	Goran Vidović (hr)
+	Jiri Grönroos (fi)
+	Yuri Chornoivan (uk)
+
+phosh 0.20.0
+------------
+Released August 2022
+* more bug fixes related to lockscreen,
+  drag surfaces and high contrast.
+* Allow to switch to high contrast theme based on
+  ambient sensor
+* Contributors:
+	Guido Günther
+	Sam Hewitt
+	Sebastian Krzyszkowiak
+
+phosh 0.20.0~beta3
+------------------
+Released July 2022
+* This is a beta release
+* Many bug fixes related to the overview, lockscreen, osk handling,
+  screen rotation, tests and drag_surfaces.
+* Support plugins on the lock screen
+* Add a symbolic icon for phosh
+* Contributors:
+	Alexander Mikhaylenko
+	Guido Günther
+	Sam Hewitt
+	Sebastian Krzyszkowiak
+* UI translations:
+	Efstathios Iosifidis (el)
+	Vittorio Monti (it)
+	Zurab Kargareteli (ka)
+	Мирослав Николић (sr)
+
+phosh 0.20.0~beta2
+-------------------
+Released June 2022
+* This is a beta release
+* Fix top-bar's layer depending on state (locked, etc.)
+* Fix multiple visual glitches related to overview and settings
+* Improve OSK handling
+* Switch to libcall-ui 0.0.3
+* Fix rotation manager not getting an output for some
+  display types
+* Style improvements for notifications
+* Contributors:
+	Evangelos Ribeiro Tzaras
+	Gerben Jan Dijkman
+	Guido Günther
+	Linus Walleij
+	Pablo Barciela
+	Sam Hewitt
+	Sebastian Krzyszkowiak
+* UI translations:
+	Aleksandr Melman (ru)
+	Anders Jonsson (sv)
+	Danial Behzadi (fa)
+	Daniel Șerbănescu (ro)
+	Jiri Grönroos (fi)
+	Jürgen Benvenuti (de)
+	Nathan Follens (nl)
+	Piotr Drąg (pl)
+	Yosef Or Boczko (he)
+	Yuri Chornoivan (uk)
+
+phosh 0.20.0~beta1
+-------------------
+Released May 2022
+* This is a beta release
+* Home- and top-bar swipe gesture support
+* Make settings and top-bar available on lock screen
+* Move settings menu closer to designs
+* Feedback indicator in top-bar
+* Allow to view app details
+* New DisplayConfig properties like
+  ApplyMonitorsConfigAllowed and NightLightSupported.
+* Another large round of cleanups and fixes
+  including a fix for the HKS indicator
+* Contributors:
+	Arnaud Ferraris
+	Guido Günther
+	InsanePrawn
+	Nathan Sherwood
+	Pablo Correa Gómez
+	Sam Hewitt
+	Sebastian Krzyszkowiak
+	Thomas
+* UI translations:
+	Balázs Úr (hu)
+	Danial Behzadi (fa)
+	Daniel Șerbănescu (ro)
+	Emin Tufan Çetin (tr)
+	Hugo Carvalho (pt)
+	Jiri Grönroos (fi)
+	Luna Jernberg (sv)
+	Nathan Follens (nl)
+	Pablo Barciela (es)
+	Piotr Drąg (pl)
+	Quentin PAGÈS (oc)
+	Vittorio Monti (it)
+	Yosef Or Boczko (he)
+	Yuri Chornoivan (uk)
+	Zurab Kargareteli (ka)
+
+phosh 0.17.0
+------------
+Released: March 2022
+* Access Portal support
+* Mobile data indicator
+* Suspend after resume fixes
+* Contributors:
+	Florian Loers
+	Guido Günther
+	Kai Lüke
+	Pablo Barciela
+	Sam Hewitt
+	ZenWalker
+* UI translations:
+	Emin Tufan Çetin (tr)
+	free software (es)
+	Hugo Carvalho (pt)
+	Jiri Grönroos (fi)
+	Martin (sl)
+	Pablo Barciela (es)
+	Piotr Drąg (pl)
+	Prasanta Hembram (sat)
+	Мирослав Николић (sr)
+
+phosh 0.16.0
+------------
+Released: February 2022
+* Fading labels in the overview
+* Keypad can shuffle buttons
+* More style refresh
+* Better ASAN coverage in tests
+* Update to libcall-ui 0.0.2
+* Plenty of fixes and cleanups
+* Contributors:
+	Adrien Plazas
+	Evangelos Ribeiro Tzaras
+	Guido Günther
+	Pablo Barciela
+	Sam Hewitt
+* UI translations:
+	Danial Behzadi (fa)
+	Daniel Șerbănescu (ro)
+	Fran Dieguez (gl)
+	Marc Riera (ca)
+	Matheus Barbosa (pt_BR)
+	Yosef Or Boczko (he)
+
+phosh 0.15.0
+------------
+Released: January 2022
+* Swipeable notification frames
+* VPN quicksettings, authentication and status icon
+* "Run command" prompt improvement
+* First parts of style refresh
+* Make osk-stub more useful for debugging
+* Hide some quick settings when hardware is not present
+* Bring back gamma control protocol support
+* Allow arbitrary passwords
+* Rather large number of fixes
+* Contributors:
+	Alexander Mikhaylenko
+	Evangelos Ribeiro Tzaras
+	Guido Günther
+	Pablo Barciela
+	PanzerSajt
+	Sam Hewitt
+	Sebastian Krzyszkowiak
+* UI translations:
+	Anders Jonsson (sv)
+	Danial Behzadi (fa)
+	Daniel Șerbănescu (ro)
+	Fabio Tomat (fur)
+	Hugo Carvalho (pt)
+	Nathan Follens (nl)
+	Rafael Fontenelle (pt_BR)
+	Vittorio Monti (it)
+	Yuri Chornoivan (uk)
+	Matej Urbančič (sl)
+
+phosh 0.14.1
+------------
+Released: December 2021
+* Show avatars during phone calls on lockscreen
+* Allow for DTMF during phone calls on lockscreen
+* Improve docked mode when phone screen is off
+* Improve thumbnails in overview
+* Add initial "Run command" prompt (Alt-F2)
+* Plenty of bug fixes and cleanups
+* Contributors: Evangelos Ribeiro Tzaras, Sebastian Krzyszkowiak, Florian Loers,
+  Dorota Czaplejewicz, Hunman, Pablo Barciela, Guido Günther
+* UI translations:
+	Anders Jonsson (sv)
+	Luna Jernberg (sv)
+	Yuri Chornoivan (uk)
+
+phosh 0.14.0
+------------
+Released: October 2021
+* Launch splash support (Guido Günther)
+* Move "Show all apps" toggle to the bottom (Guido Günther)
+* Media player widget enhancements (Oliver Smith, Guido Günther)
+* Fade in shell on startup to avoid flicker (Guido Günther)
+* App icons on activities are now centered (Florian Loers)
+* Test suite generates screenshots (Guido Günther)
+* Wifi hotspot mode indicated in the top bar (Mohammed Sadiq)
+* Music player is paused when headphones get unplugged (Guido Günther)
+* Better app_id handling (Sebastian Krzyszkowiak)
+* Some activity rendering improvements (Guido Günther)
+* Some leak fixes
+* UI translations:
+	Danial Behzadi (fa)
+	Goran Vidović (hr)
+	Hugo Carvalho (pt)
+	Jiri Groenroos (fi)
+	Matej Urbančič (sl)
+	Nathan Follens (nl)
+	Vittorio Monti (it)
+	Zander Brown (en_GB)
+
+phosh 0.13.1
+------------
+Released: August 2021
+* Cycle through all feedback profiles in quick setting
+  (Pablo Correa Gómez)
+* Add button to close all notifications (Guido Günther)
+* Improve support for mounting encrypted media (Guido Günther)
+* Don't launch app twice when keyboard activated from search bar
+  (Guido Günther)
+* Improve fractional scaling support (Guido Günther)
+* Better media player styling (Guido Günther)
+* UI translations:
+	Daniel Șerbănescu (ro)
+	Kristjan SCHMIDT (eo)
+	Marc Riera (ca)
+	Michael Oppliger (de)
+	Andika Triwidada (id)
+
+phosh 0.13.0
+------------
+Released: August 2021
+* torch: Use logind for torch brightness. This obsoletes any upower changes.
+  (Arnaud Ferraris)
+* Support high contrast mode (David Hamner, Guido Günther)
+* ci: Use prebuilt docker images in CI to speedup builds and save resources
+  (Guido Günther)
+* lockscreen: Handle incoming phone calls (Guido Günther)
+* backrounds: Handle fractional scaling (Guido Günther)
+* notifications: Look at category for notification feedback
+* lockscreen: Display notification summary and handle global
+  "show-in-lock-screen" toggle (Guido Günther)
+* panel: Fix power menu close on tap (Mohammed Sadiq)
+* quick settings: Cycle through all feedback settings instead of only
+  full / silent (Pablo Correa Gomez)
+* Migrate to GNOME World (Andrea Veri, Guido Günther)
+* UI translations:
+	Anders Jonsson (sv)
+	Efstathios Iosifidis (el)
+	Rafael Fontenelle (pt_BR)
+	Vittorio Monti (it)
+	Yuri Chornoivan (uk)
+	Мирослав Николић (sr)
+
+phosh 0.12.1
+------------
+Released: July 2021
+* Fix defaults for favorites
+* Append 'Phosh' to XDG_CURRENT_DESKOP for the system unit too so overrides get
+  applied even when not using a display manager
+* Bring search bar closer to designs again
+* Simplify tests and test calls-manager. Fix leaks spotted by those.
+* Don't claim accelerometer when rotation lock is on reducing iio-sensor-proxy
+  wakeups considerably
+* i18n updates: uk, it, sv
+
+phosh 0.12.0
+------------
+Released: June 2021
+* Only enable proximity sensor on active calls, unblank screen on incoming
+  calls. This needs at least gnome-calls 0.3.4 and either one of
+  https://gitlab.gnome.org/GNOME/gtk/-/merge_requests/3614
+  https://gitlab.gnome.org/GNOME/glib/-/merge_requests/2120
+* Implement most parts of org.Gtk.MountOperationHandler to handle
+  encrypted volume mounts in e.g. nautilus.
+* Show adaptive apps in mobile mode and all apps in docked mode. This
+  can be toggled via the sm.puri.phosh.PhoshAppFilterModeFlags GSetting.
+
+phosh 0.11.0
+------------
+Released: May 2021
+* Wifi/WWAN/BT quick settings toggle on/off, long press opens Settings
+* Initial support for gnome-session --systemd
+* Torch brightness slider
+* Allow to show battery percentage in top bar
+* Fixes modal-dialog keyboard navigation
+* Fixes crash with ja locale
