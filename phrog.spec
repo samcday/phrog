@@ -7,7 +7,7 @@
 Name:           phrog
 Version:        0.1.0
 Release:        %autorelease
-Summary:        # FIXME
+Summary:        Greetd-compatible greeter for mobile phones
 
 SourceLicense:  None
 # FIXME: paste output of %%cargo_license_summary here
@@ -16,7 +16,7 @@ License:        # FIXME
 # FIXME: No license information in crate metadata.
 
 URL:            https://github.com/samcday/phrog
-Source:         https://github.com/samcday/phrog/archive/5cd79cbbe74794ff977be05a151fac3371c27027.tar.gz
+Source:         https://github.com/samcday/phrog/archive/v%{version}.tar.gz
 
 BuildRequires:  cargo-rpm-macros >= 26
 
