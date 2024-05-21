@@ -6,7 +6,7 @@ License:        GPL-3.0-only
 URL:            https://github.com/samcday/phrog
 Source:         %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
-BuildRequires:  rust-packaging >= 26
+BuildRequires:  cargo-rpm-macros >= 24
 
 Requires:       greetd >= 0.6
 Provides:       greetd-greeter = 0.6

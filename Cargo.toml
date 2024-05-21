@@ -28,4 +28,4 @@ features = ['v3_24']
 git = "https://gitlab.gnome.org/World/Rust/libhandy-rs"
 
 [build-dependencies]
-glib-build-tools = "0.19.0"
+glib-build-tools = "0.18.0"
