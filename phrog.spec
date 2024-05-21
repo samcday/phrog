@@ -1,5 +1,5 @@
 Name:           phrog
-Version:        0.1.0
+Version:        0.1.1
 Release:        %autorelease
 Summary:        Greetd-compatible greeter for mobile phones
 License:        GPL-3.0-only
