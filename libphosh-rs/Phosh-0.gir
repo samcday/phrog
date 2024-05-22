@@ -41980,19 +41980,21 @@ and unlock keypad.
           </instance-parameter>
         </parameters>
       </method>
-      <method name="get_page" c:identifier="phosh_lockscreen_get_page">
+      <method name="get_page"
+              c:identifier="phosh_lockscreen_get_page"
+              glib:get-property="page">
         <source-position filename="src/lockscreen.h" line="55"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/lockscreen.c"
-               line="1041">The #PhoshLockscreenPage that is currently shown</doc>
+               line="1055">The #PhoshLockscreenPage that is currently shown</doc>
           <type name="LockscreenPage" c:type="PhoshLockscreenPage"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/lockscreen.c"
-                 line="1039">The #PhoshLockscreen</doc>
+                 line="1053">The #PhoshLockscreen</doc>
             <type name="Lockscreen" c:type="PhoshLockscreen*"/>
           </instance-parameter>
         </parameters>
@@ -42071,6 +42073,12 @@ and unlock keypad.
                 transfer-ownership="none">
         <type name="CallsManager"/>
       </property>
+      <property name="page"
+                transfer-ownership="none"
+                getter="get_page"
+                default-value="PHOSH_LOCKSCREEN_PAGE_UNLOCK">
+        <type name="LockscreenPage"/>
+      </property>
       <field name="parent_instance">
         <type name="LayerSurface" c:type="PhoshLayerSurface"/>
       </field>
@@ -42082,7 +42090,7 @@ and unlock keypad.
       <glib:signal name="wakeup-output" when="last">
         <doc xml:space="preserve"
              filename="src/lockscreen.c"
-             line="937">Emitted when the output showing the lock screen should be woken
+             line="951">Emitted when the output showing the lock screen should be woken
 up.</doc>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
