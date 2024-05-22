@@ -1,7 +1,7 @@
 %global cargo_install_lib 0
 
 Name:           phrog
-Version:        0.1.5
+Version:        0.1.6
 Release:        %autorelease
 Summary:        Greetd-compatible greeter for mobile phones
 License:        GPL-3.0-only
@@ -96,7 +96,7 @@ Provides:	greetd-%{name} = %{version}
 %license LICENSE
 %doc README.md
 %{_bindir}/phrog
-%{_libdir}/phrog/libphosh.so
+#%{_libdir}/phrog/libphosh.so
 
 %changelog
 %autochangelog
