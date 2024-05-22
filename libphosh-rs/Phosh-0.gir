@@ -2023,7 +2023,9 @@ reports success via the `image-loaded` signal.</doc>
           </parameter>
         </parameters>
       </constructor>
-      <function name="new" c:identifier="phosh_background_image_new">
+      <function name="new"
+                c:identifier="phosh_background_image_new"
+                glib:finish-func="new_finish">
         <source-position filename="src/background-image.h" line="22"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
@@ -4672,7 +4674,8 @@ See phosh_calls_dbus_calls_call_proxy_new() for the asynchronous version of this
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_calls_dbus_calls_call_proxy_new">
+                c:identifier="phosh_calls_dbus_calls_call_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/calls-dbus.c"
              line="1781">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-gnome-Calls-Call.top_of_page"&gt;org.gnome.Calls.Call&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -4745,7 +4748,8 @@ See phosh_calls_dbus_calls_call_proxy_new_sync() for the synchronous, blocking v
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_calls_dbus_calls_call_proxy_new_for_bus">
+                c:identifier="phosh_calls_dbus_calls_call_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/calls-dbus.c"
              line="1871">Like phosh_calls_dbus_calls_call_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -5202,7 +5206,8 @@ See phosh_calls_dbus_object_manager_client_new() for the asynchronous version of
         </parameters>
       </function>
       <function name="new"
-                c:identifier="phosh_calls_dbus_object_manager_client_new">
+                c:identifier="phosh_calls_dbus_object_manager_client_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/calls-dbus.c"
              line="2904">Asynchronously creates #GDBusObjectManagerClient using phosh_calls_dbus_object_manager_client_get_proxy_type() as the #GDBusProxyTypeFunc. See g_dbus_object_manager_client_new() for more details.
@@ -5276,7 +5281,8 @@ See phosh_calls_dbus_object_manager_client_new_sync() for the synchronous, block
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_calls_dbus_object_manager_client_new_for_bus">
+                c:identifier="phosh_calls_dbus_object_manager_client_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/calls-dbus.c"
              line="2994">Like phosh_calls_dbus_object_manager_client_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -8067,7 +8073,9 @@ See phosh_dbus_color_proxy_new() for the asynchronous version of this constructo
           </parameter>
         </parameters>
       </constructor>
-      <function name="new" c:identifier="phosh_dbus_color_proxy_new">
+      <function name="new"
+                c:identifier="phosh_dbus_color_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/gsd-color-dbus.c"
              line="653">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-gnome-SettingsDaemon-Color.top_of_page"&gt;org.gnome.SettingsDaemon.Color&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -8140,7 +8148,8 @@ See phosh_dbus_color_proxy_new_sync() for the synchronous, blocking version of t
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_dbus_color_proxy_new_for_bus">
+                c:identifier="phosh_dbus_color_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/gsd-color-dbus.c"
              line="743">Like phosh_dbus_color_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -11540,7 +11549,9 @@ See phosh_dbus_display_config_proxy_new() for the asynchronous version of this c
           </parameter>
         </parameters>
       </constructor>
-      <function name="new" c:identifier="phosh_dbus_display_config_proxy_new">
+      <function name="new"
+                c:identifier="phosh_dbus_display_config_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-display-dbus.c"
              line="3246">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-gnome-Mutter-DisplayConfig.top_of_page"&gt;org.gnome.Mutter.DisplayConfig&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -11613,7 +11624,8 @@ See phosh_dbus_display_config_proxy_new_sync() for the synchronous, blocking ver
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_dbus_display_config_proxy_new_for_bus">
+                c:identifier="phosh_dbus_display_config_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-display-dbus.c"
              line="3336">Like phosh_dbus_display_config_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -12844,7 +12856,8 @@ See phosh_dbus_end_session_dialog_proxy_new() for the asynchronous version of th
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_dbus_end_session_dialog_proxy_new">
+                c:identifier="phosh_dbus_end_session_dialog_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-end-session-dialog-dbus.c"
              line="1226">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-gnome-SessionManager-EndSessionDialog.top_of_page"&gt;org.gnome.SessionManager.EndSessionDialog&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -12918,7 +12931,8 @@ See phosh_dbus_end_session_dialog_proxy_new_sync() for the synchronous, blocking
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_dbus_end_session_dialog_proxy_new_for_bus">
+                c:identifier="phosh_dbus_end_session_dialog_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-end-session-dialog-dbus.c"
              line="1316">Like phosh_dbus_end_session_dialog_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -15317,7 +15331,9 @@ See phosh_dbus_gnome_shell_proxy_new() for the asynchronous version of this cons
           </parameter>
         </parameters>
       </constructor>
-      <function name="new" c:identifier="phosh_dbus_gnome_shell_proxy_new">
+      <function name="new"
+                c:identifier="phosh_dbus_gnome_shell_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-gnome-shell-dbus.c"
              line="2338">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-gnome-Shell.top_of_page"&gt;org.gnome.Shell&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -15391,7 +15407,8 @@ See phosh_dbus_gnome_shell_proxy_new_sync() for the synchronous, blocking versio
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_dbus_gnome_shell_proxy_new_for_bus">
+                c:identifier="phosh_dbus_gnome_shell_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-gnome-shell-dbus.c"
              line="2428">Like phosh_dbus_gnome_shell_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -15925,7 +15942,9 @@ See phosh_dbus_hostname1_proxy_new() for the asynchronous version of this constr
           </parameter>
         </parameters>
       </constructor>
-      <function name="new" c:identifier="phosh_dbus_hostname1_proxy_new">
+      <function name="new"
+                c:identifier="phosh_dbus_hostname1_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/hostname1-dbus.c"
              line="598">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-freedesktop-hostname1.top_of_page"&gt;org.freedesktop.hostname1&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -15998,7 +16017,8 @@ See phosh_dbus_hostname1_proxy_new_sync() for the synchronous, blocking version 
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_dbus_hostname1_proxy_new_for_bus">
+                c:identifier="phosh_dbus_hostname1_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/hostname1-dbus.c"
              line="688">Like phosh_dbus_hostname1_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -16820,7 +16840,8 @@ See phosh_dbus_impl_portal_access_proxy_new() for the asynchronous version of th
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_dbus_impl_portal_access_proxy_new">
+                c:identifier="phosh_dbus_impl_portal_access_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/portal-dbus.c"
              line="1771">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-freedesktop-impl-portal-Access.top_of_page"&gt;org.freedesktop.impl.portal.Access&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -16893,7 +16914,8 @@ See phosh_dbus_impl_portal_access_proxy_new_sync() for the synchronous, blocking
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_dbus_impl_portal_access_proxy_new_for_bus">
+                c:identifier="phosh_dbus_impl_portal_access_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/portal-dbus.c"
              line="1861">Like phosh_dbus_impl_portal_access_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -17493,7 +17515,8 @@ See phosh_dbus_impl_portal_request_proxy_new() for the asynchronous version of t
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_dbus_impl_portal_request_proxy_new">
+                c:identifier="phosh_dbus_impl_portal_request_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/portal-dbus.c"
              line="710">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-freedesktop-impl-portal-Request.top_of_page"&gt;org.freedesktop.impl.portal.Request&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -17566,7 +17589,8 @@ See phosh_dbus_impl_portal_request_proxy_new_sync() for the synchronous, blockin
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_dbus_impl_portal_request_proxy_new_for_bus">
+                c:identifier="phosh_dbus_impl_portal_request_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/portal-dbus.c"
              line="800">Like phosh_dbus_impl_portal_request_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -18901,7 +18925,9 @@ See phosh_dbus_login_manager_proxy_new() for the asynchronous version of this co
           </parameter>
         </parameters>
       </constructor>
-      <function name="new" c:identifier="phosh_dbus_login_manager_proxy_new">
+      <function name="new"
+                c:identifier="phosh_dbus_login_manager_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/login1-manager-dbus.c"
              line="1360">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-freedesktop-login1-Manager.top_of_page"&gt;org.freedesktop.login1.Manager&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -18974,7 +19000,8 @@ See phosh_dbus_login_manager_proxy_new_sync() for the synchronous, blocking vers
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_dbus_login_manager_proxy_new_for_bus">
+                c:identifier="phosh_dbus_login_manager_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/login1-manager-dbus.c"
              line="1450">Like phosh_dbus_login_manager_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -20206,7 +20233,9 @@ See phosh_dbus_login_session_proxy_new() for the asynchronous version of this co
           </parameter>
         </parameters>
       </constructor>
-      <function name="new" c:identifier="phosh_dbus_login_session_proxy_new">
+      <function name="new"
+                c:identifier="phosh_dbus_login_session_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/login1-session-dbus.c"
              line="1289">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-freedesktop-login1-Session.top_of_page"&gt;org.freedesktop.login1.Session&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -20279,7 +20308,8 @@ See phosh_dbus_login_session_proxy_new_sync() for the synchronous, blocking vers
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_dbus_login_session_proxy_new_for_bus">
+                c:identifier="phosh_dbus_login_session_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/login1-session-dbus.c"
              line="1379">Like phosh_dbus_login_session_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -22065,7 +22095,8 @@ See phosh_dbus_mount_operation_handler_proxy_new() for the asynchronous version 
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_dbus_mount_operation_handler_proxy_new">
+                c:identifier="phosh_dbus_mount_operation_handler_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-gtk-mountoperation-dbus.c"
              line="1733">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-Gtk-MountOperationHandler.top_of_page"&gt;org.Gtk.MountOperationHandler&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -22139,7 +22170,8 @@ See phosh_dbus_mount_operation_handler_proxy_new_sync() for the synchronous, blo
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_dbus_mount_operation_handler_proxy_new_for_bus">
+                c:identifier="phosh_dbus_mount_operation_handler_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-gtk-mountoperation-dbus.c"
              line="1823">Like phosh_dbus_mount_operation_handler_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -23672,7 +23704,9 @@ See phosh_dbus_screen_saver_proxy_new() for the asynchronous version of this con
           </parameter>
         </parameters>
       </constructor>
-      <function name="new" c:identifier="phosh_dbus_screen_saver_proxy_new">
+      <function name="new"
+                c:identifier="phosh_dbus_screen_saver_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-screen-saver-dbus.c"
              line="1404">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-gnome-ScreenSaver.top_of_page"&gt;org.gnome.ScreenSaver&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -23746,7 +23780,8 @@ See phosh_dbus_screen_saver_proxy_new_sync() for the synchronous, blocking versi
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_dbus_screen_saver_proxy_new_for_bus">
+                c:identifier="phosh_dbus_screen_saver_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-screen-saver-dbus.c"
              line="1494">Like phosh_dbus_screen_saver_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -26104,7 +26139,9 @@ See phosh_dbus_screenshot_proxy_new() for the asynchronous version of this const
           </parameter>
         </parameters>
       </constructor>
-      <function name="new" c:identifier="phosh_dbus_screenshot_proxy_new">
+      <function name="new"
+                c:identifier="phosh_dbus_screenshot_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-screenshot-dbus.c"
              line="2258">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-gnome-Shell-Screenshot.top_of_page"&gt;org.gnome.Shell.Screenshot&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -26178,7 +26215,8 @@ See phosh_dbus_screenshot_proxy_new_sync() for the synchronous, blocking version
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_dbus_screenshot_proxy_new_for_bus">
+                c:identifier="phosh_dbus_screenshot_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-screenshot-dbus.c"
              line="2348">Like phosh_dbus_screenshot_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -29123,7 +29161,8 @@ See phosh_dbus_sensor_proxy_compass_proxy_new() for the asynchronous version of 
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_dbus_sensor_proxy_compass_proxy_new">
+                c:identifier="phosh_dbus_sensor_proxy_compass_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/iio-sensor-proxy-dbus.c"
              line="3582">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-net-hadess-SensorProxy-Compass.top_of_page"&gt;net.hadess.SensorProxy.Compass&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -29197,7 +29236,8 @@ See phosh_dbus_sensor_proxy_compass_proxy_new_sync() for the synchronous, blocki
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_dbus_sensor_proxy_compass_proxy_new_for_bus">
+                c:identifier="phosh_dbus_sensor_proxy_compass_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/iio-sensor-proxy-dbus.c"
              line="3672">Like phosh_dbus_sensor_proxy_compass_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -29826,7 +29866,9 @@ See phosh_dbus_sensor_proxy_proxy_new() for the asynchronous version of this con
           </parameter>
         </parameters>
       </constructor>
-      <function name="new" c:identifier="phosh_dbus_sensor_proxy_proxy_new">
+      <function name="new"
+                c:identifier="phosh_dbus_sensor_proxy_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/iio-sensor-proxy-dbus.c"
              line="2077">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-net-hadess-SensorProxy.top_of_page"&gt;net.hadess.SensorProxy&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -29900,7 +29942,8 @@ See phosh_dbus_sensor_proxy_proxy_new_sync() for the synchronous, blocking versi
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_dbus_sensor_proxy_proxy_new_for_bus">
+                c:identifier="phosh_dbus_sensor_proxy_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/iio-sensor-proxy-dbus.c"
              line="2167">Like phosh_dbus_sensor_proxy_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -32508,7 +32551,9 @@ See phosh_dbus_session_manager_proxy_new() for the asynchronous version of this 
           </parameter>
         </parameters>
       </constructor>
-      <function name="new" c:identifier="phosh_dbus_session_manager_proxy_new">
+      <function name="new"
+                c:identifier="phosh_dbus_session_manager_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/gnome-session-dbus.c"
              line="2520">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-gnome-SessionManager.top_of_page"&gt;org.gnome.SessionManager&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -32581,7 +32626,8 @@ See phosh_dbus_session_manager_proxy_new_sync() for the synchronous, blocking ve
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_dbus_session_manager_proxy_new_for_bus">
+                c:identifier="phosh_dbus_session_manager_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/gnome-session-dbus.c"
              line="2610">Like phosh_dbus_session_manager_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -34179,7 +34225,9 @@ See phosh_emergency_calls_proxy_new() for the asynchronous version of this const
           </parameter>
         </parameters>
       </constructor>
-      <function name="new" c:identifier="phosh_emergency_calls_proxy_new">
+      <function name="new"
+                c:identifier="phosh_emergency_calls_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/calls-emergency-dbus.c"
              line="979">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-gnome-Calls-EmergencyCalls.top_of_page"&gt;org.gnome.Calls.EmergencyCalls&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -34253,7 +34301,8 @@ See phosh_emergency_calls_proxy_new_sync() for the synchronous, blocking version
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_emergency_calls_proxy_new_for_bus">
+                c:identifier="phosh_emergency_calls_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/calls-emergency-dbus.c"
              line="1069">Like phosh_emergency_calls_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -36305,7 +36354,8 @@ See phosh_geo_clue_dbus_manager_proxy_new() for the asynchronous version of this
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_geo_clue_dbus_manager_proxy_new">
+                c:identifier="phosh_geo_clue_dbus_manager_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/geoclue-manager-dbus.c"
              line="888">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-freedesktop-GeoClue2-Manager.top_of_page"&gt;org.freedesktop.GeoClue2.Manager&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -36379,7 +36429,8 @@ See phosh_geo_clue_dbus_manager_proxy_new_sync() for the synchronous, blocking v
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_geo_clue_dbus_manager_proxy_new_for_bus">
+                c:identifier="phosh_geo_clue_dbus_manager_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/geoclue-manager-dbus.c"
              line="978">Like phosh_geo_clue_dbus_manager_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -37201,7 +37252,8 @@ See phosh_geo_clue_dbus_org_freedesktop_geo_clue2_agent_proxy_new() for the asyn
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_geo_clue_dbus_org_freedesktop_geo_clue2_agent_proxy_new">
+                c:identifier="phosh_geo_clue_dbus_org_freedesktop_geo_clue2_agent_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/geoclue-agent-dbus.c"
              line="881">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-freedesktop-GeoClue2-Agent.top_of_page"&gt;org.freedesktop.GeoClue2.Agent&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -37274,7 +37326,8 @@ See phosh_geo_clue_dbus_org_freedesktop_geo_clue2_agent_proxy_new_sync() for the
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_geo_clue_dbus_org_freedesktop_geo_clue2_agent_proxy_new_for_bus">
+                c:identifier="phosh_geo_clue_dbus_org_freedesktop_geo_clue2_agent_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/geoclue-agent-dbus.c"
              line="971">Like phosh_geo_clue_dbus_org_freedesktop_geo_clue2_agent_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -39930,7 +39983,8 @@ See phosh_idle_dbus_idle_monitor_proxy_new() for the asynchronous version of thi
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_idle_dbus_idle_monitor_proxy_new">
+                c:identifier="phosh_idle_dbus_idle_monitor_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-idle-dbus.c"
              line="1440">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-gnome-Mutter-IdleMonitor.top_of_page"&gt;org.gnome.Mutter.IdleMonitor&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -40003,7 +40057,8 @@ See phosh_idle_dbus_idle_monitor_proxy_new_sync() for the synchronous, blocking 
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_idle_dbus_idle_monitor_proxy_new_for_bus">
+                c:identifier="phosh_idle_dbus_idle_monitor_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-idle-dbus.c"
              line="1530">Like phosh_idle_dbus_idle_monitor_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -40460,7 +40515,8 @@ See phosh_idle_dbus_object_manager_client_new() for the asynchronous version of 
         </parameters>
       </function>
       <function name="new"
-                c:identifier="phosh_idle_dbus_object_manager_client_new">
+                c:identifier="phosh_idle_dbus_object_manager_client_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-idle-dbus.c"
              line="2315">Asynchronously creates #GDBusObjectManagerClient using phosh_idle_dbus_object_manager_client_get_proxy_type() as the #GDBusProxyTypeFunc. See g_dbus_object_manager_client_new() for more details.
@@ -40534,7 +40590,8 @@ See phosh_idle_dbus_object_manager_client_new_sync() for the synchronous, blocki
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_idle_dbus_object_manager_client_new_for_bus">
+                c:identifier="phosh_idle_dbus_object_manager_client_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-idle-dbus.c"
              line="2405">Like phosh_idle_dbus_object_manager_client_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -41856,11 +41913,11 @@ and unlock keypad.
 # CSS nodes
 
 #PhoshLockscreen has a CSS name with the name phosh-lockscreen.</doc>
-      <source-position filename="src/lockscreen.h" line="47"/>
+      <source-position filename="src/lockscreen.h" line="48"/>
       <implements name="Atk.ImplementorIface"/>
       <implements name="Gtk.Buildable"/>
       <constructor name="new" c:identifier="phosh_lockscreen_new">
-        <source-position filename="src/lockscreen.h" line="49"/>
+        <source-position filename="src/lockscreen.h" line="50"/>
         <return-value transfer-ownership="none">
           <type name="Gtk.Widget" c:type="GtkWidget*"/>
         </return-value>
@@ -41886,7 +41943,7 @@ and unlock keypad.
         </parameters>
       </constructor>
       <virtual-method name="unlock_submit_cb">
-        <source-position filename="src/lockscreen.h" line="35"/>
+        <source-position filename="src/lockscreen.h" line="36"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
         </return-value>
@@ -41898,7 +41955,7 @@ and unlock keypad.
       </virtual-method>
       <method name="add_extra_page"
               c:identifier="phosh_lockscreen_add_extra_page">
-        <source-position filename="src/lockscreen.h" line="62"/>
+        <source-position filename="src/lockscreen.h" line="65"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
         </return-value>
@@ -41913,7 +41970,7 @@ and unlock keypad.
       </method>
       <method name="clear_pin_entry"
               c:identifier="phosh_lockscreen_clear_pin_entry">
-        <source-position filename="src/lockscreen.h" line="59"/>
+        <source-position filename="src/lockscreen.h" line="60"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
         </return-value>
@@ -41924,25 +41981,25 @@ and unlock keypad.
         </parameters>
       </method>
       <method name="get_page" c:identifier="phosh_lockscreen_get_page">
-        <source-position filename="src/lockscreen.h" line="54"/>
+        <source-position filename="src/lockscreen.h" line="55"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/lockscreen.c"
-               line="1043">The #PhoshLockscreenPage that is currently shown</doc>
+               line="1041">The #PhoshLockscreenPage that is currently shown</doc>
           <type name="LockscreenPage" c:type="PhoshLockscreenPage"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/lockscreen.c"
-                 line="1041">The #PhoshLockscreen</doc>
+                 line="1039">The #PhoshLockscreen</doc>
             <type name="Lockscreen" c:type="PhoshLockscreen*"/>
           </instance-parameter>
         </parameters>
       </method>
       <method name="get_pin_entry"
               c:identifier="phosh_lockscreen_get_pin_entry">
-        <source-position filename="src/lockscreen.h" line="58"/>
+        <source-position filename="src/lockscreen.h" line="59"/>
         <return-value transfer-ownership="none">
           <type name="utf8" c:type="const gchar*"/>
         </return-value>
@@ -41954,7 +42011,7 @@ and unlock keypad.
       </method>
       <method name="set_default_page"
               c:identifier="phosh_lockscreen_set_default_page">
-        <source-position filename="src/lockscreen.h" line="55"/>
+        <source-position filename="src/lockscreen.h" line="56"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
         </return-value>
@@ -41968,7 +42025,7 @@ and unlock keypad.
         </parameters>
       </method>
       <method name="set_page" c:identifier="phosh_lockscreen_set_page">
-        <source-position filename="src/lockscreen.h" line="52"/>
+        <source-position filename="src/lockscreen.h" line="53"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
         </return-value>
@@ -41981,9 +42038,24 @@ and unlock keypad.
           </parameter>
         </parameters>
       </method>
+      <method name="set_unlock_status"
+              c:identifier="phosh_lockscreen_set_unlock_status">
+        <source-position filename="src/lockscreen.h" line="63"/>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Lockscreen" c:type="PhoshLockscreen*"/>
+          </instance-parameter>
+          <parameter name="status" transfer-ownership="none">
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
       <method name="shake_pin_entry"
               c:identifier="phosh_lockscreen_shake_pin_entry">
-        <source-position filename="src/lockscreen.h" line="60"/>
+        <source-position filename="src/lockscreen.h" line="61"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
         </return-value>
@@ -42010,7 +42082,7 @@ and unlock keypad.
       <glib:signal name="wakeup-output" when="last">
         <doc xml:space="preserve"
              filename="src/lockscreen.c"
-             line="939">Emitted when the output showing the lock screen should be woken
+             line="937">Emitted when the output showing the lock screen should be woken
 up.</doc>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
@@ -42020,13 +42092,13 @@ up.</doc>
     <record name="LockscreenClass"
             c:type="PhoshLockscreenClass"
             glib:is-gtype-struct-for="Lockscreen">
-      <source-position filename="src/lockscreen.h" line="47"/>
+      <source-position filename="src/lockscreen.h" line="48"/>
       <field name="parent_class">
         <type name="LayerSurfaceClass" c:type="PhoshLayerSurfaceClass"/>
       </field>
       <field name="unlock_submit_cb">
         <callback name="unlock_submit_cb">
-          <source-position filename="src/lockscreen.h" line="35"/>
+          <source-position filename="src/lockscreen.h" line="36"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -42039,7 +42111,7 @@ up.</doc>
       </field>
       <field name="_phosh_reserved1" introspectable="0">
         <callback name="_phosh_reserved1">
-          <source-position filename="src/lockscreen.h" line="38"/>
+          <source-position filename="src/lockscreen.h" line="39"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -42047,7 +42119,7 @@ up.</doc>
       </field>
       <field name="_phosh_reserved2" introspectable="0">
         <callback name="_phosh_reserved2">
-          <source-position filename="src/lockscreen.h" line="39"/>
+          <source-position filename="src/lockscreen.h" line="40"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -42055,7 +42127,7 @@ up.</doc>
       </field>
       <field name="_phosh_reserved3" introspectable="0">
         <callback name="_phosh_reserved3">
-          <source-position filename="src/lockscreen.h" line="40"/>
+          <source-position filename="src/lockscreen.h" line="41"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -42063,7 +42135,7 @@ up.</doc>
       </field>
       <field name="_phosh_reserved4" introspectable="0">
         <callback name="_phosh_reserved4">
-          <source-position filename="src/lockscreen.h" line="41"/>
+          <source-position filename="src/lockscreen.h" line="42"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -42071,7 +42143,7 @@ up.</doc>
       </field>
       <field name="_phosh_reserved5" introspectable="0">
         <callback name="_phosh_reserved5">
-          <source-position filename="src/lockscreen.h" line="42"/>
+          <source-position filename="src/lockscreen.h" line="43"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -42079,7 +42151,7 @@ up.</doc>
       </field>
       <field name="_phosh_reserved6" introspectable="0">
         <callback name="_phosh_reserved6">
-          <source-position filename="src/lockscreen.h" line="43"/>
+          <source-position filename="src/lockscreen.h" line="44"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -42087,7 +42159,7 @@ up.</doc>
       </field>
       <field name="_phosh_reserved7" introspectable="0">
         <callback name="_phosh_reserved7">
-          <source-position filename="src/lockscreen.h" line="44"/>
+          <source-position filename="src/lockscreen.h" line="45"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -42095,7 +42167,7 @@ up.</doc>
       </field>
       <field name="_phosh_reserved8" introspectable="0">
         <callback name="_phosh_reserved8">
-          <source-position filename="src/lockscreen.h" line="45"/>
+          <source-position filename="src/lockscreen.h" line="46"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -42103,7 +42175,7 @@ up.</doc>
       </field>
       <field name="_phosh_reserved9" introspectable="0">
         <callback name="_phosh_reserved9">
-          <source-position filename="src/lockscreen.h" line="46"/>
+          <source-position filename="src/lockscreen.h" line="47"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -42289,6 +42361,9 @@ AcceleratorActivated events over DBus</doc>
               c:identifier="PHOSH_LOCKSCREEN_PAGE_EXTRA"
               glib:nick="extra"
               glib:name="PHOSH_LOCKSCREEN_PAGE_EXTRA">
+        <doc xml:space="preserve"
+             filename="src/lockscreen.h"
+             line="16">The extra page (an extension point used by Lockscreen subclasses)</doc>
       </member>
       <member name="unlock"
               value="2"
@@ -42297,7 +42372,7 @@ AcceleratorActivated events over DBus</doc>
               glib:name="PHOSH_LOCKSCREEN_PAGE_UNLOCK">
         <doc xml:space="preserve"
              filename="src/lockscreen.h"
-             line="16">The unlock page (where PIN is entered)</doc>
+             line="17">The unlock page (where PIN is entered)</doc>
       </member>
     </enumeration>
     <class name="Lockshield"
@@ -43447,7 +43522,8 @@ See phosh_mm_dbus_modem_modem3gpp_proxy_new() for the asynchronous version of th
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_mm_dbus_modem_modem3gpp_proxy_new">
+                c:identifier="phosh_mm_dbus_modem_modem3gpp_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-wwan-mm-dbus.c"
              line="2014">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-freedesktop-ModemManager1-Modem-Modem3gpp.top_of_page"&gt;org.freedesktop.ModemManager1.Modem.Modem3gpp&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -43520,7 +43596,8 @@ See phosh_mm_dbus_modem_modem3gpp_proxy_new_sync() for the synchronous, blocking
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_mm_dbus_modem_modem3gpp_proxy_new_for_bus">
+                c:identifier="phosh_mm_dbus_modem_modem3gpp_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-wwan-mm-dbus.c"
              line="2104">Like phosh_mm_dbus_modem_modem3gpp_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -43842,7 +43919,9 @@ See phosh_mm_dbus_modem_proxy_new() for the asynchronous version of this constru
           </parameter>
         </parameters>
       </constructor>
-      <function name="new" c:identifier="phosh_mm_dbus_modem_proxy_new">
+      <function name="new"
+                c:identifier="phosh_mm_dbus_modem_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-wwan-mm-dbus.c"
              line="916">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-freedesktop-ModemManager1-Modem.top_of_page"&gt;org.freedesktop.ModemManager1.Modem&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -43915,7 +43994,8 @@ See phosh_mm_dbus_modem_proxy_new_sync() for the synchronous, blocking version o
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_mm_dbus_modem_proxy_new_for_bus">
+                c:identifier="phosh_mm_dbus_modem_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-wwan-mm-dbus.c"
              line="1006">Like phosh_mm_dbus_modem_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -44425,7 +44505,8 @@ See phosh_mm_dbus_object_manager_client_new() for the asynchronous version of th
         </parameters>
       </function>
       <function name="new"
-                c:identifier="phosh_mm_dbus_object_manager_client_new">
+                c:identifier="phosh_mm_dbus_object_manager_client_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-wwan-mm-dbus.c"
              line="3130">Asynchronously creates #GDBusObjectManagerClient using phosh_mm_dbus_object_manager_client_get_proxy_type() as the #GDBusProxyTypeFunc. See g_dbus_object_manager_client_new() for more details.
@@ -44499,7 +44580,8 @@ See phosh_mm_dbus_object_manager_client_new_sync() for the synchronous, blocking
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_mm_dbus_object_manager_client_new_for_bus">
+                c:identifier="phosh_mm_dbus_object_manager_client_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-wwan-mm-dbus.c"
              line="3220">Like phosh_mm_dbus_object_manager_client_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -49280,7 +49362,8 @@ See phosh_mpris_dbus_media_player2_player_proxy_new() for the asynchronous versi
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_mpris_dbus_media_player2_player_proxy_new">
+                c:identifier="phosh_mpris_dbus_media_player2_player_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/mpris-dbus.c"
              line="3049">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-mpris-MediaPlayer2-Player.top_of_page"&gt;org.mpris.MediaPlayer2.Player&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -49353,7 +49436,8 @@ See phosh_mpris_dbus_media_player2_player_proxy_new_sync() for the synchronous, 
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_mpris_dbus_media_player2_player_proxy_new_for_bus">
+                c:identifier="phosh_mpris_dbus_media_player2_player_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/mpris-dbus.c"
              line="3139">Like phosh_mpris_dbus_media_player2_player_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -49680,7 +49764,8 @@ See phosh_mpris_dbus_media_player2_proxy_new() for the asynchronous version of t
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_mpris_dbus_media_player2_proxy_new">
+                c:identifier="phosh_mpris_dbus_media_player2_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/mpris-dbus.c"
              line="927">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-mpris-MediaPlayer2.top_of_page"&gt;org.mpris.MediaPlayer2&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -49753,7 +49838,8 @@ See phosh_mpris_dbus_media_player2_proxy_new_sync() for the synchronous, blockin
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_mpris_dbus_media_player2_proxy_new_for_bus">
+                c:identifier="phosh_mpris_dbus_media_player2_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/mpris-dbus.c"
              line="1017">Like phosh_mpris_dbus_media_player2_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -53180,7 +53266,8 @@ See phosh_notify_dbus_notifications_proxy_new() for the asynchronous version of 
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_notify_dbus_notifications_proxy_new">
+                c:identifier="phosh_notify_dbus_notifications_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/notify-dbus.c"
              line="1839">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-freedesktop-Notifications.top_of_page"&gt;org.freedesktop.Notifications&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -53253,7 +53340,8 @@ See phosh_notify_dbus_notifications_proxy_new_sync() for the synchronous, blocki
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_notify_dbus_notifications_proxy_new_for_bus">
+                c:identifier="phosh_notify_dbus_notifications_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/notify-dbus.c"
              line="1929">Like phosh_notify_dbus_notifications_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -54894,7 +54982,9 @@ See phosh_ofono_dbus_manager_proxy_new() for the asynchronous version of this co
           </parameter>
         </parameters>
       </constructor>
-      <function name="new" c:identifier="phosh_ofono_dbus_manager_proxy_new">
+      <function name="new"
+                c:identifier="phosh_ofono_dbus_manager_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-wwan-ofono-dbus.c"
              line="2974">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-ofono-Manager.top_of_page"&gt;org.ofono.Manager&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -54968,7 +55058,8 @@ See phosh_ofono_dbus_manager_proxy_new_sync() for the synchronous, blocking vers
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_ofono_dbus_manager_proxy_new_for_bus">
+                c:identifier="phosh_ofono_dbus_manager_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-wwan-ofono-dbus.c"
              line="3064">Like phosh_ofono_dbus_manager_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -55712,7 +55803,8 @@ See phosh_ofono_dbus_network_registration_proxy_new() for the asynchronous versi
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_ofono_dbus_network_registration_proxy_new">
+                c:identifier="phosh_ofono_dbus_network_registration_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-wwan-ofono-dbus.c"
              line="1860">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-ofono-NetworkRegistration.top_of_page"&gt;org.ofono.NetworkRegistration&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -55786,7 +55878,8 @@ See phosh_ofono_dbus_network_registration_proxy_new_sync() for the synchronous, 
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_ofono_dbus_network_registration_proxy_new_for_bus">
+                c:identifier="phosh_ofono_dbus_network_registration_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-wwan-ofono-dbus.c"
              line="1950">Like phosh_ofono_dbus_network_registration_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -56530,7 +56623,8 @@ See phosh_ofono_dbus_sim_manager_proxy_new() for the asynchronous version of thi
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_ofono_dbus_sim_manager_proxy_new">
+                c:identifier="phosh_ofono_dbus_sim_manager_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-wwan-ofono-dbus.c"
              line="825">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-ofono-SimManager.top_of_page"&gt;org.ofono.SimManager&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -56604,7 +56698,8 @@ See phosh_ofono_dbus_sim_manager_proxy_new_sync() for the synchronous, blocking 
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_ofono_dbus_sim_manager_proxy_new_for_bus">
+                c:identifier="phosh_ofono_dbus_sim_manager_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-wwan-ofono-dbus.c"
              line="915">Like phosh_ofono_dbus_sim_manager_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -57409,7 +57504,9 @@ See phosh_osk0_sm_puri_osk0_proxy_new() for the asynchronous version of this con
           </parameter>
         </parameters>
       </constructor>
-      <function name="new" c:identifier="phosh_osk0_sm_puri_osk0_proxy_new">
+      <function name="new"
+                c:identifier="phosh_osk0_sm_puri_osk0_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-osk0-dbus.c"
              line="813">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-sm-puri-OSK0.top_of_page"&gt;sm.puri.OSK0&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -57482,7 +57579,8 @@ See phosh_osk0_sm_puri_osk0_proxy_new_sync() for the synchronous, blocking versi
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_osk0_sm_puri_osk0_proxy_new_for_bus">
+                c:identifier="phosh_osk0_sm_puri_osk0_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/phosh-osk0-dbus.c"
              line="903">Like phosh_osk0_sm_puri_osk0_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -59928,7 +60026,9 @@ See phosh_rfkill_dbus_rfkill_proxy_new() for the asynchronous version of this co
           </parameter>
         </parameters>
       </constructor>
-      <function name="new" c:identifier="phosh_rfkill_dbus_rfkill_proxy_new">
+      <function name="new"
+                c:identifier="phosh_rfkill_dbus_rfkill_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/gsd-rfkill-dbus.c"
              line="953">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-gnome-SettingsDaemon-Rfkill.top_of_page"&gt;org.gnome.SettingsDaemon.Rfkill&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -60001,7 +60101,8 @@ See phosh_rfkill_dbus_rfkill_proxy_new_sync() for the synchronous, blocking vers
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_rfkill_dbus_rfkill_proxy_new_for_bus">
+                c:identifier="phosh_rfkill_dbus_rfkill_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/gsd-rfkill-dbus.c"
              line="1043">Like phosh_rfkill_dbus_rfkill_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -61850,7 +61951,8 @@ See phosh_session_client_private_dbus_client_private_proxy_new() for the asynchr
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_session_client_private_dbus_client_private_proxy_new">
+                c:identifier="phosh_session_client_private_dbus_client_private_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/gnome-session-client-private-dbus.c"
              line="988">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-gnome-SessionManager-ClientPrivate.top_of_page"&gt;org.gnome.SessionManager.ClientPrivate&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -61924,7 +62026,8 @@ See phosh_session_client_private_dbus_client_private_proxy_new_sync() for the sy
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_session_client_private_dbus_client_private_proxy_new_for_bus">
+                c:identifier="phosh_session_client_private_dbus_client_private_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/gnome-session-client-private-dbus.c"
              line="1078">Like phosh_session_client_private_dbus_client_private_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -62748,7 +62851,8 @@ See phosh_session_presence_dbus_presence_proxy_new() for the asynchronous versio
         </parameters>
       </constructor>
       <function name="new"
-                c:identifier="phosh_session_presence_dbus_presence_proxy_new">
+                c:identifier="phosh_session_presence_dbus_presence_proxy_new"
+                glib:finish-func="new_finish">
         <doc xml:space="preserve"
              filename="src/dbus/gnome-session-presence-dbus.c"
              line="669">Asynchronously creates a proxy for the D-Bus interface &lt;link linkend="gdbus-interface-org-gnome-SessionManager-Presence.top_of_page"&gt;org.gnome.SessionManager.Presence&lt;/link&gt;. See g_dbus_proxy_new() for more details.
@@ -62822,7 +62926,8 @@ See phosh_session_presence_dbus_presence_proxy_new_sync() for the synchronous, b
         </parameters>
       </function>
       <function name="new_for_bus"
-                c:identifier="phosh_session_presence_dbus_presence_proxy_new_for_bus">
+                c:identifier="phosh_session_presence_dbus_presence_proxy_new_for_bus"
+                glib:finish-func="new_for_bus_finish">
         <doc xml:space="preserve"
              filename="src/dbus/gnome-session-presence-dbus.c"
              line="759">Like phosh_session_presence_dbus_presence_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
@@ -68761,7 +68866,7 @@ for haptic feedback.</doc>
           <doc xml:space="preserve"
                filename="src/util.c"
                line="300">The file size</doc>
-          <type name="gsize" c:type="off_t"/>
+          <type name="off_t" c:type="off_t"/>
         </parameter>
       </parameters>
     </function>
