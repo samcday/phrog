@@ -1,10 +1,16 @@
+mod lockscreen;
+mod shell;
+mod session_object;
+mod sessions;
+mod user_session_page;
+mod users;
 
-use phrog::lockscreen::Lockscreen;
+use crate::lockscreen::Lockscreen;
 use gtk::glib::StaticType;
 use std::ffi::{c_int, CString};
 use libphosh::WallClock;
 use libphosh::prelude::*;
-use phrog::shell::Shell;
+use crate::shell::Shell;
 
 extern "C" {
     fn hdy_init();
