@@ -7,7 +7,6 @@ all: gir/target/release/gir
 	cargo test
 
 gir/target/release/gir:
-	git submodule update --init --checkout gir/
 	cd gir && cargo build --release
 
 Phosh-0.gir:
