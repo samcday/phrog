@@ -9,54 +9,12 @@ URL:            https://github.com/samcday/phrog
 Source:         %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  cargo-rpm-macros >= 24
-BuildRequires:  gmobile-devel
+BuildRequires:  phosh-devel
 
-# we are building our own private copy of libphosh
-BuildRequires:	gcc
-BuildRequires:	meson
-BuildRequires:	pam-devel
-BuildRequires:	phoc
-BuildRequires:	pkgconfig(libecal-2.0) >= 3.33.1
-BuildRequires:	pkgconfig(libedataserver-1.2) >= 3.33.1
-BuildRequires:	pkgconfig(fribidi)
-BuildRequires:	pkgconfig(gcr-3) >= 3.7.5
-BuildRequires:	pkgconfig(glib-2.0) >= 2.76
-BuildRequires:	pkgconfig(gio-2.0) >= 2.76
-BuildRequires:	pkgconfig(gio-unix-2.0) >= 2.76
-BuildRequires:	pkgconfig(gmobile) >= 0.1.0
-BuildRequires:	pkgconfig(gmodule-no-export-2.0) >= 2.76
-BuildRequires:	pkgconfig(gnome-desktop-3.0) >= 3.26
-BuildRequires:	pkgconfig(gobject-2.0) >= 2.76
-BuildRequires:	pkgconfig(gsettings-desktop-schemas) >= 42
-BuildRequires:	pkgconfig(gtk+-3.0) >= 3.22
-BuildRequires:	pkgconfig(gtk+-wayland-3.0) >= 3.22
-BuildRequires:	pkgconfig(gudev-1.0)
-BuildRequires:	pkgconfig(libfeedback-0.0) >= 0.2.0
-BuildRequires:	pkgconfig(libhandy-1) >= 1.1.90
-BuildRequires:	pkgconfig(libnm) >= 1.14
-BuildRequires:	pkgconfig(polkit-agent-1) >= 0.105
-BuildRequires:	pkgconfig(libsoup-3.0) >= 3.0
-BuildRequires:	pkgconfig(libsystemd) >= 241
-BuildRequires:	pkgconfig(libsecret-1)
-BuildRequires:	pkgconfig(upower-glib) >= 0.99.1
-BuildRequires:	pkgconfig(wayland-client) >= 1.14
-BuildRequires:	pkgconfig(wayland-protocols) >= 1.12
-BuildRequires:	pkgconfig(evince-document-3.0)
-BuildRequires:  pkgconfig(evince-view-3.0)
-BuildRequires:	pkgconfig(gtk4) >= 4.0
-BuildRequires:	pkgconfig(libadwaita-1) >= 1.2
-BuildRequires:	pkgconfig(alsa)
-BuildRequires:	pkgconfig(libpulse) >= 12.99.3
-BuildRequires:	pkgconfig(libpulse-mainloop-glib)
-BuildRequires:	pkgconfig(libcallaudio-0.1)
-BuildRequires:	phosh-devel
-
-Requires:	phosh
-# for libphosh.so
-Requires:	phosh-devel
-Requires:	greetd >= 0.6
-Provides:	greetd-greeter = 0.6
-Provides:	greetd-%{name} = %{version}
+Requires:       greetd >= 0.6
+Provides:       greetd-greeter = 0.6
+Provides:       greetd-%{name} = %{version}
+Requires:       phosh-devel
 
 %description
 %{summary}.
@@ -69,18 +27,6 @@ Provides:	greetd-%{name} = %{version}
 %cargo_generate_buildrequires
 
 %build
-# all of this mess in the name of vendoring our own copy of libphosh.so
-# nonsense! we'll just yeet it out of phosh-devel for now until things settle upstream
-#cd phosh/
-#%meson -Dbindings-lib=true
-#%meson_build
-#meson install -C %{_vpath_builddir} --destdir install
-#install -d -m755 %{buildroot}%{_libdir}/phrog
-#cp %{_vpath_builddir}/install%{_libdir}/libphosh.so %{buildroot}%{_libdir}/phrog
-#
-#cd ..
-#export SYSTEM_DEPS_LIBPHOSH_0_SEARCH_NATIVE=%{buildroot}%{_libdir}/phrog
-#export PKG_CONFIG_PATH=`pwd`/phosh/%{_vpath_builddir}/install%{_libdir}/pkgconfig
 %cargo_build
 %{cargo_license_summary}
 %{cargo_license} > LICENSE.dependencies
@@ -97,7 +43,6 @@ Provides:	greetd-%{name} = %{version}
 %license LICENSE
 %doc README.md
 %{_bindir}/phrog
-#%{_libdir}/phrog/libphosh.so
 
 %changelog
 %autochangelog
