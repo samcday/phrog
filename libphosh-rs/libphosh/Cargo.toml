@@ -26,20 +26,14 @@ libc = '0.2'
 
 [dependencies.glib]
 version = "0.18"
-branch = "0.18"
-git = "https://github.com/gtk-rs/gtk-rs-core"
 features = [ "v2_66" ]
 
 [dependencies.gio]
 version = "0.18"
-branch = "0.18"
-git = "https://github.com/gtk-rs/gtk-rs-core"
 features = [ "v2_70" ]
 
 [dependencies.gtk]
 version = "0.18"
-branch = "0.18"
-git = "https://github.com/gtk-rs/gtk3-rs.git"
 features = ["v3_24"]
 
 [dependencies.ffi]

@@ -20,12 +20,10 @@ serde = { version = "1.0", features = ["derive"] }
 
 [dependencies.gtk]
 version = '0.18'
-branch = "0.18"
-git = "https://github.com/gtk-rs/gtk3-rs.git"
 features = ['v3_24']
 
 [dependencies.libhandy]
-git = "https://gitlab.gnome.org/World/Rust/libhandy-rs"
+version = "0.11"
 
 [build-dependencies]
 glib-build-tools = "0.18.0"
