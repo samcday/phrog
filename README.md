@@ -55,5 +55,6 @@ Now you can build:
 export LD_LIBRARY_PATH=$(pwd)/_build-phosh/install/usr/local/lib64
 export PKG_CONFIG_PATH=$(pwd)/_build-phosh/install/usr/local/lib64/pkgconfig
 
-phoc -E "cargo run"
+cargo build
+FAKEGREET=1 phoc -E "fakegreet ./target/debug/phrog"
 ```
