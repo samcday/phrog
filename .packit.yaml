@@ -19,5 +19,7 @@ jobs:
       owner: "@samcday"
       project: "phrog"
       preserve_project: True
-      targets:
-          - fedora-stable
+
+    - job: copr_build
+      trigger: pull_request
+      targets: [fedora-stable]
