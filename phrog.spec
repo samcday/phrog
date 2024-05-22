@@ -55,6 +55,9 @@ Provides:       greetd-%{name} = %{version}
 
 Requires:	phosh
 
+Requires: phosh-devel
+BuildRequires: phosh-devel
+
 %description
 %{summary}.
 
