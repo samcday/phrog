@@ -1191,3 +1191,13 @@ void phosh_lockscreen_add_extra_page (PhoshLockscreen *self, GtkWidget *widget)
   priv->extra_page = widget;
   hdy_carousel_insert (HDY_CAROUSEL (priv->carousel), priv->extra_page, 1);
 }
+
+void
+phosh_lockscreen_set_unlock_status (PhoshLockscreen *self, const gchar *status)
+{
+  PhoshLockscreenPrivate *priv;
+  g_return_if_fail (PHOSH_IS_LOCKSCREEN (self));
+  priv = phosh_lockscreen_get_instance_private (self);
+
+  gtk_label_set_label (GTK_LABEL (priv->lbl_unlock_status), status);
+}
