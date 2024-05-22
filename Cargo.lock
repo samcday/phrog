@@ -1064,8 +1064,9 @@ checksum = "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
 
 [[package]]
 name = "uzers"
-version = "0.11.3"
-source = "git+https://github.com/rustadopt/uzers-rs?rev=8fb29db#8fb29db0d3398c40d4d467d9e0e1374a241599a9"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7d85875e16d59b3b1549efce83ff8251a64923b03bef94add0a1862847448de4"
 dependencies = [
  "libc",
  "log",
