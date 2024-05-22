@@ -13,6 +13,7 @@ BuildRequires:  cargo-rpm-macros >= 24
 Requires:       greetd >= 0.6
 Provides:       greetd-greeter = 0.6
 Provides:       greetd-%{name} = %{version}
+Requires:       phosh-devel
 
 %description
 %{summary}.
