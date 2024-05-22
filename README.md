@@ -1,13 +1,41 @@
 # 🐸
 
-A prototype re-implementation of [phog](https://gitlab.com/mobian1/phog) in Rust, [using libphosh](https://gitlab.com/mobian1/phog/-/issues/5).
+Greetd-compatible greeter for mobile phones
 
-To test with `fakegreet`:
+This is a fork of [phog](https://gitlab.com/mobian1/phog).
+
+`phrog` uses Phosh to handle a greetd conversation
+
+## Usage
+
+### Installation
+
+#### Fedora
 
 ```
-cargo build
-
-phoc -E "bash -lc './target/debug/fakegreet ./target/debug/phrog'"
+sudo dnf copr enable samcday/phrog
+sudo dnf install phrog
 ```
 
-The successful login combination is `user` / `0` / `9`.
+#### Other
+
+For now, you must build from source, see the Development section below.
+
+### Running
+
+`phrog` is primarily intended to run via greetd. That is, your `/etc/greetd/config.toml` should
+look something like this:
+
+```
+[default_session]
+command = "systemd-cat --identifier=phrog phoc -E phrog"
+```
+
+You can also run it directly in a `greetd-fakegreet` session, assuming you have that binary installed:
+
+```
+FAKEGREET=1 phoc -E "fakegreet ./target/debug/phrog"
+```
+
+
+## Development
