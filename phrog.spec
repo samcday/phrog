@@ -69,16 +69,6 @@ BuildRequires: phosh-devel
 %cargo_generate_buildrequires
 
 %build
-#cd phosh/
-#%meson -Dbindings-lib=true
-#%meson_build
-#meson install -C %{_vpath_builddir} --destdir install
-#install -d -m755 %{buildroot}%{_libdir}/phrog
-#cp %{_vpath_builddir}/install%{_libdir}/libphosh.so %{buildroot}%{_libdir}/phrog/libphosh.so
-#
-#cd ..
-#export SYSTEM_DEPS_LIBPHOSH_0_SEARCH_NATIVE=%{buildroot}%{_libdir}/phrog
-#export PKG_CONFIG_PATH=`pwd`/phosh/%{_vpath_builddir}/install%{_libdir}/pkgconfig
 %cargo_build
 %{cargo_license_summary}
 %{cargo_license} > LICENSE.dependencies
@@ -95,7 +85,6 @@ BuildRequires: phosh-devel
 %license LICENSE
 %doc README.md
 %{_bindir}/phrog
-#%{_libdir}/phrog/libphosh.so
 
 %changelog
 %autochangelog
