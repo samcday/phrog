@@ -49,8 +49,10 @@ BuildRequires:	pkgconfig(alsa)
 BuildRequires:	pkgconfig(libpulse) >= 12.99.3
 BuildRequires:	pkgconfig(libpulse-mainloop-glib)
 BuildRequires:	pkgconfig(libcallaudio-0.1)
+BuildRequires:	phosh-devel
 
 Requires:	phosh
+Requires:	phosh-devel # for libphosh.so
 Requires:	greetd >= 0.6
 Provides:	greetd-greeter = 0.6
 Provides:	greetd-%{name} = %{version}
@@ -66,16 +68,18 @@ Provides:	greetd-%{name} = %{version}
 %cargo_generate_buildrequires
 
 %build
-cd phosh/
-%meson -Dbindings-lib=true
-%meson_build
-meson install -C %{_vpath_builddir} --destdir install
-install -d -m755 %{buildroot}%{_libdir}/phrog
-cp %{_vpath_builddir}/install%{_libdir}/libphosh.so %{buildroot}%{_libdir}/phrog
-
-cd ..
-export SYSTEM_DEPS_LIBPHOSH_0_SEARCH_NATIVE=%{buildroot}%{_libdir}/phrog
-export PKG_CONFIG_PATH=`pwd`/phosh/%{_vpath_builddir}/install%{_libdir}/pkgconfig
+# all of this mess in the name of vendoring our own copy of libphosh.so
+# nonsense! we'll just yeet it out of phosh-devel for now until things settle upstream
+#cd phosh/
+#%meson -Dbindings-lib=true
+#%meson_build
+#meson install -C %{_vpath_builddir} --destdir install
+#install -d -m755 %{buildroot}%{_libdir}/phrog
+#cp %{_vpath_builddir}/install%{_libdir}/libphosh.so %{buildroot}%{_libdir}/phrog
+#
+#cd ..
+#export SYSTEM_DEPS_LIBPHOSH_0_SEARCH_NATIVE=%{buildroot}%{_libdir}/phrog
+#export PKG_CONFIG_PATH=`pwd`/phosh/%{_vpath_builddir}/install%{_libdir}/pkgconfig
 %cargo_build
 %{cargo_license_summary}
 %{cargo_license} > LICENSE.dependencies
