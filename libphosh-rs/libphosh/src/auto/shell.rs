@@ -425,7 +425,7 @@ pub trait ShellExt: IsA<Shell> + sealed::Sealed + 'static {
         unsafe {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"ready\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(ready_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(ready_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 
@@ -438,7 +438,7 @@ pub trait ShellExt: IsA<Shell> + sealed::Sealed + 'static {
         unsafe {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"notify::builtin-monitor\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_builtin_monitor_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(notify_builtin_monitor_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 
@@ -451,7 +451,7 @@ pub trait ShellExt: IsA<Shell> + sealed::Sealed + 'static {
         unsafe {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"notify::docked\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_docked_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(notify_docked_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 
@@ -464,7 +464,7 @@ pub trait ShellExt: IsA<Shell> + sealed::Sealed + 'static {
         unsafe {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"notify::locked\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_locked_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(notify_locked_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 
@@ -477,7 +477,7 @@ pub trait ShellExt: IsA<Shell> + sealed::Sealed + 'static {
         unsafe {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"notify::primary-monitor\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_primary_monitor_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(notify_primary_monitor_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 
@@ -490,7 +490,7 @@ pub trait ShellExt: IsA<Shell> + sealed::Sealed + 'static {
         unsafe {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"notify::shell-state\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_shell_state_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(notify_shell_state_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 }

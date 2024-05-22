@@ -303,6 +303,13 @@ pub trait LockscreenExt: IsA<Lockscreen> + sealed::Sealed + 'static {
         }
     }
 
+    #[doc(alias = "phosh_lockscreen_set_unlock_status")]
+    fn set_unlock_status(&self, status: &str) {
+        unsafe {
+            ffi::phosh_lockscreen_set_unlock_status(self.as_ref().to_glib_none().0, status.to_glib_none().0);
+        }
+    }
+
     #[doc(alias = "phosh_lockscreen_shake_pin_entry")]
     fn shake_pin_entry(&self) {
         unsafe {
@@ -324,7 +331,7 @@ pub trait LockscreenExt: IsA<Lockscreen> + sealed::Sealed + 'static {
         unsafe {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"lockscreen-unlock\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(lockscreen_unlock_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(lockscreen_unlock_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 
@@ -337,7 +344,7 @@ pub trait LockscreenExt: IsA<Lockscreen> + sealed::Sealed + 'static {
         unsafe {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"wakeup-output\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(wakeup_output_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(wakeup_output_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 }
