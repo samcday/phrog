@@ -52,7 +52,8 @@ BuildRequires:	pkgconfig(libcallaudio-0.1)
 BuildRequires:	phosh-devel
 
 Requires:	phosh
-Requires:	phosh-devel # for libphosh.so
+# for libphosh.so
+Requires:	phosh-devel
 Requires:	greetd >= 0.6
 Provides:	greetd-greeter = 0.6
 Provides:	greetd-%{name} = %{version}
