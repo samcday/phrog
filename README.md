@@ -55,6 +55,7 @@ Now you can build:
 
 ```
 export LD_LIBRARY_PATH=$(pwd)/_build-phosh/install/usr/local/lib64
+export SYSTEM_DEPS_LIBPHOSH_0_SEARCH_NATIVE=$(pwd)/_build-phosh/install/usr/local/lib64
 export PKG_CONFIG_PATH=$(pwd)/_build-phosh/install/usr/local/lib64/pkgconfig
 
 cargo build
