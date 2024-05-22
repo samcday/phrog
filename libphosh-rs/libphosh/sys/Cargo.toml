@@ -44,8 +44,6 @@ features = ["v3_24"]
 
 [dependencies.pango-sys]
 version = "0.18"
-branch = "0.18"
-git = "https://github.com/gtk-rs/gtk-rs-core.git"
 
 [dependencies.handy_sys]
 version = "0.11"
