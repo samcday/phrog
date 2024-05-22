@@ -44,6 +44,8 @@ are subtrees of this repo.
 
 You must first build the libphosh fork:
 
+(so, hey, fam. this means you need to do all the stuff [over here][phosh-deps], alright? okay cool.)
+
 ```
 meson setup -Dbindings-lib=true _build-phosh phosh
 meson install --destdir=install -C _build-phosh
@@ -58,3 +60,5 @@ export PKG_CONFIG_PATH=$(pwd)/_build-phosh/install/usr/local/lib64/pkgconfig
 cargo build
 FAKEGREET=1 phoc -E "fakegreet ./target/debug/phrog"
 ```
+
+[phosh-deps]: https://gitlab.gnome.org/World/Phosh/phosh#dependencies
