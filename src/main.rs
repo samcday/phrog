@@ -8,6 +8,7 @@ mod users;
 use crate::lockscreen::Lockscreen;
 use gtk::glib::StaticType;
 use std::ffi::{c_int, CString};
+use clap::Parser;
 use libphosh::WallClock;
 use libphosh::prelude::*;
 use crate::shell::Shell;
@@ -17,7 +18,14 @@ extern "C" {
     fn cui_init(v: c_int);
 }
 
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+}
+
 fn main() {
+    let args = Args::parse();
+
     gtk::gio::resources_register_include!("phrog.gresource")
         .expect("Failed to register resources.");
 

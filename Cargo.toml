@@ -1,6 +1,6 @@
 [package]
 name = "phrog"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2021"
 
 [dependencies]
@@ -10,6 +10,7 @@ uzers = "0.12"
 async-channel = "2.2.1"
 anyhow = "1.0.82"
 libphosh = { path = "libphosh-rs/libphosh" }
+clap = { version = "4.5.4", features = ["derive"] }
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
