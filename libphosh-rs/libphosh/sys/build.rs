@@ -11,7 +11,12 @@ fn main() {} // prevent linking libraries to avoid documentation failure
 
 #[cfg(not(docsrs))]
 fn main() {
-    if let Err(s) = system_deps::Config::new().probe() {
+    if let Err(s) = system_deps::Config::new()
+        .add_build_internal("libphosh_0", |lib, version| {
+            system_deps::Library::from_internal_pkg_config(std::env::var("LIBPHOSH_PC_PATH").unwrap(), "libphosh-0", "0.39")
+        })
+        .probe()
+    {
         println!("cargo:warning={s}");
         process::exit(1);
     }
