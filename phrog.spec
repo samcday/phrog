@@ -9,6 +9,8 @@ URL:            https://github.com/samcday/phrog
 Source:         %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  cargo-rpm-macros >= 24
+BuildRequires:  phosh-devel
+BuildRequires:  gmobile-devel
 
 Requires:       greetd >= 0.6
 Provides:       greetd-greeter = 0.6
