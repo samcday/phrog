@@ -1,0 +1,84 @@
+# Maintainer: Sam Day <me@samcday.com>
+pkgname=greetd-phrog
+pkgver=0.1.10
+pkgrel=1
+pkgdesc="Greetd-compatible greeter for mobile phones"
+url="https://github.com/samcday/phrog"
+# riscv64: blocked by greetd
+# s390x: blocked by greetd & phosh
+# ppc64le: blocked by phosh
+# armhf: blocked by phosh
+arch="all !s390x !riscv64 !armhf !ppc64le"
+license="GPL-3.0-only"
+depends="
+	phosh
+	greetd"
+makedepends="
+	cargo
+	cargo-auditable
+	callaudiod-dev
+	elogind-dev
+	evince-dev
+	evolution-data-server-dev
+	feedbackd-dev
+	gcr-dev
+	gettext-dev
+	glib-dev
+	gmobile-dev
+	gnome-desktop-dev
+	gtk+3.0-dev
+	libadwaita-dev
+	libgudev-dev
+	libhandy1-dev
+	libsecret-dev
+	linux-pam-dev
+	meson
+	networkmanager-dev
+	polkit-elogind-dev
+	pulseaudio-dev
+	py3-docutils
+	upower-dev
+	wayland-dev
+	wayland-protocols
+	"
+commit=66c14f84e28332b152cfdd5cde19ac3a950d940d
+source="$pkgname-${commit}.tar.gz::https://github.com/samcday/phrog/archive/${commit}.tar.gz
+        phrog"
+
+export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix=$builddir=/build/"
+
+prepare() {
+	cd phrog-${commit}
+
+	cargo fetch --target="$CTARGET" --locked
+}
+
+build() {
+	abuild-meson \
+		-Dphoc_tests=disabled \
+		-Dbindings-lib=true \
+		phosh phosh-output
+	meson compile -C phosh-output
+	meson install -C phosh-output --destdir install
+
+	export LD_LIBRARY_PATH=$(pwd)/phosh-output/install/usr/lib
+	export SYSTEM_DEPS_LIBPHOSH_0_SEARCH_NATIVE=$(pwd)/phosh-output/install/usr/lib
+	export PKG_CONFIG_PATH=$(pwd)/phosh-output/install/usr/lib/pkgconfig
+
+	cargo auditable build --release --frozen
+}
+
+check() {
+	cargo test --frozen
+}
+
+package() {
+	install -Dm755 phrog -t "$pkgdir"/usr/bin/
+	install -Dm644 src/phrog-${commit}/phosh-output/install/usr/lib/libphosh.so -t "$pkgdir"/usr/lib/phrog/
+	install -Dm755 src/phrog-${commit}/target/release/phrog -t "$pkgdir"/usr/libexec/
+}
+
+sha512sums="
+f174263e493ed30e94ec35465b69dccba34117b3aaded65d2d694e09213c0c061e8fa6a7b863d20de7439539339b51493f58a9daae9d66685ed90e21f3206082  greetd-phrog-66c14f84e28332b152cfdd5cde19ac3a950d940d.tar.gz
+6b74433bc38510a062ebcb70c05ff97876427c7828e6e0e4040213916c5e04bb3e6a5d53ed0f81e544dc9b6f766395b0e950e802fa4f8bd7b30139c70c83788a  phrog
+"
