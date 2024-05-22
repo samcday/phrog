@@ -23,7 +23,7 @@ mod imp {
     use async_channel::{Receiver, Sender};
     use greetd_ipc::codec::SyncCodec;
     use greetd_ipc::{AuthMessageType, ErrorType, Request, Response};
-    use gtk::glib::{Cast, clone, closure_local, g_critical, g_warning, ObjectExt};
+    use gtk::glib::{Cast, clone, closure_local, g_critical, g_info, g_warning, ObjectExt};
     use gtk::subclass::prelude::{ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt};
     use gtk::subclass::widget::WidgetImpl;
     use gtk::{gio, glib, Widget};
@@ -95,6 +95,24 @@ mod imp {
             self.greetd_sender.set(greetd_sender.clone()).unwrap();
             self.greetd_receiver.set(greetd_receiver.clone()).unwrap();
 
+            self.obj().connect_page_notify(clone!(@weak self as this => move |ls| {
+                glib::spawn_future_local(clone!(@weak ls => async move {
+                    // Page is not Unlock, clear out session.
+                    if ls.page() != LockscreenPage::Unlock {
+                        this.clear_session().await;
+                        return;
+                    }
+                    // Page is lockscreen, begin greetd conversation.
+                    if ls.page() == LockscreenPage::Unlock {
+                        g_warning!("greetd", "starting greetd session");
+                        ls.set_sensitive(false);
+                        this.greetd_interaction(Request::CreateSession {
+                            username: this.user_session_page.get().unwrap().username().unwrap(),
+                        }).await;
+                    }
+                }));
+            }));
+
             self.user_session_page.get().unwrap()
                 .connect_closure("login", false, closure_local!(@weak-allow-none self as this => move |_: UserSessionPage| {
                     let this = if let Some(this) = this { this } else {
@@ -106,6 +124,16 @@ mod imp {
     }
 
     impl Lockscreen {
+        // Whenever user swipes away from keypad entry page, and after an auth failure, fire off a
+        // CancelSession.
+        async fn clear_session(&self) {
+            self.obj().set_sensitive(false);
+            if let Err(err) = self.greetd_req(Request::CancelSession).await {
+                g_warning!("greetd", "greetd CancelSession failed: {}", err);
+            }
+            self.obj().set_sensitive(true);
+        }
+
         async fn start_session(&self) -> anyhow::Result<()> {
             let session = self.user_session_page.get().unwrap().session();
 
@@ -132,43 +160,32 @@ mod imp {
             }
         }
 
-        async fn login(&self) -> anyhow::Result<()> {
-            let req = Request::CreateSession {
-                username: self.user_session_page.get().unwrap().username().unwrap(),
-            };
-            match self.greetd_req(req).await? {
-                Response::AuthMessage { auth_message_type, auth_message} => {
-                    if auth_message != "Password:" {
-                        // In future we might want to properly handle more complicated PAM
-                        // conversations. For now, we only support simple password auth.
-                        return Err(anyhow!("Unexpected auth message {}", auth_message));
-                    }
-                }
-                Response::Success => {
-                    // Some kind of PAM autologin madness? Just roll with it.
-                    self.start_session().await?;
-                }
-                v => return Err(anyhow!("unexpected response to start session: {:?}", v))
+        async fn greetd_interaction(&self, req: Request) {
+            let resp = self.greetd_req(req).await;
+            if let Err(err) = resp {
+                g_critical!("greetd", "failed to send greetd request: {:?}", err);
+                return;
             }
-
-            let resp = self.greetd_req(Request::PostAuthMessageResponse {
-                response: Some(self.obj().pin_entry().to_string())
-            }).await?;
+            let resp = resp.unwrap();
 
             match resp {
-                Response::AuthMessage { auth_message_type: _, auth_message} => {
-                    // Same deal as previously noted: we're only expecting a simplistic PAM
-                    // conversation that asks for password and that's it.
-                    return Err(anyhow!("Unexpected auth message {}", auth_message));
-                }
+                Response::AuthMessage { auth_message_type, auth_message} => {
+                    g_warning!("greetd", "got greetd auth message ({:?}) {}", auth_message_type, auth_message);
+                    self.obj().set_unlock_status(&auth_message);
+                    // TODO: it would be nice to override the GtkEntry input-purpose depending on
+                    // AuthMessageType
+                    self.obj().set_sensitive(true);
+                },
+                Response::Success => {
+                    self.start_session().await.unwrap();
+                },
                 Response::Error { error_type: ErrorType::AuthError, description } => {
-                    return Ok(())
-                }
-                Response::Success => self.start_session().await.unwrap(),
-                v => return Err(anyhow!("unexpected response to start session: {:?}", v))
-            }
-
-            Ok(())
+                    g_warning!("greetd", "auth error '{}'", description);
+                    self.obj().shake_pin_entry();
+                    self.clear_session().await;
+                },
+                v => g_critical!("greetd", "unexpected response to start session: {:?}", v),
+            };
         }
     }
 
@@ -176,15 +193,12 @@ mod imp {
     impl LockscreenImpl for Lockscreen {
         fn unlock_submit_cb(&self) {
             glib::spawn_future_local(clone!(@weak self as this => async move {
-                this.obj().upcast_ref::<Widget>().set_sensitive(false);
-                if let Err(err) = this.login().await {
-                    g_warning!("lockscreen", "Login failed: {}", err);
-                }
-                // If we got here, the login failed in some way.
-                // For now the best we can do is visually indicate this to the user.
-                // shake_pin_entry will set the lockscreen as sensitive again when
-                // animation completes.
-                this.obj().shake_pin_entry();
+                this.obj().set_sensitive(false);
+                let entry = this.obj().pin_entry().to_string();
+                this.obj().clear_pin_entry();
+                this.greetd_interaction(Request::PostAuthMessageResponse {
+                    response: Some(entry)
+                }).await;
             }));
         }
     }
