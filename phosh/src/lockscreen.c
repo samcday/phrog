@@ -52,6 +52,7 @@
 enum {
   PROP_0,
   PROP_CALLS_MANAGER,
+  PROP_PAGE,
   PROP_LAST_PROP
 };
 static GParamSpec *props[PROP_LAST_PROP];
@@ -144,6 +145,9 @@ phosh_lockscreen_get_property (GObject    *object,
   switch (property_id) {
   case PROP_CALLS_MANAGER:
     g_value_set_object (value, priv->calls_manager);
+    break;
+  case PROP_PAGE:
+    g_value_set_enum (value, phosh_lockscreen_get_page (self));
     break;
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -472,6 +476,8 @@ carousel_page_changed_cb (PhoshLockscreen *self,
   PhoshOskManager *osk_manager = phosh_shell_get_osk_manager (shell);
   gboolean osk_visible = phosh_osk_manager_get_visible (osk_manager);
   PhoshLockscreenPage page = phosh_lockscreen_get_page (self);
+
+  g_object_notify_by_pspec (G_OBJECT (self), props[PROP_PAGE]);
 
   if (page == PHOSH_LOCKSCREEN_PAGE_UNLOCK) {
     focus_pin_entry (self, osk_visible);
@@ -928,6 +934,14 @@ phosh_lockscreen_class_init (PhoshLockscreenClass *klass)
                          "",
                          PHOSH_TYPE_CALLS_MANAGER,
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
+
+  props[PROP_PAGE] =
+          g_param_spec_enum ("page",
+                             "",
+                             "Active page",
+                             PHOSH_TYPE_LOCKSCREEN_PAGE,
+                             PHOSH_LOCKSCREEN_PAGE_UNLOCK,
+                             G_PARAM_READABLE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (object_class, PROP_LAST_PROP, props);
 
