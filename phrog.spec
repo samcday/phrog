@@ -74,6 +74,8 @@ BuildRequires: phosh-devel
 %{cargo_license} > LICENSE.dependencies
 
 %install
+install -d %{buildroot}%{_datadir}/glib-2.0/schemas/
+%{__install} -Dpm 0644 resources/com.samcday.phrog.gschema.xml %{buildroot}%{_datadir}/glib-2.0/schemas/
 %cargo_install
 
 %if %{with check}
@@ -84,6 +86,7 @@ BuildRequires: phosh-devel
 %files
 %license LICENSE
 %doc README.md
+%{_datadir}/glib-2.0/schemas/*
 %{_bindir}/phrog
 
 %changelog
