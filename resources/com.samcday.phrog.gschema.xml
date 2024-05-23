@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+    <schema id="com.samcday.phrog" path="/com/samcday/phrog/">
+        <key name="last-user" type="s">
+            <default>""</default>
+            <summary>The last user that successfully launched a session</summary>
+        </key>
+        <key name="last-session" type="s">
+            <default>""</default>
+            <summary>The name of the last session that successfully launched</summary>
+        </key>
+    </schema>
+</schemalist>

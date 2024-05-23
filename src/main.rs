@@ -5,17 +5,21 @@ mod sessions;
 mod user_session_page;
 mod users;
 
-use crate::lockscreen::Lockscreen;
 use gtk::glib::StaticType;
 use std::ffi::{c_int, CString};
 use clap::Parser;
+use gtk::Application;
+use gtk::gio::Settings;
+use gtk::prelude::*;
 use libphosh::WallClock;
 use libphosh::prelude::*;
 use crate::shell::Shell;
 
+pub const APP_ID: &str = "com.samcday.phrog";
+
 extern "C" {
     fn hdy_init();
-    fn cui_init(v: c_int);
+    // fn cui_init(v: c_int);
 }
 
 #[derive(Parser, Debug)]
@@ -30,11 +34,7 @@ fn main() {
         .expect("Failed to register resources.");
 
     gtk::init().unwrap();
-
-    // This is necessary to ensure the Lockscreen type is actually registered. Otherwise it's done
-    // lazily the first time it's instantiated, but we're currently hacking the type lookup in
-    // phosh_lockscreen_new
-    let _ = Lockscreen::static_type();
+    let app = Application::builder().application_id(APP_ID).build();
 
     let wall_clock = WallClock::new();
     wall_clock.set_default();

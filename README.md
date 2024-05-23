@@ -65,14 +65,31 @@ meson setup -Dbindings-lib=true _build-phosh phosh
 meson install --destdir=install -C _build-phosh
 ```
 
-Now you can build:
+Now you can build with these flags:
 
 ```
 export LD_LIBRARY_PATH=$(pwd)/_build-phosh/install/usr/local/lib64
 export SYSTEM_DEPS_LIBPHOSH_0_SEARCH_NATIVE=$(pwd)/_build-phosh/install/usr/local/lib64
 export PKG_CONFIG_PATH=$(pwd)/_build-phosh/install/usr/local/lib64/pkgconfig
+```
 
+Make sure the local project schema is installed:
+
+```
+mkdir -p $HOME/.local/share/glib-2.0/schemas
+cp resources/com.samcday.phrog.gschema.xml $HOME/.local/share/glib-2.0/schemas/
+glib-compile-schemas $HOME/.local/share/glib-2.0/schemas/
+```
+
+Build the app.
+
+```
 cargo build
+```
+
+Have a fake conversation with greetd.
+
+```
 FAKEGREET=1 phoc -E "fakegreet ./target/debug/phrog"
 ```
 

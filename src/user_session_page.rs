@@ -1,6 +1,5 @@
-use glib::Object;
 use gtk::glib;
-use gtk::glib::{Cast, CastNone};
+use gtk::glib::{Cast, CastNone, Object};
 use gtk::prelude::ListModelExt;
 use gtk::subclass::prelude::ObjectSubclassIsExt;
 use gtk::traits::ListBoxExt;
@@ -34,11 +33,11 @@ impl UserSessionPage {
 
 mod imp {
     use crate::session_object::SessionObject;
-    use crate::{sessions, users};
+    use crate::{APP_ID, sessions, users};
     use glib::subclass::InitializingObject;
-    use gtk::gio::ListStore;
+    use gtk::gio::{ListStore, Settings};
     use gtk::glib::subclass::Signal;
-    use gtk::glib::clone;
+    use gtk::glib::{clone, g_info, g_warning};
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
     use gtk::{glib, CompositeTemplate, ListBox};
@@ -78,16 +77,28 @@ mod imp {
         fn constructed(&self) {
             self.parent_constructed();
 
+            let settings = Settings::new(APP_ID);
+
+            let last_user = settings.string("last-user").to_string();
+            let last_session = settings.string("last-session").to_string();
+
             for user in users::users() {
                 let row = ActionRow::builder()
                         .title(user.1)
-                        .subtitle(user.0)
+                        .subtitle(user.0.clone())
                         .activatable(true)
                         .build();
                 self.box_users.add(&row);
+                // use last-user setting as default for user selection
+                if user.0 == last_user {
+                    g_warning!("user-session-page", "defaulting user selection to {}", last_user);
+                    self.box_users.select_row(Some(&row));
+                }
             }
-            self.box_users.select_row(self.box_users.row_at_index(0).as_ref());
             self.box_users.show_all();
+            if self.box_users.selected_row().is_none() {
+                self.box_users.select_row(self.box_users.row_at_index(0).as_ref());
+            }
 
             self.box_users.connect_row_activated(clone!(@weak self as this => move |_, _| {
                 this.obj().emit_by_name::<()>("login", &[]);
@@ -96,10 +107,12 @@ mod imp {
             self.sessions
                 .set(ListStore::new::<SessionObject>())
                 .unwrap();
+
+            let session_list = sessions::sessions();
             self.sessions
                 .get()
                 .unwrap()
-                .extend_from_slice(&sessions::sessions());
+                .extend_from_slice(&session_list);
 
             self.row_sessions.bind_name_model(
                 Some(self.sessions.get().unwrap()),
@@ -107,6 +120,15 @@ mod imp {
                     v.downcast_ref::<SessionObject>().unwrap().name()
                 })),
             );
+
+            // use last-session setting as default for session selection
+            for (idx, session) in session_list.iter().enumerate() {
+                if session.id() == last_session {
+                    g_info!("user-session-page", "defaulting session selection to {}", session.id());
+                    self.row_sessions.set_selected_index(idx as i32);
+                    break;
+                }
+            }
         }
 
         fn signals() -> &'static [Signal] {

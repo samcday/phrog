@@ -28,20 +28,23 @@ mod imp {
     use gtk::subclass::widget::WidgetImpl;
     use gtk::{gio, glib, Widget};
     use libphosh::subclass::lockscreen::LockscreenImpl;
-    use std::cell::OnceCell;
+    use std::cell::{OnceCell, RefCell};
     use std::os::unix::net::UnixStream;
     use std::process;
     use anyhow::{anyhow, Context};
+    use gtk::gio::Settings;
+    use gtk::prelude::SettingsExtManual;
     use gtk::traits::WidgetExt;
     use libphosh::prelude::*;
     use libphosh::LockscreenPage;
+    use crate::APP_ID;
 
     #[derive(Default)]
     pub struct Lockscreen {
         user_session_page: OnceCell<UserSessionPage>,
         greetd_sender: OnceCell<Sender<Request>>,
         greetd_receiver: OnceCell<Receiver<Response>>,
-
+        session: RefCell<Option<String>>,
     }
 
     #[glib::object_subclass]
@@ -94,21 +97,14 @@ mod imp {
 
             self.greetd_sender.set(greetd_sender.clone()).unwrap();
             self.greetd_receiver.set(greetd_receiver.clone()).unwrap();
-
             self.obj().connect_page_notify(clone!(@weak self as this => move |ls| {
                 glib::spawn_future_local(clone!(@weak ls => async move {
-                    // Page is not Unlock, clear out session.
-                    if ls.page() != LockscreenPage::Unlock {
-                        this.clear_session().await;
-                        return;
-                    }
                     // Page is lockscreen, begin greetd conversation.
                     if ls.page() == LockscreenPage::Unlock {
-                        g_warning!("greetd", "starting greetd session");
-                        ls.set_sensitive(false);
-                        this.greetd_interaction(Request::CreateSession {
-                            username: this.user_session_page.get().unwrap().username().unwrap(),
-                        }).await;
+                        this.create_session().await;
+                    } else {
+                        // No longer on unlock, cancel session.
+                        this.cancel_session().await;
                     }
                 }));
             }));
@@ -126,17 +122,46 @@ mod imp {
     impl Lockscreen {
         // Whenever user swipes away from keypad entry page, and after an auth failure, fire off a
         // CancelSession.
-        async fn clear_session(&self) {
-            self.obj().set_sensitive(false);
+        async fn cancel_session(&self) {
+            if self.session.borrow().is_none() {
+                // no session to cancel
+                return;
+            }
+
             if let Err(err) = self.greetd_req(Request::CancelSession).await {
                 g_warning!("greetd", "greetd CancelSession failed: {}", err);
             }
-            self.obj().set_sensitive(true);
+            self.session.replace(None);
+        }
+
+        async fn create_session(&self) {
+            let user = self.user_session_page.get().unwrap().username();
+            if user.is_none() || self.session.borrow().eq(&user) {
+                // no user selected, or the session for that user is already started
+                return;
+            }
+
+            self.session.replace(user.clone());
+            let username = user.unwrap();
+            g_warning!("greetd", "creating greetd session for user {}", username);
+            self.obj().set_sensitive(false);
+            let mut req = Some(Request::CreateSession { username });
+            while let Some(next_req) = req.take() {
+                req = self.greetd_interaction(next_req).await;
+            }
         }
 
         async fn start_session(&self) -> anyhow::Result<()> {
             let session = self.user_session_page.get().unwrap().session();
 
+            let settings = Settings::new(APP_ID);
+            if let Err(err) = settings.set("last-user", self.session.clone().take().unwrap_or_default()) {
+                g_warning!("lockscreen", "setting last-user failed {}", err);
+            }
+
+            if let Err(err) = settings.set("last-session", session.id()) {
+                g_warning!("lockscreen", "setting last-session failed {}", err);
+            }
             self.greetd_req(Request::StartSession {
                 cmd: vec![session.command()],
                 env: vec![
@@ -160,11 +185,11 @@ mod imp {
             }
         }
 
-        async fn greetd_interaction(&self, req: Request) {
+        async fn greetd_interaction(&self, req: Request) -> Option<Request> {
             let resp = self.greetd_req(req).await;
             if let Err(err) = resp {
                 g_critical!("greetd", "failed to send greetd request: {:?}", err);
-                return;
+                return None;
             }
             let resp = resp.unwrap();
 
@@ -173,19 +198,36 @@ mod imp {
                     g_warning!("greetd", "got greetd auth message ({:?}) {}", auth_message_type, auth_message);
                     self.obj().set_unlock_status(&auth_message);
                     // TODO: it would be nice to override the GtkEntry input-purpose depending on
-                    // AuthMessageType
+                    // AuthMessageType.
                     self.obj().set_sensitive(true);
+                    // If this is an Info message, wait 1 sec and then encourage the caller to
+                    // progress the conversation with some awkward silence.
+                    if let AuthMessageType::Info = auth_message_type {
+                        // TODO: detecting fingerprint prompt phrases could be done here.
+                        // show a visual cue (fingerprint icon) somewhere to indicate fprint
+                        // liveness or something?
+                        glib::timeout_future_seconds(1).await;
+                        return Some(Request::PostAuthMessageResponse {
+                            response: Some(String::new()),
+                        });
+                    }
                 },
                 Response::Success => {
+                    self.obj().set_unlock_status("Logging in...");
                     self.start_session().await.unwrap();
                 },
                 Response::Error { error_type: ErrorType::AuthError, description } => {
                     g_warning!("greetd", "auth error '{}'", description);
                     self.obj().shake_pin_entry();
-                    self.clear_session().await;
+                    self.cancel_session().await;
+                    glib::timeout_future_seconds(1).await;
+                    return Some(Request::CreateSession {
+                        username: self.user_session_page.get().unwrap().username().unwrap()
+                    });
                 },
                 v => g_critical!("greetd", "unexpected response to start session: {:?}", v),
-            };
+            }
+            None
         }
     }
 
@@ -194,11 +236,13 @@ mod imp {
         fn unlock_submit_cb(&self) {
             glib::spawn_future_local(clone!(@weak self as this => async move {
                 this.obj().set_sensitive(false);
-                let entry = this.obj().pin_entry().to_string();
+                let mut req = Some(Request::PostAuthMessageResponse {
+                    response: Some(this.obj().pin_entry().to_string())
+                });
+                while let Some(next_req) = req.take() {
+                    req = this.greetd_interaction(next_req).await;
+                }
                 this.obj().clear_pin_entry();
-                this.greetd_interaction(Request::PostAuthMessageResponse {
-                    response: Some(entry)
-                }).await;
             }));
         }
     }
