@@ -41,6 +41,8 @@ look something like this:
 ```
 [default_session]
 command = "systemd-cat --identifier=phrog phoc -E phrog"
+# or this if you are using postmarketOS:
+command = "dbus-run-session phoc -E phrog"
 ```
 
 You can also run it directly in a `greetd-fakegreet` session, assuming you have that binary installed:
