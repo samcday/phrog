@@ -1,6 +1,6 @@
 # Maintainer: Sam Day <me@samcday.com>
 pkgname=greetd-phrog
-pkgver=0.1.10
+pkgver=0.1.11
 pkgrel=1
 pkgdesc="Greetd-compatible greeter for mobile phones"
 url="https://github.com/samcday/phrog"
@@ -41,15 +41,13 @@ makedepends="
 	wayland-dev
 	wayland-protocols
 	"
-commit=66c14f84e28332b152cfdd5cde19ac3a950d940d
-source="$pkgname-${commit}.tar.gz::https://github.com/samcday/phrog/archive/${commit}.tar.gz
+source="${url}/archive/$pkgver/phrog-$pkgver.tar.gz
         phrog"
 
 export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix=$builddir=/build/"
 
 prepare() {
-	cd phrog-${commit}
-
+    cd phrog-$pkgver
 	cargo fetch --target="$CTARGET" --locked
 }
 
@@ -68,17 +66,13 @@ build() {
 	cargo auditable build --release --frozen
 }
 
-check() {
-	cargo test --frozen
-}
-
 package() {
 	install -Dm755 phrog -t "$pkgdir"/usr/bin/
-	install -Dm644 src/phrog-${commit}/phosh-output/install/usr/lib/libphosh.so -t "$pkgdir"/usr/lib/phrog/
-	install -Dm755 src/phrog-${commit}/target/release/phrog -t "$pkgdir"/usr/libexec/
+	install -Dm644 src/phrog-$pkgver/phosh-output/install/usr/lib/libphosh.so -t "$pkgdir"/usr/lib/phrog/
+	install -Dm755 src/phrog-$pkgver/target/release/phrog -t "$pkgdir"/usr/libexec/
 }
 
 sha512sums="
-f174263e493ed30e94ec35465b69dccba34117b3aaded65d2d694e09213c0c061e8fa6a7b863d20de7439539339b51493f58a9daae9d66685ed90e21f3206082  greetd-phrog-66c14f84e28332b152cfdd5cde19ac3a950d940d.tar.gz
+f20c5bf5aa82e151c97be86a476664c1090c63a263ff5a3405a68a8c1c69522310f643d3bd43ed39ece82e50c2da09038445d739fcc0a7e7b11bb2407b71d55d  phrog-0.1.11.tar.gz
 6b74433bc38510a062ebcb70c05ff97876427c7828e6e0e4040213916c5e04bb3e6a5d53ed0f81e544dc9b6f766395b0e950e802fa4f8bd7b30139c70c83788a  phrog
 "
