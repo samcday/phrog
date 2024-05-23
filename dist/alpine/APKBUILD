@@ -12,7 +12,8 @@ arch="all !s390x !riscv64 !armhf !ppc64le"
 license="GPL-3.0-only"
 depends="
 	phosh
-	greetd"
+	greetd
+	greetd-phrog-schemas"
 makedepends="
 	cargo
 	cargo-auditable
@@ -43,6 +44,7 @@ makedepends="
 	"
 source="${url}/archive/$pkgver/phrog-$pkgver.tar.gz
         phrog"
+subpackages="$pkgname-schemas::noarch"
 
 export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix=$builddir=/build/"
 
@@ -68,8 +70,15 @@ build() {
 
 package() {
 	install -Dm755 phrog -t "$pkgdir"/usr/bin/
+	install -Dm755 src/phrog-$pkgver/resources/com.samcday.phrog.gschema.xml -t "$pkgdir"/usr/share/glib-2.0/schemas/
 	install -Dm644 src/phrog-$pkgver/phosh-output/install/usr/lib/libphosh.so -t "$pkgdir"/usr/lib/phrog/
 	install -Dm755 src/phrog-$pkgver/target/release/phrog -t "$pkgdir"/usr/libexec/
+}
+
+schemas() {
+    pkgdesc="Phrog schema files"
+    depends=""
+    amove usr/share/glib-2.0/schemas
 }
 
 sha512sums="
