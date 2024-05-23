@@ -1,6 +1,6 @@
 # Maintainer: Sam Day <me@samcday.com>
 pkgname=greetd-phrog
-pkgver=0.1.11
+pkgver=0.2.0
 pkgrel=1
 pkgdesc="Greetd-compatible greeter for mobile phones"
 url="https://github.com/samcday/phrog"
@@ -73,6 +73,6 @@ package() {
 }
 
 sha512sums="
-f20c5bf5aa82e151c97be86a476664c1090c63a263ff5a3405a68a8c1c69522310f643d3bd43ed39ece82e50c2da09038445d739fcc0a7e7b11bb2407b71d55d  phrog-0.1.11.tar.gz
+45d931ea42240d7ad4a93d82dcd93abeca18cbeac0fb633fde0351769db500e3ad30f7c124030f0289de857289fb521a57d47c6286e23f41ecec34f19fb75792  phrog-0.2.0.tar.gz
 6b74433bc38510a062ebcb70c05ff97876427c7828e6e0e4040213916c5e04bb3e6a5d53ed0f81e544dc9b6f766395b0e950e802fa4f8bd7b30139c70c83788a  phrog
 "
