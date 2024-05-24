@@ -3,61 +3,79 @@
 // from ../gir-files
 // DO NOT EDIT
 
-use crate::{LockscreenPage};
 use glib::{prelude::*,signal::{connect_raw, SignalHandlerId},translate::*};
 use std::{boxed::Box as Box_};
 
 glib::wrapper! {
-    #[doc(alias = "PhoshLockscreen")]
-    pub struct Lockscreen(Object<ffi::PhoshLockscreen, ffi::PhoshLockscreenClass>) @extends gtk::Widget;
+    #[doc(alias = "PhoshQuickSetting")]
+    pub struct QuickSetting(Object<ffi::PhoshQuickSetting, ffi::PhoshQuickSettingClass>) @extends gtk::Widget;
 
     match fn {
-        type_ => || ffi::phosh_lockscreen_get_type(),
+        type_ => || ffi::phosh_quick_setting_get_type(),
     }
 }
 
-impl Lockscreen {
-        pub const NONE: Option<&'static Lockscreen> = None;
+impl QuickSetting {
+        pub const NONE: Option<&'static QuickSetting> = None;
     
 
-    //#[doc(alias = "phosh_lockscreen_new")]
-    //pub fn new(lockscreen_type: glib::types::Type, layer_shell: /*Unimplemented*/Option<Basic: Pointer>, wl_output: /*Unimplemented*/Option<Basic: Pointer>, calls_manager: /*Ignored*/&CallsManager) -> Lockscreen {
-    //    unsafe { TODO: call ffi:phosh_lockscreen_new() }
-    //}
+    #[doc(alias = "phosh_quick_setting_new")]
+    pub fn new() -> QuickSetting {
+        assert_initialized_main_thread!();
+        unsafe {
+            gtk::Widget::from_glib_none(ffi::phosh_quick_setting_new()).unsafe_cast()
+        }
+    }
 
             // rustdoc-stripper-ignore-next
-            /// Creates a new builder-pattern struct instance to construct [`Lockscreen`] objects.
+            /// Creates a new builder-pattern struct instance to construct [`QuickSetting`] objects.
             ///
-            /// This method returns an instance of [`LockscreenBuilder`](crate::builders::LockscreenBuilder) which can be used to create [`Lockscreen`] objects.
-            pub fn builder() -> LockscreenBuilder {
-                LockscreenBuilder::new()
+            /// This method returns an instance of [`QuickSettingBuilder`](crate::builders::QuickSettingBuilder) which can be used to create [`QuickSetting`] objects.
+            pub fn builder() -> QuickSettingBuilder {
+                QuickSettingBuilder::new()
             }
         
+
+    #[doc(alias = "phosh_quick_setting_open_settings_panel")]
+    pub fn open_settings_panel(panel: &str) {
+        assert_initialized_main_thread!();
+        unsafe {
+            ffi::phosh_quick_setting_open_settings_panel(panel.to_glib_none().0);
+        }
+    }
 }
 
-impl Default for Lockscreen {
+impl Default for QuickSetting {
                      fn default() -> Self {
-                         glib::object::Object::new::<Self>()
+                         Self::new()
                      }
                  }
 
 // rustdoc-stripper-ignore-next
-        /// A [builder-pattern] type to construct [`Lockscreen`] objects.
+        /// A [builder-pattern] type to construct [`QuickSetting`] objects.
         ///
         /// [builder-pattern]: https://doc.rust-lang.org/1.0.0/style/ownership/builders.html
 #[must_use = "The builder must be built to be used"]
-pub struct LockscreenBuilder {
-            builder: glib::object::ObjectBuilder<'static, Lockscreen>,
+pub struct QuickSettingBuilder {
+            builder: glib::object::ObjectBuilder<'static, QuickSetting>,
         }
 
-        impl LockscreenBuilder {
+        impl QuickSettingBuilder {
         fn new() -> Self {
             Self { builder: glib::object::Object::builder() }
         }
 
-                            //pub fn calls_manager(self, calls_manager: /*Ignored*/&CallsManager) -> Self {
-                        //    Self { builder: self.builder.property("calls-manager", calls_manager), }
-                        //}
+                            pub fn active(self, active: bool) -> Self {
+                            Self { builder: self.builder.property("active", active), }
+                        }
+
+                            pub fn has_status(self, has_status: bool) -> Self {
+                            Self { builder: self.builder.property("has-status", has_status), }
+                        }
+
+                            pub fn present(self, present: bool) -> Self {
+                            Self { builder: self.builder.property("present", present), }
+                        }
 
                             pub fn app_paintable(self, app_paintable: bool) -> Self {
                             Self { builder: self.builder.property("app-paintable", app_paintable), }
@@ -247,119 +265,142 @@ pub struct LockscreenBuilder {
                         }
 
     // rustdoc-stripper-ignore-next
-    /// Build the [`Lockscreen`].
+    /// Build the [`QuickSetting`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
-    pub fn build(self) -> Lockscreen {
+    pub fn build(self) -> QuickSetting {
     self.builder.build() }
 }
 
 mod sealed {
     pub trait Sealed {}
-    impl<T: super::IsA<super::Lockscreen>> Sealed for T {}
+    impl<T: super::IsA<super::QuickSetting>> Sealed for T {}
 }
 
-pub trait LockscreenExt: IsA<Lockscreen> + sealed::Sealed + 'static {
-    #[doc(alias = "phosh_lockscreen_add_extra_page")]
-    fn add_extra_page(&self, widget: &impl IsA<gtk::Widget>) {
+pub trait QuickSettingExt: IsA<QuickSetting> + sealed::Sealed + 'static {
+    #[doc(alias = "phosh_quick_setting_get_active")]
+    #[doc(alias = "get_active")]
+    fn is_active(&self) -> bool {
         unsafe {
-            ffi::phosh_lockscreen_add_extra_page(self.as_ref().to_glib_none().0, widget.as_ref().to_glib_none().0);
+            from_glib(ffi::phosh_quick_setting_get_active(self.as_ref().to_glib_none().0))
         }
     }
 
-    #[doc(alias = "phosh_lockscreen_clear_pin_entry")]
-    fn clear_pin_entry(&self) {
+    #[doc(alias = "phosh_quick_setting_get_has_status")]
+    #[doc(alias = "get_has_status")]
+    fn has_status(&self) -> bool {
         unsafe {
-            ffi::phosh_lockscreen_clear_pin_entry(self.as_ref().to_glib_none().0);
+            from_glib(ffi::phosh_quick_setting_get_has_status(self.as_ref().to_glib_none().0))
         }
     }
 
-    #[doc(alias = "phosh_lockscreen_get_page")]
-    #[doc(alias = "get_page")]
-    fn page(&self) -> LockscreenPage {
+    #[doc(alias = "phosh_quick_setting_get_present")]
+    #[doc(alias = "get_present")]
+    fn is_present(&self) -> bool {
         unsafe {
-            from_glib(ffi::phosh_lockscreen_get_page(self.as_ref().to_glib_none().0))
+            from_glib(ffi::phosh_quick_setting_get_present(self.as_ref().to_glib_none().0))
         }
     }
 
-    #[doc(alias = "phosh_lockscreen_get_pin_entry")]
-    #[doc(alias = "get_pin_entry")]
-    fn pin_entry(&self) -> glib::GString {
-        unsafe {
-            from_glib_none(ffi::phosh_lockscreen_get_pin_entry(self.as_ref().to_glib_none().0))
-        }
-    }
-
-    #[doc(alias = "phosh_lockscreen_set_default_page")]
-    fn set_default_page(&self, page: LockscreenPage) {
-        unsafe {
-            ffi::phosh_lockscreen_set_default_page(self.as_ref().to_glib_none().0, page.into_glib());
-        }
-    }
-
-    #[doc(alias = "phosh_lockscreen_set_page")]
-    fn set_page(&self, page: LockscreenPage) {
-        unsafe {
-            ffi::phosh_lockscreen_set_page(self.as_ref().to_glib_none().0, page.into_glib());
-        }
-    }
-
-    #[doc(alias = "phosh_lockscreen_set_unlock_status")]
-    fn set_unlock_status(&self, status: &str) {
-        unsafe {
-            ffi::phosh_lockscreen_set_unlock_status(self.as_ref().to_glib_none().0, status.to_glib_none().0);
-        }
-    }
-
-    #[doc(alias = "phosh_lockscreen_shake_pin_entry")]
-    fn shake_pin_entry(&self) {
-        unsafe {
-            ffi::phosh_lockscreen_shake_pin_entry(self.as_ref().to_glib_none().0);
-        }
-    }
-
-    //#[doc(alias = "calls-manager")]
-    //fn calls_manager(&self) -> /*Ignored*/Option<CallsManager> {
-    //    ObjectExt::property(self.as_ref(), "calls-manager")
+    //#[doc(alias = "phosh_quick_setting_get_status_icon")]
+    //#[doc(alias = "get_status_icon")]
+    //fn status_icon(&self) -> /*Ignored*/StatusIcon {
+    //    unsafe { TODO: call ffi:phosh_quick_setting_get_status_icon() }
     //}
 
-    #[doc(alias = "lockscreen-unlock")]
-    fn connect_lockscreen_unlock<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn lockscreen_unlock_trampoline<P: IsA<Lockscreen>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshLockscreen, f: glib::ffi::gpointer) {
-            let f: &F = &*(f as *const F);
-            f(Lockscreen::from_glib_borrow(this).unsafe_cast_ref())
-        }
+    #[doc(alias = "phosh_quick_setting_set_active")]
+    fn set_active(&self, active: bool) {
         unsafe {
-            let f: Box_<F> = Box_::new(f);
-            connect_raw(self.as_ptr() as *mut _, b"lockscreen-unlock\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(lockscreen_unlock_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+            ffi::phosh_quick_setting_set_active(self.as_ref().to_glib_none().0, active.into_glib());
         }
     }
 
-    #[doc(alias = "wakeup-output")]
-    fn connect_wakeup_output<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn wakeup_output_trampoline<P: IsA<Lockscreen>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshLockscreen, f: glib::ffi::gpointer) {
-            let f: &F = &*(f as *const F);
-            f(Lockscreen::from_glib_borrow(this).unsafe_cast_ref())
-        }
+    #[doc(alias = "phosh_quick_setting_set_has_status")]
+    fn set_has_status(&self, has_status: bool) {
         unsafe {
-            let f: Box_<F> = Box_::new(f);
-            connect_raw(self.as_ptr() as *mut _, b"wakeup-output\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(wakeup_output_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+            ffi::phosh_quick_setting_set_has_status(self.as_ref().to_glib_none().0, has_status.into_glib());
         }
     }
 
-    #[doc(alias = "page")]
-    fn connect_page_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn notify_page_trampoline<P: IsA<Lockscreen>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshLockscreen, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+    #[doc(alias = "phosh_quick_setting_set_present")]
+    fn set_present(&self, present: bool) {
+        unsafe {
+            ffi::phosh_quick_setting_set_present(self.as_ref().to_glib_none().0, present.into_glib());
+        }
+    }
+
+    //#[doc(alias = "phosh_quick_setting_set_status_icon")]
+    //fn set_status_icon(&self, widget: /*Ignored*/&StatusIcon) {
+    //    unsafe { TODO: call ffi:phosh_quick_setting_set_status_icon() }
+    //}
+
+    #[doc(alias = "long-pressed")]
+    fn connect_long_pressed<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn long_pressed_trampoline<P: IsA<QuickSetting>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshQuickSetting, f: glib::ffi::gpointer) {
             let f: &F = &*(f as *const F);
-            f(Lockscreen::from_glib_borrow(this).unsafe_cast_ref())
+            f(QuickSetting::from_glib_borrow(this).unsafe_cast_ref())
         }
         unsafe {
             let f: Box_<F> = Box_::new(f);
-            connect_raw(self.as_ptr() as *mut _, b"notify::page\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_page_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+            connect_raw(self.as_ptr() as *mut _, b"long-pressed\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(long_pressed_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+        }
+    }
+
+    fn emit_long_pressed(&self) {
+        self.emit_by_name::<()>("long-pressed", &[]);
+    }
+
+    #[doc(alias = "active")]
+    fn connect_active_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_active_trampoline<P: IsA<QuickSetting>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshQuickSetting, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+            let f: &F = &*(f as *const F);
+            f(QuickSetting::from_glib_borrow(this).unsafe_cast_ref())
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"notify::active\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_active_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+        }
+    }
+
+    #[doc(alias = "has-status")]
+    fn connect_has_status_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_has_status_trampoline<P: IsA<QuickSetting>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshQuickSetting, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+            let f: &F = &*(f as *const F);
+            f(QuickSetting::from_glib_borrow(this).unsafe_cast_ref())
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"notify::has-status\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_has_status_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+        }
+    }
+
+    #[doc(alias = "present")]
+    fn connect_present_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_present_trampoline<P: IsA<QuickSetting>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshQuickSetting, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+            let f: &F = &*(f as *const F);
+            f(QuickSetting::from_glib_borrow(this).unsafe_cast_ref())
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"notify::present\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_present_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+        }
+    }
+
+    #[doc(alias = "status-icon")]
+    fn connect_status_icon_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_status_icon_trampoline<P: IsA<QuickSetting>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshQuickSetting, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+            let f: &F = &*(f as *const F);
+            f(QuickSetting::from_glib_borrow(this).unsafe_cast_ref())
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"notify::status-icon\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_status_icon_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 }
 
-impl<O: IsA<Lockscreen>> LockscreenExt for O {}
+impl<O: IsA<QuickSetting>> QuickSettingExt for O {}

@@ -94,7 +94,7 @@ pub trait WallClockExt: IsA<WallClock> + sealed::Sealed + 'static {
         unsafe {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"notify::date-time\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(notify_date_time_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_date_time_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 
@@ -107,7 +107,7 @@ pub trait WallClockExt: IsA<WallClock> + sealed::Sealed + 'static {
         unsafe {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"notify::time\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(notify_time_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_time_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 }

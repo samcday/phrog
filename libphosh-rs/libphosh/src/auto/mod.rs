@@ -6,6 +6,9 @@
 mod lockscreen;
 pub use self::lockscreen::Lockscreen;
 
+mod quick_setting;
+pub use self::quick_setting::QuickSetting;
+
 mod shell;
 pub use self::shell::Shell;
 
@@ -17,10 +20,12 @@ pub use self::enums::LockscreenPage;
 
 pub(crate) mod traits {
     pub use super::lockscreen::LockscreenExt;
+    pub use super::quick_setting::QuickSettingExt;
     pub use super::shell::ShellExt;
     pub use super::wall_clock::WallClockExt;
 }
 pub(crate) mod builders {
     pub use super::lockscreen::LockscreenBuilder;
+    pub use super::quick_setting::QuickSettingBuilder;
     pub use super::shell::ShellBuilder;
 }
