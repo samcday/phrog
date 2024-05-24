@@ -55,6 +55,9 @@ Provides:       greetd-%{name} = %{version}
 
 Requires:	phosh
 
+# for dbus-launch
+Requires:   dbus-x11
+
 Requires: phosh-devel
 BuildRequires: phosh-devel
 
