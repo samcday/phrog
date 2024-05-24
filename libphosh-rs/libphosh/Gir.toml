@@ -25,6 +25,7 @@ generate = [
   "Phosh.Lockscreen",
   "Phosh.WallClock",
   "Phosh.LockscreenPage",
+  "Phosh.QuickSetting",
 ]
 
 manual = [
@@ -192,7 +193,6 @@ ignore = [
     "Phosh.PowerMenu",
     "Phosh.PowerMenuManager",
     "Phosh.Proximity",
-    "Phosh.QuickSetting",
     "Phosh.Revealer",
     "Phosh.RfkillDBusRfkillProxy",
     "Phosh.RfkillDBusRfkillSkeleton",
