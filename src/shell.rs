@@ -19,12 +19,12 @@ impl Default for Shell {
 }
 
 mod imp {
+    use crate::lockscreen::Lockscreen;
     use gtk::glib;
     use gtk::glib::Type;
     use gtk::prelude::StaticType;
     use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass};
     use libphosh::subclass::shell::ShellImpl;
-    use crate::lockscreen::Lockscreen;
 
     #[derive(Default)]
     pub struct Shell;
@@ -36,9 +36,7 @@ mod imp {
         type ParentType = libphosh::Shell;
     }
 
-    impl ObjectImpl for Shell {
-
-    }
+    impl ObjectImpl for Shell {}
 
     impl ShellImpl for Shell {
         fn get_lockscreen_type(&self) -> Type {

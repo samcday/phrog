@@ -20,24 +20,24 @@ impl Default for Lockscreen {
 
 mod imp {
     use crate::user_session_page::UserSessionPage;
+    use crate::APP_ID;
+    use anyhow::{anyhow, Context};
     use async_channel::{Receiver, Sender};
     use greetd_ipc::codec::SyncCodec;
     use greetd_ipc::{AuthMessageType, ErrorType, Request, Response};
-    use gtk::glib::{Cast, clone, closure_local, g_critical, g_info, g_warning, ObjectExt};
+    use gtk::gio::Settings;
+    use gtk::glib::{clone, closure_local, g_critical, g_warning, ObjectExt};
+    use gtk::prelude::SettingsExtManual;
     use gtk::subclass::prelude::{ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt};
     use gtk::subclass::widget::WidgetImpl;
-    use gtk::{gio, glib, Widget};
+    use gtk::traits::WidgetExt;
+    use gtk::{gio, glib};
+    use libphosh::prelude::*;
     use libphosh::subclass::lockscreen::LockscreenImpl;
+    use libphosh::LockscreenPage;
     use std::cell::{OnceCell, RefCell};
     use std::os::unix::net::UnixStream;
     use std::process;
-    use anyhow::{anyhow, Context};
-    use gtk::gio::Settings;
-    use gtk::prelude::SettingsExtManual;
-    use gtk::traits::WidgetExt;
-    use libphosh::prelude::*;
-    use libphosh::LockscreenPage;
-    use crate::APP_ID;
 
     #[derive(Default)]
     pub struct Lockscreen {
@@ -90,32 +90,37 @@ mod imp {
 
             self.user_session_page.set(UserSessionPage::new()).unwrap();
 
-            self.obj().add_extra_page(self.user_session_page.get().unwrap());
+            self.obj()
+                .add_extra_page(self.user_session_page.get().unwrap());
             self.obj().set_default_page(LockscreenPage::Extra);
 
             let (greetd_sender, greetd_receiver) = run_greetd();
 
             self.greetd_sender.set(greetd_sender.clone()).unwrap();
             self.greetd_receiver.set(greetd_receiver.clone()).unwrap();
-            self.obj().connect_page_notify(clone!(@weak self as this => move |ls| {
-                glib::spawn_future_local(clone!(@weak ls => async move {
-                    // Page is lockscreen, begin greetd conversation.
-                    if ls.page() == LockscreenPage::Unlock {
-                        this.create_session().await;
-                    } else {
-                        // No longer on unlock, cancel session.
-                        this.cancel_session().await;
-                    }
+            self.obj()
+                .connect_page_notify(clone!(@weak self as this => move |ls| {
+                    glib::spawn_future_local(clone!(@weak ls => async move {
+                        // Page is lockscreen, begin greetd conversation.
+                        if ls.page() == LockscreenPage::Unlock {
+                            this.create_session().await;
+                        } else {
+                            // No longer on unlock, cancel session.
+                            this.cancel_session().await;
+                        }
+                    }));
                 }));
-            }));
 
-            self.user_session_page.get().unwrap()
-                .connect_closure("login", false, closure_local!(@weak-allow-none self as this => move |_: UserSessionPage| {
-                    let this = if let Some(this) = this { this } else {
-                        return;
-                    };
-                    this.obj().set_page(LockscreenPage::Unlock);
-            }));
+            self.user_session_page.get().unwrap().connect_closure(
+                "login",
+                false,
+                closure_local!(@weak-allow-none self as this => move |_: UserSessionPage| {
+                        let this = if let Some(this) = this { this } else {
+                            return;
+                        };
+                        this.obj().set_page(LockscreenPage::Unlock);
+                }),
+            );
         }
     }
 
@@ -155,7 +160,9 @@ mod imp {
             let session = self.user_session_page.get().unwrap().session();
 
             let settings = Settings::new(APP_ID);
-            if let Err(err) = settings.set("last-user", self.session.clone().take().unwrap_or_default()) {
+            if let Err(err) =
+                settings.set("last-user", self.session.clone().take().unwrap_or_default())
+            {
                 g_warning!("lockscreen", "setting last-user failed {}", err);
             }
 
@@ -170,18 +177,33 @@ mod imp {
                     format!("XDG_SESSION_DESKTOP={}", session.id()),
                     format!("GDMSESSION={}", session.id()),
                 ],
-            }).await.context("start session")?;
+            })
+            .await
+            .context("start session")?;
 
             process::exit(0);
         }
 
         async fn greetd_req(&self, req: Request) -> anyhow::Result<Response> {
-            self.greetd_sender.get().unwrap().send(req).await.context("send greetd request")?;
-            match self.greetd_receiver.get().unwrap().recv().await.context("receive greetd response")? {
-                Response::Error { error_type: ErrorType::Error, description } => {
-                    Err(anyhow!("greetd error: {}", description))
-                }
-                resp => Ok(resp)
+            self.greetd_sender
+                .get()
+                .unwrap()
+                .send(req)
+                .await
+                .context("send greetd request")?;
+            match self
+                .greetd_receiver
+                .get()
+                .unwrap()
+                .recv()
+                .await
+                .context("receive greetd response")?
+            {
+                Response::Error {
+                    error_type: ErrorType::Error,
+                    description,
+                } => Err(anyhow!("greetd error: {}", description)),
+                resp => Ok(resp),
             }
         }
 
@@ -194,8 +216,16 @@ mod imp {
             let resp = resp.unwrap();
 
             match resp {
-                Response::AuthMessage { auth_message_type, auth_message} => {
-                    g_warning!("greetd", "got greetd auth message ({:?}) {}", auth_message_type, auth_message);
+                Response::AuthMessage {
+                    auth_message_type,
+                    auth_message,
+                } => {
+                    g_warning!(
+                        "greetd",
+                        "got greetd auth message ({:?}) {}",
+                        auth_message_type,
+                        auth_message
+                    );
                     self.obj().set_unlock_status(&auth_message);
                     // TODO: it would be nice to override the GtkEntry input-purpose depending on
                     // AuthMessageType.
@@ -211,20 +241,23 @@ mod imp {
                             response: Some(String::new()),
                         });
                     }
-                },
+                }
                 Response::Success => {
                     self.obj().set_unlock_status("Logging in...");
                     self.start_session().await.unwrap();
-                },
-                Response::Error { error_type: ErrorType::AuthError, description } => {
+                }
+                Response::Error {
+                    error_type: ErrorType::AuthError,
+                    description,
+                } => {
                     g_warning!("greetd", "auth error '{}'", description);
                     self.obj().shake_pin_entry();
                     self.cancel_session().await;
                     glib::timeout_future_seconds(1).await;
                     return Some(Request::CreateSession {
-                        username: self.user_session_page.get().unwrap().username().unwrap()
+                        username: self.user_session_page.get().unwrap().username().unwrap(),
                     });
-                },
+                }
                 v => g_critical!("greetd", "unexpected response to start session: {:?}", v),
             }
             None

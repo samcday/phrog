@@ -6,7 +6,13 @@ glib::wrapper! {
 }
 
 impl SessionObject {
-    pub fn new(id: &str, name: &str, session_type: &str, command: &str, desktop_names: &str) -> Self {
+    pub fn new(
+        id: &str,
+        name: &str,
+        session_type: &str,
+        command: &str,
+        desktop_names: &str,
+    ) -> Self {
         Object::builder()
             .property("id", id.to_string())
             .property("name", name.to_string())

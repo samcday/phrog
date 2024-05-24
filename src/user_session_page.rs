@@ -1,12 +1,12 @@
+use crate::session_object::SessionObject;
 use gtk::glib;
 use gtk::glib::{Cast, CastNone, Object};
 use gtk::prelude::ListModelExt;
 use gtk::subclass::prelude::ObjectSubclassIsExt;
 use gtk::traits::ListBoxExt;
-use libhandy::ActionRow;
 use libhandy::prelude::ActionRowExt;
 use libhandy::traits::ComboRowExt;
-use crate::session_object::SessionObject;
+use libhandy::ActionRow;
 
 glib::wrapper! {
     pub struct UserSessionPage(ObjectSubclass<imp::UserSessionPage>)
@@ -21,11 +21,17 @@ impl UserSessionPage {
     pub fn session(&self) -> SessionObject {
         let session_idx = self.imp().row_sessions.selected_index() as u32;
         let sessions = self.imp().sessions.get().unwrap();
-        sessions.item(session_idx).clone().and_downcast::<SessionObject>().unwrap()
+        sessions
+            .item(session_idx)
+            .clone()
+            .and_downcast::<SessionObject>()
+            .unwrap()
     }
 
     pub fn username(&self) -> Option<String> {
-        self.imp().box_users.selected_row()
+        self.imp()
+            .box_users
+            .selected_row()
             .and_then(|row| row.downcast_ref::<ActionRow>().unwrap().subtitle())
             .and_then(|str| Some(str.to_string()))
     }
@@ -33,7 +39,7 @@ impl UserSessionPage {
 
 mod imp {
     use crate::session_object::SessionObject;
-    use crate::{APP_ID, sessions, users};
+    use crate::{sessions, users, APP_ID};
     use glib::subclass::InitializingObject;
     use gtk::gio::{ListStore, Settings};
     use gtk::glib::subclass::Signal;
@@ -84,25 +90,31 @@ mod imp {
 
             for user in users::users() {
                 let row = ActionRow::builder()
-                        .title(user.1)
-                        .subtitle(user.0.clone())
-                        .activatable(true)
-                        .build();
+                    .title(user.1)
+                    .subtitle(user.0.clone())
+                    .activatable(true)
+                    .build();
                 self.box_users.add(&row);
                 // use last-user setting as default for user selection
                 if user.0 == last_user {
-                    g_warning!("user-session-page", "defaulting user selection to {}", last_user);
+                    g_warning!(
+                        "user-session-page",
+                        "defaulting user selection to {}",
+                        last_user
+                    );
                     self.box_users.select_row(Some(&row));
                 }
             }
             self.box_users.show_all();
             if self.box_users.selected_row().is_none() {
-                self.box_users.select_row(self.box_users.row_at_index(0).as_ref());
+                self.box_users
+                    .select_row(self.box_users.row_at_index(0).as_ref());
             }
 
-            self.box_users.connect_row_activated(clone!(@weak self as this => move |_, _| {
-                this.obj().emit_by_name::<()>("login", &[]);
-            }));
+            self.box_users
+                .connect_row_activated(clone!(@weak self as this => move |_, _| {
+                    this.obj().emit_by_name::<()>("login", &[]);
+                }));
 
             self.sessions
                 .set(ListStore::new::<SessionObject>())
@@ -124,7 +136,11 @@ mod imp {
             // use last-session setting as default for session selection
             for (idx, session) in session_list.iter().enumerate() {
                 if session.id() == last_session {
-                    g_info!("user-session-page", "defaulting session selection to {}", session.id());
+                    g_info!(
+                        "user-session-page",
+                        "defaulting session selection to {}",
+                        session.id()
+                    );
                     self.row_sessions.set_selected_index(idx as i32);
                     break;
                 }
@@ -133,10 +149,7 @@ mod imp {
 
         fn signals() -> &'static [Signal] {
             static SIGNALS: OnceLock<Vec<Signal>> = OnceLock::new();
-            SIGNALS.get_or_init(|| {
-                vec![Signal::builder("login")
-                    .build()]
-            })
+            SIGNALS.get_or_init(|| vec![Signal::builder("login").build()])
         }
     }
 
