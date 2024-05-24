@@ -86,8 +86,6 @@ mod imp {
 
     impl ObjectImpl for Lockscreen {
         fn constructed(&self) {
-            self.parent_constructed();
-
             self.user_session_page.set(UserSessionPage::new()).unwrap();
 
             self.obj()
@@ -121,6 +119,8 @@ mod imp {
                         this.obj().set_page(LockscreenPage::Unlock);
                 }),
             );
+
+            self.parent_constructed();
         }
     }
 
