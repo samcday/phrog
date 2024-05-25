@@ -1166,6 +1166,13 @@ get_lockscreen_type (PhoshShell *self)
   return PHOSH_TYPE_LOCKSCREEN;
 }
 
+
+static PhoshPluginLoader*
+get_plugin_loader (PhoshShell *self, GStrv plugin_dirs, const char *extension_point)
+{
+  return phosh_plugin_loader_new (plugin_dirs, extension_point);
+}
+
 /* }}} */
 /* {{{ GObject init */
 
@@ -1181,6 +1188,7 @@ phosh_shell_class_init (PhoshShellClass *klass)
   object_class->get_property = phosh_shell_get_property;
 
   klass->get_lockscreen_type = get_lockscreen_type;
+  klass->get_plugin_loader = get_plugin_loader;
 
   type_setup ();
 
@@ -2480,6 +2488,12 @@ phosh_shell_get_lockscreen_type (PhoshShell *self)
 {
   PhoshShellClass *klass = PHOSH_SHELL_GET_CLASS (self);
   return klass->get_lockscreen_type (self);
+}
+
+PhoshPluginLoader*
+phosh_shell_get_plugin_loader (PhoshShell *self, GStrv plugin_dirs, const char *extension_point) {
+  PhoshShellClass *klass = PHOSH_SHELL_GET_CLASS (self);
+  return klass->get_plugin_loader (self, plugin_dirs, extension_point);
 }
 
 /* }}} */

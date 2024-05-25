@@ -11,6 +11,7 @@
 #include "launcher-entry-manager.h"
 #include "monitor-manager.h"
 #include "session-manager.h"
+#include "plugin-loader.h"
 
 G_BEGIN_DECLS
 
@@ -20,10 +21,12 @@ G_DECLARE_DERIVABLE_TYPE (PhoshShell, phosh_shell, PHOSH, SHELL, GObject)
 
 struct _PhoshShellClass {
   GObjectClass parent_class;
-  GType        (*get_lockscreen_type) (PhoshShell *self);
+
+  GType              (*get_lockscreen_type) (PhoshShell *self);
+  PhoshPluginLoader* (*get_plugin_loader)   (PhoshShell *self, GStrv plugin_dirs,
+                                             const char *extension_point);
 
   /* Padding for future expansion */
-  void (*_phosh_reserved1) (void);
   void (*_phosh_reserved2) (void);
   void (*_phosh_reserved3) (void);
   void (*_phosh_reserved4) (void);
@@ -38,6 +41,8 @@ void                       phosh_shell_set_default (PhoshShell *self);
 PhoshShell                *phosh_shell_get_default (void);
 
 GType                      phosh_shell_get_lockscreen_type (PhoshShell *self);
+PhoshPluginLoader         *phosh_shell_get_plugin_loader (PhoshShell *self, GStrv plugin_dirs,
+                                                          const char *extension_point);
 
 /* Created by the shell on startup */
 PhoshLauncherEntryManager *phosh_shell_get_launcher_entry_manager (PhoshShell *self);
