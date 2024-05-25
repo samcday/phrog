@@ -1,5 +1,6 @@
 [options]
 work_mode = "sys"
+split_build_rs = true
 library = "Phosh"
 version = "0"
 girs_directories = ["../../gir-files", "../../"]

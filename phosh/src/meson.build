@@ -422,6 +422,8 @@ phosh_lib = both_libraries('phosh',
   include_directories: phosh_lib_inc,
   dependencies: [phosh_tool_dep, phosh_deps],
   install: bindings_lib,
+  install_dir: join_paths(libdir, 'phosh', meson.project_version()),
+  install_rpath: join_paths(libdir, 'phosh', meson.project_version()),
 )
 
 phosh_static_lib_dep = declare_dependency(
@@ -466,6 +468,7 @@ if bindings_lib
   pkgconfig.generate(
     phosh_lib,
     name: 'libphosh',
+    install_dir: join_paths(libdir, 'phosh', meson.project_version(), 'pkgconfig'),
     subdirs: 'libphosh-0',
     filebase: 'libphosh-0',
     version : meson.project_version(),
