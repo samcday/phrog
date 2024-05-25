@@ -3,6 +3,7 @@
 // from ../gir-files
 // DO NOT EDIT
 
+use crate::{StatusIcon};
 use glib::{prelude::*,signal::{connect_raw, SignalHandlerId},translate::*};
 use std::{boxed::Box as Box_};
 
@@ -301,11 +302,13 @@ pub trait QuickSettingExt: IsA<QuickSetting> + sealed::Sealed + 'static {
         }
     }
 
-    //#[doc(alias = "phosh_quick_setting_get_status_icon")]
-    //#[doc(alias = "get_status_icon")]
-    //fn status_icon(&self) -> /*Ignored*/StatusIcon {
-    //    unsafe { TODO: call ffi:phosh_quick_setting_get_status_icon() }
-    //}
+    #[doc(alias = "phosh_quick_setting_get_status_icon")]
+    #[doc(alias = "get_status_icon")]
+    fn status_icon(&self) -> StatusIcon {
+        unsafe {
+            from_glib_none(ffi::phosh_quick_setting_get_status_icon(self.as_ref().to_glib_none().0))
+        }
+    }
 
     #[doc(alias = "phosh_quick_setting_set_active")]
     fn set_active(&self, active: bool) {
@@ -328,10 +331,12 @@ pub trait QuickSettingExt: IsA<QuickSetting> + sealed::Sealed + 'static {
         }
     }
 
-    //#[doc(alias = "phosh_quick_setting_set_status_icon")]
-    //fn set_status_icon(&self, widget: /*Ignored*/&StatusIcon) {
-    //    unsafe { TODO: call ffi:phosh_quick_setting_set_status_icon() }
-    //}
+    #[doc(alias = "phosh_quick_setting_set_status_icon")]
+    fn set_status_icon(&self, widget: &impl IsA<StatusIcon>) {
+        unsafe {
+            ffi::phosh_quick_setting_set_status_icon(self.as_ref().to_glib_none().0, widget.as_ref().to_glib_none().0);
+        }
+    }
 
     #[doc(alias = "long-pressed")]
     fn connect_long_pressed<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {

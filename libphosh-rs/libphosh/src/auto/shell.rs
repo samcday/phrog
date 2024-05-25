@@ -362,6 +362,13 @@ pub trait ShellExt: IsA<Shell> + sealed::Sealed + 'static {
         }
     }
 
+    #[doc(alias = "phosh_shell_load_extension_point")]
+    fn load_extension_point(&self, extension_point: &str) {
+        unsafe {
+            ffi::phosh_shell_load_extension_point(self.as_ref().to_glib_none().0, extension_point.to_glib_none().0);
+        }
+    }
+
     #[doc(alias = "phosh_shell_lock")]
     fn lock(&self) {
         unsafe {

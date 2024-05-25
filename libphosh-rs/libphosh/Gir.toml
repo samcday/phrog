@@ -26,6 +26,7 @@ generate = [
   "Phosh.WallClock",
   "Phosh.LockscreenPage",
   "Phosh.QuickSetting",
+  "Phosh.StatusIcon",
 ]
 
 manual = [
@@ -211,7 +212,6 @@ ignore = [
     "Phosh.SessionPresenceDBusPresenceSkeleton",
     "Phosh.Splash",
     "Phosh.SplashManager",
-    "Phosh.StatusIcon",
     "Phosh.StatusPage",
     "Phosh.SuspendManager",
     "Phosh.SwipeAwayBin",
