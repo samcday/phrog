@@ -238,7 +238,7 @@ mod imp {
                         // liveness or something?
                         glib::timeout_future_seconds(1).await;
                         return Some(Request::PostAuthMessageResponse {
-                            response: Some(String::new()),
+                            response: Some(String::from("\n")),
                         });
                     }
                 }
