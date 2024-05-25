@@ -10,7 +10,7 @@ license = "MIT"
 
 [package.metadata.system-deps.libphosh_0]
 name = "libphosh-0"
-version = "0.38"
+version = "0.39.0"
 
 [package.metadata.docs.rs]
 rustc-args = ["--cfg", "docsrs"]
