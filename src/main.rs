@@ -7,9 +7,11 @@ mod users;
 
 use crate::shell::Shell;
 use clap::Parser;
-use gtk::Application;
+use gtk::{Application, gio};
+use gtk::glib::StaticType;
 use libphosh::prelude::*;
-use libphosh::WallClock;
+use libphosh::{QuickSetting, WallClock};
+use crate::keypad_shuffle::KeypadShuffleQuickSetting;
 
 pub const APP_ID: &str = "com.samcday.phrog";
 
@@ -22,10 +24,49 @@ extern "C" {
 #[command(version, about, long_about = None)]
 struct Args {}
 
+mod keypad_shuffle {
+    use gtk::glib;
+
+    glib::wrapper! {
+        pub struct KeypadShuffleQuickSetting(ObjectSubclass<imp::KeypadShuffleQuickSetting>)
+            @extends libphosh::QuickSetting;
+    }
+
+    mod imp {
+        use gtk::glib;
+        use gtk::subclass::prelude::*;
+        use libphosh::subclass::quick_setting::QuickSettingImpl;
+
+        #[derive(Default)]
+        pub struct KeypadShuffleQuickSetting;
+
+        #[glib::object_subclass]
+        impl ObjectSubclass for KeypadShuffleQuickSetting {
+            const NAME: &'static str = "PhrogKeypadShuffleQuickSetting";
+            type Type = super::KeypadShuffleQuickSetting;
+            type ParentType = libphosh::QuickSetting;
+            fn class_init(_klass: &mut Self::Class) {
+                println!("hi mom");
+            }
+        }
+        impl ObjectImpl for KeypadShuffleQuickSetting {
+            fn constructed(&self) {
+                println!("the keypad-shuffle quick setting got constructed");
+                self.parent_constructed();
+            }
+        }
+        impl WidgetImpl for KeypadShuffleQuickSetting {}
+        impl ContainerImpl for KeypadShuffleQuickSetting {}
+        impl BinImpl for KeypadShuffleQuickSetting {}
+        impl ButtonImpl for KeypadShuffleQuickSetting {}
+        impl QuickSettingImpl for KeypadShuffleQuickSetting {}
+    }
+}
+
 fn main() {
     let _args = Args::parse();
 
-    gtk::gio::resources_register_include!("phrog.gresource")
+    gio::resources_register_include!("phrog.gresource")
         .expect("Failed to register resources.");
 
     gtk::init().unwrap();
@@ -47,6 +88,7 @@ fn main() {
 
     shell.connect_ready(|_| {
         println!("Shell is ready");
+        gio::IOExtensionPoint::implement("phosh-quick-setting-widget", KeypadShuffleQuickSetting::static_type(), "keypad-shuffle", 10).unwrap();
     });
 
     shell.set_locked(true);
