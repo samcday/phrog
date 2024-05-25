@@ -11,7 +11,7 @@ use gtk::{Application, gio};
 use gtk::glib::StaticType;
 use libphosh::prelude::*;
 use libphosh::{QuickSetting, WallClock};
-use crate::keypad_shuffle::KeypadShuffleQuickSetting;
+use crate::keypad_shuffle::ShuffleKeypadQuickSetting;
 
 pub const APP_ID: &str = "com.samcday.phrog";
 
@@ -28,38 +28,78 @@ mod keypad_shuffle {
     use gtk::glib;
 
     glib::wrapper! {
-        pub struct KeypadShuffleQuickSetting(ObjectSubclass<imp::KeypadShuffleQuickSetting>)
-            @extends libphosh::QuickSetting;
+        pub struct ShuffleKeypadQuickSetting(ObjectSubclass<imp::ShuffleKeypadQuickSetting>)
+            @extends libphosh::QuickSetting, gtk::Button;
     }
 
     mod imp {
-        use gtk::glib;
+        use gtk::{CompositeTemplate, glib};
+        use gtk::gio::Settings;
+        use gtk::glib::clone;
+        use gtk::glib::subclass::InitializingObject;
+        use gtk::prelude::{ButtonExt, InitializingWidgetExt, SettingsExt, SettingsExtManual};
         use gtk::subclass::prelude::*;
+        use libphosh::prelude::{QuickSettingExt, StatusIconExt};
         use libphosh::subclass::quick_setting::QuickSettingImpl;
 
-        #[derive(Default)]
-        pub struct KeypadShuffleQuickSetting;
+        #[derive(CompositeTemplate, Default)]
+        #[template(resource = "/com/samcday/phrog/shuffle-keypad-quick-setting.ui")]
+        pub struct ShuffleKeypadQuickSetting {
+            #[template_child]
+            pub info: TemplateChild<libphosh::StatusIcon>,
+        }
 
         #[glib::object_subclass]
-        impl ObjectSubclass for KeypadShuffleQuickSetting {
+        impl ObjectSubclass for ShuffleKeypadQuickSetting {
             const NAME: &'static str = "PhrogKeypadShuffleQuickSetting";
-            type Type = super::KeypadShuffleQuickSetting;
+            type Type = super::ShuffleKeypadQuickSetting;
             type ParentType = libphosh::QuickSetting;
-            fn class_init(_klass: &mut Self::Class) {
-                println!("hi mom");
+
+            fn class_init(klass: &mut Self::Class) {
+                Self::bind_template(klass);
+            }
+
+            fn instance_init(obj: &InitializingObject<Self>) {
+                obj.init_template();
             }
         }
-        impl ObjectImpl for KeypadShuffleQuickSetting {
+
+        impl ShuffleKeypadQuickSetting {
+            fn update(&self) {
+                self.info.set_icon_name(if self.obj().is_active() {
+                    "view-refresh-symbolic"
+                } else {
+                    "view-app-grid-symbolic"
+                });
+                self.info.set_info(if self.obj().is_active() {
+                    "Shuffled keypad"
+                } else {
+                    "Unshuffled keypad"
+                })
+            }
+        }
+        impl ObjectImpl for ShuffleKeypadQuickSetting {
             fn constructed(&self) {
-                println!("the keypad-shuffle quick setting got constructed");
                 self.parent_constructed();
+
+                let settings = Settings::new("sm.puri.phosh.lockscreen");
+                settings.bind("shuffle-keypad", self.obj().as_ref(), "active").build();
+
+                self.obj().connect_active_notify(clone!(@weak self as this => move |qs| {
+                    this.update();
+                }));
+                self.update();
+
+                self.obj().connect_clicked(move |btn| {
+                    settings.set_boolean("shuffle-keypad", !settings.boolean("shuffle-keypad")).unwrap();
+                });
             }
         }
-        impl WidgetImpl for KeypadShuffleQuickSetting {}
-        impl ContainerImpl for KeypadShuffleQuickSetting {}
-        impl BinImpl for KeypadShuffleQuickSetting {}
-        impl ButtonImpl for KeypadShuffleQuickSetting {}
-        impl QuickSettingImpl for KeypadShuffleQuickSetting {}
+        impl WidgetImpl for ShuffleKeypadQuickSetting {}
+        impl ContainerImpl for ShuffleKeypadQuickSetting {}
+        impl BinImpl for ShuffleKeypadQuickSetting {}
+        impl ButtonImpl for ShuffleKeypadQuickSetting {}
+        impl QuickSettingImpl for ShuffleKeypadQuickSetting {}
     }
 }
 
@@ -88,7 +128,6 @@ fn main() {
 
     shell.connect_ready(|_| {
         println!("Shell is ready");
-        gio::IOExtensionPoint::implement("phosh-quick-setting-widget", KeypadShuffleQuickSetting::static_type(), "keypad-shuffle", 10).unwrap();
     });
 
     shell.set_locked(true);

@@ -2,5 +2,6 @@
 <gresources>
     <gresource prefix="/com/samcday/phrog/">
         <file compressed="true" preprocess="xml-stripblanks">lockscreen-user-session.ui</file>
+        <file compressed="true" preprocess="xml-stripblanks">shuffle-keypad-quick-setting.ui</file>
     </gresource>
 </gresources>
