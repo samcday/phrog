@@ -58261,25 +58261,25 @@ the app grid (#PhoshAppGrid) to launch new applications.</doc>
               c:identifier="phosh_plugin_loader_load_plugin">
         <doc xml:space="preserve"
              filename="src/plugin-loader.c"
-             line="166">Load the given plugin.</doc>
+             line="168">Load the given plugin.</doc>
         <source-position filename="src/plugin-loader.h" line="24"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/plugin-loader.c"
-               line="173">The plugin widget</doc>
+               line="175">The plugin widget</doc>
           <type name="Gtk.Widget" c:type="GtkWidget*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/plugin-loader.c"
-                 line="168">The plugin loader</doc>
+                 line="170">The plugin loader</doc>
             <type name="PluginLoader" c:type="PhoshPluginLoader*"/>
           </instance-parameter>
           <parameter name="name" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/plugin-loader.c"
-                 line="169">The name of the plugin to load</doc>
+                 line="171">The name of the plugin to load</doc>
             <type name="utf8" c:type="const char*"/>
           </parameter>
         </parameters>
@@ -58292,7 +58292,7 @@ the app grid (#PhoshAppGrid) to launch new applications.</doc>
                 default-value="NULL">
         <doc xml:space="preserve"
              filename="src/plugin-loader.c"
-             line="137">The name of the extension point to load plugins for.</doc>
+             line="139">The name of the extension point to load plugins for.</doc>
         <type name="utf8" c:type="gchar*"/>
       </property>
       <property name="plugin-dirs"
@@ -58302,7 +58302,7 @@ the app grid (#PhoshAppGrid) to launch new applications.</doc>
                 getter="get_plugin_dirs">
         <doc xml:space="preserve"
              filename="src/plugin-loader.c"
-             line="127">The directory to search for plugins</doc>
+             line="129">The directory to search for plugins</doc>
         <array>
           <type name="utf8"/>
         </array>
@@ -63120,7 +63120,7 @@ https://people.gnome.org/~mccann/gnome-session/docs/gnome-session.html#org.gnome
 parts of the shell#PhoshTopPanel, #PhoshHome,… and the managers that
 interface with DBus #PhoshMonitorManager, #PhoshFeedbackManager, …
 and coordinates between them.</doc>
-      <source-position filename="src/plugin-shell.h" line="35"/>
+      <source-position filename="src/plugin-shell.h" line="38"/>
       <implements name="Gio.ActionGroup"/>
       <implements name="Gio.ActionMap"/>
       <constructor name="new" c:identifier="phosh_shell_new">
@@ -63139,17 +63139,17 @@ and coordinates between them.</doc>
       <function name="get_default" c:identifier="phosh_shell_get_default">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="2086">Get the shell singleton</doc>
-        <source-position filename="src/plugin-shell.h" line="38"/>
+             line="2094">Get the shell singleton</doc>
+        <source-position filename="src/plugin-shell.h" line="41"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="2091">The shell singleton</doc>
+               line="2099">The shell singleton</doc>
           <type name="Shell" c:type="PhoshShell*"/>
         </return-value>
       </function>
       <virtual-method name="get_lockscreen_type" invoker="get_lockscreen_type">
-        <source-position filename="src/plugin-shell.h" line="23"/>
+        <source-position filename="src/plugin-shell.h" line="25"/>
         <return-value transfer-ownership="none">
           <type name="GType" c:type="GType"/>
         </return-value>
@@ -63159,36 +63159,57 @@ and coordinates between them.</doc>
           </instance-parameter>
         </parameters>
       </virtual-method>
+      <virtual-method name="get_plugin_loader"
+                      invoker="get_plugin_loader"
+                      introspectable="0">
+        <source-position filename="src/plugin-shell.h" line="26"/>
+        <return-value>
+          <type name="PluginLoader" c:type="PhoshPluginLoader*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Shell" c:type="PhoshShell*"/>
+          </instance-parameter>
+          <parameter name="plugin_dirs" transfer-ownership="none">
+            <array c:type="GStrv">
+              <type name="utf8"/>
+            </array>
+          </parameter>
+          <parameter name="extension_point" transfer-ownership="none">
+            <type name="utf8" c:type="const char*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
       <method name="activate_action"
               c:identifier="phosh_shell_activate_action">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="2438">Activates the given action. If the action is not found %FALSE is returned and a
+             line="2446">Activates the given action. If the action is not found %FALSE is returned and a
 warning is logged.</doc>
         <source-position filename="src/shell.h" line="136"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="2447">%TRUE if the action was found</doc>
+               line="2455">%TRUE if the action was found</doc>
           <type name="gboolean" c:type="gboolean"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2440">The #PhoshShell singleton</doc>
+                 line="2448">The #PhoshShell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
           <parameter name="action" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2441">The action name</doc>
+                 line="2449">The action name</doc>
             <type name="utf8" c:type="const char*"/>
           </parameter>
           <parameter name="parameter" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2442">The action's parameters</doc>
+                 line="2450">The action's parameters</doc>
             <type name="GLib.Variant" c:type="GVariant*"/>
           </parameter>
         </parameters>
@@ -63252,14 +63273,14 @@ warning is logged.</doc>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="2244">an app launch context for the primary display</doc>
+               line="2252">an app launch context for the primary display</doc>
           <type name="Gdk.AppLaunchContext" c:type="GdkAppLaunchContext*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2242">The shell</doc>
+                 line="2250">The shell</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63268,19 +63289,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_app_tracker">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1405">Get the app tracker</doc>
+             line="1413">Get the app tracker</doc>
         <source-position filename="src/shell.h" line="95"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1411">The app tracker</doc>
+               line="1419">The app tracker</doc>
           <type name="AppTracker" c:type="PhoshAppTracker*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1407">The shell singleton</doc>
+                 line="1415">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63288,7 +63309,7 @@ warning is logged.</doc>
       <method name="get_area" c:identifier="phosh_shell_get_area">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="2045">Gives the currently available screen area on the primary display.</doc>
+             line="2053">Gives the currently available screen area on the primary display.</doc>
         <source-position filename="src/shell.h" line="85"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
@@ -63297,7 +63318,7 @@ warning is logged.</doc>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2047">The shell singleton</doc>
+                 line="2055">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
           <parameter name="width"
@@ -63307,7 +63328,7 @@ warning is logged.</doc>
                      nullable="1">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2048">The available width</doc>
+                 line="2056">The available width</doc>
             <type name="gint" c:type="int*"/>
           </parameter>
           <parameter name="height"
@@ -63317,7 +63338,7 @@ warning is logged.</doc>
                      nullable="1">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2049">The available height</doc>
+                 line="2057">The available height</doc>
             <type name="gint" c:type="int*"/>
           </parameter>
         </parameters>
@@ -63326,19 +63347,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_background_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1426">Get the background manager</doc>
+             line="1434">Get the background manager</doc>
         <source-position filename="src/shell.h" line="96"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1432">The background manager</doc>
+               line="1440">The background manager</doc>
           <type name="BackgroundManager" c:type="PhoshBackgroundManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1428">The shell singleton</doc>
+                 line="1436">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63348,14 +63369,14 @@ warning is logged.</doc>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="2427">%TRUE if the primary output is currently blanked</doc>
+               line="2435">%TRUE if the primary output is currently blanked</doc>
           <type name="gboolean" c:type="gboolean"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2425">The #PhoshShell singleton</doc>
+                 line="2433">The #PhoshShell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63363,19 +63384,19 @@ warning is logged.</doc>
       <method name="get_bt_manager" c:identifier="phosh_shell_get_bt_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1721">Get the bluetooth manager</doc>
+             line="1729">Get the bluetooth manager</doc>
         <source-position filename="src/shell.h" line="107"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1727">The bluetooth manager</doc>
+               line="1735">The bluetooth manager</doc>
           <type name="BtManager" c:type="PhoshBtManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1723">The shell singleton</doc>
+                 line="1731">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63387,14 +63408,14 @@ warning is logged.</doc>
         <return-value transfer-ownership="none" nullable="1">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1371">the built in monitor or %NULL if there is no built in monitor</doc>
+               line="1379">the built in monitor or %NULL if there is no built in monitor</doc>
           <type name="Monitor" c:type="PhoshMonitor*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1369">The shell</doc>
+                 line="1377">The shell</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63403,19 +63424,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_calls_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1447">Get the calls manager</doc>
+             line="1455">Get the calls manager</doc>
         <source-position filename="src/shell.h" line="97"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1453">The calls manager</doc>
+               line="1461">The calls manager</doc>
           <type name="CallsManager" c:type="PhoshCallsManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1449">The shell singleton</doc>
+                 line="1457">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63427,14 +63448,14 @@ warning is logged.</doc>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="2409">%TRUE if the device is currently docked, otherwise %FALSE.</doc>
+               line="2417">%TRUE if the device is currently docked, otherwise %FALSE.</doc>
           <type name="gboolean" c:type="gboolean"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2407">The #PhoshShell singleton</doc>
+                 line="2415">The #PhoshShell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63443,19 +63464,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_docked_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1745">Get the docked manager</doc>
+             line="1753">Get the docked manager</doc>
         <source-position filename="src/shell.h" line="108"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1751">The docked manager</doc>
+               line="1759">The docked manager</doc>
           <type name="DockedManager" c:type="PhoshDockedManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1747">The shell singleton</doc>
+                 line="1755">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63464,12 +63485,12 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_emergency_calls_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1468">Get the emergency calls manager</doc>
+             line="1476">Get the emergency calls manager</doc>
         <source-position filename="src/shell.h" line="117"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1474">The emergency calls manager</doc>
+               line="1482">The emergency calls manager</doc>
           <type name="EmergencyCallsManager"
                 c:type="PhoshEmergencyCallsManager*"/>
         </return-value>
@@ -63477,7 +63498,7 @@ warning is logged.</doc>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1470">The shell singleton</doc>
+                 line="1478">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63486,19 +63507,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_feedback_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1489">Get the feedback manager</doc>
+             line="1497">Get the feedback manager</doc>
         <source-position filename="src/shell.h" line="98"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1495">The feedback manager</doc>
+               line="1503">The feedback manager</doc>
           <type name="FeedbackManager" c:type="PhoshFeedbackManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1491">The shell singleton</doc>
+                 line="1499">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63507,19 +63528,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_gtk_mount_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1510">Get the GTK mount manager</doc>
+             line="1518">Get the GTK mount manager</doc>
         <source-position filename="src/shell.h" line="99"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1516">The GTK mount manager</doc>
+               line="1524">The GTK mount manager</doc>
           <type name="GtkMountManager" c:type="PhoshGtkMountManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1512">The shell singleton</doc>
+                 line="1520">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63528,19 +63549,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_hks_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1775">Get the hardware killswitch manager</doc>
+             line="1783">Get the hardware killswitch manager</doc>
         <source-position filename="src/shell.h" line="109"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1781">The hardware killswitch manager</doc>
+               line="1789">The hardware killswitch manager</doc>
           <type name="HksManager" c:type="PhoshHksManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1777">The shell singleton</doc>
+                 line="1785">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63549,12 +63570,12 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_launcher_entry_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1531">Get the launcher entry manager</doc>
-        <source-position filename="src/plugin-shell.h" line="43"/>
+             line="1539">Get the launcher entry manager</doc>
+        <source-position filename="src/plugin-shell.h" line="48"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1537">The launcher entry manager</doc>
+               line="1545">The launcher entry manager</doc>
           <type name="LauncherEntryManager"
                 c:type="PhoshLauncherEntryManager*"/>
         </return-value>
@@ -63562,7 +63583,7 @@ warning is logged.</doc>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1533">The shell singleton</doc>
+                 line="1541">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63571,19 +63592,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_layout_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1552">Get the layout manager</doc>
+             line="1560">Get the layout manager</doc>
         <source-position filename="src/shell.h" line="100"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1558">The layout manager</doc>
+               line="1566">The layout manager</doc>
           <type name="LayoutManager" c:type="PhoshLayoutManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1554">The shell singleton</doc>
+                 line="1562">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63592,19 +63613,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_location_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1799">Get the location manager</doc>
+             line="1807">Get the location manager</doc>
         <source-position filename="src/shell.h" line="110"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1805">The location manager</doc>
+               line="1813">The location manager</doc>
           <type name="LocationManager" c:type="PhoshLocationManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1801">The shell singleton</doc>
+                 line="1809">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63616,14 +63637,14 @@ warning is logged.</doc>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="2342">%TRUE if the shell is currently locked, otherwise %FALSE.</doc>
+               line="2350">%TRUE if the shell is currently locked, otherwise %FALSE.</doc>
           <type name="gboolean" c:type="gboolean"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2340">The #PhoshShell singleton</doc>
+                 line="2348">The #PhoshShell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63632,26 +63653,26 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_lockscreen_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1573">Get the lockscreen manager</doc>
+             line="1581">Get the lockscreen manager</doc>
         <source-position filename="src/shell.h" line="101"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1579">The lockscreen manager</doc>
+               line="1587">The lockscreen manager</doc>
           <type name="LockscreenManager" c:type="PhoshLockscreenManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1575">The shell singleton</doc>
+                 line="1583">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
       </method>
       <method name="get_lockscreen_type"
               c:identifier="phosh_shell_get_lockscreen_type">
-        <source-position filename="src/plugin-shell.h" line="40"/>
+        <source-position filename="src/plugin-shell.h" line="43"/>
         <return-value transfer-ownership="none">
           <type name="GType" c:type="GType"/>
         </return-value>
@@ -63665,19 +63686,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_mode_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1594">Get the mode manager</doc>
+             line="1602">Get the mode manager</doc>
         <source-position filename="src/shell.h" line="102"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1600">The mode manager</doc>
+               line="1608">The mode manager</doc>
           <type name="ModeManager" c:type="PhoshModeManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1596">The shell singleton</doc>
+                 line="1604">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63686,19 +63707,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_monitor_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1615">Get the monitor manager</doc>
-        <source-position filename="src/plugin-shell.h" line="44"/>
+             line="1623">Get the monitor manager</doc>
+        <source-position filename="src/plugin-shell.h" line="49"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1621">The monitor manager</doc>
+               line="1629">The monitor manager</doc>
           <type name="MonitorManager" c:type="PhoshMonitorManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1617">The shell singleton</doc>
+                 line="1625">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63707,21 +63728,42 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_osk_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1823">Get the onscreen keyboard manager</doc>
+             line="1831">Get the onscreen keyboard manager</doc>
         <source-position filename="src/shell.h" line="111"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1829">The onscreen keyboard manager</doc>
+               line="1837">The onscreen keyboard manager</doc>
           <type name="OskManager" c:type="PhoshOskManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1825">The shell singleton</doc>
+                 line="1833">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
+        </parameters>
+      </method>
+      <method name="get_plugin_loader"
+              c:identifier="phosh_shell_get_plugin_loader"
+              introspectable="0">
+        <source-position filename="src/plugin-shell.h" line="44"/>
+        <return-value>
+          <type name="PluginLoader" c:type="PhoshPluginLoader*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Shell" c:type="PhoshShell*"/>
+          </instance-parameter>
+          <parameter name="plugin_dirs" transfer-ownership="none">
+            <array c:type="GStrv">
+              <type name="utf8"/>
+            </array>
+          </parameter>
+          <parameter name="extension_point" transfer-ownership="none">
+            <type name="utf8" c:type="const char*"/>
+          </parameter>
         </parameters>
       </method>
       <method name="get_primary_monitor"
@@ -63731,14 +63773,14 @@ warning is logged.</doc>
         <return-value transfer-ownership="none" nullable="1">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1390">the primary monitor or %NULL if there currently are no outputs</doc>
+               line="1398">the primary monitor or %NULL if there currently are no outputs</doc>
           <type name="Monitor" c:type="PhoshMonitor*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1388">The shell</doc>
+                 line="1396">The shell</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63747,19 +63789,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_rotation_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1847">Get the rotation manager</doc>
+             line="1855">Get the rotation manager</doc>
         <source-position filename="src/shell.h" line="112"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1853">The rotation manager</doc>
+               line="1861">The rotation manager</doc>
           <type name="RotationManager" c:type="PhoshRotationManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1849">The shell singleton</doc>
+                 line="1857">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63768,19 +63810,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_screen_saver_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1657">Get the screensaver manager</doc>
+             line="1665">Get the screensaver manager</doc>
         <source-position filename="src/shell.h" line="104"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1663">The screensaver manager</doc>
+               line="1671">The screensaver manager</doc>
           <type name="ScreenSaverManager" c:type="PhoshScreenSaverManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1659">The shell singleton</doc>
+                 line="1667">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63789,19 +63831,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_screenshot_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1678">Get the screenshot manager</doc>
+             line="1686">Get the screenshot manager</doc>
         <source-position filename="src/shell.h" line="105"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1684">The screenshot manager</doc>
+               line="1692">The screenshot manager</doc>
           <type name="ScreenshotManager" c:type="PhoshScreenshotManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1680">The shell singleton</doc>
+                 line="1688">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63810,19 +63852,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_session_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1699">Get the session manager</doc>
-        <source-position filename="src/plugin-shell.h" line="45"/>
+             line="1707">Get the session manager</doc>
+        <source-position filename="src/plugin-shell.h" line="50"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1705">The session manager</doc>
+               line="1713">The session manager</doc>
           <type name="SessionManager" c:type="PhoshSessionManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1701">The shell singleton</doc>
+                 line="1709">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63831,19 +63873,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_show_splash">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="2379">Whether splash screens should be used when apps start</doc>
+             line="2387">Whether splash screens should be used when apps start</doc>
         <source-position filename="src/shell.h" line="133"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="2384">%TRUE when splash should be used, otherwise %FALSE</doc>
+               line="2392">%TRUE when splash should be used, otherwise %FALSE</doc>
           <type name="gboolean" c:type="gboolean"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2381">The #PhoshShell singleton</doc>
+                 line="2389">The #PhoshShell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63853,14 +63895,14 @@ warning is logged.</doc>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="2261">The current #PhoshShellStateFlags</doc>
+               line="2269">The current #PhoshShellStateFlags</doc>
           <type name="ShellStateFlags" c:type="PhoshShellStateFlags"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2259">The shell</doc>
+                 line="2267">The shell</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63869,19 +63911,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_toplevel_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1636">Get the toplevel manager</doc>
+             line="1644">Get the toplevel manager</doc>
         <source-position filename="src/shell.h" line="103"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1642">The toplevel manager</doc>
+               line="1650">The toplevel manager</doc>
           <type name="ToplevelManager" c:type="PhoshToplevelManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1638">The shell singleton</doc>
+                 line="1646">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63890,19 +63932,19 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_torch_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1880">Get the torch manager</doc>
+             line="1888">Get the torch manager</doc>
         <source-position filename="src/shell.h" line="113"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1886">The torch manager</doc>
+               line="1894">The torch manager</doc>
           <type name="TorchManager" c:type="PhoshTorchManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1882">The shell singleton</doc>
+                 line="1890">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63911,7 +63953,7 @@ warning is logged.</doc>
               c:identifier="phosh_shell_get_usable_area">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1986">Gives the usable area in pixels usable by a client on the primary
+             line="1994">Gives the usable area in pixels usable by a client on the primary
 display.</doc>
         <source-position filename="src/shell.h" line="80"/>
         <return-value transfer-ownership="none">
@@ -63921,7 +63963,7 @@ display.</doc>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1988">The shell</doc>
+                 line="1996">The shell</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
           <parameter name="x"
@@ -63931,7 +63973,7 @@ display.</doc>
                      nullable="1">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1989">The x coordinate where client usable area starts</doc>
+                 line="1997">The x coordinate where client usable area starts</doc>
             <type name="gint" c:type="int*"/>
           </parameter>
           <parameter name="y"
@@ -63941,7 +63983,7 @@ display.</doc>
                      nullable="1">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1990">The y coordinate where client usable area starts</doc>
+                 line="1998">The y coordinate where client usable area starts</doc>
             <type name="gint" c:type="int*"/>
           </parameter>
           <parameter name="width"
@@ -63951,7 +63993,7 @@ display.</doc>
                      nullable="1">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1991">The width of the client usable area</doc>
+                 line="1999">The width of the client usable area</doc>
             <type name="gint" c:type="int*"/>
           </parameter>
           <parameter name="height"
@@ -63961,7 +64003,7 @@ display.</doc>
                      nullable="1">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1992">The height of the client usable area</doc>
+                 line="2000">The height of the client usable area</doc>
             <type name="gint" c:type="int*"/>
           </parameter>
         </parameters>
@@ -63970,19 +64012,19 @@ display.</doc>
               c:identifier="phosh_shell_get_vpn_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1904">Get the VPN manager</doc>
+             line="1912">Get the VPN manager</doc>
         <source-position filename="src/shell.h" line="114"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1910">The VPN manager</doc>
+               line="1918">The VPN manager</doc>
           <type name="VpnManager" c:type="PhoshVpnManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1906">The shell singleton</doc>
+                 line="1914">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -63991,19 +64033,19 @@ display.</doc>
               c:identifier="phosh_shell_get_wifi_manager">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1928">Get the Wifi manager</doc>
+             line="1936">Get the Wifi manager</doc>
         <source-position filename="src/shell.h" line="115"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1934">The Wifi manager</doc>
+               line="1942">The Wifi manager</doc>
           <type name="WifiManager" c:type="PhoshWifiManager*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1930">The shell singleton</doc>
+                 line="1938">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -64011,19 +64053,19 @@ display.</doc>
       <method name="get_wwan" c:identifier="phosh_shell_get_wwan">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1952">Get the WWAN manager</doc>
+             line="1960">Get the WWAN manager</doc>
         <source-position filename="src/shell.h" line="116"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="1958">The WWAN manager</doc>
+               line="1966">The WWAN manager</doc>
           <type name="WWan" c:type="PhoshWWan*"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="1954">The shell singleton</doc>
+                 line="1962">The shell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -64032,7 +64074,7 @@ display.</doc>
               c:identifier="phosh_shell_is_session_active">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="2222">Whether this shell is part of the active session</doc>
+             line="2230">Whether this shell is part of the active session</doc>
         <source-position filename="src/shell.h" line="129"/>
         <return-value transfer-ownership="none">
           <type name="gboolean" c:type="gboolean"/>
@@ -64041,7 +64083,7 @@ display.</doc>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2224">The shell</doc>
+                 line="2232">The shell</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -64052,14 +64094,14 @@ display.</doc>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="2172">%TRUE if the shell finished startup. %FALSE otherwise.</doc>
+               line="2180">%TRUE if the shell finished startup. %FALSE otherwise.</doc>
           <type name="gboolean" c:type="gboolean"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2170">The shell</doc>
+                 line="2178">The shell</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -64095,8 +64137,8 @@ display.</doc>
       <method name="set_default" c:identifier="phosh_shell_set_default">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="2069">Set the PhoshShell singleton that is returned by `phosh_shell_get_default()`</doc>
-        <source-position filename="src/plugin-shell.h" line="37"/>
+             line="2077">Set the PhoshShell singleton that is returned by `phosh_shell_get_default()`</doc>
+        <source-position filename="src/plugin-shell.h" line="40"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
         </return-value>
@@ -64104,7 +64146,7 @@ display.</doc>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2071">The shell to use</doc>
+                 line="2079">The shell to use</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -64114,7 +64156,7 @@ display.</doc>
               glib:set-property="locked">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="2355">Lock the shell. We proxy to lockscreen-manager to avoid
+             line="2363">Lock the shell. We proxy to lockscreen-manager to avoid
 that other parts of the shell need to care about this
 abstraction.</doc>
         <source-position filename="src/shell.h" line="86"/>
@@ -64125,13 +64167,13 @@ abstraction.</doc>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2357">The #PhoshShell singleton</doc>
+                 line="2365">The #PhoshShell singleton</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
           <parameter name="locked" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2358">%TRUE to lock the shell</doc>
+                 line="2366">%TRUE to lock the shell</doc>
             <type name="gboolean" c:type="gboolean"/>
           </parameter>
         </parameters>
@@ -64155,7 +64197,7 @@ abstraction.</doc>
       <method name="set_state" c:identifier="phosh_shell_set_state">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="2274">Set the shells state.</doc>
+             line="2282">Set the shells state.</doc>
         <source-position filename="src/shell.h" line="132"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
@@ -64164,19 +64206,19 @@ abstraction.</doc>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2276">The shell</doc>
+                 line="2284">The shell</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
           <parameter name="state" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2277">The #PhoshShellStateFlags to set</doc>
+                 line="2285">The #PhoshShellStateFlags to set</doc>
             <type name="ShellStateFlags" c:type="PhoshShellStateFlags"/>
           </parameter>
           <parameter name="enabled" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2278">%TRUE to set a shell state, %FALSE to reset</doc>
+                 line="2286">%TRUE to set a shell state, %FALSE to reset</doc>
             <type name="gboolean" c:type="gboolean"/>
           </parameter>
         </parameters>
@@ -64187,14 +64229,14 @@ abstraction.</doc>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/shell.c"
-               line="2155">%TRUE if we were started from a display manager. %FALSE otherwise.</doc>
+               line="2163">%TRUE if we were started from a display manager. %FALSE otherwise.</doc>
           <type name="gboolean" c:type="gboolean"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/shell.c"
-                 line="2153">The shell</doc>
+                 line="2161">The shell</doc>
             <type name="Shell" c:type="PhoshShell*"/>
           </instance-parameter>
         </parameters>
@@ -64215,7 +64257,7 @@ abstraction.</doc>
                 getter="get_builtin_monitor">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1208">The built in monitor. This is a hardware property and hence can
+             line="1216">The built in monitor. This is a hardware property and hence can
 only be read. It can be %NULL when not present or disabled.</doc>
         <type name="Monitor"/>
       </property>
@@ -64226,7 +64268,7 @@ only be read. It can be %NULL when not present or disabled.</doc>
                 default-value="FALSE">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1197">Whether the device is currently docked. This mirrors the property
+             line="1205">Whether the device is currently docked. This mirrors the property
 from #PhoshDockedManager for easier access.</doc>
         <type name="gboolean" c:type="gboolean"/>
       </property>
@@ -64238,7 +64280,7 @@ from #PhoshDockedManager for easier access.</doc>
                 default-value="FALSE">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1187">Whether the screen is currently locked. This mirrors the property
+             line="1195">Whether the screen is currently locked. This mirrors the property
 from #PhoshLockscreenManager for easier access.</doc>
         <type name="gboolean" c:type="gboolean"/>
       </property>
@@ -64249,7 +64291,7 @@ from #PhoshLockscreenManager for easier access.</doc>
                 getter="get_primary_monitor">
         <doc xml:space="preserve"
              filename="src/shell.c"
-             line="1220">The primary monitor that has the panels, lock screen etc.</doc>
+             line="1228">The primary monitor that has the panels, lock screen etc.</doc>
         <type name="Monitor"/>
       </property>
       <property name="shell-state"
@@ -64334,13 +64376,13 @@ from #PhoshLockscreenManager for easier access.</doc>
     <record name="ShellClass"
             c:type="PhoshShellClass"
             glib:is-gtype-struct-for="Shell">
-      <source-position filename="src/plugin-shell.h" line="35"/>
+      <source-position filename="src/plugin-shell.h" line="38"/>
       <field name="parent_class">
         <type name="GObject.ObjectClass" c:type="GObjectClass"/>
       </field>
       <field name="get_lockscreen_type">
         <callback name="get_lockscreen_type">
-          <source-position filename="src/plugin-shell.h" line="23"/>
+          <source-position filename="src/plugin-shell.h" line="25"/>
           <return-value transfer-ownership="none">
             <type name="GType" c:type="GType"/>
           </return-value>
@@ -64351,17 +64393,30 @@ from #PhoshLockscreenManager for easier access.</doc>
           </parameters>
         </callback>
       </field>
-      <field name="_phosh_reserved1" introspectable="0">
-        <callback name="_phosh_reserved1">
+      <field name="get_plugin_loader" introspectable="0">
+        <callback name="get_plugin_loader" introspectable="0">
           <source-position filename="src/plugin-shell.h" line="26"/>
-          <return-value transfer-ownership="none">
-            <type name="none" c:type="void"/>
+          <return-value>
+            <type name="PluginLoader" c:type="PhoshPluginLoader*"/>
           </return-value>
+          <parameters>
+            <parameter name="self" transfer-ownership="none">
+              <type name="Shell" c:type="PhoshShell*"/>
+            </parameter>
+            <parameter name="plugin_dirs" transfer-ownership="none">
+              <array c:type="GStrv">
+                <type name="utf8"/>
+              </array>
+            </parameter>
+            <parameter name="extension_point" transfer-ownership="none">
+              <type name="utf8" c:type="const char*"/>
+            </parameter>
+          </parameters>
         </callback>
       </field>
       <field name="_phosh_reserved2" introspectable="0">
         <callback name="_phosh_reserved2">
-          <source-position filename="src/plugin-shell.h" line="27"/>
+          <source-position filename="src/plugin-shell.h" line="30"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -64369,7 +64424,7 @@ from #PhoshLockscreenManager for easier access.</doc>
       </field>
       <field name="_phosh_reserved3" introspectable="0">
         <callback name="_phosh_reserved3">
-          <source-position filename="src/plugin-shell.h" line="28"/>
+          <source-position filename="src/plugin-shell.h" line="31"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -64377,7 +64432,7 @@ from #PhoshLockscreenManager for easier access.</doc>
       </field>
       <field name="_phosh_reserved4" introspectable="0">
         <callback name="_phosh_reserved4">
-          <source-position filename="src/plugin-shell.h" line="29"/>
+          <source-position filename="src/plugin-shell.h" line="32"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -64385,7 +64440,7 @@ from #PhoshLockscreenManager for easier access.</doc>
       </field>
       <field name="_phosh_reserved5" introspectable="0">
         <callback name="_phosh_reserved5">
-          <source-position filename="src/plugin-shell.h" line="30"/>
+          <source-position filename="src/plugin-shell.h" line="33"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -64393,7 +64448,7 @@ from #PhoshLockscreenManager for easier access.</doc>
       </field>
       <field name="_phosh_reserved6" introspectable="0">
         <callback name="_phosh_reserved6">
-          <source-position filename="src/plugin-shell.h" line="31"/>
+          <source-position filename="src/plugin-shell.h" line="34"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -64401,7 +64456,7 @@ from #PhoshLockscreenManager for easier access.</doc>
       </field>
       <field name="_phosh_reserved7" introspectable="0">
         <callback name="_phosh_reserved7">
-          <source-position filename="src/plugin-shell.h" line="32"/>
+          <source-position filename="src/plugin-shell.h" line="35"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -64409,7 +64464,7 @@ from #PhoshLockscreenManager for easier access.</doc>
       </field>
       <field name="_phosh_reserved8" introspectable="0">
         <callback name="_phosh_reserved8">
-          <source-position filename="src/plugin-shell.h" line="33"/>
+          <source-position filename="src/plugin-shell.h" line="36"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
@@ -64417,7 +64472,7 @@ from #PhoshLockscreenManager for easier access.</doc>
       </field>
       <field name="_phosh_reserved9" introspectable="0">
         <callback name="_phosh_reserved9">
-          <source-position filename="src/plugin-shell.h" line="34"/>
+          <source-position filename="src/plugin-shell.h" line="37"/>
           <return-value transfer-ownership="none">
             <type name="none" c:type="void"/>
           </return-value>
