@@ -708,12 +708,10 @@ phosh_settings_constructed (GObject *object)
 {
   PhoshSettings *self = PHOSH_SETTINGS (object);
   PhoshNotifyManager *manager;
-  PhoshShell *shell;
   const char *plugin_dirs[] = { PHOSH_PLUGINS_DIR, NULL };
 
   G_OBJECT_CLASS (phosh_settings_parent_class)->constructed (object);
 
-  shell = phosh_shell_get_default ();
   setup_brightness_range (self);
   setup_torch (self);
 
@@ -736,19 +734,23 @@ phosh_settings_constructed (GObject *object)
   on_notification_frames_items_changed (self, -1, -1, -1,
                                         G_LIST_MODEL (phosh_notify_manager_get_list (manager)));
 
-  g_object_bind_property (shell,
+  g_object_bind_property (phosh_shell_get_default (),
                           "locked",
                           self,
                           "on-lockscreen",
                           G_BINDING_SYNC_CREATE);
 
   self->plugin_settings = g_settings_new ("sm.puri.phosh.plugins");
-  self->plugin_loader = phosh_shell_get_plugin_loader (shell, (GStrv) plugin_dirs,
-                                                       PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET);
+  self->plugin_loader = phosh_plugin_loader_new ((GStrv) plugin_dirs,
+                                                 PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET);
   self->custom_quick_settings = g_ptr_array_new_with_free_func ((GDestroyNotify) unload_custom_quick_setting);
 
   g_signal_connect_object (self->plugin_settings, "changed::quick-settings",
                            G_CALLBACK (load_custom_quick_settings), self, G_CONNECT_SWAPPED);
+
+
+  phosh_shell_load_extension_point (phosh_shell_get_default (),
+                                    PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET);
 
   load_custom_quick_settings (self, NULL, NULL);
 }
