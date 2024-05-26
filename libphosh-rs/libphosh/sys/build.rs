@@ -15,6 +15,8 @@ fn main() {
         .add_build_internal("libphosh_0", move |_, version| {
             // We're going to build and statically link phosh.
             println!("cargo:rustc-link-lib=static=phosh");
+            // TODO: temporary hack?
+            println!("cargo:rustc-link-lib=static=gmobile");
 
             // $PHOSH_SRC controls where to find a Phosh Meson project root.
             let mut path = std::env::var("PHOSH_SRC").ok();
