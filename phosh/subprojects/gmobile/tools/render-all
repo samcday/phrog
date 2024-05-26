@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+OUT=_build/out/
+DTS=$(sed -n -e 's,.*devices/display-panels/\([a-z0-9,]\+\).json<.*,\1,p' data/gmobile.gresources.xml)
+
+mkdir -p "${OUT}"
+for DT in ${DTS}; do
+  _build/examples/gm-display-panel-preview -c "${DT}" -o "${OUT}/${DT}.html"
+done

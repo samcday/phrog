@@ -1,0 +1,14 @@
+{
+  "name": "Fairphone 5",
+  "x-res": 1224,
+  "y-res": 2700,
+  "border-radius": 100,
+  "width": 68,
+  "height": 150,
+  "cutouts" : [
+    {
+      "name": "notch",
+      "path": "M 612 16  a 42 42 0 0 0 0 84  a 42 42 0 0 0 0 -84  Z"
+    }
+  ]
+}

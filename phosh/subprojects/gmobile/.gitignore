@@ -1,0 +1,10 @@
+subprojects/json-glib/
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/*.log
+debian/tmp/
+debian/gir1.2-gm-0/
+debian/libgmobile-dev/
+debian/libgmobile-examples/
+debian/libgmobile-common/
+debian/libgmobile0/
