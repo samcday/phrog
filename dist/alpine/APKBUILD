@@ -42,37 +42,28 @@ makedepends="
 	wayland-dev
 	wayland-protocols
 	"
-source="${url}/archive/$pkgver/phrog-$pkgver.tar.gz
-        phrog"
+source="${url}/archive/$pkgver/phrog-$pkgver.tar.gz"
 subpackages="$pkgname-schemas::noarch"
 
 export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix=$builddir=/build/"
 
 prepare() {
     cd phrog-$pkgver
+	export PHOSH_SRC=$(pwd)/phosh
+	export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
 	cargo fetch --target="$CTARGET" --locked
 }
 
 build() {
-	abuild-meson \
-		-Dphoc_tests=disabled \
-		-Dbindings-lib=true \
-		phosh phosh-output
-	meson compile -C phosh-output
-	meson install -C phosh-output --destdir install
-
-	export LD_LIBRARY_PATH=$(pwd)/phosh-output/install/usr/lib
-	export SYSTEM_DEPS_LIBPHOSH_0_SEARCH_NATIVE=$(pwd)/phosh-output/install/usr/lib
-	export PKG_CONFIG_PATH=$(pwd)/phosh-output/install/usr/lib/pkgconfig
+	export PHOSH_SRC=$(pwd)/phosh
+	export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
 
 	cargo auditable build --release --frozen
 }
 
 package() {
-	install -Dm755 phrog -t "$pkgdir"/usr/bin/
 	install -Dm755 src/phrog-$pkgver/resources/com.samcday.phrog.gschema.xml -t "$pkgdir"/usr/share/glib-2.0/schemas/
-	install -Dm644 src/phrog-$pkgver/phosh-output/install/usr/lib/libphosh.so -t "$pkgdir"/usr/lib/phrog/
-	install -Dm755 src/phrog-$pkgver/target/release/phrog -t "$pkgdir"/usr/libexec/
+	install -Dm755 src/phrog-$pkgver/target/release/phrog -t "$pkgdir"/usr/bin/
 }
 
 schemas() {
@@ -83,5 +74,4 @@ schemas() {
 
 sha512sums="
 d04dbb4a353ed4c1349bcdf3aab6fdca0c648f2260e7b9cfd474b51a2049ab1cf3cb2442dcec7790b24602556a2cba67aed2e7fb19ad8884a00ab124edc976db  phrog-0.3.0.tar.gz
-6b74433bc38510a062ebcb70c05ff97876427c7828e6e0e4040213916c5e04bb3e6a5d53ed0f81e544dc9b6f766395b0e950e802fa4f8bd7b30139c70c83788a  phrog
 "
