@@ -22,6 +22,7 @@
 #include <gdk/gdkwayland.h>
 
 #include "phosh-config.h"
+#include "phosh-resources.h"
 #include "ambient.h"
 #include "drag-surface.h"
 #include "shell.h"
@@ -1174,6 +1175,12 @@ static void
 phosh_shell_class_init (PhoshShellClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  static gsize resources_initialized = FALSE;
+
+  if (g_once_init_enter (&resources_initialized)) {
+    phosh_register_resource ();
+    g_once_init_leave (&resources_initialized, TRUE);
+  }
 
   object_class->constructed = phosh_shell_constructed;
   object_class->dispose = phosh_shell_dispose;

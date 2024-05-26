@@ -9,6 +9,7 @@ phosh_resources = gnome.compile_resources(
   'phosh-resources',
   'phosh.gresources.xml',
 
+  extra_args: '--manual-register',
   c_name: 'phosh',
 )
 
