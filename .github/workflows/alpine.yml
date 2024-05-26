@@ -1,0 +1,64 @@
+runs-on: ubuntu-latest
+strategy:
+  matrix:
+    include:
+      - rust-target: aarch64-unknown-linux-musl
+        os-arch: aarch64
+env:
+  CROSS_SYSROOT: /mnt/alpine-${{ matrix.os-arch }}
+steps:
+  - uses: actions/checkout@v1
+
+  - name: Set up Alpine Linux for ${{ matrix.os-arch }} (target arch)
+    id: alpine-target
+    uses: jirutka/setup-alpine@v1
+    with:
+      arch: ${{ matrix.os-arch }}
+      branch: edge
+      packages: >
+        dbus-dev
+        dbus-static
+      shell-name: alpine-target.sh
+
+  - name: Set up Alpine Linux for x86_64 (build arch)
+    uses: jirutka/setup-alpine@v1
+    with:
+      arch: x86_64
+      packages: >
+        alpine-sdk
+        build-base
+        pkgconf
+        lld
+        rustup
+      volumes: ${{ steps.alpine-target.outputs.root-path }}:${{ env.CROSS_SYSROOT }}
+      shell-name: alpine.sh
+
+  - name: Install Rust stable toolchain via rustup
+    run: rustup-init --target ${{ matrix.rust-target }} --default-toolchain stable --profile minimal -y
+    shell: alpine.sh {0}
+
+  - name: Install build deps
+    run: cd dist/alpine && abuild deps
+    shell: alpine.sh {0}
+
+  - name: Build statically linked binary
+    env:
+      CARGO_BUILD_TARGET: ${{ matrix.rust-target }}
+      CARGO_PROFILE_RELEASE_STRIP: symbols
+      PKG_CONFIG_ALL_STATIC: '1'
+      PKG_CONFIG_LIBDIR: ${{ env.CROSS_SYSROOT }}/usr/lib/pkgconfig
+      RUSTFLAGS: -C linker=/usr/bin/ld.lld
+      SYSROOT: /dummy  # workaround for https://github.com/rust-lang/pkg-config-rs/issues/102
+    run: |
+      # Workaround for https://github.com/rust-lang/pkg-config-rs/issues/102.
+      echo -e '#!/bin/sh\nPKG_CONFIG_SYSROOT_DIR=${{ env.CROSS_SYSROOT }} exec pkgconf "$@"' \
+          | install -m755 /dev/stdin pkg-config
+      export PKG_CONFIG="$(pwd)/pkg-config"
+      export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
+      cargo build --release --locked --verbose
+    shell: alpine.sh {0}
+
+  - name: Try to run the binary
+    run: ./myapp --version
+    working-directory: target/${{ matrix.rust-target }}/release
+    shell: alpine-target.sh {0}
