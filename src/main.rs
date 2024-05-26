@@ -17,7 +17,7 @@ pub const APP_ID: &str = "com.samcday.phrog";
 
 extern "C" {
     fn hdy_init();
-    // fn cui_init(v: c_int);
+    fn cui_init(v: core::ffi::c_int);
 }
 
 #[derive(Parser, Debug)]
@@ -120,7 +120,7 @@ fn main() {
         //     CString::new(std::env::var("G_MESSAGES_DEBUG").unwrap_or("".to_string())).unwrap();
         // phosh_log_set_log_domains(loglevel.as_ptr());
         hdy_init();
-        // cui_init(1);
+        cui_init(1);
     }
 
     let shell = Shell::new();
