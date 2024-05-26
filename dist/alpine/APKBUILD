@@ -49,13 +49,11 @@ export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix=$builddir=/build/"
 
 prepare() {
     cd phrog-$pkgver
-	export PHOSH_SRC=$(pwd)/phosh
 	export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
 	cargo fetch --target="$CTARGET" --locked
 }
 
 build() {
-	export PHOSH_SRC=$(pwd)/phosh
 	export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
 
 	cargo auditable build --release --frozen

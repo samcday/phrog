@@ -84,10 +84,6 @@ jobs:
           RUSTFLAGS: -C linker=/usr/bin/ld.lld
           SYSROOT: /dummy  # workaround for https://github.com/rust-lang/pkg-config-rs/issues/102
         run: |
-          # Workaround for https://github.com/rust-lang/pkg-config-rs/issues/102.
-          echo -e '#!/bin/sh\nPKG_CONFIG_SYSROOT_DIR=${{ env.CROSS_SYSROOT }} exec pkgconf "$@"' \
-              | install -m755 /dev/stdin pkg-config
-          export PKG_CONFIG="$(pwd)/pkg-config"
           export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
           cargo build --release --locked --verbose
         shell: alpine.sh {0}
