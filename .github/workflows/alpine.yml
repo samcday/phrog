@@ -75,6 +75,6 @@ jobs:
         shell: alpine.sh {0}
 
       - name: Try to run the binary
-        run: ./myapp --version
+        run: ./phrog --version
         working-directory: target/${{ matrix.rust-target }}/release
         shell: alpine-target.sh {0}
