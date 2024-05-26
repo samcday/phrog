@@ -67,10 +67,10 @@ jobs:
               | install -m755 /dev/stdin pkg-config
           export PKG_CONFIG="$(pwd)/pkg-config"
           export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
-        cargo build --release --locked --verbose
-      shell: alpine.sh {0}
+          cargo build --release --locked --verbose
+        shell: alpine.sh {0}
 
-    - name: Try to run the binary
-      run: ./myapp --version
-      working-directory: target/${{ matrix.rust-target }}/release
-      shell: alpine-target.sh {0}
+      - name: Try to run the binary
+        run: ./myapp --version
+        working-directory: target/${{ matrix.rust-target }}/release
+        shell: alpine-target.sh {0}
