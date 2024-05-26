@@ -19,6 +19,7 @@ jobs:
     - name: Build
       run: |
         sudo apt-get -y build-dep ./phosh
+        export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
         cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
