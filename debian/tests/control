@@ -1,0 +1,4 @@
+Test-Command: /usr/bin/phrog --help
+Restrictions: superficial
+Depends: phrog
+
