@@ -1,19 +1,17 @@
-name: Build app
+name: x86-64
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   build:
-
     runs-on: ubuntu-24.04
-
     steps:
     - uses: actions/checkout@v4
     - name: Build
@@ -32,3 +30,7 @@ jobs:
       run: |
         export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
         cargo test --verbose
+    - uses: actions/upload-artifact@v4
+      with:
+        name: x86-64-debug
+        path: target/debug/phrog
