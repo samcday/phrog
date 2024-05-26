@@ -30,7 +30,6 @@ jobs:
           packages: >
             phosh
             greetd
-            greetd-phrog-schemas
           shell-name: alpine-target.sh
 
       - name: Set up Alpine Linux for x86_64 (build arch)
