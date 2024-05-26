@@ -1,4 +1,11 @@
 runs-on: ubuntu-latest
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
 strategy:
   matrix:
     include:
