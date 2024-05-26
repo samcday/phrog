@@ -18,13 +18,14 @@ jobs:
     - uses: actions/checkout@v4
     - name: Build
       run: |
+        sudo apt-get -y build-dep ./phosh
+
         git clone https://gitlab.gnome.org/World/Phosh/gmobile.git
         cd gmobile
         git checkout v0.2.0
         meson setup _build .
         meson install -C _build
 
-        sudo apt-get -y build-dep ./phosh
         export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
         cargo build --verbose
     - name: Run tests
