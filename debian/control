@@ -1,0 +1,95 @@
+Source: gmobile
+Priority: optional
+Maintainer: Guido Günther <agx@sigxcpu.org>
+Build-Depends:
+ debhelper-compat (= 13),
+ gi-docgen <!nodoc>,
+ libgirepository1.0-dev,
+ libglib2.0-dev,
+ libjson-glib-dev,
+ meson,
+ pkgconf,
+ python3-docutils <!nodoc>,
+Standards-Version: 4.6.2
+Section: libs
+Homepage: https://gitlab.gnome.org/World/Phosh/gmobile/
+Rules-Requires-Root: no
+
+Package: libgmobile-dev
+Section: libdevel
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${misc:Depends},
+ gir1.2-gm-0 (= ${binary:Version}),
+ libgmobile0 (= ${binary:Version}),
+ libglib2.0-dev,
+ libjson-glib-dev,
+Description: Mobile related helpers - development headers
+ gmobile is a library containing mobile related helpers for
+ glib based projects.
+ .
+ This package contains the development headers.
+
+Package: libgmobile0
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+ libgmobile-common (>= ${source:Version}),
+Description: Mobile related helpers - shared library
+ gmobile is a library containing mobile related helpers for
+ glib based projects.
+ .
+ This package contains the shared library.
+
+Package: libgmobile-common
+Section: misc
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}
+Recommends: libgmobile0
+Description: common files for the gmobile library
+ gmobile is a library containing mobile related helpers for
+ glib based projects.
+ .
+ This package contains common files like the hwdb and udev rules.
+
+Package: libgmobile-examples
+Architecture: any
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+Description: Mobile related helpers - binaries
+ gmobile is a library containing mobile related helpers for
+ glib based projects.
+ .
+ This package contains examples on how to use gmobile.
+
+Package: gir1.2-gm-0
+Architecture: any
+Multi-Arch: same
+Section: introspection
+Depends:
+ ${gir:Depends},
+ ${misc:Depends},
+ ${shlibs:Depends},
+Description: GObject introspection data for gmobile
+ gmobile is a library containing mobile related helpers for
+ glib based projects.
+ .
+ This package contains introspection data for the gmoible library.
+
+Package: libgmobile-doc
+Section: doc
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}
+Recommends: libglib2.0-doc,
+Suggests: devhelp
+Description: documentation for the gmobile library
+ gmobile is a library containing mobile related helpers for
+ glib based projects.
+ .
+ This package contains the HTML documentation for the gmobile library.
