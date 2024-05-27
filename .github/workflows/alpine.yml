@@ -1,94 +1,21 @@
-name: Alpine build
+name: alpine-apk
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
-
+permissions:
+  contents: write
 
 jobs:
-  alpine:
+  release:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - rust-target: aarch64-unknown-linux-musl
-            os-arch: aarch64
-    env:
-      CROSS_SYSROOT: /mnt/alpine-${{ matrix.os-arch }}
     steps:
-      - uses: actions/checkout@v1
-
-      - name: Set up Alpine Linux for ${{ matrix.os-arch }} (target arch)
-        id: alpine-target
-        uses: jirutka/setup-alpine@v1
+      - uses: actions/checkout@v4
+      - uses: ivanvc/abuild-releaser-action@v1.0.0
         with:
-          arch: ${{ matrix.os-arch }}
-          branch: edge
-          packages: >
-            phosh
-            greetd
-          shell-name: alpine-target.sh
-
-      - name: Set up Alpine Linux for x86_64 (build arch)
-        uses: jirutka/setup-alpine@v1
-        with:
-          arch: x86_64
-          packages: >
-            alpine-sdk
-            build-base
-            pkgconf
-            lld
-            rustup
-            cargo
-            cargo-auditable
-            callaudiod-dev
-            elogind-dev
-            evince-dev
-            evolution-data-server-dev
-            feedbackd-dev
-            gcr-dev
-            gettext-dev
-            glib-dev
-            gmobile-dev
-            gnome-desktop-dev
-            gtk+3.0-dev
-            libadwaita-dev
-            libgudev-dev
-            libhandy1-dev
-            libsecret-dev
-            linux-pam-dev
-            meson
-            networkmanager-dev
-            polkit-elogind-dev
-            pulseaudio-dev
-            py3-docutils
-            upower-dev
-            wayland-dev
-            wayland-protocols
-          volumes: ${{ steps.alpine-target.outputs.root-path }}:${{ env.CROSS_SYSROOT }}
-          shell-name: alpine.sh
-
-      - name: Install Rust stable toolchain via rustup
-        run: rustup-init --target ${{ matrix.rust-target }} --default-toolchain stable --profile minimal -y
-        shell: alpine.sh {0}
-
-      - name: Build statically linked binary
-        env:
-          CARGO_BUILD_TARGET: ${{ matrix.rust-target }}
-          CARGO_PROFILE_RELEASE_STRIP: symbols
-          PKG_CONFIG_ALL_STATIC: '1'
-          PKG_CONFIG_LIBDIR: ${{ env.CROSS_SYSROOT }}/usr/lib/pkgconfig
-          RUSTFLAGS: -C linker=/usr/bin/ld.lld
-          SYSROOT: /dummy  # workaround for https://github.com/rust-lang/pkg-config-rs/issues/102
-        run: |
-          export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
-          cargo build --release --locked --verbose
-        shell: alpine.sh {0}
-
-      - name: Try to run the binary
-        run: ./phrog --version
-        working-directory: target/${{ matrix.rust-target }}/release
-        shell: alpine-target.sh {0}
+          author: Sam Day <me@samcday.com>
+          rsa_public_key: ${{ secrets.RSA_PUBLIC_KEY }}
+          rsa_private_key: ${{ secrets.RSA_PRIVATE_KEY }}
+          package_dirs: "dist/alpine"
