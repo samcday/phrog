@@ -18,3 +18,4 @@ jobs:
           author: Sam Day <me@samcday.com>
           rsa_public_key: ${{ secrets.RSA_PUBLIC_KEY }}
           rsa_private_key: ${{ secrets.RSA_PRIVATE_KEY }}
+          alpine_branch: edge
