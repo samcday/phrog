@@ -13,24 +13,104 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: |
-        sudo apt-get -y build-dep ./phosh
+      - uses: actions/checkout@v4
 
-        git clone https://gitlab.gnome.org/World/Phosh/gmobile.git
-        cd gmobile
-        git checkout v0.2.0
-        meson setup _build .
-        sudo meson install -C _build
+      # selecting a toolchain either by action or manual `rustup` calls should happen
+      # before the plugin, as the cache uses the current rustc version as its cache key
+      - run: rustup toolchain install stable --profile minimal
+      - uses: Swatinem/rust-cache@v2
+        with: {}
 
-        export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
-        cargo build --verbose
-    - name: Run tests
-      run: |
-        export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
-        cargo test --verbose
-    - uses: actions/upload-artifact@v4
-      with:
-        name: x86-64-debug
-        path: target/debug/phrog
+      - name: Build
+        run: |
+          sudo apt-get -y build-dep ./phosh
+  
+          git clone https://gitlab.gnome.org/World/Phosh/gmobile.git
+          cd gmobile
+          git checkout v0.2.0
+          meson setup _build .
+          sudo meson install -C _build
+  
+          export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
+          cargo build --verbose
+      - name: Run tests
+        run: |
+          export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
+          cargo test --verbose
+      - uses: actions/upload-artifact@v4
+        with:
+          name: x86-64-debug
+          path: target/debug/phrog
+  recording:
+    runs-on: ubuntu-24.04
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: x86-64-debug
+      - run: |
+          set -uexo pipefail
+          export DEBIAN_FRONTEND=noninteractive
+          chmod +x phrog
+
+          git clone https://gitlab.gnome.org/World/Phosh/gmobile.git
+          (
+            cd gmobile
+            sudo apt-get -y build-dep .
+            git checkout v0.2.0
+            meson setup _build .
+            sudo meson install -C _build
+          )
+
+          git clone https://git.sr.ht/~kennylevinsen/greetd
+          (
+            cd greetd
+            cargo build --bin fakegreet
+            sudo install -m755 target/debug/fakegreet /usr/local/bin/fakegreet
+          )
+
+          # Install deps.
+          # wtype is temporary for demo below.
+          # this will be replaced with virtual-pointer + virtual-keyboard
+          # from phrog tests.
+          sudo apt-get install -y phosh phoc xvfb wf-recorder wtype
+
+          export XDG_RUNTIME_DIR=$HOME
+          # Start Phoc + a wf-recorder recording
+          dbus-run-session xvfb-run -a -s -noreset phoc -E "wf-recorder -f recording.mp4" &
+          export WAYLAND_DISPLAY=wayland-0
+
+          # TODO: find a more robust wait mechanism here. write to fifo from phoc launched cmd perhaps?
+          sleep 3
+
+          # Install phrog schemas.
+          mkdir -p $HOME/.local/share/glib-2.0/schemas/
+          cp resources/com.samcday.phrog.gschema.xml $HOME/.local/share/glib-2.0/schemas/
+          glib-compile-schemas $HOME/.local/share/glib-2.0/schemas/
+
+          # Run phrog under fakegreet + DBus.
+          FAKEGREET=1 dbus-run-session fakegreet ./phrog &
+          sleep 2
+
+          # demonstrate using wtype to get through fakegreet flow
+
+          wtype 'password'
+          sleep 1
+          # send newline to hit "Return" and submit password.
+          echo | wtype -
+
+          sleep 1
+          # Prove we are not a robot by confidently answering that 7+2=9
+          echo '9' | wtype -
+          sleep 3
+
+          set +e
+          pkill phoc
+          pkill phrog
+
+          echo done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recording
+          path: recording.mp4
