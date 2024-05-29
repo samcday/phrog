@@ -9,7 +9,6 @@ pub fn users() -> HashMap<String, String> {
     if std::env::var("FAKEGREET").unwrap_or(String::new()) == "1" {
         let mut fake = HashMap::new();
         fake.insert("user".to_string(), "Fake User".to_string());
-        fake.insert("bad-user".to_string(), "Fake User (won't work)".to_string());
         return fake;
     }
 
