@@ -102,8 +102,10 @@ jobs:
 
           sleep 1
           # Prove we are not a robot by confidently answering that 7+2=9
-          echo '9' | wtype -
-          sleep 3
+          echo -n '9' | wtype -
+          sleep 1
+          echo | wtype -
+          sleep 5
 
           set +e
           pkill phoc
