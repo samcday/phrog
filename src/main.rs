@@ -11,7 +11,7 @@ use std::process::Stdio;
 use crate::shell::Shell;
 use clap::Parser;
 use gtk::{Application, gdk, gio};
-use gtk::glib::{g_info, StaticType};
+use gtk::glib::{g_critical, g_info, StaticType};
 use libphosh::prelude::*;
 use libphosh::WallClock;
 
@@ -27,48 +27,65 @@ extern "C" {
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
-    #[arg(short, long, help = "Launch nested phoc compositor if necessary")]
-    phoc: bool,
+    #[arg(
+        short,
+        long,
+        default_value = "phoc",
+        help = "Launch nested phoc compositor if necessary"
+    )]
+    phoc: Option<String>,
+}
+
+pub fn spawn_phoc(binary: &str) -> Option<String> {
+    let mut phoc = std::process::Command::new(binary)
+        .stdout(Stdio::piped())
+        .stdin(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .unwrap();
+
+    // Wait for startup message.
+    let mut display = None;
+    for line in BufReader::new(phoc.stdout.as_mut().unwrap()).lines() {
+        let line = line.unwrap();
+        if line.starts_with(PHOC_RUNNING_PREFIX) {
+            display = Some(
+                line.strip_prefix(PHOC_RUNNING_PREFIX)
+                    .unwrap()
+                    .strip_suffix("'")
+                    .unwrap()
+                    .to_string(),
+            );
+            break;
+        }
+    }
+
+    ctrlc::set_handler(move || {
+        phoc.kill().unwrap();
+        phoc.wait().unwrap();
+    }).unwrap();
+
+    display
 }
 
 fn main() {
     gio::resources_register_include!("phrog.gresource")
         .expect("Failed to register resources.");
 
-    let args = Args::parse();
+    let mut args = Args::parse();
 
     // TODO: check XDG_RUNTIME_DIR here? Angry if not set? Default?
 
-    let display = if args.phoc {
-        // launch nested phoc, ensure the GDK in this process uses it.
-        let mut phoc = std::process::Command::new("phoc")
-            .stdout(Stdio::piped())
-            .stdin(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()
-            .unwrap();
+    args.phoc = args.phoc.and_then(|v| if v == "" { None } else { Some(v) });
 
-        // Wait for startup message.
-        let mut display = None;
-        for line in BufReader::new(phoc.stdout.as_mut().unwrap()).lines() {
-            let line = line.unwrap();
-            if line.starts_with(PHOC_RUNNING_PREFIX) {
-                display = Some(line.strip_prefix(PHOC_RUNNING_PREFIX).unwrap().strip_suffix("'").unwrap().to_string());
-                break;
-            }
-        }
-        let display = display.unwrap();
-        g_info!("phrog", "phoc running '{}'", display);
-        std::env::set_var("WAYLAND_DISPLAY", &display);
 
-        ctrlc::set_handler(move || {
-            phoc.kill().unwrap();
-            phoc.wait().unwrap();
-        }).unwrap();
-
+    let display = if let Some(phoc_binary) = args.phoc {
+        let display_name = spawn_phoc(&phoc_binary).expect("failed to spawn phoc");
+        g_info!("phrog", "spawned phoc on {}", display_name);
+        std::env::set_var("WAYLAND_DISPLAY", &display_name);
         gdk::set_allowed_backends("wayland");
         gdk::init();
-        gdk::Display::open(&display)
+        gdk::Display::open(&display_name)
     } else {
         gdk::set_allowed_backends("wayland");
         gdk::init();
