@@ -9,6 +9,7 @@
 #define G_LOG_DOMAIN "phosh-main"
 
 #include "phosh-config.h"
+#include "phosh-main.h"
 
 #include "log.h"
 #include "shell.h"
@@ -16,8 +17,6 @@
 #include "wall-clock.h"
 #include "background-cache.h"
 
-#include <handy.h>
-#include <call-ui.h>
 
 #include <glib/gi18n.h>
 #include <glib-unix.h>
@@ -130,8 +129,7 @@ int main(int argc, char *argv[])
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
   gtk_init (&argc, &argv);
-  hdy_init ();
-  cui_init (TRUE);
+  phosh_init ();
 
   g_unix_signal_add (SIGTERM, on_shutdown_signal, NULL);
   g_unix_signal_add (SIGINT, on_shutdown_signal, NULL);
@@ -150,7 +148,7 @@ int main(int argc, char *argv[])
 
   gtk_main ();
 
-  cui_uninit ();
+  phosh_uninit ();
 
   phosh_log_set_log_domains (NULL);
   return EXIT_SUCCESS;

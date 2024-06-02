@@ -19,11 +19,6 @@ pub const APP_ID: &str = "com.samcday.phrog";
 
 const PHOC_RUNNING_PREFIX: &'static str = "Running compositor on wayland display '";
 
-extern "C" {
-    fn hdy_init();
-    fn cui_init(v: core::ffi::c_int);
-}
-
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
@@ -102,13 +97,7 @@ fn main() {
     let wall_clock = WallClock::new();
     wall_clock.set_default();
 
-    unsafe {
-        // let loglevel =
-        //     CString::new(std::env::var("G_MESSAGES_DEBUG").unwrap_or("".to_string())).unwrap();
-        // phosh_log_set_log_domains(loglevel.as_ptr());
-        hdy_init();
-        cui_init(1);
-    }
+    libphosh::init();
 
     let shell = Shell::new();
     shell.set_default();
