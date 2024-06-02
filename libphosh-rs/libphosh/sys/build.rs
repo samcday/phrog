@@ -35,12 +35,9 @@ fn main() {
                 panic!("$PHOSH_SRC was not set");
             }
 
-            // TODO: ideally setup the meson build dir under cargo out/ but weird shit happens
-            // with enums at the moment.
-            // let build_dir = Path::new(&out_dir).join("_phosh-build");
+            let build_dir = Path::new(&out_dir).join("_phosh-build");
             let path = path.unwrap();
-            println!("building Phosh from {}", &path);
-            let build_dir = Path::new(&path).join("_libphoshrs-build");
+            println!("building Phosh from {} in build-dir: {:?}", &path, &build_dir);
 
             let status = std::process::Command::new("meson")
                 .arg("setup")
