@@ -8,16 +8,16 @@ mod users;
 
 use crate::shell::Shell;
 use clap::Parser;
-use gtk::glib::{g_info, StaticType};
+use gtk::glib::{g_info};
 use gtk::{gdk, gio, Application};
 use libphosh::prelude::*;
 use libphosh::WallClock;
-use std::io::{BufRead, BufReader, Read};
+use std::io::{BufRead, BufReader};
 use std::process::Stdio;
 
 pub const APP_ID: &str = "com.samcday.phrog";
 
-const PHOC_RUNNING_PREFIX: &'static str = "Running compositor on wayland display '";
+const PHOC_RUNNING_PREFIX: &str = "Running compositor on wayland display '";
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -71,7 +71,7 @@ pub fn spawn_phoc(binary: &str) -> Option<String> {
             display = Some(
                 line.strip_prefix(PHOC_RUNNING_PREFIX)
                     .unwrap()
-                    .strip_suffix("'")
+                    .strip_suffix('\'')
                     .unwrap()
                     .to_string(),
             );
@@ -90,7 +90,7 @@ pub fn spawn_phoc(binary: &str) -> Option<String> {
 
 fn main() {
     let mut args = Args::parse();
-    args.phoc = args.phoc.and_then(|v| if v == "" { None } else { Some(v) });
+    args.phoc = args.phoc.and_then(|v| if v.is_empty() { None } else { Some(v) });
 
     // TODO: check XDG_RUNTIME_DIR here? Angry if not set? Default?
 
@@ -122,7 +122,7 @@ mod test {
     use libphosh::prelude::ShellExt;
     use libphosh::prelude::WallClockExt;
     use libphosh::WallClock;
-    use std::ptr::read;
+    
     use std::sync::atomic::{AtomicBool, Ordering};
     use std::sync::Arc;
 
@@ -136,7 +136,7 @@ mod test {
         shell.set_default();
         shell.set_locked(true);
 
-        let mut ready_called = Arc::new(AtomicBool::new(false));
+        let ready_called = Arc::new(AtomicBool::new(false));
         let (ready_tx, ready_rx) = async_channel::bounded(1);
         shell.connect_ready(clone!(@strong ready_called => move |_| {
             ready_called.store(true, Ordering::Relaxed);

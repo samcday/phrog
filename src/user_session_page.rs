@@ -13,6 +13,12 @@ glib::wrapper! {
         @extends gtk::Widget, gtk::Box;
 }
 
+impl Default for UserSessionPage {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl UserSessionPage {
     pub fn new() -> Self {
         Object::builder().build()
@@ -32,8 +38,7 @@ impl UserSessionPage {
         self.imp()
             .box_users
             .selected_row()
-            .and_then(|row| row.downcast_ref::<ActionRow>().unwrap().subtitle())
-            .and_then(|str| Some(str.to_string()))
+            .and_then(|row| row.downcast_ref::<ActionRow>().unwrap().subtitle()).map(|str| str.to_string())
     }
 }
 

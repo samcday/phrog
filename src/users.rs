@@ -6,7 +6,7 @@ const DEFAULT_MIN_UID: uzers::uid_t = 1000;
 const DEFAULT_MAX_UID: uzers::uid_t = 60000;
 
 pub fn users() -> HashMap<String, String> {
-    if std::env::var("FAKEGREET").unwrap_or(String::new()) == "1" {
+    if std::env::var("FAKEGREET").unwrap_or_default() == "1" {
         let mut fake = HashMap::new();
         fake.insert("user".to_string(), "Fake User".to_string());
         return fake;

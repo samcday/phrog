@@ -41,14 +41,13 @@ fn session_list(path: &str, session_type: &str, sessions: &mut HashMap<String, S
             id.clone(),
             SessionObject::new(
                 &id,
-                &info.name().to_string(),
+                info.name().as_ref(),
                 session_type,
                 &info
                     .commandline()
                     .map_or(String::new(), |v| v.to_string_lossy().to_string()),
                 &info
-                    .string("DesktopNames")
-                    .and_then(|v| Some(v.trim_end_matches(";").replace(";", ":")))
+                    .string("DesktopNames").map(|v| v.trim_end_matches(';').replace(';', ":"))
                     .unwrap_or(String::new()),
             ),
         );
