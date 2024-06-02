@@ -8,35 +8,42 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL: auto
 
 jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-
       # selecting a toolchain either by action or manual `rustup` calls should happen
       # before the plugin, as the cache uses the current rustc version as its cache key
       - run: rustup toolchain install stable --profile minimal
       - uses: Swatinem/rust-cache@v2
         with: {}
-
-      - name: Build
+      - name: apt-get deps
         run: |
+          export DEBIAN_FRONTEND=noninteractive
+          # for phrog tests
+          sudo apt-get install -y phoc xvfb
           sudo apt-get -y build-dep ./phosh
-  
+      - name: build gmobile (should be temporary)
+        run: |
           git clone https://gitlab.gnome.org/World/Phosh/gmobile.git
           cd gmobile
           git checkout v0.2.0
           meson setup --prefix=/usr _build .
           sudo meson install -C _build
-  
-          export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
-          cargo build --verbose
-      - name: Run tests
+      - name: Build
         run: |
-          export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
-          cargo test --verbose
+          cargo build --verbose
+      - name: Test
+        run: |
+          # Install phrog schemas so the tests can run.
+          mkdir -p $HOME/.local/share/glib-2.0/schemas/
+          cp resources/com.samcday.phrog.gschema.xml $HOME/.local/share/glib-2.0/schemas/
+          glib-compile-schemas $HOME/.local/share/glib-2.0/schemas/
+
+          dbus-run-session xvfb-run -a -s -noreset phoc -E "cargo test --verbose"
       - uses: actions/upload-artifact@v4
         with:
           name: x86-64-debug

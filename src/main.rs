@@ -11,7 +11,7 @@ use std::process::Stdio;
 use crate::shell::Shell;
 use clap::Parser;
 use gtk::{Application, gdk, gio};
-use gtk::glib::{g_critical, g_info, StaticType};
+use gtk::glib::{g_info, StaticType};
 use libphosh::prelude::*;
 use libphosh::WallClock;
 
@@ -29,6 +29,30 @@ struct Args {
         help = "Launch nested phoc compositor if necessary"
     )]
     phoc: Option<String>,
+}
+
+pub fn init(phoc: Option<String>) {
+    gio::resources_register_include!("phrog.gresource").expect("Failed to register resources.");
+
+    let display = if let Some(phoc_binary) = phoc {
+        let display_name = spawn_phoc(&phoc_binary).expect("failed to spawn phoc");
+        g_info!("phrog", "spawned phoc on {}", display_name);
+        std::env::set_var("WAYLAND_DISPLAY", &display_name);
+        gdk::set_allowed_backends("wayland");
+        gdk::init();
+        gdk::Display::open(&display_name)
+    } else {
+        gdk::set_allowed_backends("wayland");
+        gdk::init();
+        gdk::Display::default()
+    };
+
+    if display.is_none() {
+        panic!("failed GDK init");
+    }
+
+    gtk::init().unwrap();
+    libphosh::init();
 }
 
 pub fn spawn_phoc(binary: &str) -> Option<String> {
@@ -64,40 +88,17 @@ pub fn spawn_phoc(binary: &str) -> Option<String> {
 }
 
 fn main() {
-    gio::resources_register_include!("phrog.gresource")
-        .expect("Failed to register resources.");
-
     let mut args = Args::parse();
+    args.phoc = args.phoc.and_then(|v| if v == "" { None } else { Some(v) });
 
     // TODO: check XDG_RUNTIME_DIR here? Angry if not set? Default?
 
-    args.phoc = args.phoc.and_then(|v| if v == "" { None } else { Some(v) });
+    init(args.phoc);
 
-
-    let display = if let Some(phoc_binary) = args.phoc {
-        let display_name = spawn_phoc(&phoc_binary).expect("failed to spawn phoc");
-        g_info!("phrog", "spawned phoc on {}", display_name);
-        std::env::set_var("WAYLAND_DISPLAY", &display_name);
-        gdk::set_allowed_backends("wayland");
-        gdk::init();
-        gdk::Display::open(&display_name)
-    } else {
-        gdk::set_allowed_backends("wayland");
-        gdk::init();
-        gdk::Display::default()
-    };
-
-    if display.is_none() {
-        panic!("failed GDK init");
-    }
-
-    gtk::init().unwrap();
     let _app = Application::builder().application_id(APP_ID).build();
 
     let wall_clock = WallClock::new();
     wall_clock.set_default();
-
-    libphosh::init();
 
     let shell = Shell::new();
     shell.set_default();
@@ -109,4 +110,43 @@ fn main() {
     shell.set_locked(true);
 
     gtk::main();
+}
+
+#[cfg(test)]
+mod test {
+    use std::ptr::read;
+    use std::sync::Arc;
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use gtk::glib;
+    use gtk::glib::clone;
+    use libphosh::prelude::ShellExt;
+    use libphosh::prelude::WallClockExt;
+    use libphosh::WallClock;
+    use crate::init;
+    use crate::shell::Shell;
+
+    #[test]
+    fn shell_ready() {
+        init(None);
+
+        let wall_clock = WallClock::new();
+        wall_clock.set_default();
+        let shell = Shell::new();
+        shell.set_default();
+        shell.set_locked(true);
+
+        let mut ready_called = Arc::new(AtomicBool::new(false));
+        let (ready_tx, ready_rx) = async_channel::bounded(1);
+        shell.connect_ready(clone!(@strong ready_called => move |_| {
+            ready_called.store(true, Ordering::Relaxed);
+            ready_tx.send_blocking(()).expect("notify ready failed");
+        }));
+        glib::spawn_future_local(clone!(@weak shell => async move {
+            ready_rx.recv().await.unwrap();
+            gtk::main_quit();
+        }));
+
+        gtk::main();
+        assert!(ready_called.load(Ordering::Relaxed));
+    }
 }
