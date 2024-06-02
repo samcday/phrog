@@ -19,13 +19,13 @@ impl Default for Shell {
 }
 
 mod imp {
+    use crate::keypad_shuffle::ShuffleKeypadQuickSetting;
     use crate::lockscreen::Lockscreen;
-    use gtk::{gio, glib};
     use gtk::glib::Type;
     use gtk::prelude::StaticType;
     use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass};
+    use gtk::{gio, glib};
     use libphosh::subclass::shell::ShellImpl;
-    use crate::keypad_shuffle::ShuffleKeypadQuickSetting;
 
     #[derive(Default)]
     pub struct Shell;
@@ -46,7 +46,13 @@ mod imp {
 
         fn load_extension_point(&self, extension_point: String) {
             if extension_point == "phosh-quick-setting-widget" {
-                gio::IOExtensionPoint::implement(extension_point, ShuffleKeypadQuickSetting::static_type(), "keypad-shuffle", 10).unwrap();
+                gio::IOExtensionPoint::implement(
+                    extension_point,
+                    ShuffleKeypadQuickSetting::static_type(),
+                    "keypad-shuffle",
+                    10,
+                )
+                .unwrap();
             }
         }
     }

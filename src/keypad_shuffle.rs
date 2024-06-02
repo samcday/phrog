@@ -6,12 +6,12 @@ glib::wrapper! {
 }
 
 mod imp {
-    use gtk::{CompositeTemplate, glib};
     use gtk::gio::Settings;
     use gtk::glib::clone;
     use gtk::glib::subclass::InitializingObject;
     use gtk::prelude::{ButtonExt, InitializingWidgetExt, SettingsExt, SettingsExtManual};
     use gtk::subclass::prelude::*;
+    use gtk::{glib, CompositeTemplate};
     use libphosh::prelude::{QuickSettingExt, StatusIconExt};
     use libphosh::subclass::quick_setting::QuickSettingImpl;
 
@@ -56,15 +56,20 @@ mod imp {
             self.parent_constructed();
 
             let settings = Settings::new("sm.puri.phosh.lockscreen");
-            settings.bind("shuffle-keypad", self.obj().as_ref(), "active").build();
+            settings
+                .bind("shuffle-keypad", self.obj().as_ref(), "active")
+                .build();
 
-            self.obj().connect_active_notify(clone!(@weak self as this => move |qs| {
+            self.obj()
+                .connect_active_notify(clone!(@weak self as this => move |qs| {
                     this.update();
                 }));
             self.update();
 
             self.obj().connect_clicked(move |btn| {
-                settings.set_boolean("shuffle-keypad", !settings.boolean("shuffle-keypad")).unwrap();
+                settings
+                    .set_boolean("shuffle-keypad", !settings.boolean("shuffle-keypad"))
+                    .unwrap();
             });
         }
     }

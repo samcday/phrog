@@ -6,14 +6,14 @@ mod shell;
 mod user_session_page;
 mod users;
 
-use std::io::{BufRead, BufReader, Read};
-use std::process::Stdio;
 use crate::shell::Shell;
 use clap::Parser;
-use gtk::{Application, gdk, gio};
 use gtk::glib::{g_info, StaticType};
+use gtk::{gdk, gio, Application};
 use libphosh::prelude::*;
 use libphosh::WallClock;
+use std::io::{BufRead, BufReader, Read};
+use std::process::Stdio;
 
 pub const APP_ID: &str = "com.samcday.phrog";
 
@@ -82,7 +82,8 @@ pub fn spawn_phoc(binary: &str) -> Option<String> {
     ctrlc::set_handler(move || {
         phoc.kill().unwrap();
         phoc.wait().unwrap();
-    }).unwrap();
+    })
+    .unwrap();
 
     display
 }
@@ -114,16 +115,16 @@ fn main() {
 
 #[cfg(test)]
 mod test {
-    use std::ptr::read;
-    use std::sync::Arc;
-    use std::sync::atomic::{AtomicBool, Ordering};
+    use crate::init;
+    use crate::shell::Shell;
     use gtk::glib;
     use gtk::glib::clone;
     use libphosh::prelude::ShellExt;
     use libphosh::prelude::WallClockExt;
     use libphosh::WallClock;
-    use crate::init;
-    use crate::shell::Shell;
+    use std::ptr::read;
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::sync::Arc;
 
     #[test]
     fn shell_ready() {
