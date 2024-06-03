@@ -32,10 +32,12 @@ jobs:
           version: 1.0
       - name: apt-get build-dep ./phosh
         run: |
+          set -uexo pipefail
           export DEBIAN_FRONTEND=noninteractive
           sudo apt-get -y build-dep ./phosh
       - name: build gmobile (should be temporary)
         run: |
+          set -uexo pipefail
           git clone https://gitlab.gnome.org/World/Phosh/gmobile.git
           cd gmobile
           git checkout v0.2.0
@@ -43,21 +45,24 @@ jobs:
           sudo meson install -C _build
       - name: Build
         run: |
+          set -uexo pipefail
           cargo build --all-targets --verbose
       - name: Test
         run: |
+          set -uexo pipefail
           # Install phrog schemas so the tests can run.
           mkdir -p $HOME/.local/share/glib-2.0/schemas/
           cp resources/com.samcday.phrog.gschema.xml $HOME/.local/share/glib-2.0/schemas/
           glib-compile-schemas $HOME/.local/share/glib-2.0/schemas/
-
+          # start phoc + wf-recorder
           dbus-run-session xvfb-run -a -s -noreset phoc -E "wf-recorder -f tests.mp4" &
+          export WAYLAND_DISPLAY=wayland-0
           trap "pkill phoc; sleep 1" EXIT
-
-          # wait a moment for compositor startup. would be better to properly parse out the
+          # wait some moments for compositor startup. would be better to properly parse out the
           # display name and readiness state from phoc stdout.
-          sleep 1
-          WAYLAND_DISPLAY=wayland-0 cargo test --verbose -- --test-threads=1 --nocapture
+          sleep 3
+          # run tests
+          cargo test --verbose -- --test-threads=1 --nocapture
       - uses: actions/upload-artifact@v4
         with:
           name: x86-64-debug
