@@ -39,7 +39,7 @@ jobs:
           sudo meson install -C _build
       - name: Build
         run: |
-          cargo build --verbose
+          cargo build --all-targets --verbose
       - name: Test
         run: |
           # Install phrog schemas so the tests can run.
