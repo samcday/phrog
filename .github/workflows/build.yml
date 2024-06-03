@@ -99,7 +99,7 @@ jobs:
 
           export XDG_RUNTIME_DIR=$HOME
           # Start Phoc + a wf-recorder recording
-          dbus-run-session xvfb-run -a -s -noreset phoc -E "wf-recorder -f recording.mp4" &
+          dbus-run-session xvfb-run -a -s -noreset phoc -E "wf-recorder -f demo.mp4" &
           export WAYLAND_DISPLAY=wayland-0
 
           # TODO: find a more robust wait mechanism here. write to fifo from phoc launched cmd perhaps?
@@ -135,5 +135,5 @@ jobs:
           echo done
       - uses: actions/upload-artifact@v4
         with:
-          name: recording
-          path: recording.mp4
+          name: demo-recording
+          path: demo.mp4
