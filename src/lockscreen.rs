@@ -37,7 +37,6 @@ mod imp {
     use libphosh::LockscreenPage;
     use std::cell::{OnceCell, RefCell};
     use std::os::unix::net::UnixStream;
-    use std::process;
 
     #[derive(Default)]
     pub struct Lockscreen {
@@ -181,7 +180,7 @@ mod imp {
             .await
             .context("start session")?;
 
-            process::exit(0);
+            return Ok(());
         }
 
         async fn greetd_req(&self, req: Request) -> anyhow::Result<Response> {
