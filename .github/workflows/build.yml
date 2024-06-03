@@ -24,11 +24,15 @@ jobs:
       - run: rustup toolchain install stable --profile minimal
       - uses: Swatinem/rust-cache@v2
         with: {}
+      # for phrog tests
       - name: apt-get deps
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: phosh phoc xvfb wf-recorder
+          version: 1.0
+      - name: apt-get build-dep ./phosh
         run: |
           export DEBIAN_FRONTEND=noninteractive
-          # for phrog tests
-          sudo apt-get install -y phosh phoc xvfb wf-recorder
           sudo apt-get -y build-dep ./phosh
       - name: build gmobile (should be temporary)
         run: |
