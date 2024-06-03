@@ -62,7 +62,7 @@ jobs:
         with:
           name: tests-recording
           path: tests.mp4
-  recording:
+  demo:
     runs-on: ubuntu-24.04
     needs: [build]
     steps:
