@@ -47,7 +47,8 @@ fn session_list(path: &str, session_type: &str, sessions: &mut HashMap<String, S
                     .commandline()
                     .map_or(String::new(), |v| v.to_string_lossy().to_string()),
                 &info
-                    .string("DesktopNames").map(|v| v.trim_end_matches(';').replace(';', ":"))
+                    .string("DesktopNames")
+                    .map(|v| v.trim_end_matches(';').replace(';', ":"))
                     .unwrap_or(String::new()),
             ),
         );

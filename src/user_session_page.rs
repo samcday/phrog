@@ -38,7 +38,8 @@ impl UserSessionPage {
         self.imp()
             .box_users
             .selected_row()
-            .and_then(|row| row.downcast_ref::<ActionRow>().unwrap().subtitle()).map(|str| str.to_string())
+            .and_then(|row| row.downcast_ref::<ActionRow>().unwrap().subtitle())
+            .map(|str| str.to_string())
     }
 }
 
