@@ -22,18 +22,17 @@ mod imp {
     use crate::user_session_page::UserSessionPage;
     use crate::APP_ID;
     use anyhow::{anyhow, Context};
-    use async_channel::{Receiver, Sender};
     use greetd_ipc::codec::SyncCodec;
     use greetd_ipc::{AuthMessageType, ErrorType, Request, Response};
     use gtk::gio::Settings;
-    use gtk::glib::{clone, closure_local, g_critical, g_warning, ObjectExt};
+    use gtk::glib::{clone, closure_local, g_critical, g_info, g_warning, ObjectExt};
     use gtk::prelude::SettingsExtManual;
     use gtk::subclass::prelude::{ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt};
     use gtk::subclass::widget::WidgetImpl;
     use gtk::traits::WidgetExt;
     use gtk::{gio, glib};
     use libphosh::prelude::*;
-    use libphosh::subclass::lockscreen::LockscreenImpl;
+    use libphosh::subclass::lockscreen::{LockscreenImpl, LockscreenImplExt};
     use libphosh::LockscreenPage;
     use std::cell::{OnceCell, RefCell};
     use std::os::unix::net::UnixStream;
@@ -41,9 +40,8 @@ mod imp {
     #[derive(Default)]
     pub struct Lockscreen {
         user_session_page: OnceCell<UserSessionPage>,
-        greetd_sender: OnceCell<Sender<Request>>,
-        greetd_receiver: OnceCell<Receiver<Response>>,
-        session: RefCell<Option<String>>,
+        greetd_user: RefCell<Option<String>>,
+        greetd: RefCell<Option<UnixStream>>,
     }
 
     #[glib::object_subclass]
@@ -51,36 +49,6 @@ mod imp {
         const NAME: &'static str = "PhrogLockscreen";
         type Type = super::Lockscreen;
         type ParentType = libphosh::Lockscreen;
-    }
-
-    fn run_greetd() -> (Sender<Request>, Receiver<Response>) {
-        let (greetd_req_send, greetd_req_recv) = async_channel::bounded::<Request>(1);
-        let (greetd_resp_send, greetd_resp_recv) = async_channel::bounded(1);
-
-        gio::spawn_blocking(move || {
-            let mut sock = UnixStream::connect(std::env::var("GREETD_SOCK").unwrap()).unwrap();
-
-            while let Ok(req) = greetd_req_recv.recv_blocking() {
-                if let Err(err) = req.write_to(&mut sock) {
-                    g_critical!("greetd", "error sending request: {}", err);
-                    continue;
-                }
-                match Response::read_from(&mut sock) {
-                    Err(err) => {
-                        g_critical!("greetd", "error receiving response: {}", err);
-                        continue;
-                    }
-                    Ok(resp) => {
-                        if let Err(err) = greetd_resp_send.send_blocking(resp) {
-                            g_critical!("greetd", "error sending response on channel: {}", err);
-                            continue;
-                        }
-                    }
-                }
-            }
-        });
-
-        (greetd_req_send, greetd_resp_recv)
     }
 
     impl ObjectImpl for Lockscreen {
@@ -91,19 +59,16 @@ mod imp {
                 .add_extra_page(self.user_session_page.get().unwrap());
             self.obj().set_default_page(LockscreenPage::Extra);
 
-            let (greetd_sender, greetd_receiver) = run_greetd();
-
-            self.greetd_sender.set(greetd_sender.clone()).unwrap();
-            self.greetd_receiver.set(greetd_receiver.clone()).unwrap();
             self.obj()
                 .connect_page_notify(clone!(@weak self as this => move |ls| {
                     glib::spawn_future_local(clone!(@weak ls => async move {
-                        // Page is lockscreen, begin greetd conversation.
                         if ls.page() == LockscreenPage::Unlock {
+                        // Page is lockscreen, begin greetd conversation.
                             this.create_session().await;
                         } else {
-                            // No longer on unlock, cancel session.
-                            this.cancel_session().await;
+                            // No longer on unlock, clear greetd.
+                            this.greetd.take();
+                            this.greetd_user.take();
                         }
                     }));
                 }));
@@ -124,30 +89,19 @@ mod imp {
     }
 
     impl Lockscreen {
-        // Whenever user swipes away from keypad entry page, and after an auth failure, fire off a
-        // CancelSession.
-        async fn cancel_session(&self) {
-            if self.session.borrow().is_none() {
-                // no session to cancel
-                return;
-            }
-
-            if let Err(err) = self.greetd_req(Request::CancelSession).await {
-                g_warning!("greetd", "greetd CancelSession failed: {}", err);
-            }
-            self.session.replace(None);
-        }
-
         async fn create_session(&self) {
             let user = self.user_session_page.get().unwrap().username();
-            if user.is_none() || self.session.borrow().eq(&user) {
+            if user.is_none() || self.greetd_user.borrow().eq(&user) {
                 // no user selected, or the session for that user is already started
                 return;
             }
 
-            self.session.replace(user.clone());
+            self.greetd_user.replace(user.clone());
+            if let Ok(path) = std::env::var("GREETD_SOCK") {
+                self.greetd.replace(UnixStream::connect(path).ok());
+            }
             let username = user.unwrap();
-            g_warning!("greetd", "creating greetd session for user {}", username);
+            g_info!("greetd", "creating greetd session for user {}", username);
             self.obj().set_sensitive(false);
             let mut req = Some(Request::CreateSession { username });
             while let Some(next_req) = req.take() {
@@ -160,7 +114,7 @@ mod imp {
 
             let settings = Settings::new(APP_ID);
             if let Err(err) =
-                settings.set("last-user", self.session.clone().take().unwrap_or_default())
+                settings.set("last-user", self.greetd_user.clone().take().unwrap_or_default())
             {
                 g_warning!("lockscreen", "setting last-user failed {}", err);
             }
@@ -184,26 +138,15 @@ mod imp {
         }
 
         async fn greetd_req(&self, req: Request) -> anyhow::Result<Response> {
-            self.greetd_sender
-                .get()
-                .unwrap()
-                .send(req)
-                .await
-                .context("send greetd request")?;
-            match self
-                .greetd_receiver
-                .get()
-                .unwrap()
-                .recv()
-                .await
-                .context("receive greetd response")?
-            {
-                Response::Error {
-                    error_type: ErrorType::Error,
-                    description,
-                } => Err(anyhow!("greetd error: {}", description)),
-                resp => Ok(resp),
+            if self.greetd.borrow().is_none() {
+                return Err(anyhow!("greetd_req called with no active greetd socket"));
             }
+
+            if let Err(err) = req.write_to(self.greetd.borrow_mut().as_mut().unwrap()) {
+                return Err(anyhow!("error sending request: {}", err));
+            }
+
+            return Response::read_from(self.greetd.borrow_mut().as_mut().unwrap()).context("failed to read response from greetd");
         }
 
         async fn greetd_interaction(&self, req: Request) -> Option<Request> {
@@ -251,7 +194,6 @@ mod imp {
                 } => {
                     g_warning!("greetd", "auth error '{}'", description);
                     self.obj().shake_pin_entry();
-                    self.cancel_session().await;
                     glib::timeout_future_seconds(1).await;
                     return Some(Request::CreateSession {
                         username: self.user_session_page.get().unwrap().username().unwrap(),
