@@ -12,6 +12,8 @@ BuildRequires:  cargo-rpm-macros >= 24
 BuildRequires:	pkgconfig(libphosh-0)
 
 Requires:       greetd >= 0.6
+Requires:       phosh-bindings >= 0.41
+
 # dbus-launch
 Requires:   dbus-x11
 
