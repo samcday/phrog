@@ -1,5 +1,7 @@
 stages:
  - build
+ - test+docs
+ - deploy
 
 image: debian:trixie
 
@@ -30,13 +32,14 @@ variables:
   DEPS: |
     git build-essential ca-certificates meson curl rustup xmlstarlet
   GIT_SUBMODULE_STRATEGY: recursive
+  RUST_VERSION: stable
 
 .common_before_script: &common_before_script
   before_script:
     - apt update
     - apt install -y --no-install-recommends eatmydata
     - eatmydata apt install -y --no-install-recommends $DEPS
-    - rustup default stable
+    - rustup default $RUST_VERSION
     - git submodule update --checkout
     - meson subprojects download
     - if [ -n "$UPSTREAM_BRANCH" ]; then cd subprojects/phosh && git fetch origin "$UPSTREAM_BRANCH" && git checkout FETCH_HEAD && git show HEAD && cd -; fi
@@ -54,3 +57,41 @@ build:
     - cd gir && cargo build && cd -
     # Rebuild bindings
     - make
+
+build-doc:
+  stage: test+docs
+  needs: []
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    RUSTFLAGS: --cfg docsrs
+    RUST_VERSION: nightly
+  <<: *common_before_script
+  script:
+    - git checkout -f *.gir
+    - ./fix.sh
+    # generate the docs
+    - export PATH=$HOME/.cargo/bin:$PATH
+    - curl --proto '=https' --tlsv1.2 -sSf -o gir-rustdoc.py
+      https://gitlab.gnome.org/World/Rust/gir-rustdoc/-/raw/main/gir-rustdoc.py
+    - chmod +x gir-rustdoc.py
+    - cargo install rustdoc-stripper
+    - ./generator.py --embed-docs
+    - eval $(./gir-rustdoc.py --branch=$CI_COMMIT_BRANCH pre-docs)
+    - cargo doc --all-features --no-deps
+    - ./gir-rustdoc.py html-index
+    - mv target/doc/ docs
+  artifacts:
+    paths:
+      - docs
+
+pages:
+  stage: deploy
+  needs: [ build-doc ]
+  script:
+    - mkdir -p public/git
+    - mv docs public/git/docs
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH

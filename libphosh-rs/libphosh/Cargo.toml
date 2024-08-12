@@ -4,10 +4,10 @@ version = "0.0.1"
 authors = ["Guido Günther <agx@sigxcpu.org>"]
 edition = "2021"
 readme = "../README.md"
-homepage = "https://guidog.pages.gitlab.gnome.org/libphosh-rs/"
+homepage = "https://gitlab.gnome.org/guidog/libphosh-rs"
 description = "Rust bindings for libphosh"
 license = "MIT"
-repository = "https://guidog.pages.gitlab.gnome.org/libphosh-rs/"
+repository = "https://gitlab.gnome.org/guidog/libphosh-rs.git"
 categories = ["api-bindings"]
 keywords = ["phosh", "gnome"]
 

@@ -19,7 +19,7 @@ impl Default for Shell {
 }
 
 mod imp {
-    use crate::keypad_shuffle::ShuffleKeypadQuickSetting;
+    // use crate::keypad_shuffle::ShuffleKeypadQuickSetting;
     use crate::lockscreen::Lockscreen;
     use gtk::glib::Type;
     use gtk::prelude::StaticType;
@@ -44,16 +44,16 @@ mod imp {
             Lockscreen::static_type()
         }
 
-        fn load_extension_point(&self, extension_point: String) {
-            if extension_point == "phosh-quick-setting-widget" {
-                gio::IOExtensionPoint::implement(
-                    extension_point,
-                    ShuffleKeypadQuickSetting::static_type(),
-                    "keypad-shuffle",
-                    10,
-                )
-                .unwrap();
-            }
-        }
+        // fn load_extension_point(&self, extension_point: String) {
+        //     if extension_point == "phosh-quick-setting-widget" {
+        //         gio::IOExtensionPoint::implement(
+        //             extension_point,
+        //             ShuffleKeypadQuickSetting::static_type(),
+        //             "keypad-shuffle",
+        //             10,
+        //         )
+        //         .unwrap();
+        //     }
+        // }
     }
 }

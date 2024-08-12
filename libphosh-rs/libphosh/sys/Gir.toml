@@ -1,6 +1,5 @@
 [options]
 work_mode = "sys"
-split_build_rs = true
 library = "Phosh"
 version = "0"
 girs_directories = ["../../gir-files", "../../"]
@@ -173,6 +172,7 @@ ignore = [
     "Phosh.PowerMenu",
     "Phosh.PowerMenuManager",
     "Phosh.Proximity",
+    "Phosh.QuickSetting",
     "Phosh.RfkillDBusRfkillProxy",
     "Phosh.RfkillDBusRfkillSkeleton",
     "Phosh.RotateInfo",
@@ -243,11 +243,18 @@ ignore = [
     # Ingore as they use raw Wayland types
     "Phosh.WlBuffer",
     "Phosh.HeadMode",
+    "Phosh.HeadStatePending",
     # Not actual types
     "Phosh.PhysicalSize",
     "Phosh.LogicalSize",
     # Not needed constants:
     "Phosh.ModeDeviceType",
+    # gnome-bluetooth has no Rust bindings
+    "Phosh.BtDeviceRowClass",
+    "Phosh.BtDeviceRow",
+    "Phosh.BtStatusPage",
+    "Phosh.BtStatusPageClass",
+    "GnomeBluetooth.Device",
 ]
 
 [[object]]

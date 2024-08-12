@@ -2,3 +2,4 @@
 directory=phosh
 url=https://gitlab.gnome.org/World/Phosh/phosh.git
 revision=main
+depth=1

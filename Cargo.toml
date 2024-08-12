@@ -16,11 +16,12 @@ ctrlc = { version = "3.4.4", features = ["termination"] }
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies.gtk]
-version = '0.18'
-features = ['v3_24']
+version = "0.18"
+features = ["v3_24"]
 
 [dependencies.libhandy]
 version = "0.11"
+features = ["v1_6"]
 
 [build-dependencies]
 glib-build-tools = "0.18.0"

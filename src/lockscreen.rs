@@ -265,7 +265,7 @@ mod imp {
 
     impl WidgetImpl for Lockscreen {}
     impl LockscreenImpl for Lockscreen {
-        fn unlock_submit_cb(&self) {
+        fn unlock_submit(&self) {
             glib::spawn_future_local(clone!(@weak self as this => async move {
                 this.obj().set_sensitive(false);
                 let mut req = Some(Request::PostAuthMessageResponse {

@@ -6,11 +6,12 @@ build = "build.rs"
 authors = ["Guido Günther <agx@sigxcpu.org>"]
 categories = ["api-bindings", "gui"]
 keywords = ["phosh", "gnome"]
+description = "FFI bindings for libphosh"
 license = "MIT"
 
 [package.metadata.system-deps.libphosh_0]
 name = "libphosh-0"
-version = "0.39.0"
+version = "0.38"
 
 [package.metadata.docs.rs]
 rustc-args = ["--cfg", "docsrs"]
@@ -46,8 +47,8 @@ features = ["v3_24"]
 version = "0.18"
 
 [dependencies.handy_sys]
-version = "0.11"
 package = "libhandy-sys"
+version = "0.11"
 
 [build-dependencies]
 system-deps = "6"

@@ -23,10 +23,8 @@ external_libraries = [
 
 generate = [
   "Phosh.Lockscreen",
-  "Phosh.WallClock",
   "Phosh.LockscreenPage",
-  "Phosh.QuickSetting",
-  "Phosh.StatusIcon",
+  "Phosh.WallClock",
 ]
 
 manual = [
@@ -194,6 +192,7 @@ ignore = [
     "Phosh.PowerMenu",
     "Phosh.PowerMenuManager",
     "Phosh.Proximity",
+    "Phosh.QuickSetting",
     "Phosh.Revealer",
     "Phosh.RfkillDBusRfkillProxy",
     "Phosh.RfkillDBusRfkillSkeleton",
@@ -212,6 +211,7 @@ ignore = [
     "Phosh.SessionPresenceDBusPresenceSkeleton",
     "Phosh.Splash",
     "Phosh.SplashManager",
+    "Phosh.StatusIcon",
     "Phosh.StatusPage",
     "Phosh.SuspendManager",
     "Phosh.SwipeAwayBin",

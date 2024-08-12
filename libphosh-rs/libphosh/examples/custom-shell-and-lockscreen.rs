@@ -89,10 +89,10 @@ mod custom_lockscreen {
     }
 
     mod imp {
-        use glib::Cast;
         use gtk::glib::ObjectExt;
         use gtk::subclass::prelude::*;
-        use gtk::glib;
+        use gtk::{glib, Button, Image, Label};
+        use gtk::prelude::WidgetExt;
         use libphosh::Lockscreen;
         use libphosh::prelude::LockscreenExt;
         use libphosh::subclass::lockscreen::LockscreenImpl;
@@ -104,15 +104,27 @@ mod custom_lockscreen {
         impl ObjectSubclass for CustomLockscreen {
             const NAME: &'static str = "CustomLockscreen";
             type Type = super::CustomLockscreen;
-            type ParentType = libphosh::Lockscreen;
+            type ParentType = Lockscreen;
         }
 
         impl ObjectImpl for CustomLockscreen {
             fn constructed(&self) {
                 self.parent_constructed();
                 glib::g_message!("example", "Constructed custom Lockscreen");
+
+                let hi = Image::builder()
+                    .icon_name("face-kiss")
+                    .pixel_size(100)
+                    .build();
+                self.obj().add_extra_page(&hi);
+                hi.set_visible(true);
+
                 self.obj().connect_lockscreen_unlock(|_| {
                     glib::g_message!("example", "Custom Lockscreen was unlocked.");
+                });
+
+                self.obj().connect_page_notify(|me| {
+                    glib::g_message!("example", "Lockscreen page changed to {:?}", me.page());
                 });
             }
         }
