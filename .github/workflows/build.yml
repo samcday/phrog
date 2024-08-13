@@ -65,8 +65,7 @@ jobs:
           EOF
           # for phrog tests
           sudo apt update
-          sudo apt-get install -y xvfb wf-recorder
-          sudo apt-get install -y -t trixie-nightly phoc
+          sudo apt-get install -y xvfb wf-recorder phoc
       - name: build phosh (temporary until libphosh is packaged upstream)
         run: |
           set -uexo pipefail
