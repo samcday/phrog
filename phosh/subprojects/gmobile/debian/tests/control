@@ -1,3 +1,0 @@
-Tests: build-test
-Depends: libgmobile-dev, pkgconf
-Restrictions: allow-stderr, superficial

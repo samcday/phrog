@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=@app_id@.CalendarServer
-Exec=@libexecdir@/@shell@-calendar-server
