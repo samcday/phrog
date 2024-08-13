@@ -36,6 +36,14 @@ jobs:
           cd gmobile
           sudo apt-get -y build-dep ./
           meson setup --prefix=/usr _build .
+          sudo meson install -C
+      - name: build feedbackd
+        run: |
+          set -uexo pipefail
+          git clone https://source.puri.sm/Librem5/feedbackd.git
+          cd feedbackd
+          sudo apt-get -y build-dep ./
+          meson setup --prefix=/usr _build .
           sudo meson install -C _build
       - name: build phosh
         run: |
