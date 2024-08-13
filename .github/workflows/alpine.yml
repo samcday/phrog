@@ -2,8 +2,10 @@ name: alpine-apk
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+    paths:
+      - 'dist/alpine/**'
+      - '.github/workflows/alpine.yml'
 
 permissions:
   contents: write
