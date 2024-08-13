@@ -30,7 +30,7 @@ jobs:
           cat <<EOF | sudo tee /etc/apt/sources.list.d/phosh-nightly.sources
           Types: deb
           URIs: http://deb.phosh.mobi/nightly/
-          Suites: noble
+          Suites: trixie-nightly
           Components: main
           Signed-By:
             -----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -64,14 +64,15 @@ jobs:
             -----END PGP PUBLIC KEY BLOCK-----
           EOF
           # for phrog tests
+          sudo apt update
           sudo apt-get install -y xvfb wf-recorder
-          sudo apt-get install -y -t noble phoc
+          sudo apt-get install -y -t trixie-nightly phoc
       - name: build phosh (temporary until libphosh is packaged upstream)
         run: |
           set -uexo pipefail
           git clone --depth=1 https://gitlab.gnome.org/World/Phosh/phosh.git
           cd phosh
-          sudo apt-get build-dep -t noble -y ./
+          sudo apt-get build-dep -t trixie-nightly -y ./
           meson setup --prefix=/usr -Dbindings-lib=true _build .
           sudo meson install -C _build
       - name: Build
