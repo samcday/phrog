@@ -57,6 +57,7 @@ pub fn init(phoc: Option<String>) {
     }
 
     gtk::init().unwrap();
+    libhandy::init();
 }
 
 pub fn spawn_phoc(binary: &str) -> Option<String> {
