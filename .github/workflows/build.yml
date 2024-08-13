@@ -62,7 +62,7 @@ jobs:
             MHjCZ4GQaiw5Uq+5sQTUWYkFeb/j3NeRadmSTshinPgTISGNYBo=
             =lIij
             -----END PGP PUBLIC KEY BLOCK-----
-            EOF
+          EOF
           # for phrog tests
           sudo apt-get install -y xvfb wf-recorder
           sudo apt-get install -y -t trixie-nightly phoc
@@ -71,8 +71,7 @@ jobs:
           set -uexo pipefail
           git clone --depth=1 https://gitlab.gnome.org/World/Phosh/phosh.git
           cd phosh
-          sudo apt-get install -t trixie-nightly gmobile-dev
-          sudo apt-get build-dep -y ./
+          sudo apt-get build-dep -t trixie-nightly -y ./
           meson setup --prefix=/usr -Dbindings-lib=true _build .
           sudo meson install -C _build
       - name: Build
