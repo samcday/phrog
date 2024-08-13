@@ -32,7 +32,7 @@ jobs:
       - name: build gmobile
         run: |
           set -uexo pipefail
-          git clone https://gitlab.gnome.org/World/Phosh/gmobile.git
+          git clone --shallow https://gitlab.gnome.org/World/Phosh/gmobile.git
           cd gmobile
           sudo apt-get -y build-dep ./
           meson setup --prefix=/usr _build .
@@ -40,7 +40,7 @@ jobs:
       - name: build feedbackd
         run: |
           set -uexo pipefail
-          git clone https://source.puri.sm/Librem5/feedbackd.git
+          git clone --shallow https://source.puri.sm/Librem5/feedbackd.git
           cd feedbackd
           sudo apt-get -y build-dep ./
           meson setup --prefix=/usr _build .
@@ -48,7 +48,7 @@ jobs:
       - name: build phosh
         run: |
           set -uexo pipefail
-          git clone https://gitlab.gnome.org/World/Phosh/phosh.git
+          git clone --shallow https://gitlab.gnome.org/World/Phosh/phosh.git
           cd phosh
           sudo apt-get -y build-dep ./
           meson setup --prefix=/usr -Dbindings-lib=true _build .
