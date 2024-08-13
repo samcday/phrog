@@ -29,20 +29,21 @@ jobs:
           export DEBIAN_FRONTEND=noninteractive
           # for phrog tests
           sudo apt-get install -y phoc xvfb wf-recorder
-      - name: build phosh
-        run: |
-          set -uexo pipefail
-          git clone https://gitlab.gnome.org/World/Phosh/phosh.git
-          cd phosh
-          sudo apt-get -y build-dep ./phosh
-          meson setup --prefix=/usr -Dbindings-lib=true _build .
-          sudo meson install -C _build
       - name: build gmobile
         run: |
           set -uexo pipefail
           git clone https://gitlab.gnome.org/World/Phosh/gmobile.git
           cd gmobile
+          sudo apt-get -y build-dep ./
           meson setup --prefix=/usr _build .
+          sudo meson install -C _build
+      - name: build phosh
+        run: |
+          set -uexo pipefail
+          git clone https://gitlab.gnome.org/World/Phosh/phosh.git
+          cd phosh
+          sudo apt-get -y build-dep ./
+          meson setup --prefix=/usr -Dbindings-lib=true _build .
           sudo meson install -C _build
       - name: Build
         run: |
