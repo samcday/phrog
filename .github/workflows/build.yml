@@ -70,7 +70,8 @@ jobs:
           set -uexo pipefail
           git clone --depth=1 https://gitlab.gnome.org/World/Phosh/phosh.git
           cd phosh
-          sudo apt-get build-dep -y -t trixie-nightly ./
+          sudo apt-get install -t trixie-nightly gmobile-dev
+          sudo apt-get build-dep -y ./
           meson setup --prefix=/usr -Dbindings-lib=true _build .
           sudo meson install -C _build
       - name: Build
