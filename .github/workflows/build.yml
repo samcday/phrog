@@ -34,6 +34,7 @@ jobs:
           Components: main
           Signed-By:
             -----BEGIN PGP PUBLIC KEY BLOCK-----
+            
             mQINBGXoHOYBEAC/893ifemxPCa3l+46Vtpjiew4Eu+c3kXEj6sEOQZS8+ZvJ93O
             So3cEe7tqPM8AjqPjO6GsBjqr86swk5bbZ70GIqo1H2p9JdBaiQWqTDXxXRDvel5
             0SaxbUQvLm880pjS/gcsBezRv8vb9dxDsPMzap6GuJnF5QqagfOX8B1aQKCywJNo
@@ -70,8 +71,7 @@ jobs:
           set -uexo pipefail
           git clone --depth=1 https://gitlab.gnome.org/World/Phosh/phosh.git
           cd phosh
-          sudo apt-get install -t trixie-nightly gmobile-dev
-          sudo apt-get build-dep -y ./
+          sudo apt-get build-dep -y -t trixie-nightly ./
           meson setup --prefix=/usr -Dbindings-lib=true _build .
           sudo meson install -C _build
       - name: Build
