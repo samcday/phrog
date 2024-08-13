@@ -8,7 +8,6 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL: auto
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -29,14 +28,20 @@ jobs:
           set -uexo pipefail
           export DEBIAN_FRONTEND=noninteractive
           # for phrog tests
-          sudo apt-get install -y phosh phoc xvfb wf-recorder
+          sudo apt-get install -y phoc xvfb wf-recorder
+      - name: build phosh
+        run: |
+          set -uexo pipefail
+          git clone https://gitlab.gnome.org/World/Phosh/phosh.git
+          cd phosh
           sudo apt-get -y build-dep ./phosh
-      - name: build gmobile (should be temporary)
+          meson setup --prefix=/usr -Dbindings-lib=true _build .
+          sudo meson install -C _build
+      - name: build gmobile
         run: |
           set -uexo pipefail
           git clone https://gitlab.gnome.org/World/Phosh/gmobile.git
           cd gmobile
-          git checkout v0.2.0
           meson setup --prefix=/usr _build .
           sudo meson install -C _build
       - name: Build
