@@ -81,6 +81,9 @@ jobs:
       - name: Test
         run: |
           set -uexo pipefail
+
+          export G_MESSAGES_DEBUG=all
+
           # Install phrog schemas so the tests can run.
           mkdir -p $HOME/.local/share/glib-2.0/schemas/
           cp resources/com.samcday.phrog.gschema.xml $HOME/.local/share/glib-2.0/schemas/
