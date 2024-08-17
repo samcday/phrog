@@ -17,18 +17,6 @@ sudo dnf copr enable samcday/phrog
 sudo dnf install phrog
 ```
 
-#### Alpine
-
-Hopefully this makes it into Alpine repos soon. For now:
-
-```
-sudo apk add alpine-sdk
-cd dist/alpine
-abuild deps
-abuild
-sudo apk add ~/packages/dist/$(uname -m)/greetd-phrog-*.apk
-```
-
 #### Other
 
 For now, you must build from source, see the Development section below.
