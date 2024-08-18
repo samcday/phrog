@@ -9,13 +9,13 @@ URL:            https://github.com/samcday/phrog
 Source:         %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  cargo-rpm-macros >= 24
-BuildRequires:	pkgconfig(libphosh-0)
+BuildRequires:  pkgconfig(libphosh-0)
 
 Requires:       greetd >= 0.6
-Requires:       phosh-bindings >= 0.41
+Requires:       libphosh >= 0.41
 
-# dbus-launch
-Requires:   dbus-x11
+# for dbus-launch
+Requires:       dbus-x11
 
 Provides:       greetd-greeter = 0.6
 Provides:       greetd-%{name} = %{version}
