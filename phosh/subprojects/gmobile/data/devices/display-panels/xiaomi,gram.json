@@ -1,0 +1,12 @@
+{
+    "name": "Xiaomi POCO M2 Pro",
+    "x-res": 1080,
+    "y-res": 2400,
+    "border-radius": 93,
+    "cutouts": [
+        {
+            "name": "notch",
+            "path": "M 504,0 L 504,102 L 576,102 L 576,0 L 540,0 Z"
+        }
+    ]
+}

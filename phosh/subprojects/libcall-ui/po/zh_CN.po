@@ -1,0 +1,133 @@
+# Chinese (China) translation for libcall-ui.
+# Copyright (C) 2021 libcall-ui's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libcall-ui package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libcall-ui main\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/World/Phosh/libcall-ui/"
+"issues/\n"
+"POT-Creation-Date: 2022-11-02 11:56+0000\n"
+"PO-Revision-Date: 2023-07-13 17:05-0400\n"
+"Last-Translator: \n"
+"Language-Team: Chinese (China) <i18n-zh@googlegroups.com>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.3.2\n"
+
+#: src/cui-call.c:308
+msgid "Call active"
+msgstr "呼叫处于活动状态"
+
+#: src/cui-call.c:310
+msgid "Call held"
+msgstr "呼叫保留"
+
+#: src/cui-call.c:312
+msgid "Calling…"
+msgstr "正在拨号……"
+
+#: src/cui-call.c:314
+msgid "Incoming call"
+msgstr "来电"
+
+#: src/cui-call.c:316
+msgid "Call ended"
+msgstr "通话结束"
+
+#: src/cui-call.c:319 src/cui-call-display.c:305
+msgid "Unknown"
+msgstr "未知"
+
+#: src/cui-call-display.c:99
+msgid "Accepting call…"
+msgstr "正在接受来电……"
+
+#: src/cui-call-display.c:114
+msgid "Hanging up…"
+msgstr "正在挂断……"
+
+#: src/cui-call-display.ui:182
+msgid "Mute"
+msgstr "静音"
+
+#: src/cui-call-display.ui:198
+msgid "Speaker"
+msgstr "扬声器"
+
+#: src/cui-call-display.ui:214
+msgid "Add call"
+msgstr "增加拨号"
+
+#: src/cui-call-display.ui:264
+msgid "Hold"
+msgstr "挂机"
+
+#: src/cui-call-display.ui:306
+msgid "Dial Pad"
+msgstr "拨号盘"
+
+#: src/cui-dialpad.ui:24
+msgid "Enter a number"
+msgstr "输入一个号码"
+
+#: src/cui-dialpad.ui:25
+msgid "Type a phone number"
+msgstr "输入电话号码"
+
+#: src/cui-dialpad.ui:50
+msgid "Call that phone number"
+msgstr "拨打电话号码"
+
+#: src/cui-encryption-indicator.ui:21
+msgid "This call is not encrypted"
+msgstr "本通话未加密"
+
+#: src/cui-encryption-indicator.ui:42
+msgid "This call is encrypted"
+msgstr "本通话已加密"
+
+#~ msgid "Call-UI Demo"
+#~ msgstr "拨号界面演示"
+
+#~ msgid "Back"
+#~ msgstr "返回"
+
+#~ msgid "Welcome to Call-UI Demo"
+#~ msgstr "欢迎来到拨号界面演示"
+
+#~ msgid "This is a tour of the features the library has to offer."
+#~ msgstr "这是体验库里提供的功能的小旅途。"
+
+#~ msgid "Welcome"
+#~ msgstr "欢迎"
+
+#~ msgid "Call Display"
+#~ msgstr "拨号显示"
+
+#~ msgid "A simple dial pad to enter phone numbers."
+#~ msgstr "用来输入号码的简单拨号盘"
+
+#~ msgid "Keypad"
+#~ msgstr "键盘"
+
+#~ msgid "A number keypad."
+#~ msgstr "数学键盘"
+
+#~ msgid "Show letters"
+#~ msgstr "显示字母"
+
+#~ msgid "Show symbols"
+#~ msgstr "显示符号"
+
+#~ msgid "Key pad"
+#~ msgstr "小键盘"
+
+#~ msgid "Answer"
+#~ msgstr "接听"
+
+#~ msgid "Hide the dial pad"
+#~ msgstr "隐藏拨号盘"

@@ -1,0 +1,367 @@
+include:
+ - project: 'guidog/meta-phosh'
+   ref: '04a85df2f3311f3012b6c49bf353b376ae0f32b2'
+   file: '/ci/phosh-common-jobs.yml'
+ - project: 'Infrastructure/Mirrors/lorry-mirrors/gitlab_freedesktop_org/freedesktop/ci-templates'
+   ref: 'b791bd48996e3ced9ca13f1c5ee82be8540b8adb'
+   file: '/templates/ci-fairy.yml'
+
+stages:
+ - build
+ - test+docs
+ - style-checks
+ - analyze
+ - package
+ - deploy
+ - triggers
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    # Don't trigger a branch pipeline if there is an open MR
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH
+
+default:
+  # Protect CI infra from rogue jobs
+  timeout: 15 minutes
+  # Allow jobs to be caneled on new commits
+  interruptible: true
+  # Retry on infra hickups automatically
+  retry:
+    max: 1
+    when:
+      - 'api_failure'
+      - 'runner_system_failure'
+      - 'scheduler_failure'
+      - 'stuck_or_timeout_failure'
+
+variables:
+  # For ci-fairy
+  FDO_UPSTREAM_REPO: World/Phosh/phosh
+  # screenshot and asan builds on DEBIAN_IMAGE so keep them in sync
+  IMAGE_VERSION: v0.0.2024-05-08
+  DEBIAN_IMAGE: $CI_REGISTRY/world/phosh/phosh/debian:$IMAGE_VERSION
+  SCREENSHOT_IMAGE: $CI_REGISTRY/world/phosh/phosh/screenshot:$IMAGE_VERSION
+  ASAN_IMAGE: $CI_REGISTRY/world/phosh/phosh/asan:$IMAGE_VERSION
+  XVFB_RUN: xvfb-run -a -s -noreset
+  COMMON_BUILD_OPTS: -Db_coverage=true --werror -Dtools=true
+  ALPINE_EDGE_DEPS: alpine-sdk callaudiod-dev elogind-dev feedbackd-dev gcr-dev git glib-dev gnome-desktop-dev
+                    gtk+3.0-dev libgudev-dev libhandy1-dev gcr-dev libsecret-dev gcovr linux-pam-dev
+                    meson musl-dev networkmanager networkmanager-dev ninja polkit-elogind-dev pulseaudio-dev
+                    upower-dev wayland-dev wayland-protocols ttf-dejavu evolution-data-server-dev evince-dev
+                    libadwaita-dev json-glib-dev
+  RUST_BINDINGS_BRANCH: main
+
+.trixie_vars: &trixie_vars
+  variables:
+    BUILD_OPTS: -Dcallui-i18n=true -Dphoc_tests=enabled ${COMMON_BUILD_OPTS}
+
+.build_step: &build_step
+  script:
+    - git submodule update --recursive
+    - 'echo "Build opts: ${BUILD_OPTS}"'
+    - meson setup ${BUILD_OPTS} _build
+    - meson compile -C _build
+
+.test_before_script: &test_before_script
+  before_script:
+     - export DEBIAN_FRONTEND=noninteractive
+     - |
+       echo 'ar_AE.UTF-8 UTF-8
+       de_DE.UTF-8 UTF-8
+       en_US.UTF-8 UTF-8
+       ja_JP.UTF-8 UTF-8
+       uk_UA.UTF-8 UTF-8
+       ' > /etc/locale.gen
+     - dpkg-reconfigure locales
+     - apt -y update
+     - apt -y build-dep .
+
+.build_before_script: &build_before_script
+  before_script:
+     - export DEBIAN_FRONTEND=noninteractive
+     - apt -y update
+     - apt -y build-dep .
+
+.test_step: &test_step
+  script:
+    - export LC_ALL=C.UTF-8
+    - ${XVFB_RUN} meson test --print-errorlogs -C _build --suite tools
+    - ${XVFB_RUN} meson test --print-errorlogs -C _build --suite unit
+    - ${XVFB_RUN} meson test --print-errorlogs -C _build --suite integration
+  after_script:
+    - gcovr --json --output=coverage-${CI_JOB_NAME}.json
+
+# Sanity checks of MR settings and commit logs
+commit-log-check:
+  extends:
+    - .fdo.ci-fairy
+  stage: style-checks
+  variables:
+    GIT_DEPTH: "100"
+  needs: []
+  script: |
+    ci-fairy check-commits --junit-xml=commit-message-junit-report.xml
+  artifacts:
+    reports:
+      junit: commit-message-junit-report.xml
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+
+build:native-debian-trixie:
+  stage: build
+  image: ${DEBIAN_IMAGE}
+  <<: *build_before_script
+  <<: *trixie_vars
+  <<: *build_step
+  artifacts:
+    paths:
+      - _build
+  except:
+    variables:
+      - $PKG_ONLY == "1"
+
+unit-test:native-debian-trixie:
+  stage: test+docs
+  image: ${DEBIAN_IMAGE}
+  needs:
+    - build:native-debian-trixie
+  <<: *trixie_vars
+  <<: *test_before_script
+  <<: *test_step
+  artifacts:
+    when: always
+    paths:
+      - _build
+      - coverage-*.json
+  except:
+    variables:
+      - $PKG_ONLY == "1"
+      - $SCREENSHOTS_ONLY == "1"
+
+asan-test:native-debian-trixie:
+  stage: test+docs
+  image: ${ASAN_IMAGE}
+  tags: [ asan ]
+  needs: []
+  <<: *trixie_vars
+  <<: *test_before_script
+  script:
+    - meson setup -Dphoc_tests=enabled -Dtools=false -Db_sanitize=address -Dbuildtype=debug _build-asan
+    - meson compile -C _build-asan ./data/glib-compile-schemas:custom
+    - ${XVFB_RUN} meson test --print-errorlogs -C _build-asan --suite unit --timeout-multiplier 5
+  except:
+    variables:
+      - $PKG_ONLY == "1"
+      - $SCREENSHOTS_ONLY == "1"
+  allow_failure: true
+
+screenshot:native-debian-trixie:
+  stage: test+docs
+  image: ${SCREENSHOT_IMAGE}
+  needs:
+    - build:native-debian-trixie
+  <<: *test_before_script
+  <<: *trixie_vars
+  script:
+    - export LC_ALL=C.UTF-8
+    - export G_MESSAGES_DEBUG=all
+    # Make sure tests can find the plugins and po files
+    - "meson install -C _build"
+    - ${XVFB_RUN} meson test -C _build --print-errorlogs --suite screenshots
+    - tools/montage-screenshots _build/
+    - mv _build/tests/screenshots/* screenshots/
+  after_script:
+    - gcovr --json --output=screenshots/coverage-${CI_JOB_NAME}.json
+  artifacts:
+    when: always
+    expose_as: 'Screenshots'
+    paths:
+      - screenshots/
+      - _build/meson-logs/testlog.txt
+  except:
+    variables:
+      - $PKG_ONLY == "1"
+
+build-doc:
+  stage: test+docs
+  image: ${DEBIAN_IMAGE}
+  variables:
+    BUILD_OPTS: -Dtools=false -Dtests=false -Dgtk_doc=true
+  <<: *build_before_script
+  needs: []
+  script:
+    - git clean -dfx
+    - 'echo "Build opts: ${BUILD_OPTS}"'
+    - meson setup ${BUILD_OPTS} _build
+    - tools/check-doc _build
+    - mv _build/docs/phosh-0/ _reference/
+  artifacts:
+    paths:
+      - _reference
+  except:
+    variables:
+      - $PKG_ONLY == "1"
+      - $SCREENSHOTS_ONLY == "1"
+
+check-po:
+  stage: test+docs
+  extends: .phosh-check-po
+  except:
+    variables:
+      - $PKG_ONLY == "1"
+      - $SCREENSHOTS_ONLY == "1"
+
+check-license-headers:
+  stage: test+docs
+  image: ${DEBIAN_IMAGE}
+  <<: *trixie_vars
+  needs: []
+  script:
+    # Checks .c and .h files begin with a license header as
+    # defined in HACKING.md
+    - ./tools/check-license-headers.py
+  except:
+    variables:
+      - $PKG_ONLY == "1"
+      - $SCREENSHOTS_ONLY == "1"
+
+build:native-alpinelinux-edge:
+  stage: build
+  image: alpine:edge
+  allow_failure: true
+  before_script:
+    - echo "https://alpine.global.ssl.fastly.net/alpine/edge/testing" >> /etc/apk/repositories
+    - apk add $ALPINE_EDGE_DEPS
+  artifacts:
+    paths:
+      - _build
+  script:
+    - git submodule update --recursive
+    - meson setup --werror -Dphoc_tests=disabled  _build
+    - meson compile -C _build
+  except:
+    variables:
+      - $PKG_ONLY == "1"
+      - $SCREENSHOTS_ONLY == "1"
+
+unit-test:native-alpinelinux-edge:
+  stage: test+docs
+  image: alpine:edge
+  allow_failure: true
+  needs:
+    - build:native-alpinelinux-edge
+  before_script:
+    - echo "https://alpine.global.ssl.fastly.net/alpine/edge/testing" >> /etc/apk/repositories
+    - apk add xvfb-run $ALPINE_EDGE_DEPS
+  script:
+    - export LC_ALL=C.UTF-8
+    - ${XVFB_RUN} meson test -C _build --suite unit
+  artifacts:
+    when: always
+    paths:
+      - _build
+  when: manual
+  except:
+    variables:
+      - $PKG_ONLY == "1"
+      - $SCREENSHOTS_ONLY == "1"
+
+format-check:
+  stage: style-checks
+  image: ${DEBIAN_IMAGE}
+  needs: []
+  script:
+    - |
+      if [ -n "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" ]; then
+        git remote add target $CI_MERGE_REQUEST_PROJECT_URL.git
+        echo "Fetching MR target branch $CI_MERGE_REQUEST_TARGET_BRANCH_NAME from $CI_MERGE_REQUEST_PROJECT_URL"
+        git fetch target "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+        git fetch --deepen=100 origin HEAD
+        merge_base=$(git merge-base "target/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" HEAD)
+        if [ -z "$merge_base" ]; then
+          echo "Could't determine merge base"
+          exit 1
+        fi
+        echo "Merge base: $merge_base"
+        ./.gitlab-ci/check-style.py --dry-run --sha $merge_base
+      else
+        echo "Not a merge request"
+      fi
+  allow_failure: true
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME'
+
+coverage:
+  image: ${DEBIAN_IMAGE}
+  stage: analyze
+  script:
+    - mkdir coverage-report
+    - gcovr --add-tracefile 'coverage-*.json'
+        --add-tracefile 'screenshots/coverage-*.json'
+        --html-details --print-summary --output coverage-report/index.html
+    - gcovr --add-tracefile 'coverage-*.json'
+        --add-tracefile 'screenshots/coverage-*.json'
+        --xml --output coverage-report/coverage.xml
+  artifacts:
+    expose_as: 'Coverage Report'
+    paths:
+      - coverage-report
+      - coverage-report/index.html
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage-report/coverage.xml
+  coverage: '/^lines: (\d+\.\d+\%)/'
+  needs:
+    - unit-test:native-debian-trixie
+    - screenshot:native-debian-trixie
+  except:
+    variables:
+      - $PKG_ONLY == "1"
+      - $SCREENSHOTS_ONLY == "1"
+
+package:deb-debian-trixie:arm64:
+  stage: package
+  variables:
+    PHOSH_DOCKER_IMAGE: debian:trixie
+    DEB_BUILD_PROFILES: "nodoc nocheck"
+    DEB_BUILD_OPTIONS: nocheck
+  extends: .phosh-build-debian-package
+  tags:
+    - aarch64
+  except:
+    variables:
+      - $SCREENSHOTS_ONLY == "1"
+
+pages:
+  stage: deploy
+  needs:
+    - build-doc
+  script:
+    - mv _reference/ public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
+  except:
+    variables:
+      - $PKG_ONLY == "1"
+      - $SCREENSHOTS_ONLY == "1"
+
+rust-bindings:
+  stage: triggers
+  variables:
+    UPSTREAM_BRANCH: $CI_COMMIT_REF_NAME
+  needs: []
+  trigger:
+    project: guidog/libphosh-rs
+    branch: $RUST_BINDINGS_BRANCH
+  rules:
+    - if: $CI_COMMIT_BRANCH == $RUST_BINDINGS_BRANCH
+      changes:
+        - src/**/*

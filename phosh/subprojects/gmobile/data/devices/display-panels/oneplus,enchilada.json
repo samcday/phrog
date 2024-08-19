@@ -1,0 +1,15 @@
+{
+  "name": "Oneplus 6",
+  "x-res": 1080,
+  "y-res": 2280,
+  "comment": "Device owner, please provide a value:",
+  "border-radius": 30,
+  "width": 68,
+  "height": 145,
+  "cutouts" : [
+    {
+      "name": "notch",
+      "path": "M 357 0  A 24 24 0 0 1 381 22  A 64 64 0 0 0 445 80  L 635 80  A 64 64 0 0 0 699 22  A 24 24 0 0 1 723 0  Z"
+    }
+  ]
+}

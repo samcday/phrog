@@ -1,0 +1,240 @@
+<protocol name="phosh">
+  <interface name="phosh_private" version="7">
+    <description summary="Phone shell extensions">
+      Private protocol between phosh and the compositor.
+    </description>
+
+    <enum name="error">
+      <entry name="invalid_argument" value="0"
+             summary="an invalid argument was provided in a request"/>
+    </enum>
+
+    <request name="rotate_display" since="1">
+      <description summary="rotate output">
+        This request is unused, ignore. Use wlr-output-management instead.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="degree" type="uint"/>
+    </request>
+
+    <request name="get_xdg_switcher" since="2">
+      <description summary="rotate output">
+        This request is unused, ignore. Use wlr-foreign-toplevel-management instead.
+      </description>
+      <arg name="id" type="new_id" interface="phosh_private_xdg_switcher"/>
+    </request>
+
+    <request name="get_thumbnail" since="4">
+      <description summary="request a window thumbnail for a given toplevel">
+        Allows to retrieve a window thumbnail image for a given foreign
+        toplevel via wlr_screencopy protocol.
+
+        The thumbnail will be scaled down to the size provided by
+        max_width and max_height arguments, preserving original aspect
+        ratio. Pass 0 to leave it unconstrained.
+      </description>
+      <arg name="id" type="new_id" interface="zwlr_screencopy_frame_v1"/>
+      <arg name="toplevel" type="object" interface="zwlr_foreign_toplevel_handle_v1"/>
+      <arg name="max_width" type="uint" />
+      <arg name="max_height" type="uint" />
+    </request>
+
+    <request name="get_keyboard_event" since="5">
+      <description summary="request a keyboard event handler">
+        Allows to subscribe to specific keyboard events.
+
+        The client grabs an accelerator by a string and gets an action id returned.
+        When the accelerator is used the client will be informed via the corresponding
+        action id.
+      </description>
+      <arg name="id" type="new_id" interface="phosh_private_keyboard_event"/>
+    </request>
+
+    <request name="get_startup_tracker" since="6">
+      <description summary="Request an application startup tracker">
+        Allows to track application startup.
+      </description>
+      <arg name="id" type="new_id" interface="phosh_private_startup_tracker"/>
+    </request>
+
+    <enum name="shell_state" since="6">
+      <entry name="unknown" value="0" summary="shell state unknown"/>
+      <entry name="up" value="1" summary="shell is up and running"/>
+    </enum>
+
+    <request name="set_shell_state" since="6">
+      <description summary="Report shell state">
+        This allows the shell to report it's current state. This can
+        e.g. be used to notify the compositor that the shell is up.
+      </description>
+      <arg name="state" type="uint" enum="shell_state" summary="Status"/>
+    </request>
+
+  </interface>
+
+  <interface name="phosh_private_keyboard_event" version="7">
+    <description summary="Interface for additional keyboard events">
+      The interface is meant to allow subscription and forwarding of keyboard events.
+    </description>
+    <enum name="error">
+      <entry name="invalid_argument" value="0"
+             summary="an invalid argument was provided in a request"/>
+      <entry name="invalid_keysym" value="1"
+             summary="keysym not subscribeable"/>
+      <entry name="already_subscribed" value="2"
+             summary="accelerator has already been subscribed to"/>
+      <entry name="misc_error" value="3"
+             summary="an miscellaneous error has occured"/>
+    </enum>
+    <event name="accelerator_activated_event" since="5">
+      <description summary="Report an accelerator press">
+        The subscribed accelerator has been pressed.
+      </description>
+      <arg name="action_id" type="uint" summary="The previously assigned action_id"/>
+      <arg name="timestamp" type="uint" summary="The timestamp when the key has been pressed"/>
+    </event>
+
+    <event name="grab_failed_event" since="5">
+      <description summary="Report subscription failure">
+        A previous accelerator grab request has failed.
+      </description>
+      <arg name="accelerator" type="string" summary="The failed accelerator"/>
+      <arg name="error" type="uint" summary="The error code"/>
+    </event>
+
+    <event name="grab_success_event" since="5">
+      <description summary="Report subscription success">
+        A previous accelerator grab request has succeeded.
+      </description>
+      <arg name="accelerator" type="string" summary="The subscribed accelerator"/>
+      <arg name="action_id" type="uint" summary="The id that has been assigned to the accelerator"/>
+    </event>
+
+    <request name="grab_accelerator_request" since="5">
+      <description summary="Subscribe to an accelerator">
+        Client subscribes to a specific accelerator.
+      </description>
+      <arg name="accelerator" type="string" summary="The accelerator string (with modifiers)"/>
+    </request>
+
+    <event name="ungrab_failed_event" since="5">
+      <description summary="Report unsubscription failure">
+        A previous accelerator ungrab request has failed.
+      </description>
+      <arg name="action_id" type="uint" summary="The failed action"/>
+      <arg name="error" type="uint" summary="The error code"/>
+    </event>
+
+    <event name="ungrab_success_event" since="5">
+      <description summary="Report unsubscription success">
+        A previous accelerator ungrab request has suceeded.
+      </description>
+      <arg name="action" type="uint" summary="The unsubscribed action"/>
+    </event>
+
+    <request name="ungrab_accelerator_request" since="5">
+      <description summary="Unsubscribe to an accelerator">
+        Client unsubscribes a specific accelerator"
+      </description>
+      <arg name="action_id" type="uint" summary="The action to unsubscribe"/>
+    </request>
+
+    <request name="destroy" type="destructor" since="5">
+      <description summary="destroy the keyboard_event interface instance"/>
+    </request>
+
+    <!-- Version 7 additions -->
+    <event name="accelerator_released_event" since="7">
+      <description summary="Report an accelerator release">
+        The subscribed accelerator has been released.
+      </description>
+      <arg name="action_id" type="uint" summary="The previously assigned action_id"/>
+      <arg name="timestamp" type="uint" summary="The timestamp when the key has been released"/>
+    </event>
+  </interface>
+
+  <!-- application switch/close handling -->
+  <interface name="phosh_private_xdg_switcher" version="7">
+    <description summary="Interface to list and raise xdg surfaces">
+      This interface is unused, ignore. Use wlr-foreign-toplevel-management instead.
+    </description>
+    <enum name="error">
+      <entry name="invalid_argument" value="0"
+             summary="an invalid argument was provided in a request"/>
+    </enum>
+
+    <request name="list_xdg_surfaces" since="2">
+      <description summary="Get current xdg surfaces"/>
+
+    </request>
+
+    <request name="destroy"  type="destructor" since="2">
+      <description summary="destroy the xdg_switcher interface instance"/>
+    </request>
+
+    <request name="raise_xdg_surface" since="2">
+      <description summary="raise the given xdg surface to the top of the stack"/>
+      <arg name="app_id" type="string" summary="The app_id of the xdg surface"/>
+      <arg name="title" type="string" summary="The title of the xdg surface" allow-null="true"/>
+    </request>
+
+    <event name="xdg_surface" since="2">
+      <description summary="report an xdg surface"/>
+      <arg name="app_id" type="string" summary="the app_id of the xdg surface"/>
+      <arg name="title" type="string" summary="the title of the xdg surface" allow-null="true"/>
+    </event>
+
+    <event name="list_xdg_surfaces_done" since="2">
+      <description summary="all xdg surfaces were sent"/>
+    </event>
+
+    <request name="close_xdg_surface" since="3">
+      <description summary="close the given xdg surface"/>
+      <arg name="app_id" type="string" summary="The app_id of the xdg surface"/>
+      <arg name="title" type="string" summary="The title of the xdg surface" allow-null="true"/>
+    </request>
+  </interface>
+
+  <!-- application startup tracking -->
+  <interface name="phosh_private_startup_tracker" version="7">
+    <description summary="Interface to track application startup">
+      Allows shells to track application startup.
+    </description>
+
+    <enum name="flag" bitfield="true">
+      <entry name="none" value="0" summary="no flags"/>
+    </enum>
+
+    <enum name="protocol">
+      <entry name="unknown" value="0" summary="unknown protocol"/>
+      <entry name="x11" value="1" summary="x11 startup notification protocol"/>
+      <entry name="gtk_shell" value="2" summary="gtk_shell protocol"/>
+      <entry name="xdg_activation" value="3" summary="xdg_activation protocol"/>
+    </enum>
+
+    <event name="startup_id">
+      <description summary="Report a startup id">
+        This event indicates that the client sent it's startup id.
+        (which implies the app is running).
+      </description>
+      <arg name="startup_id" type="string" summary="The startup_id"/>
+      <arg name="protocol" type="uint" enum="protocol" summary="The protocol"/>
+      <arg name="flags" type="uint" enum="flags" summary="flags"/>
+    </event>
+
+    <event name="launched">
+      <description summary="Report an application launch">
+        This event indicates that the launcher spawned the app.
+      </description>
+      <arg name="startup_id" type="string" summary="The startup_id"/>
+      <arg name="protocol" type="uint" enum="protocol" summary="The protocol"/>
+      <arg name="flags" type="uint" enum="flags" summary="flags"/>
+    </event>
+
+    <request name="destroy" type="destructor">
+      <description summary="destroy the startup_tracker interface instance">
+        The Client should invoke this when done using the interface.
+      </description>
+    </request>
+  </interface>
+</protocol>

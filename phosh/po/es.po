@@ -1,0 +1,758 @@
+# Spanish translation for Phosh.
+# Copyright (C) 2022 Phosh developers
+# This file is distributed under the same license as the phosh package.
+#
+# Roberto MF <zanata@virgulilla.com>, 2018. #zanata
+# Amos Batto <amosbatto@yahoo.com>, 2019. #zanata
+# Maximilian <maxi.madlung@gmx.de>, 2019. #zanata
+# Roberto MF <zanata@virgulilla.com>, 2019. #zanata
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2020.
+# carlosgonz <carlosgonz@protonmail.com>, 2022.
+# Pablo Barciela <scow@riseup.net>, 2022-2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: phosh\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/World/Phosh/phosh/issues\n"
+"POT-Creation-Date: 2023-06-20 08:29+0000\n"
+"PO-Revision-Date: 2023-06-20 10:51+0200\n"
+"Last-Translator: Pablo Barciela <scow@riseup.net>\n"
+"Language-Team: Spanish - Spain <gnome-es-list@gnome.org>\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Gtranslator 42.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#. Translators: this is the session name, no need to translate it
+#: data/phosh.session.desktop.in.in:4 data/wayland-sessions/phosh.desktop:3
+msgid "Phosh"
+msgstr "Phosh"
+
+#: data/sm.puri.Phosh.desktop.in.in:4 data/wayland-sessions/phosh.desktop:4
+msgid "Phone Shell"
+msgstr "Interfaz para Móviles"
+
+#: data/sm.puri.Phosh.desktop.in.in:5
+msgid "Window management and application launching for mobile"
+msgstr "Gestor de ventanas y lanzador de aplicaciones para móviles"
+
+#: data/wayland-sessions/phosh.desktop:5
+msgid "This session logs you into Phosh"
+msgstr "Esto inicia su sesión en Phosh"
+
+#: plugins/calendar/calendar.desktop.in.in:5
+msgid "Calendar"
+msgstr "Calendario"
+
+#: plugins/calendar/calendar.desktop.in.in:6
+msgid "A simple calendar widget"
+msgstr "Un sencillo widget de calendario"
+
+#: plugins/ticket-box/ticket-box.desktop.in.in:4
+#: plugins/ticket-box/ticket-box.ui:14
+msgid "Ticket Box"
+msgstr "Caja de tickets"
+
+#: plugins/ticket-box/ticket-box.desktop.in.in:5
+msgid "Show PDFs on the lock screen. <b>This plugin is experimental.</b>"
+msgstr ""
+"Muestra PDF en la pantalla de bloqueo. <b>Este complemento es experimental</"
+"b>"
+
+#: plugins/upcoming-events/upcoming-events.desktop.in.in:4
+msgid "Upcoming Events"
+msgstr "Próximos eventos"
+
+#: plugins/upcoming-events/upcoming-events.desktop.in.in:5
+msgid "Show upcoming calendar events"
+msgstr "Muestra los próximos eventos del calendario"
+
+#: src/app-grid-button.c:529
+msgid "Application"
+msgstr "Aplicación"
+
+#: src/app-grid.c:137
+msgid "Show All Apps"
+msgstr "Mostrar Todas las Aplicaciones"
+
+#: src/app-grid.c:140
+msgid "Show Only Mobile Friendly Apps"
+msgstr "Mostrar Sólo Aplicaciones Adaptadas"
+
+#: src/bt-info.c:92
+msgctxt "bluetooth:enabled"
+msgid "On"
+msgstr "Activado"
+
+#: src/bt-info.c:94
+msgid "Bluetooth"
+msgstr "Bluetooth"
+
+#: src/docked-info.c:81
+msgid "Docked"
+msgstr "Acoplado"
+
+#: src/docked-info.c:81 src/docked-info.c:199
+msgid "Undocked"
+msgstr "Desacoplado"
+
+#: src/emergency-menu.c:97 src/ui/app-auth-prompt.ui:71
+#: src/ui/end-session-dialog.ui:71
+msgid "Ok"
+msgstr "Aceptar"
+
+#: src/emergency-menu.c:100
+msgid "Unable to place emergency call"
+msgstr "No ha sido posible realizar la llamada de emergencia"
+
+#: src/emergency-menu.c:105
+msgid "Internal error"
+msgstr "Error interno"
+
+#: src/end-session-dialog.c:163
+msgid "Log Out"
+msgstr "Cerrar la sesión"
+
+#: src/end-session-dialog.c:166
+#, c-format
+msgid "%s will be logged out automatically in %d second."
+msgid_plural "%s will be logged out automatically in %d seconds."
+msgstr[0] "%s se deslogueará automáticamente en %d segundo."
+msgstr[1] "%s se deslogueará automáticamente en %d segundos."
+
+#: src/end-session-dialog.c:172
+msgid "Power Off"
+msgstr "Apagar"
+
+#: src/end-session-dialog.c:173
+#, c-format
+msgid "The system will power off automatically in %d second."
+msgid_plural "The system will power off automatically in %d seconds."
+msgstr[0] "El sistema se apagará automáticamente en %d segundo."
+msgstr[1] "El sistema se apagará automáticamente en %d segundos."
+
+#: src/end-session-dialog.c:179
+msgid "Restart"
+msgstr "Reiniciar"
+
+#: src/end-session-dialog.c:180
+#, c-format
+msgid "The system will restart automatically in %d second."
+msgid_plural "The system will restart automatically in %d seconds."
+msgstr[0] "El sistema se reiniciará automáticamente en %d segundo."
+msgstr[1] "El sistema se reiniciará automáticamente en %d segundos."
+
+#: src/end-session-dialog.c:270
+msgid "Unknown application"
+msgstr "Aplicación desconocida"
+
+#. Translators: quiet and silent are fbd profiles names:
+#. see https://source.puri.sm/Librem5/feedbackd#profiles
+#. for details
+#: src/feedbackinfo.c:97
+msgid "Quiet"
+msgstr "Vibración"
+
+#. Translators: quiet and silent are fbd profiles names:
+#. see https://source.puri.sm/Librem5/feedbackd#profiles
+#. for details
+#: src/feedbackinfo.c:104
+msgid "Silent"
+msgstr "Silenciado"
+
+#. Translators: Enable LED, haptic and audio feedback
+#: src/feedbackinfo.c:108
+msgctxt "feedback:enabled"
+msgid "On"
+msgstr "Activado"
+
+#: src/location-manager.c:268
+#, c-format
+msgid "Allow '%s' to access your location information?"
+msgstr "¿Permitir que '%s' acceda a la información de ubicación?"
+
+#: src/location-manager.c:273
+msgid "Geolocation"
+msgstr "Geolocalización"
+
+#: src/location-manager.c:274
+msgid "Yes"
+msgstr "Sí"
+
+#: src/location-manager.c:274
+msgid "No"
+msgstr "No"
+
+#: src/lockscreen.c:170 src/ui/lockscreen.ui:221
+msgid "Enter Passcode"
+msgstr "Introduce el código de desbloqueo"
+
+#: src/lockscreen.c:393
+msgid "Checking…"
+msgstr "Verificando…"
+
+#: src/screenshot-manager.c:212
+msgid "Screenshot"
+msgstr "Captura de pantalla"
+
+#: src/screenshot-manager.c:213
+msgid "Screenshot copied to clipboard"
+msgstr "Captura de pantalla copiada al portapapeles"
+
+#. Translators: Used when the title of a song is unknown
+#: src/media-player.c:322 src/ui/media-player.ui:182
+msgid "Unknown Title"
+msgstr "Título Desconocido"
+
+#. Translators: Used when the artist of a song is unknown
+#: src/media-player.c:330 src/ui/media-player.ui:165
+msgid "Unknown Artist"
+msgstr "Artista Desconocido"
+
+#: src/monitor-manager.c:119
+msgid "Built-in display"
+msgstr "Monitor incorporado"
+
+#: src/monitor-manager.c:137
+#, c-format
+msgctxt ""
+"This is a monitor vendor name, followed by a size in inches, like 'Dell 15\"'"
+msgid "%s %s"
+msgstr "%s %s"
+
+#: src/monitor-manager.c:144
+#, c-format
+msgctxt ""
+"This is a monitor vendor name followed by product/model name where size in "
+"inches could not be calculated, e.g. Dell U2414H"
+msgid "%s %s"
+msgstr "%s %s"
+
+#. Translators: An unknown monitor type
+#: src/monitor-manager.c:153
+msgid "Unknown"
+msgstr "Desconocido"
+
+#: src/network-auth-prompt.c:201
+#, c-format
+msgid "Authentication type of wifi network “%s” not supported"
+msgstr "No se admite el tipo de autenticación wifi de “%s”"
+
+#: src/network-auth-prompt.c:206
+#, c-format
+msgid "Enter password for the wifi network “%s”"
+msgstr "Introducir contraseña wifi de “%s”"
+
+#: src/notifications/mount-notification.c:121
+msgid "Open"
+msgstr "Abrir"
+
+#: src/notifications/notification.c:383 src/notifications/notification.c:654
+msgid "Notification"
+msgstr "Notificación"
+
+#. Translators: Timestamp seconds suffix
+#: src/notifications/timestamp-label.c:84
+msgctxt "timestamp-suffix-seconds"
+msgid "s"
+msgstr "s"
+
+#. Translators: Timestamp minute suffix
+#: src/notifications/timestamp-label.c:86
+msgctxt "timestamp-suffix-minute"
+msgid "m"
+msgstr "m"
+
+#. Translators: Timestamp minutes suffix
+#: src/notifications/timestamp-label.c:88
+msgctxt "timestamp-suffix-minutes"
+msgid "m"
+msgstr "ms"
+
+#. Translators: Timestamp hour suffix
+#: src/notifications/timestamp-label.c:90
+msgctxt "timestamp-suffix-hour"
+msgid "h"
+msgstr "h"
+
+#. Translators: Timestamp hours suffix
+#: src/notifications/timestamp-label.c:92
+msgctxt "timestamp-suffix-hours"
+msgid "h"
+msgstr "hs"
+
+#. Translators: Timestamp day suffix
+#: src/notifications/timestamp-label.c:94
+msgctxt "timestamp-suffix-day"
+msgid "d"
+msgstr "d"
+
+#. Translators: Timestamp days suffix
+#: src/notifications/timestamp-label.c:96
+msgctxt "timestamp-suffix-days"
+msgid "d"
+msgstr "ds"
+
+#. Translators: Timestamp month suffix
+#: src/notifications/timestamp-label.c:98
+msgctxt "timestamp-suffix-month"
+msgid "mo"
+msgstr "me"
+
+#. Translators: Timestamp months suffix
+#: src/notifications/timestamp-label.c:100
+msgctxt "timestamp-suffix-months"
+msgid "mos"
+msgstr "mes"
+
+#. Translators: Timestamp year suffix
+#: src/notifications/timestamp-label.c:102
+msgctxt "timestamp-suffix-year"
+msgid "y"
+msgstr "a"
+
+#. Translators: Timestamp years suffix
+#: src/notifications/timestamp-label.c:104
+msgctxt "timestamp-suffix-years"
+msgid "y"
+msgstr "as"
+
+#: src/notifications/timestamp-label.c:121
+msgid "now"
+msgstr "Ahora"
+
+#. Translators: time difference "Over 5 years"
+#: src/notifications/timestamp-label.c:189
+#, c-format
+msgid "Over %dy"
+msgstr "Sobre %da"
+
+#. Translators: time difference "almost 5 years"
+#: src/notifications/timestamp-label.c:193
+#, c-format
+msgid "Almost %dy"
+msgstr "Casi %da"
+
+#. Translators: a time difference like '<5m', if in doubt leave untranslated
+#: src/notifications/timestamp-label.c:200
+#, c-format
+msgid "%s%d%s"
+msgstr "%s%d%s"
+
+#: src/polkit-auth-agent.c:227
+msgid "Authentication dialog was dismissed by the user"
+msgstr "El usuario descartó el cuadro de diálogo de autenticación"
+
+#: src/polkit-auth-prompt.c:278 src/ui/gtk-mount-prompt.ui:20
+#: src/ui/network-auth-prompt.ui:82 src/ui/polkit-auth-prompt.ui:56
+#: src/ui/system-prompt.ui:32
+msgid "Password:"
+msgstr "Contraseña:"
+
+#: src/polkit-auth-prompt.c:325
+msgid "Sorry, that didn’t work. Please try again."
+msgstr "Lo siento, eso no funcionó. Inténtelo de nuevo."
+
+#: src/rotateinfo.c:102
+msgid "Portrait"
+msgstr "Vertical"
+
+#: src/rotateinfo.c:105
+msgid "Landscape"
+msgstr "Horizontal"
+
+#: src/rotateinfo.c:125 src/rotateinfo.c:230
+msgctxt "automatic-screen-rotation-disabled"
+msgid "Off"
+msgstr "Desactivada"
+
+#: src/rotateinfo.c:126
+msgctxt "automatic-screen-rotation-enabled"
+msgid "On"
+msgstr "Activada"
+
+#: src/run-command-dialog.c:129
+msgid "Press ESC to close"
+msgstr "Pulse ESC para cerrar"
+
+#: src/run-command-manager.c:89
+#, c-format
+msgid "Running '%s' failed"
+msgstr "El comando '%s' falló"
+
+#: src/system-prompt.c:365
+msgid "Passwords do not match."
+msgstr "Las contraseñas no coinciden."
+
+#: src/system-prompt.c:372
+msgid "Password cannot be blank"
+msgstr "La contraseña no puede estar vacía"
+
+#: src/torch-info.c:80
+msgid "Torch"
+msgstr "Linterna"
+
+#: src/ui/app-auth-prompt.ui:49
+msgid "Remember decision"
+msgstr "Recordar decisión"
+
+#: src/ui/app-auth-prompt.ui:62 src/ui/end-session-dialog.ui:62
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:29
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:289
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: src/ui/app-grid-button.ui:55
+msgid "App"
+msgstr "App"
+
+#: src/ui/app-grid-button.ui:79
+msgid "Remove from _Favorites"
+msgstr "Quitar de _Favoritos"
+
+#: src/ui/app-grid-button.ui:84
+msgid "Add to _Favorites"
+msgstr "Agregar a _Favoritos"
+
+#: src/ui/app-grid-button.ui:89
+msgid "View _Details"
+msgstr "Ver _detalles"
+
+#: src/ui/app-grid.ui:21
+msgid "Search apps…"
+msgstr "Buscar apps…"
+
+#: src/ui/emergency-menu.ui:26
+msgid "Close the emergency call dialog"
+msgstr "Cerrar el diálogo de las llamadas de emergencia"
+
+#: src/ui/emergency-menu.ui:52
+msgid "Emergency _Contacts"
+msgstr "Contactos de emergencia"
+
+#: src/ui/emergency-menu.ui:59
+msgid "Go to the emergency contacts page"
+msgstr "Ir a la página de contactos de emergencia"
+
+#: src/ui/emergency-menu.ui:83
+msgid "Go back to the emergency dialpad page"
+msgstr "Volver a página de tecleo de número de emergencia"
+
+#: src/ui/emergency-menu.ui:106
+msgid "Owner unknown"
+msgstr "Propietario desconocido"
+
+#: src/ui/emergency-menu.ui:124 plugins/emergency-info/emergency-info.ui:195
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:230
+msgid "Emergency Contacts"
+msgstr "Contactos de emergencia"
+
+#: src/ui/emergency-menu.ui:142
+msgid "No emergency contacts available."
+msgstr "Ningún contacto de emergencia disponible"
+
+#: src/ui/end-session-dialog.ui:31
+msgid "Some applications are busy or have unsaved work"
+msgstr "Algunas aplicaciones están ocupadas o tienen trabajo sin guardar"
+
+#: src/ui/gtk-mount-prompt.ui:94
+msgid "User:"
+msgstr "Usuario:"
+
+#: src/ui/gtk-mount-prompt.ui:117
+msgid "Domain:"
+msgstr "Dominio:"
+
+#: src/ui/gtk-mount-prompt.ui:150
+msgid "Co_nnect"
+msgstr "Co_nectar"
+
+#: src/ui/lockscreen.ui:39 src/ui/lockscreen.ui:310
+msgid "Back"
+msgstr "Atrás"
+
+#: src/ui/lockscreen.ui:90
+msgid "Slide up to unlock"
+msgstr "Deslice hacia arriba para desbloquear"
+
+#: src/ui/lockscreen.ui:273
+msgid "Unlock"
+msgstr "Desbloquear"
+
+#: src/ui/network-auth-prompt.ui:5 src/ui/polkit-auth-prompt.ui:6
+msgid "Authentication required"
+msgstr "Autenticación requerida"
+
+#: src/ui/network-auth-prompt.ui:40
+#: plugins/ticket-box/prefs/ticket-box-prefs.c:90
+msgid "_Cancel"
+msgstr "_Cancelar"
+
+#: src/ui/network-auth-prompt.ui:58
+msgid "C_onnect"
+msgstr "C_onectar"
+
+#: src/ui/polkit-auth-prompt.ui:122
+msgid "Authenticate"
+msgstr "Autenticar"
+
+#: src/ui/power-menu.ui:69
+msgid "_Power Off"
+msgstr "_Apagar"
+
+#: src/ui/power-menu.ui:110
+msgid "_Lock"
+msgstr "B_loquear"
+
+#: src/ui/power-menu.ui:151
+msgid "_Screenshot"
+msgstr "_Capturar"
+
+#: src/ui/power-menu.ui:192
+msgid "_Emergency"
+msgstr "_Emergencia"
+
+#: src/ui/run-command-dialog.ui:6
+msgid "Run Command"
+msgstr "Ejecutar comando"
+
+#: src/ui/settings.ui:290
+msgid "No notifications"
+msgstr "Ninguna notificación"
+
+#: src/ui/settings.ui:330
+msgid "Clear all"
+msgstr "Eliminar todos"
+
+#: src/ui/system-prompt.ui:62
+msgid "Confirm:"
+msgstr "Confirmar:"
+
+#: src/ui/top-panel.ui:32
+msgid "_Power Off…"
+msgstr "_Apagar"
+
+#: src/ui/top-panel.ui:60
+msgid "_Restart…"
+msgstr "_Reiniciar"
+
+#: src/ui/top-panel.ui:88
+msgid "_Suspend…"
+msgstr ""
+
+#: src/ui/top-panel.ui:116
+msgid "_Log Out…"
+msgstr "_Cerrar la sesión"
+
+#. Translators: This is a time format for a date in
+#. long format
+#: src/util.c:339
+msgid "%A, %B %-e"
+msgstr "%A, %d de %B"
+
+#: src/vpn-info.c:89
+msgid "VPN"
+msgstr "VPN"
+
+#: src/widget-box.c:54
+msgid "Plugin not found"
+msgstr "Complemento no encontrado"
+
+#: src/widget-box.c:57
+#, c-format
+msgid "The plugin '%s' could not be loaded."
+msgstr "No se pudo cargar el complemento '%s'"
+
+#: src/wifiinfo.c:90
+msgid "Wi-Fi"
+msgstr "Wi-Fi"
+
+#. Translators: Refers to the cellular wireless network
+#: src/wwan-info.c:210
+msgid "Cellular"
+msgstr "Módem"
+
+#: plugins/emergency-info/emergency-info.ui:39
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:70
+msgid "Personal Information"
+msgstr "Información personal"
+
+#: plugins/emergency-info/emergency-info.ui:47
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:88
+msgid "Date of Birth"
+msgstr "Fecha de nacimiento"
+
+#: plugins/emergency-info/emergency-info.ui:65
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:100
+msgid "Preferred Language"
+msgstr "Idioma de preferencia"
+
+#: plugins/emergency-info/emergency-info.ui:83
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:112
+msgid "Home Address"
+msgstr "Dirección"
+
+#: plugins/emergency-info/emergency-info.ui:91
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:129
+msgid "Medical Information"
+msgstr "Información médica"
+
+#: plugins/emergency-info/emergency-info.ui:99
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:135
+msgid "Age"
+msgstr "Edad"
+
+#: plugins/emergency-info/emergency-info.ui:117
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:147
+msgid "Blood Type"
+msgstr "Tipo sanguíneo"
+
+#: plugins/emergency-info/emergency-info.ui:135
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:159
+msgid "Height"
+msgstr "Altura"
+
+#: plugins/emergency-info/emergency-info.ui:153
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:171
+msgid "Weight"
+msgstr "Peso"
+
+#: plugins/emergency-info/emergency-info.ui:171
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:183
+msgid "Allergies"
+msgstr "Alergias"
+
+#: plugins/emergency-info/emergency-info.ui:179
+msgid "Medications & Conditions"
+msgstr "Condición médica y tratamientos"
+
+#: plugins/emergency-info/emergency-info.ui:187
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:213
+msgid "Other Information"
+msgstr "Otra información"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:6
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:19
+msgid "Emergency Info Preferences"
+msgstr "Ajustes de información de emergencia"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:40
+msgid "Done"
+msgstr "Hecho"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:76
+msgid "Owner Name"
+msgstr "Nombre del propietario"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:198
+msgid "Medications and Conditions"
+msgstr "Condición médica y tratamientos"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:239
+msgid "Add Contact"
+msgstr "Añadir contacto"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:284
+msgid "Add New Contact"
+msgstr "Añadir nuevo contacto"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:294
+msgid "Add"
+msgstr "Añadir"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:315
+msgid "New Contact Name"
+msgstr "Nombre del nuevo contacto"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:329
+msgid "Relationship"
+msgstr "Relación"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:342
+msgid "Number"
+msgstr "Número"
+
+#: plugins/ticket-box/ticket-box.ui:15
+msgid "No documents to display"
+msgstr "No hay documentos que mostrar"
+
+#: plugins/ticket-box/ticket-box.ui:83
+msgid "Tickets"
+msgstr "Tickets"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.c:86
+msgid "Choose Folder"
+msgstr "Seleccione carpeta"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.c:89
+msgid "_Open"
+msgstr "_Abrir"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:6
+msgid "Ticket Box Preferences"
+msgstr "Preferencias de la caja de tickets"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:13
+msgid "Paths"
+msgstr "Rutas"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:18
+msgid "Folder Settings"
+msgstr "Ajustes de carpeta"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:19
+msgid "Where Phosh looks for your tickets"
+msgstr "Dónde debe Phosh buscar sus tickets"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:22
+msgid "Ticket Folder"
+msgstr "Carpeta de tickets"
+
+#: plugins/upcoming-events/event-list.c:142
+msgid "Today"
+msgstr "Hoy"
+
+#: plugins/upcoming-events/event-list.c:144
+msgid "Tomorrow"
+msgstr "Mañana"
+
+#: plugins/upcoming-events/event-list.c:150
+#, c-format
+msgid "In %d day"
+msgid_plural "In %d days"
+msgstr[0] "En %d día"
+msgstr[1] "En %d días"
+
+#: plugins/upcoming-events/event-list.ui:26
+msgid "No events"
+msgstr "Sin eventos"
+
+#. Translators: This is the time format used in 24-hour mode.
+#: plugins/upcoming-events/upcoming-event.c:56
+msgid "%R"
+msgstr "%R"
+
+#. Translators: This is the time format used in 12-hour mode.
+#: plugins/upcoming-events/upcoming-event.c:59
+msgid "%l:%M %p"
+msgstr "%l:%M %p"
+
+#. Translators: An all day event
+#: plugins/upcoming-events/upcoming-event.c:122
+#: plugins/upcoming-events/upcoming-event.c:159
+msgid "All day"
+msgstr "Todo el día"
+
+#. Translators: When the event ends: Ends\r16:00
+#: plugins/upcoming-events/upcoming-event.c:148
+msgid "Ends"
+msgstr "Finaliza"
+
+#: plugins/upcoming-events/upcoming-event.c:398
+msgid "Untitled event"
+msgstr "Evento sin título"
+
+#~ msgid "Emergency"
+#~ msgstr "Emergencia"

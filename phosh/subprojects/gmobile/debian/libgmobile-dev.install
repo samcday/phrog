@@ -1,0 +1,6 @@
+usr/include/gmobile/
+usr/lib/*/libgmobile.a
+usr/lib/*/libgmobile.so
+usr/lib/*/pkgconfig/gmobile.pc
+usr/share/gir-1.0/Gm-0.gir
+

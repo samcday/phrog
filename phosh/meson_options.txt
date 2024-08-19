@@ -1,0 +1,53 @@
+option('tests',
+       type: 'boolean', value: true,
+       description: 'Whether to compile unit tests')
+
+option('phoc_tests',
+       type: 'feature', value: 'auto',
+       description: 'Whether to enable tests that need phoc')
+
+option('gtk_doc',
+       type: 'boolean', value: false,
+       description: 'Whether to generate the API reference for Phosh')
+
+option('man',
+       type: 'boolean', value : false,
+       description : 'generate man pages (requires rst2man)')
+
+option('systemd',
+       type: 'boolean', value: true,
+       description: 'Whether to generate systemd user units')
+
+option('compositor',
+       type: 'string', value: '/usr/bin/phoc',
+       description: 'Path to the Phoc compositor for use in the launcher script')
+
+option('callui-i18n',
+       type: 'boolean', value: false,
+       description: 'Whether to install libcallui\s i18n fles')
+
+option('animation-slowdown',
+       type: 'integer', value: 1,
+       description: 'Slowdown for phosh specific animations')
+
+# Tools helping with e.g. notification server development
+option('tools',
+       type: 'boolean', value: false,
+       description: 'Whether to build the tools')
+
+option('lockscreen-plugins',
+       type: 'boolean', value: true,
+       description: 'Whether to build the lockscreen plugins')
+
+option('quick-setting-plugins',
+       type: 'boolean', value: true,
+       description: 'Whether to build the quick setting plugins')
+
+option('introspection',
+       type: 'boolean', value: false,
+       description: 'Build gobject-introspection support')
+
+# Install files needed to generate some bindings (e.g. Rust).
+option('bindings-lib',
+       type: 'boolean', value: false,
+       description: 'Whether to install the headers and shared library to generate bindings.')

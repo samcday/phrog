@@ -1,0 +1,16 @@
+option('tests',
+       type: 'boolean', value: true,
+       description: 'Whether to compile unit tests')
+
+option('examples',
+       type: 'boolean', value: 'true',
+       description: 'Whether to build the examples')
+
+option('gtk_doc',
+       type: 'boolean', value: false,
+       description: 'Whether to generate the API reference')
+
+option('install-i18n',
+       type: 'boolean', value: true,
+       description: 'Whether to install translations')
+

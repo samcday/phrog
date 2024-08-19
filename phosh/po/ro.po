@@ -1,0 +1,879 @@
+# Romanian translation for phosh.
+# Copyright (C) 2020 phosh's COPYRIGHT HOLDER
+# This file is distributed under the same license as the phosh package.
+# Antonio Marin (libre) <gnmer.6qxyg@slmail.me>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: phosh master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/World/Phosh/phosh/issues\n"
+"POT-Creation-Date: 2024-05-04 15:17+0000\n"
+"PO-Revision-Date: 2024-05-04 18:53+0200\n"
+"Last-Translator: Antonio Marin <gnmer.6qxyg@slmail.me>\n"
+"Language-Team: Romanian <gnomero-list@lists.sourceforge.net>\n"
+"Language: ro\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n==0 || (n!=1 && n%100>=1 && "
+"n%100<=19) ? 1 : 2);\n"
+"X-Generator: Poedit 3.4.2\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#. Translators: this is the session name, no need to translate it
+#: data/phosh.session.desktop.in.in:4 data/wayland-sessions/phosh.desktop:3
+msgid "Phosh"
+msgstr "Phosh"
+
+#: data/sm.puri.Phosh.desktop.in.in:4 data/wayland-sessions/phosh.desktop:4
+msgid "Phone Shell"
+msgstr "Interfață pentru telefon"
+
+#: data/sm.puri.Phosh.desktop.in.in:5
+msgid "Window management and application launching for mobile"
+msgstr "Gestionarea ferestrei și pornirea aplicațiilor pentru mobil"
+
+#: data/wayland-sessions/phosh.desktop:5
+msgid "This session logs you into Phosh"
+msgstr "Această sesiune permite accesul la Phosh"
+
+#: plugins/caffeine-quick-setting/caffeine-quick-setting.desktop.in.in:5
+msgid "Caffeine Quick Setting"
+msgstr "Opțiuni pentru Cafeină"
+
+#: plugins/caffeine-quick-setting/caffeine-quick-setting.desktop.in.in:7
+msgid "Prevent the session from going idle"
+msgstr "Împiedică sesiunea să devină inactivă"
+
+#: plugins/calendar/calendar.desktop.in.in:5
+msgid "Calendar"
+msgstr "Calendar"
+
+#: plugins/calendar/calendar.desktop.in.in:7
+msgid "A simple calendar widget"
+msgstr "Un calendar în miniatură"
+
+#: plugins/emergency-info/emergency-info.desktop.in.in:5
+msgid "Emergency Info"
+msgstr "Info. de urgență"
+
+#: plugins/emergency-info/emergency-info.desktop.in.in:7
+msgid "Show emergency information and contacts"
+msgstr "Arată informațiile de urgență și contactele"
+
+#: plugins/launcher-box/launcher-box.desktop.in.in:4
+#: plugins/launcher-box/launcher-box.ui:14
+msgid "Launcher Box"
+msgstr "Cutie lansator"
+
+#: plugins/launcher-box/launcher-box.desktop.in.in:6
+msgid "Add launchers to the lock screen. <b>This plugin is experimental.</b>"
+msgstr ""
+"Adaugă lansatoare pe ecranul blocat. <b>Acest modul este experimental.</b>"
+
+#: plugins/night-light-quick-setting/night-light-quick-setting.desktop.in.in:5
+msgid "Night Light Quick Setting"
+msgstr "Opțiuni pentru Lumina de noapte"
+
+#: plugins/night-light-quick-setting/night-light-quick-setting.desktop.in.in:7
+msgid "Toggle night light on/off"
+msgstr "Lumina de noapte pornită/oprită"
+
+#: plugins/ticket-box/ticket-box.desktop.in.in:4
+#: plugins/ticket-box/ticket-box.ui:14
+msgid "Ticket Box"
+msgstr "Casa de bilete"
+
+#: plugins/ticket-box/ticket-box.desktop.in.in:6
+msgid "Show PDFs on the lock screen. <b>This plugin is experimental.</b>"
+msgstr ""
+"Arată fișiere PDF pe ecranul blocat. <b>Acest modul este experimental.</b>"
+
+#: plugins/upcoming-events/upcoming-events.desktop.in.in:4
+msgid "Upcoming Events"
+msgstr "Evenimente viitoare"
+
+#: plugins/upcoming-events/upcoming-events.desktop.in.in:6
+msgid "Show upcoming calendar events"
+msgstr "Arată evenimentele viitoare din calendar"
+
+#: src/app-grid-button.c:153
+msgid "Add to Folder"
+msgstr "Adaugă în dosar"
+
+#: src/app-grid-button.c:177
+msgid "Create new folder"
+msgstr "Creează un dosar nou"
+
+#: src/app-grid-button.c:692 src/app-grid-button.c:749
+msgid "Application"
+msgstr "Aplicație"
+
+#: src/app-grid.c:263
+msgid "Show All Apps"
+msgstr "Arată toate aplicațiile"
+
+#: src/app-grid.c:266
+msgid "Show Only Mobile Friendly Apps"
+msgstr "Arată numai aplicații pentru mobil"
+
+#: src/bt-info.c:92
+msgctxt "bluetooth:enabled"
+msgid "On"
+msgstr "Pornit"
+
+#: src/bt-info.c:94
+msgid "Bluetooth"
+msgstr "Bluetooth"
+
+#: src/call-notification.c:63
+msgid "Unknown caller"
+msgstr "Apelant necunoscut"
+
+#: src/docked-info.c:81
+msgid "Docked"
+msgstr "Cuplat"
+
+#: src/docked-info.c:81 src/docked-info.c:199
+msgid "Undocked"
+msgstr "Decuplat"
+
+#: src/emergency-menu.c:97 src/ui/app-auth-prompt.ui:71
+#: src/ui/end-session-dialog.ui:71
+msgid "Ok"
+msgstr "Bine"
+
+#: src/emergency-menu.c:100
+msgid "Unable to place emergency call"
+msgstr "Nu se poate efectua apelul de urgență"
+
+#: src/emergency-menu.c:105
+msgid "Internal error"
+msgstr "Eroare internă"
+
+#: src/end-session-dialog.c:174
+msgid "Log Out"
+msgstr "Deconectare"
+
+#: src/end-session-dialog.c:177
+#, c-format
+msgid "%s will be logged out automatically in %d second."
+msgid_plural "%s will be logged out automatically in %d seconds."
+msgstr[0] "%s se va deconecta automat în %d secundă."
+msgstr[1] "%s se va deconecta automat în %d secunde."
+msgstr[2] "%s se va deconecta automat în %d de secunde."
+
+#: src/end-session-dialog.c:183 src/ui/power-menu.ui:69
+msgid "Power Off"
+msgstr "Oprește"
+
+#: src/end-session-dialog.c:184
+#, c-format
+msgid "The system will power off automatically in %d second."
+msgid_plural "The system will power off automatically in %d seconds."
+msgstr[0] "Sistemul se va opri automat în %d secundă."
+msgstr[1] "Sistemul se va opri automat în %d secunde."
+msgstr[2] "Sistemul se va opri automat în %d de secunde."
+
+#: src/end-session-dialog.c:190
+msgid "Restart"
+msgstr "Repornește"
+
+#: src/end-session-dialog.c:191
+#, c-format
+msgid "The system will restart automatically in %d second."
+msgid_plural "The system will restart automatically in %d seconds."
+msgstr[0] "Sistemul va reporni automat în %d secundă."
+msgstr[1] "Sistemul va reporni automat în %d secunde."
+msgstr[2] "Sistemul va reporni automat în %d de secunde."
+
+#. Translators: quiet and silent are fbd profiles names:
+#. see https://source.puri.sm/Librem5/feedbackd#profiles
+#. for details
+#: src/feedbackinfo.c:97
+msgid "Quiet"
+msgstr "Liniștit"
+
+#. Translators: quiet and silent are fbd profiles names:
+#. see https://source.puri.sm/Librem5/feedbackd#profiles
+#. for details
+#: src/feedbackinfo.c:104
+msgid "Silent"
+msgstr "Silențios"
+
+#. Translators: Enable LED, haptic and audio feedback
+#: src/feedbackinfo.c:108
+msgctxt "feedback:enabled"
+msgid "On"
+msgstr "Pornit"
+
+#: src/location-manager.c:268
+#, c-format
+msgid "Allow '%s' to access your location information?"
+msgstr "„%s” poate accesa poziția ta geografică?"
+
+#: src/location-manager.c:273
+msgid "Geolocation"
+msgstr "Poziția geografică"
+
+#: src/location-manager.c:274
+msgid "Yes"
+msgstr "Da"
+
+#: src/location-manager.c:274
+msgid "No"
+msgstr "Nu"
+
+#: src/lockscreen.c:172 src/ui/lockscreen.ui:245
+msgid "Enter Passcode"
+msgstr "Introdu codul de acces"
+
+#: src/lockscreen.c:398
+msgid "Checking…"
+msgstr "Se verifică…"
+
+#: src/screenshot-manager.c:215 src/ui/power-menu.ui:147
+msgid "Screenshot"
+msgstr "Captură de ecran"
+
+#: src/screenshot-manager.c:216
+msgid "Screenshot copied to clipboard"
+msgstr "Captură de ecran copiată în memorie"
+
+#. Translators: Used when the title of a song is unknown
+#: src/media-player.c:324 src/ui/media-player.ui:161
+msgid "Unknown Title"
+msgstr "Titlu necunoscut"
+
+#. Translators: Used when the artist of a song is unknown
+#: src/media-player.c:332 src/ui/media-player.ui:148
+msgid "Unknown Artist"
+msgstr "Artist necunoscut"
+
+#: src/monitor-manager.c:127
+msgid "Built-in display"
+msgstr "Ecran integrat"
+
+#: src/monitor-manager.c:145
+#, c-format
+msgctxt ""
+"This is a monitor vendor name, followed by a size in inches, like 'Dell 15\"'"
+msgid "%s %s"
+msgstr "%s %s"
+
+#: src/monitor-manager.c:152
+#, c-format
+msgctxt ""
+"This is a monitor vendor name followed by product/model name where size in "
+"inches could not be calculated, e.g. Dell U2414H"
+msgid "%s %s"
+msgstr "%s %s"
+
+#. Translators: An unknown monitor type
+#: src/monitor-manager.c:161
+msgid "Unknown"
+msgstr "Necunoscut"
+
+#: src/network-auth-prompt.c:202
+#, c-format
+msgid "Authentication type of Wi-Fi network “%s” not supported"
+msgstr "Tipul de autentificare pentru rețeaua Wi-Fi „%s” nu este acceptat"
+
+#: src/network-auth-prompt.c:207
+#, c-format
+msgid "Enter password for the Wi-Fi network “%s”"
+msgstr "Introdu parola pentru rețeaua Wi-Fi „%s”"
+
+#: src/notifications/mount-notification.c:121
+msgid "Open"
+msgstr "Deschide"
+
+#: src/notifications/notification.c:405 src/notifications/notification.c:678
+msgid "Notification"
+msgstr "Notificare"
+
+#. Translators: Point in time, use a short word or abbreviation
+#. Please stick to a maximum of 7 chars
+#: src/notifications/timestamp-label.c:86
+msgid "now"
+msgstr "acum"
+
+#. Translators: abbreviated time difference "Less than 30 seconds"
+#. Please stick to a maximum of 7 chars
+#: src/notifications/timestamp-label.c:91
+#, c-format
+msgid "<30s"
+msgstr "<30s"
+
+#. Translators: abbreviated time difference "Less than one minute"
+#. Please stick to a maximum of 7 chars
+#: src/notifications/timestamp-label.c:96
+#, c-format
+msgid "<1m"
+msgstr "<1m"
+
+#. Translators: abbreviated time difference "About one minute"
+#. Please stick to a maximum of 7 chars
+#: src/notifications/timestamp-label.c:101
+#, c-format
+msgid "~1m"
+msgstr "~1m"
+
+#. Translators: abbreviated, exact time difference "1 minute ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:109
+#, c-format
+msgid "%dm"
+msgid_plural "%dm"
+msgstr[0] "%dm"
+msgstr[1] "%dm"
+msgstr[2] "%dm"
+
+#. Translators: abbreviated time difference "About 3 hours ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:117
+#, c-format
+msgid "~%dh"
+msgid_plural "~%dh"
+msgstr[0] "~%dh"
+msgstr[1] "~%dh"
+msgstr[2] "~%dh"
+
+#. Translators: abbreviated time difference "About 1 day ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:122
+#, c-format
+msgid "~1d"
+msgstr "~1 zi"
+
+#. Translators: abbreviated, exact time difference "3 days ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:127
+#, c-format
+msgid "%dd"
+msgid_plural "%dd"
+msgstr[0] "%d zi"
+msgstr[1] "%dzile"
+msgstr[2] "%dzile"
+
+#. Translators: abbreviated time difference "About 1 month ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:132
+#, c-format
+msgid "~1mo"
+msgstr "~1lună"
+
+#. Translators: abbreviated, exact time difference "3 months ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:137
+#, c-format
+msgid "%dmo"
+msgid_plural "%dmos"
+msgstr[0] "%dlună"
+msgstr[1] "%dluni"
+msgstr[2] "%dluni"
+
+#. Translators: abbreviated time difference "About 5 years ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:147
+#, c-format
+msgid "~%dy"
+msgid_plural "~%dy"
+msgstr[0] "~%d an"
+msgstr[1] "~%d ani"
+msgstr[2] "~%d ani"
+
+#. Translators: abbreviated time difference "Over 5 years ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:151
+#, c-format
+msgid "Over %dy"
+msgid_plural "Over %dy"
+msgstr[0] "Peste %d an"
+msgstr[1] "Peste %d ani"
+msgstr[2] "Peste %d ani"
+
+#. Translators: abbreviated time difference "almost 5 years ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:156
+#, c-format
+msgid "Almost %dy"
+msgid_plural "Almost %dy"
+msgstr[0] "Aproape %d an"
+msgstr[1] "Aproape %d ani"
+msgstr[2] "Aproape %d ani"
+
+#: src/polkit-auth-agent.c:227
+msgid "Authentication dialog was dismissed by the user"
+msgstr "Fereastra de autentificare a fost închisă de utilizator"
+
+#: src/polkit-auth-prompt.c:278 src/ui/gtk-mount-prompt.ui:20
+#: src/ui/network-auth-prompt.ui:82 src/ui/polkit-auth-prompt.ui:56
+#: src/ui/system-prompt.ui:32
+msgid "Password:"
+msgstr "Parola:"
+
+#: src/polkit-auth-prompt.c:325
+msgid "Sorry, that didn’t work. Please try again."
+msgstr "Nu a funcționat. Încearcă din nou."
+
+#: src/rotateinfo.c:102
+msgid "Portrait"
+msgstr "Portret"
+
+#: src/rotateinfo.c:105
+msgid "Landscape"
+msgstr "Peisaj"
+
+#: src/rotateinfo.c:125 src/rotateinfo.c:230
+msgctxt "automatic-screen-rotation-disabled"
+msgid "Off"
+msgstr "Oprit"
+
+#: src/rotateinfo.c:126
+msgctxt "automatic-screen-rotation-enabled"
+msgid "On"
+msgstr "Pornit"
+
+#: src/run-command-dialog.c:129
+msgid "Press ESC to close"
+msgstr "Apasă ESC pentru a închide"
+
+#: src/run-command-manager.c:89
+#, c-format
+msgid "Running '%s' failed"
+msgstr "Executarea „%s” a eșuat"
+
+#: src/settings/audio-settings.c:376
+msgid "Phone Shell Volume Control"
+msgstr "Controlul sunetului"
+
+#: src/system-prompt.c:365
+msgid "Passwords do not match."
+msgstr "Parolele nu se potrivesc."
+
+#: src/system-prompt.c:372
+msgid "Password cannot be blank"
+msgstr "Parola nu poate fi goală"
+
+#: src/torch-info.c:80
+msgid "Torch"
+msgstr "Lanternă"
+
+#: src/ui/app-auth-prompt.ui:49
+msgid "Remember decision"
+msgstr "Memorează decizia"
+
+#: src/ui/app-auth-prompt.ui:62 src/ui/end-session-dialog.ui:62
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:29
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:293
+msgid "Cancel"
+msgstr "Anulează"
+
+#: src/ui/app-grid-button.ui:23
+msgid "Remove from _Favorites"
+msgstr "Elimină din _Favorite"
+
+#: src/ui/app-grid-button.ui:28
+msgid "Add to _Favorites"
+msgstr "Adaugă în _Favorite"
+
+#: src/ui/app-grid-button.ui:33
+msgid "View _Details"
+msgstr "Arată _detalii"
+
+#: src/ui/app-grid-button.ui:41
+msgid "_Remove from Folder"
+msgstr "_Elimină din dosar"
+
+#: src/ui/app-grid.ui:24
+msgid "Search apps…"
+msgstr "Caută aplicații…"
+
+#: src/ui/audio-settings.ui:84
+msgid "Output Devices"
+msgstr "Dispozitive de ieșire"
+
+#: src/ui/audio-settings.ui:108
+msgid "Input Devices"
+msgstr "Dispozitive de intrare"
+
+#: src/ui/audio-settings.ui:136
+msgid "Sound Settings"
+msgstr "Opțiuni pentru sunet"
+
+#: src/ui/emergency-menu.ui:26
+msgid "Close the emergency call dialog"
+msgstr "Închide dialogul despre apelul de urgență"
+
+#: src/ui/emergency-menu.ui:52
+msgid "Emergency _Contacts"
+msgstr "_Contacte de urgență"
+
+#: src/ui/emergency-menu.ui:59
+msgid "Go to the emergency contacts page"
+msgstr "Du-te la pagina contactelor de urgență"
+
+#: src/ui/emergency-menu.ui:83
+msgid "Go back to the emergency dialpad page"
+msgstr "Înapoi la pagina de apelare de urgență"
+
+#: src/ui/emergency-menu.ui:106
+msgid "Owner unknown"
+msgstr "Proprietar necunoscut"
+
+#: src/ui/emergency-menu.ui:124 plugins/emergency-info/emergency-info.ui:195
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:234
+msgid "Emergency Contacts"
+msgstr "Contacte de urgență"
+
+#: src/ui/emergency-menu.ui:142
+msgid "No emergency contacts available."
+msgstr "Nu există contacte de urgență."
+
+#: src/ui/end-session-dialog.ui:31
+msgid "Some applications are busy or have unsaved work"
+msgstr "Unele aplicații sunt ocupate sau au lucrări nesalvate"
+
+#: src/ui/gtk-mount-prompt.ui:88
+msgid "User:"
+msgstr "Utilizator:"
+
+#: src/ui/gtk-mount-prompt.ui:111
+msgid "Domain:"
+msgstr "Domeniu:"
+
+#: src/ui/gtk-mount-prompt.ui:144
+msgid "Co_nnect"
+msgstr "Co_nectează"
+
+#: src/ui/lockscreen.ui:36 src/ui/lockscreen.ui:334
+msgid "Back"
+msgstr "Înapoi"
+
+#: src/ui/lockscreen.ui:97
+msgid "Slide up to unlock"
+msgstr "Trage în sus pentru a debloca"
+
+#: src/ui/lockscreen.ui:297
+msgid "Unlock"
+msgstr "Deblochează"
+
+#: src/ui/network-auth-prompt.ui:5 src/ui/polkit-auth-prompt.ui:6
+msgid "Authentication required"
+msgstr "Autentificare necesară"
+
+#: src/ui/network-auth-prompt.ui:40
+#: plugins/ticket-box/prefs/ticket-box-prefs.c:90
+msgid "_Cancel"
+msgstr "_Anulează"
+
+#: src/ui/network-auth-prompt.ui:58
+msgid "C_onnect"
+msgstr "C_onectează"
+
+#: src/ui/polkit-auth-prompt.ui:117
+msgid "Authenticate"
+msgstr "Autentificare"
+
+#: src/ui/power-menu.ui:108
+msgid "Lock"
+msgstr "Blochează"
+
+#: src/ui/power-menu.ui:186
+msgid "Emergency"
+msgstr "Urgență"
+
+#: src/ui/run-command-dialog.ui:6
+msgid "Run Command"
+msgstr "Execută comanda"
+
+#: src/ui/settings.ui:327
+msgid "No notifications"
+msgstr "Nicio notificare"
+
+#: src/ui/settings.ui:367
+msgid "Clear all"
+msgstr "Șterge tot"
+
+#: src/ui/system-prompt.ui:57
+msgid "Confirm:"
+msgstr "Confirmă:"
+
+#: src/ui/top-panel.ui:32
+msgid "_Power Off…"
+msgstr "O_prește…"
+
+#: src/ui/top-panel.ui:60
+msgid "_Restart…"
+msgstr "_Repornește…"
+
+#: src/ui/top-panel.ui:88
+msgid "_Suspend…"
+msgstr "_Suspendă…"
+
+#: src/ui/top-panel.ui:116
+msgid "_Log Out…"
+msgstr "_Deconectare…"
+
+#: src/ui/wifi-status-page.ui:32
+msgid "No Wi-Fi Device Found"
+msgstr "Niciun dispozitiv Wi-Fi"
+
+#: src/ui/wifi-status-page.ui:60
+msgid "Wi-Fi Disabled"
+msgstr "Wi-Fi dezactivat"
+
+#: src/ui/wifi-status-page.ui:97
+msgid "Wi-Fi Hotspot Active"
+msgstr "Punct de acces Wi-Fi activ"
+
+#: src/ui/wifi-status-page.ui:133
+msgid "No Wi-Fi Hotspots Found"
+msgstr "Niciun punct de acces Wi-Fi"
+
+#: src/ui/wifi-status-page.ui:144
+msgid "Scan"
+msgstr "Caută"
+
+#: src/ui/wifi-status-page.ui:176
+msgid "Wi-Fi Settings"
+msgstr "Opțiuni Wi-Fi"
+
+#: src/vpn-info.c:89
+msgid "VPN"
+msgstr "VPN"
+
+#. Translators: This is a time format for a date in
+#. long format
+#: src/wall-clock.c:222
+msgid "%A, %B %-e"
+msgstr "%A, %B %-e"
+
+#: src/widget-box.c:54
+msgid "Plugin not found"
+msgstr "Modulul n-a fost găsit"
+
+#: src/widget-box.c:57
+#, c-format
+msgid "The plugin '%s' could not be loaded."
+msgstr "Modulul „%s” nu a putut fi încărcat."
+
+#: src/wifi-info.c:90
+msgid "Wi-Fi"
+msgstr "Wi-Fi"
+
+#. Translators: Refers to the cellular wireless network
+#: src/wwan-info.c:210
+msgid "Cellular"
+msgstr "Celular"
+
+#. Translators: Phosh prevents the session from going idle because the caffeine quick setting is toggled
+#: plugins/caffeine-quick-setting/caffeine-quick-setting.c:52
+msgid "Phosh on caffeine"
+msgstr "Phosh cu Cafeină"
+
+#: plugins/caffeine-quick-setting/caffeine-quick-setting.c:131
+msgid "On"
+msgstr "Pornit"
+
+#: plugins/caffeine-quick-setting/caffeine-quick-setting.c:131
+msgid "Off"
+msgstr "Oprit"
+
+#: plugins/emergency-info/emergency-info.ui:39
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:70
+msgid "Personal Information"
+msgstr "Informații personale"
+
+#: plugins/emergency-info/emergency-info.ui:47
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:88
+msgid "Date of Birth"
+msgstr "Data nașterii"
+
+#: plugins/emergency-info/emergency-info.ui:65
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:100
+msgid "Preferred Language"
+msgstr "Limba preferată"
+
+#: plugins/emergency-info/emergency-info.ui:83
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:112
+msgid "Home Address"
+msgstr "Adresa"
+
+#: plugins/emergency-info/emergency-info.ui:91
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:130
+msgid "Medical Information"
+msgstr "Informații medicale"
+
+#: plugins/emergency-info/emergency-info.ui:99
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:136
+msgid "Age"
+msgstr "Vârsta"
+
+#: plugins/emergency-info/emergency-info.ui:117
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:148
+msgid "Blood Type"
+msgstr "Grupa sanguină"
+
+#: plugins/emergency-info/emergency-info.ui:135
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:160
+msgid "Height"
+msgstr "Înălțimea"
+
+#: plugins/emergency-info/emergency-info.ui:153
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:172
+msgid "Weight"
+msgstr "Greutatea"
+
+#: plugins/emergency-info/emergency-info.ui:171
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:184
+msgid "Allergies"
+msgstr "Alergii"
+
+#: plugins/emergency-info/emergency-info.ui:179
+msgid "Medications & Conditions"
+msgstr "Medicamente și Boli"
+
+#: plugins/emergency-info/emergency-info.ui:187
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:216
+msgid "Other Information"
+msgstr "Alte informații"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:6
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:19
+msgid "Emergency Info Preferences"
+msgstr "Preferințe pentru Urgență"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:40
+msgid "Done"
+msgstr "Gata"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:76
+msgid "Owner Name"
+msgstr "Numele proprietarului"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:200
+msgid "Medications and Conditions"
+msgstr "Medicamente și Boli"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:243
+msgid "Add Contact"
+msgstr "Adaugă un contact"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:288
+msgid "Add New Contact"
+msgstr "Adaugă un contact nou"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:298
+msgid "Add"
+msgstr "Adaugă"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:319
+msgid "New Contact Name"
+msgstr "Numele noului contact"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:333
+msgid "Relationship"
+msgstr "Relație"
+
+#: plugins/emergency-info/prefs/emergency-info-prefs.ui:346
+msgid "Number"
+msgstr "Număr"
+
+#: plugins/launcher-box/launcher-box.ui:15
+msgid "No launchers configured"
+msgstr "Nu există lansatoare configurate"
+
+#: plugins/launcher-box/launcher-box.ui:32
+msgid "Launchers"
+msgstr "Lansatoare"
+
+#: plugins/night-light-quick-setting/night-light-quick-setting.c:64
+msgid "Night Light On"
+msgstr "Lumina de noapte Pornită"
+
+#: plugins/night-light-quick-setting/night-light-quick-setting.c:64
+msgid "Night Light Off"
+msgstr "Lumina de noapte Oprită"
+
+#: plugins/ticket-box/ticket-box.ui:15
+msgid "No documents to display"
+msgstr "Niciun document de arătat"
+
+#: plugins/ticket-box/ticket-box.ui:83
+msgid "Tickets"
+msgstr "Bilete"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.c:86
+msgid "Choose Folder"
+msgstr "Alege dosarul"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.c:89
+msgid "_Open"
+msgstr "_Deschide"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:6
+msgid "Ticket Box Preferences"
+msgstr "Preferințe Casa de bilete"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:13
+msgid "Paths"
+msgstr "Căi"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:18
+msgid "Folder Settings"
+msgstr "Opțiuni pentru dosar"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:19
+msgid "Where Phosh looks for your tickets"
+msgstr "Unde vor fi căutate biletele"
+
+#: plugins/ticket-box/prefs/ticket-box-prefs.ui:22
+msgid "Ticket Folder"
+msgstr "Dosar Bilete"
+
+#: plugins/upcoming-events/event-list.c:142
+msgid "Today"
+msgstr "Azi"
+
+#: plugins/upcoming-events/event-list.c:144
+msgid "Tomorrow"
+msgstr "Mâine"
+
+#: plugins/upcoming-events/event-list.c:150
+#, c-format
+msgid "In %d day"
+msgid_plural "In %d days"
+msgstr[0] "Peste %d zi"
+msgstr[1] "Peste %d zile"
+msgstr[2] "Peste %d de zile"
+
+#: plugins/upcoming-events/event-list.ui:26
+msgid "No events"
+msgstr "Niciun eveniment"
+
+#. Translators: This is the time format used in 24-hour mode.
+#: plugins/upcoming-events/upcoming-event.c:56
+msgid "%R"
+msgstr "%R"
+
+#. Translators: This is the time format used in 12-hour mode.
+#: plugins/upcoming-events/upcoming-event.c:59
+msgid "%l:%M %p"
+msgstr "%l:%M %p"
+
+#. Translators: An all day event
+#: plugins/upcoming-events/upcoming-event.c:122
+#: plugins/upcoming-events/upcoming-event.c:159
+msgid "All day"
+msgstr "Toată ziua"
+
+#. Translators: When the event ends: Ends\r16:00
+#: plugins/upcoming-events/upcoming-event.c:148
+msgid "Ends"
+msgstr "Se termină"
+
+#: plugins/upcoming-events/upcoming-event.c:400
+msgid "Untitled event"
+msgstr "Eveniment fără titlu"

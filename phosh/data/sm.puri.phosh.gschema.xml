@@ -1,0 +1,175 @@
+<schemalist>
+  <schema id="sm.puri.phosh"
+          path="/sm/puri/phosh/">
+    <key name="favorites" type="as">
+      <default>[ 'org.gnome.Calls.desktop',
+                 'sm.puri.Chatty.desktop',
+                 'org.gnome.Epiphany.desktop',
+                 'org.gnome.Contacts.desktop'
+               ]</default>
+      <summary>List of desktop file IDs for favorite applications</summary>
+      <description>
+        The applications corresponding to these identifiers will be
+        displayed in the favorites panel along with running applications.
+      </description>
+    </key>
+
+    <key name="app-filter-mode" flags="sm.puri.phosh.PhoshAppFilterModeFlags">
+      <default>['adaptive']</default>
+      <summary>
+        How to filter apps in the overview. The default 'adaptive' shows only
+        adaptive apps in mobile mode and all apps in docked mode. 'off' turns
+        of all filtering.
+      </summary>
+      <description>
+        Whether to filter out apps that aren't marked as adaptive in mobile mode.
+      </description>
+    </key>
+
+    <key name="force-adaptive" type="as">
+      <default>[]</default>
+      <summary>
+	List of desktop file IDs for applications that are adaptive for phone
+	usage but not marked as such in their desktop file.
+      </summary>
+      <description>
+        The applications corresponding to these identifiers will be
+        displayed in the app grid panel even when in mobile mode that only
+	lists touch capable apps that adapt to small screen sizes.
+      </description>
+    </key>
+
+    <key name="wwan-backend" enum="sm.puri.phosh.PhoshWWanBackend">
+      <default>'modemmanager'</default>
+      <summary>Which backend to use for interfacing with the cellular modem</summary>
+      <description>
+        The available backends are 'modemmanager' for ModemManager (the default)
+        and 'ofono' for oFono. This setting is only read when Phosh starts, so a
+        shell restart is required after changing it.
+      </description>
+    </key>
+
+    <key name="automatic-high-contrast" type="b">
+      <default>false</default>
+      <summary>Whether to switch to HighContrast theme in high brightness conditions</summary>
+      <description>
+        Setting this to true enables automatic switching to HighContrast on high ambient
+        night levels.
+      </description>
+    </key>
+
+    <key name="automatic-high-contrast-threshold" type="u">
+      <default>500</default>
+      <summary>The light level (in Lux) to switch to HighContrast theme</summary>
+      <description>
+        When automatic high contrast is enabled this defines the light level at which to switch.
+      </description>
+    </key>
+    <key name="enable-suspend" type="b">
+
+      <default>false</default>
+      <summary>Whether to enable suspend from the power menu</summary>
+      <description>
+          Setting this to true allows manually suspending the device from the power menu.
+          Suspend is an experimental feature on some devices and may result in crashes or instability.
+      </description>
+    </key>
+
+    <key name="shell-layout" enum="sm.puri.phosh.PhoshShellLayout">
+      <default>'device'</default>
+      <summary>What information to use to layout UI elements.</summary>
+      <description>
+        This determines if Phosh will use device information to layout
+        UI elements in order to not overlap with notches and cutouts.
+      </description>
+    </key>
+
+    <key name="osk-unfold-delay" type="d">
+      <default>1.0</default>
+      <summary>OSK unfold long press delay factor</summary>
+      <description>
+        Delay factor for long press on the home bar to unfold the keyboard.
+        Valid values are [0.5,2.0]. Values less than 1.0 make the unfold trigger
+        sooner, greater than 1.0 make the unfold trigger later.
+      </description>
+    </key>
+
+  </schema>
+
+  <schema id="sm.puri.phosh.emergency-calls"
+          path="/sm/puri/phosh/emergency-calls/">
+    <key name="enabled" type="b">
+      <default>false</default>
+      <summary>Whether emergency calls are enabled</summary>
+      <description>
+        When this is disabled the shell will not offer emergency call
+        functionality.
+      </description>
+    </key>
+  </schema>
+
+  <schema id="sm.puri.phosh.lockscreen"
+          path="/sm/puri/phosh/lockscreen/">
+    <key name="shuffle-keypad" type="b">
+      <default>false</default>
+      <summary>Whether to scramble the keypad</summary>
+      <description>
+        Setting this to true shuffle the digits on the PIN keypad to
+        make eavesdropping harder.
+      </description>
+    </key>
+  </schema>
+
+  <enum id='sm.puri.phosh.NotificationUrgency'>
+    <value nick='low' value='0'/>
+    <value nick='normal' value='1'/>
+    <value nick='critical' value='2'/>
+  </enum>
+
+  <schema id="sm.puri.phosh.notifications"
+          path="/sm/puri/phosh/notifications/">
+    <key name="wakeup-screen-triggers" flags="sm.puri.phosh.PhoshNotifyScreenWakeupFlags">
+      <default>['urgency']</default>
+      <summary>What notification properties wake up the screen</summary>
+      <description>
+        This setting defines what properties of a notification wake up the screen. (e.g. the
+        notification's category or urgency).
+      </description>
+    </key>
+    <key name="wakeup-screen-categories" type="as">
+      <default>[]</default>
+      <summary>Notification categories that wake up the screen</summary>
+      <description>
+        If matching by category is enabled defines which categories
+        will wake up the screen.
+      </description>
+    </key>
+    <key name="wakeup-screen-urgency" enum="sm.puri.phosh.NotificationUrgency">
+      <default>'critical'</default>
+      <summary>Notification urgency that wakes up the screen</summary>
+      <description>
+        If matching by urgency is enabled sets the lowest notification
+        urgency that wakes up the screen.
+      </description>
+    </key>
+  </schema>
+
+  <schema id="sm.puri.phosh.plugins"
+          path="/sm/puri/phosh/plugins/">
+    <key name="lock-screen" type="as">
+      <default>[]</default>
+      <summary>List of enabled lockscreen plugins</summary>
+      <description>
+        The list of currently enabled plugins on the lock screen.
+      </description>
+    </key>
+    <key name="quick-settings" type="as">
+      <default>[]</default>
+      <summary>List of enabled quick setting plugins</summary>
+      <description>
+        The list of currently enabled plugins on the quick settings box.
+      </description>
+    </key>
+  </schema>
+
+</schemalist>
