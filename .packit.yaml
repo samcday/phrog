@@ -22,11 +22,11 @@ jobs:
   - job: copr_build
     trigger: commit
     branch: main
-    owner: "@samcday"
+    owner: samcday
     project: phrog-nightly
 
   # Build tagged releases in samcday/phrog COPR
   - job: copr_build
     trigger: release
-    owner: "@samcday"
+    owner: samcday
     project: phrog
