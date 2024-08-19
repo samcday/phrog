@@ -12,7 +12,9 @@
 
 #include "log.h"
 #include "shell.h"
-#include "phosh-main.h"
+
+#include <handy.h>
+#include <call-ui.h>
 
 /**
  * PhoshTestFullShellFixture:
@@ -62,7 +64,8 @@ phosh_test_full_shell_thread (gpointer data)
   signal (SIGTRAP, kill_compositor);
 
   gtk_init (NULL, NULL);
-  phosh_init ();
+  hdy_init ();
+  cui_init (TRUE);
 
   phosh_log_set_log_domains (fixture->log_domains);
 
@@ -95,7 +98,7 @@ phosh_test_full_shell_thread (gpointer data)
 
   g_assert_finalize_object (wall_clock);
   g_assert_finalize_object (shell);
-  phosh_uninit ();
+  cui_uninit ();
   phosh_test_compositor_free (fixture->state);
 
   /* Process events to tear down compositor */
