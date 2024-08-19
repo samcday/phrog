@@ -1,12 +1,14 @@
 project('phosh', 'c',
-          version: '0.39.0',
+          version: '0.41.0',
           license: 'GPL-3.0-or-later',
     meson_version: '>= 1.0.0',
   default_options: [ 'warning_level=1', 'buildtype=debugoptimized', 'c_std=gnu11' ],
 )
 
 app_id = 'sm.puri.Phosh'
-inc_subdir = 'libphosh-0'
+lib_inc_subdir = 'libphosh-0'
+ver_parts = meson.project_version().split('.')
+soversion = '@0@_@1@'.format(ver_parts[0], ver_parts[1])
 
 prefix = get_option('prefix')
 bindir = join_paths(prefix, get_option('bindir'))
@@ -24,7 +26,7 @@ plugins_dir = join_paths(prefix, libdir, 'phosh', 'plugins')
 plugin_prefs_dir = join_paths(prefix, libdir, 'phosh', 'plugins', 'prefs')
 servicedir = join_paths(datadir, 'dbus-1', 'services')
 schemasdir = datadir / 'glib-2.0/schemas'
-inc_dir = prefix / get_option('includedir') / inc_subdir
+lib_inc_dir = prefix / get_option('includedir') / lib_inc_subdir
 
 enable_introspection = get_option('introspection') or get_option('gtk_doc')
 bindings_lib = get_option('bindings-lib')
@@ -44,6 +46,7 @@ add_project_arguments([
   '-DGLIB_VERSION_MAX_REQUIRED=@0@'.format(glib_ver_str),
   '-DG_LOG_USE_STRUCTURED',
   '-DGMOBILE_USE_UNSTABLE_API',
+  '-DLIBFEEDBACK_USE_UNSTABLE_API',
 ], language: 'c')
 
 root_inc = include_directories('.')
@@ -127,6 +130,7 @@ gcr_dep = dependency('gcr-3', version: '>= 3.7.5')
 glib_dep = dependency('glib-2.0', version: glib_ver_cmp)
 gio_dep = dependency('gio-2.0', version: glib_ver_cmp)
 gio_unix_dep =  dependency('gio-unix-2.0', version: glib_ver_cmp)
+gnome_bluetooth_dep = dependency ('gnome-bluetooth-3.0', version: '>= 46.0')
 gmobile_dep = dependency('gmobile',
   version: '>= 0.1.0',
   fallback: ['gmobile', 'gmobile_dep'],
@@ -151,7 +155,7 @@ libcall_ui = subproject('libcall-ui',
     'install-i18n=@0@'.format(get_option('callui-i18n')),
   ])
 libfeedback_dep = dependency('libfeedback-0.0',
-  version: '>= 0.2.0',
+  version: '>= 0.4.0',
   fallback: ['libfeedback', 'libfeedback_dep'],
   default_options: ['introspection=disabled', 'daemon=false', 'gtk_doc=false']
   )
@@ -236,7 +240,7 @@ configure_file(
   output: 'phosh-config.h',
   configuration: config_h,
   install: bindings_lib,
-  install_dir: inc_dir,
+  install_dir: lib_inc_dir,
 )
 
 subdir('data')
@@ -275,7 +279,6 @@ summary({
 
 summary({
     'Compositor:': get_option('compositor'),
-    'Systemd for session': get_option('systemd'),
   },
   bool_yn: true,
   section: 'Runtime',

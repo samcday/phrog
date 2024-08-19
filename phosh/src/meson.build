@@ -5,6 +5,20 @@ subdir('wwan')
 subdir('settings')
 subdir('gtk-list-models')
 
+phosh_enums_header_subdir = 'phosh'
+
+install_headers('phosh-settings-enums.h', subdir : phosh_enums_header_subdir)
+
+pkgconfig.generate(
+  requires : gsettings_desktop_schemas_dep,
+  subdirs : phosh_enums_header_subdir,
+  version : meson.project_version(),
+  install_dir : libdir / 'pkgconfig',
+  filebase : 'phosh-settings',
+  name : 'phosh-settings-schemas',
+  description : 'Shared gsettings schema and enum headers for Phosh',
+)
+
 phosh_resources = gnome.compile_resources(
   'phosh-resources',
   'phosh.gresources.xml',
@@ -34,7 +48,7 @@ phosh_enums = gnome.mkenums_simple(
   'phosh-enums',
   sources : phosh_enum_headers,
   install_header: bindings_lib,
-  install_dir: inc_dir,
+  install_dir: lib_inc_dir,
 )
 
 phosh_settings_sources = files(
@@ -133,7 +147,6 @@ libphosh_tool_headers = files(
   'suspend-manager.h',
   'system-modal.h',
   'system-modal-dialog.h',
-  'thumbnail.h',
   'vpn-info.h',
   'vpn-manager.h',
   'quick-setting.h',
@@ -206,7 +219,6 @@ libphosh_tool_sources = files(
   'suspend-manager.c',
   'system-modal.c',
   'system-modal-dialog.c',
-  'thumbnail.c',
   'vpn-info.c',
   'vpn-manager.c',
   'quick-setting.c',
@@ -228,8 +240,10 @@ libphosh_headers = files(
   'auth.h',
   'background-manager.h',
   'batteryinfo.h',
+  'bt-device-row.h',
   'bt-info.h',
   'bt-manager.h',
+  'bt-status-page.h',
   'emergency-calls-manager.h',
   'fader.h',
   'feedbackinfo.h',
@@ -264,8 +278,10 @@ libphosh_headers = files(
   'session-manager.h',
   'shell.h',
   'status-page.h',
+  'status-page-placeholder.h',
   'system-prompt.h',
   'system-prompter.h',
+  'thumbnail.h',
   'toplevel-manager.h',
   'toplevel-thumbnail.h',
   'torch-info.h',
@@ -292,8 +308,10 @@ libphosh_sources = files(
   'auth.c',
   'background-manager.c',
   'batteryinfo.c',
+  'bt-device-row.c',
   'bt-info.c',
   'bt-manager.c',
+  'bt-status-page.c',
   'contrib/shell-network-agent.c',
   'emergency-calls-manager.c',
   'fader.c',
@@ -329,8 +347,10 @@ libphosh_sources = files(
   'session-manager.c',
   'shell.c',
   'status-page.c',
+  'status-page-placeholder.c',
   'system-prompt.c',
   'system-prompter.c',
+  'thumbnail.c',
   'toplevel-manager.c',
   'toplevel-thumbnail.c',
   'torch-info.c',
@@ -356,6 +376,20 @@ if libsoup_dep.version().version_compare('< 3.5.1')
   )
 endif
 
+
+# Headers are bundled as they're not shipped by gnome-bluetooth
+# https://gitlab.gnome.org/GNOME/gnome-bluetooth/-/merge_requests/200
+gnome_bluetooth_headers_dep = declare_dependency(
+  include_directories: 'contrib/gnome-bluetooth',
+)
+# We build our own dep to avoid `-Wmissing-include-dirs` as the
+# directory in the Cflags of gnome-bluetooth-3.0.pc do not
+# necessarily exist
+gnome_bluetooth_custom_dep = gnome_bluetooth_dep.partial_dependency(
+  link_args: true,
+  links: true,
+)
+
 phosh_deps = [
   libsoup_dep,
   fribidi_dep,
@@ -365,6 +399,8 @@ phosh_deps = [
   glib_dep,
   gmodule_dep,
   gmobile_dep,
+  gnome_bluetooth_custom_dep,
+  gnome_bluetooth_headers_dep,
   gnome_desktop_dep,
   gobject_dep,
   gsettings_desktop_schemas_dep,
@@ -424,6 +460,7 @@ phosh_lib = both_libraries('phosh',
   libphosh_sources,
   include_directories: phosh_lib_inc,
   dependencies: [phosh_tool_dep, phosh_deps],
+  soversion: soversion,
   install: bindings_lib,
 )
 
@@ -459,9 +496,11 @@ if enable_introspection
           symbol_prefix : 'phosh',
       identifier_prefix : 'Phosh',
               link_with : phosh_lib,
-               includes : ['Gcr-3', 'Gio-2.0', 'Gtk-3.0', 'GnomeDesktop-3.0', 'Handy-1', 'NM-1.0'],
+               includes : ['Gcr-3', 'Gio-2.0', 'Gtk-3.0', 'GnomeDesktop-3.0',
+                           'Handy-1', 'NM-1.0', 'GnomeBluetooth-3.0'],
              extra_args : phosh_gir_extra_args,
            dependencies : phosh_static_lib_dep,
+         fatal_warnings : true,
    )
 endif
 
@@ -473,6 +512,7 @@ if bindings_lib
     filebase: 'libphosh-0',
     version : meson.project_version(),
     description: 'Private library for building external components',
+    requires: 'phosh-settings',
     url: 'https://world.pages.gitlab.gnome.org/Phosh/phosh/',
   )
 
@@ -482,27 +522,27 @@ if bindings_lib
       libphosh_tool_headers,
       libphosh_headers,
     ],
-    subdir : inc_subdir,
+    subdir : lib_inc_subdir,
   )
 
   install_headers(
     phosh_monitor_headers,
-    subdir : inc_subdir / 'monitor',
+    subdir : lib_inc_subdir / 'monitor',
   )
 
   install_headers(
     phosh_notifications_headers,
-    subdir : inc_subdir / 'notifications',
+    subdir : lib_inc_subdir / 'notifications',
   )
 
   install_headers(
     phosh_settings_widgets_headers,
-    subdir : inc_subdir / 'settings',
+    subdir : lib_inc_subdir / 'settings',
   )
 
   install_headers(
     phosh_wwan_headers,
-    subdir : inc_subdir / 'wwan',
+    subdir : lib_inc_subdir / 'wwan',
   )
 endif
 

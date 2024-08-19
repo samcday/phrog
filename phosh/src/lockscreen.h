@@ -30,10 +30,17 @@ typedef enum {
 
 G_DECLARE_DERIVABLE_TYPE (PhoshLockscreen, phosh_lockscreen, PHOSH, LOCKSCREEN, PhoshLayerSurface)
 
+/**
+ * PhoshLockscreenClass:
+ * @parent_class: The parent class
+ * @unlock_submit: This function is invoked when a PIN or password is submitted from the lockscreen
+ *     keypad. It allows to implement a custom authentication mechanism. To indicate success the
+ *     `lockscreen-unlock` signal should be emitted.
+ */
 struct _PhoshLockscreenClass
 {
   PhoshLayerSurfaceClass parent_class;
-  void (*unlock_submit_cb) (PhoshLockscreen *self);
+  void (*unlock_submit) (PhoshLockscreen *self);
 
   /* Padding for future expansion */
   void (*_phosh_reserved1) (void);
@@ -56,12 +63,12 @@ PhoshLockscreenPage phosh_lockscreen_get_page         (PhoshLockscreen *self);
 void                phosh_lockscreen_set_default_page (PhoshLockscreen *self,
                                                        PhoshLockscreenPage page);
 
-const gchar *phosh_lockscreen_get_pin_entry   (PhoshLockscreen *self);
-void         phosh_lockscreen_clear_pin_entry (PhoshLockscreen *self);
-void         phosh_lockscreen_shake_pin_entry (PhoshLockscreen *self);
+const char *        phosh_lockscreen_get_pin_entry   (PhoshLockscreen *self);
+void                phosh_lockscreen_clear_pin_entry (PhoshLockscreen *self);
+void                phosh_lockscreen_shake_pin_entry (PhoshLockscreen *self);
 
-void phosh_lockscreen_set_unlock_status (PhoshLockscreen *self, const gchar *status);
+void                phosh_lockscreen_set_unlock_status (PhoshLockscreen *self, const char *status);
 
-void         phosh_lockscreen_add_extra_page (PhoshLockscreen *self, GtkWidget *widget);
+void                phosh_lockscreen_add_extra_page (PhoshLockscreen *self, GtkWidget *widget);
 
 G_END_DECLS

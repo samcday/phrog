@@ -1,3 +1,637 @@
+phosh (0.41.0) experimental; urgency=medium
+
+  [ Guido Günther ]
+  * media-player: Use G_GINT64_FORMAT to print gint64.
+    Otherwise we'll break i386
+  * lockscreen: Delay clock update past the animation.
+    The visible child changes at the start of the animation hence the clock
+    can still be outdated.
+    Closes: https://gitlab.gnome.org/World/Phosh/phosh/-/issues/922
+  * plugins: Avoid adw deprecation warning
+
+  [ Sam Day ]
+  * lockscreen: Rename PHOSH_LOCKSCREEN_PAGE_INFO.
+    This better describes the purpose of this page. Further, it lays
+    groundwork to introduce functionality that changes the default page
+    displayed on the lockscreen.
+  * lockscreen: Clean up some unused imports
+  * lockscreen: Always clear idle timer in carousel_position_notified_cb.
+    Even if the keypad is already visible, any swiping activity triggers
+    carousel_page_changed_cb again anyway.
+    This actually slightly improves UX in a somewhat edge case condition. If
+    you swipe to the keypad, and then swipe up/down in the keypad region
+    without any keypad input (or switching all the way back to the page
+    above), the idle timer will kick in and suddenly take control of the
+    carousel. With this change, *any* swiping behaviour properly resets the
+    idle timer.
+    This is fortunate, because the intent is to remove "PhoshLocksreenPos"
+    imminently, and this change removes two usages of that enum.
+  * lockscreen: Use phosh_lockscreen_set_page more.
+    The logic in phosh_lockscreen_set_page was duplicated in show_info_page
+    and show_unlock_page.
+    Since show_info_page wasn't doing anything else, just remove it entirely
+    and use phosh_lockscreen_set_page.
+    In the case of show_unlock_page, it's also emitting a signal, and is
+    used as a callback from the UI XML, so it remains intact.
+  * lockscreen: Remove PhoshLocksreenPos enum.
+    Instead, phosh_lockscreen_get_page is used. The logic of this function
+    was also tweaked a bit to incorporate the rounding that was previously
+    only done in key_press_event_cb.
+    This means that phosh_lockscreen_get_page will report the current page
+    slightly differently if queried while the carousel is animating or being
+    dragged.
+  * lockscreen: Support setting the default page.
+    The default page will be presented when the lockscreen is shown, it is
+    also the page that is scrolled to when keypad expires or the escape key
+    is pressed.
+  * lockscreen: Allow custom unlock submit callback.
+    The callback that is fired when a passphrase is submitted from the
+    keypad entry is virtualized so that subclasses can override this
+    behaviour.
+    This change primarily benefits Phosh-based greeters like Phrog. In this
+    case, the login behaviour is entirely different from the default (the
+    PAM conversation is mediated through greetd IPC, and takes place before
+    there's actually any user logged in).
+  * lockscreen: Provide methods to get/clear/shake PIN entry.
+    This is useful for lockscreen subclasses that want to override or
+    influence the behaviour of the authentication flow.
+    The shake_label/finish_shake_label functions were renamed, since they
+    shake the entry, not the label.
+  * lockscreen: Allow an "extra" page to be inserted.
+    If phosh_lockscreen_add_extra_page is called, the carousel will have an
+    extra page inserted between the info page and the unlock page. This
+    extra page can then be navigated via swipes, and also set as the
+    current and/or default page.
+    This is useful for the Phosh-based greeter use case (for example Phrog),
+    which inserts a user/session selection page.
+  * lockscreen: Setter for unlock status label.
+    Allows subclasses to override the message displayed above the keypad
+    entry.
+  * lockscreen: Property for current carousel page.
+    This property can be used by subclasses / observers to be notified when
+    lockscreen page considered "visible" changes.
+  * lockscreen: Don't set label after shaking.
+    The existing usage is changed to set the label before shaking.
+    This way the shaking mechanism can be used in other scenarios,
+    particularly by lockscreen subclasses.
+  * lockscreen-manager: Add phosh_lockscreen_manager_get_lockscreen
+  * tests/lockscreen: Add test for extra page functionality
+  * background: Use G_GNUC_FALLTHROUGH for consistency
+  * bt-manager: Replace #include <bluetooth-device.h> with a typedef.
+    This header is vendored into phosh because upstream does not want to
+    make it public, so we can't leak it into libphosh headers.
+    Further usage of types from these vendored headers are not anticipated
+    for now, so we can get away with a typedef for the one BluetoothDevice
+    type we need.
+  * libphosh: Include status-page-placeholder.h.
+    PhoshStatusPagePlaceholder has bled into other publicly exported types
+    from libphosh, so we need to make sure this is included. Elsewise
+    libphosh-rs compile-time ABI tests fail, for example.
+
+  [ Arun Mani J ]
+  * subprojects: Sync libfeedback version with packaging.
+    Let's use the same version everywhere
+
+  [ Anders Jonsson ]
+  * Update Swedish translation
+
+  [ Daniel Rusek ]
+  * Update Czech translation
+
+  [ Ekaterine Papava ]
+  * Update Georgian translation
+
+  [ Sabri Ünal ]
+  * Update Turkish translation
+
+  [ Scrambled 777 ]
+  * Update Hindi translation
+
+ -- Guido Günther <agx@sigxcpu.org>  Thu, 15 Aug 2024 10:17:28 +0200
+
+phosh (0.41.0~rc1) experimental; urgency=medium
+
+  [ Teemu Ikonen ]
+  * media-player: Add a label with track position and length.
+    The 'Position' property is read every 1 s when the player is playing.
+  * media-player: Add a ProgressBar below details button
+  * media-player: Show box_pos_len only when MPRIS has Position and length
+
+  [ Guido Günther ]
+  * packaging: No need to set tests twice
+  * subprojects: Use a wrap for libgnome-volume-control
+  * subprojects: Update gvc.
+    Update to 5f9768a2eac29c1ed56f1fbb449a77a3523683b6 to fix a crash
+    with BT speakers
+  * submodule: Use wrap for libcall-ui.
+    This makes all subprojects consistent
+  * subrojects: Update libcall-ui to 0.1.2.
+    Pull in the build system improvements to avoid build warnings.
+  * auth: Make async function names match the async/finish pattern.
+  * audio-devices: Use gpointer instead of GvcMixerControl.
+  * head: Prefix struct name.
+  * build: Make gir warnings fatal
+  * ci: Avoid check-doc.
+    It trips onto all kinds of things and fail on both introspection and
+    gi-docgen warnings no.
+  * wifi-status-page: Mark more strings as translatable
+  * settings: Mark "Notifications" as translatable
+  * prompt: Only show when we got a request.
+    So far we showed the prompt right away which led to some flicker when
+    the UI elements were made visible and can also lead to an empty dialog
+    when non of system_prompt_{password,confirm}_async are ever invoked.
+    Closes: https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1092
+  * docs: Mention `gtk-builder-tool --simplify`
+  * style: Drop unused osk-button class
+  * wifi-status-page: Wrap text.
+    This can easily overflow in translations
+  * ci: Ensure build-deps are present when building dist tarball.
+    Meson checks for available libraries so we need those.
+  * check-license-header: Fail on too short header.
+    We expect it to at least have one prelude, then copyright.
+  * bt-info: Use g_connect_object.
+    Less code.
+  * bt-info: Only connect to enabled once
+  * settings: Use an action to toggle Bluetooth.
+    This allows us to use the same code on status page and quick setting
+    and makes it available to plugins.
+  * settings: Only apply margin to toplevel viewport.
+    The current CSS would apply a wide margin to all viewports in settings
+    but we only want it for the toplevel one that contains all the widgets
+    but not for others like the ones in status pages.
+  * settings: Use background color for all separators in settings.
+    Otherwise they're hard to see.
+  * status-page: Remove phosh-settings-list-box style class.
+    This breaks the HdyPreferencesRow styles and we only want to use it for
+    the sound list boxes not the status pages in quick settings.
+  * bluetooth: Depend on gnome-bluetooth.
+    We need to add the headers as they're currently not shipped upsteam.
+    We might bundle the library instead.
+    This is from cccaaa7928c2b9195295d8c7dae80665b4b62c4d
+  * bt-manager: Track connectable Bluetooth devices.
+    We track connectable Bluetooth devices and add some properties based on
+    that like the number of currently connected devices.
+  * bt-info: Improve available information.
+    If at least two devices are connected we print the number of connected
+    devices. If a single device is connected we print it's info.
+  * status-page: Add placeholder / empty state widget.
+    Add a placeholder widget for the displaying the empty/disabled state in
+    settings status pages. This is very similar to `HdyStatusPage` but we
+    add a custom widget as we can't scale down the icons in GTK3 via CSS as
+    -gtk-icon-size doesn't exist yet and -gtk-icon-scale scales the icon but
+    doesn't shring the size allocations.
+    This also helps to ease displaying empty states for list boxes as the
+    `placeholder` there doesn't work well with advanced styling. See
+    libhandy#468.
+    This can be replaced with AdwStatusPage once we switch to GTK4.
+  * status-page: Introduce page header bar and a footer.
+    This avoids leaking parent widget details into the derived classes (like
+    requiring a `packaging` `end`).
+    The optional footer usually holds a button to open Settings. We use a
+    `GtkBox` to place a single child. We'd use `GtkBin` but that is
+    abstract, in GTK4 we'll use `AdwBin`.
+    The header contains the back button and has a user defined title. One
+    also get a user defined child widget.
+  * wifi-status-page: Use page header.
+    This uses the page header introduced in the previous commit.
+  * wifi-status-page: Use StatusPagePlaceholder.
+    We also remove the superfluous position packing.
+  * wifi-status-page: Use wireless-disabled symbolic for disabled state.
+    It's the icon meant for this state
+  * settings: Add a Bluetooth status page.
+    The status page lists the currently connected devices in a list box and
+    allows to connect / disconnect them by activating the list box row.
+  * bt-status-page: Hide enable button when there aren't any devices.
+    While at that streamline the logic a bit by avoiding putting the `TRUE`
+    branch first and using minimum scope for variables.
+  * settings: Fix id of Bluetooth status page.
+    Fixes: 5807fa273 ("settings: Add a Bluetooth status page")
+  * settings: Return `NULL` when we return a pointer
+  * settings: Drop nested stack.
+    No need to have a separate stack for status pages. This just adds
+    more size calculations when GTK lays out the widgets.
+  * settings: Use g_timeout_add_once
+  * status-page: Make a revealer.
+    This allows us to use more vertical space
+  * settings: Add handler for quick setting stack page changes.
+    We will add more logic here soon.
+  * settings: Do not reveal status pages when not shown.
+    Don't reveal the status pages when the quick settings are
+    visible. This ensures they don't take any vertical space ensuring
+    we don't push down other elements in settings (like the media player
+    or notifications) when there's e.g. a lot of Wi-Fi networks.
+    We reveal the children individually as they might have different
+    heights so we move down the other UI elements as little as possible
+    when a status page is shown.
+  * status-pages: Remove scrolled windows.
+    They're not needed as the whole settings panel is scrollable
+    and interact badly with the revealer.
+    We could swap revealer and scrolled window but that's actually not
+    necessary.
+  * status-pages: Reindent ui files.
+    Do this in a separate commit to ease review
+  * settings: Use less top margin for notification empty state.
+    This avoids the scroll bar even when we add more quick settings. To keep
+    the empty state centered with fewer quick settings we valign centered.
+  * settings: Move top margin from quick settings to the stack.
+    This ensures the status page's top aligns with the top of the quick
+    setting and we get a bit more "visual distance" between the sound
+    slider and the status page.
+  * feedback-manager: Ack libfeeback unstable API in meson.
+    This avoids cluttering the code with multiple defines
+  * main: Init libfeedback early.
+    This moves all library inits to single place and avoids a
+       end_notify_feedback: assertion 'lfb_is_initted ()' failed
+    warning on startup. We can ignore all error handling as the feedback
+    manager will try reinitialization later on anyway.
+  * keyboard-events: Drop fallback for ancient phoc
+  * feedback-manager: Allow to set profile
+  * keyboard-events: Emit signal on keybinding press.
+    Emit a signal when a subscribed keybinding is pressed. This allows other
+    parts of the shell to perform additional activities on global
+    keybindings (that possibly aren't even subscribed by Phosh itself).
+  * calls-manager: Track incoming state.
+    This allows to check if the active call is in incoming state.
+    As with the rest of calls manager this will need some tweaking once
+    calls handles multiple active calls.
+  * build: Bump feedbackd dependency.
+    We want 0.4.0 as only this does end running events on profile changes.
+  * shell: Allow to silence the device on incoming calls.
+    When the shell is locked and there's an incoming call pressing the
+    button to lower the volume will put the device into silent mode.
+    Bump copyright while at that as this didn't happen since some time.
+    Closes: https://gitlab.gnome.org/World/Phosh/phosh/-/issues/780
+  * app-tracker: Log success at `debug` priority.
+    Fixes: 1226ae949 ("app-tracker: Move launched processes to transient systemd scope")
+  * screen-saver-manager: Send locked hint.
+  * settings/brightness: Fix indent
+  * settings/brightness: Make globals static.
+    These are only meant for the current compilation module
+
+  [ Arun Mani J ]
+  * wifi-manager: Decouple hotspot check from icon.
+    Since b3c8142a ("wifimanager: Track whether we're an active wifi
+    hotspot") `update_icon` checked the value of `is-hotspot-master` as a side
+    effect. This leads to the state not being updated when there was no
+    active connection as in this case the check is never run.
+    Fix this by moving the hotspot check before any icon updates making
+    `update_icon` side effect free again.
+  * wifi-manager: Clear SSID when connection is cleaned.
+    We clean the `ssid` when the AP changes but we also need to clear it
+    when our network device tracking the connection goes away.
+  * wifi-network-row: Port to HdyActionRow
+  * wifi-status-page: Add content style class
+  * wifi-status-page: Set scrolling related properties
+  * wifi-status-page: Merge placeholders to one
+  * wifi-network-row: Simplify UI via gtk-builder-tool
+  * wifi-status-page: Clean up code and simplify UI
+    - Move headers to `wifi-status-page.c`.
+    - Fix formatting in `wifi-status-page.c`.
+    - Simplify UI via `gtk-builder-tool`.
+  * mobile-data-quick-setting: Drop unused variables
+  * wifi-manager: Rename connection callbacks.
+    We rename connection activated and added-activated methods to prevent
+    conflict with similar methods for hotspot.
+  * wifi-manager: Extract hotspot check method.
+    This will be used in further commits, so extract it out to avoid duplication.
+  * wifi-manager: Add method to toggle hotspot
+  * wifi-manager: Create hotspot connection if one doesn't exist
+  * wifi-manager: Rename update methods
+  * wifi-manager: Fix typo
+  * wifi-manager: Add property `state`
+  * wifi-status-page: Add turn off hotspot button
+  * plugin-shell: Export Wi-Fi manager
+  * build: Export Wi-Fi manager symbols
+  * plugins: Add Wi-Fi hotspot quick setting
+
+  [ Evangelos Ribeiro Tzaras ]
+  * run: Export XDG_CURRENT_DESKTOP.
+    Otherwise .desktop files with OnlyShowIn= might end up ignored.
+  * keypad: Force left-to-right button layout.
+    Real life keypads are the same for in RTL and LTR locales.
+    Closes https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1086
+    Modelled after similar change in libcall-ui
+    https://gitlab.gnome.org/World/Phosh/libcall-ui/-/merge_requests/89
+  * libcall-ui: Update to 0.1.3.
+    Forces LTR text direction for keypad in the call display
+  * polkit-auth-agent: Init autocleaned variable to NULL.
+    While it isn't technically necessary here because of the assignment
+    that always takes place a couple lines below, it deviates from the pattern
+    established throughout the codebase and requires closer inspection
+    increasing mental load.
+  * polkit-auth-agent: Register asynchronously
+
+  [ Cédric Bellegarde ]
+  * settings: Block value changed handler id.
+    When brightness is updated by gnome-settings-daemon DBus API, ignore value-changed signal.
+    Otherwise, we will send value back to GSD.
+    Fix #1093
+
+  [ Xiao Pan ]
+  * docs: Update URL to GTK inspector documentation
+
+  [ Daniel Rusek ]
+  * Update Czech translation
+
+  [ Jürgen Benvenuti ]
+  * Update German translation
+
+  [ Danial Behzadi ]
+  * Update Persian translation
+
+  [ Ekaterine Papava ]
+  * Update Georgian translation
+
+  [ Yuri Chornoivan ]
+  * Update Ukrainian translation
+
+  [ Antonio Marin ]
+  * Update Romanian translation
+
+  [ Martin ]
+  * Update Slovenian translation
+
+  [ Artur S0 ]
+  * Update Russian translation
+
+  [ Jiri Grönroos ]
+  * Update Finnish translation
+
+  [ Daniel Șerbănescu ]
+  * Update Romanian translation
+
+  [ Scrambled 777 ]
+  * Update Hindi translation
+
+  [ Emin Tufan Çetin ]
+  * Update Turkish translation
+
+  [ Balázs Úr ]
+  * Update Hungarian translation
+
+  [ Yaron Shahrabani ]
+  * Update Hebrew translation
+
+  [ Jordi Mas i Hernandez ]
+  * Update Catalan translation
+
+ -- Guido Günther <agx@sigxcpu.org>  Thu, 08 Aug 2024 10:58:30 +0200
+
+phosh (0.40.0) experimental; urgency=medium
+
+  [ Guido Günther ]
+  * build: Install headers and shared lib for Rust binding generation.
+    This allows to install headers, pkgconfig file and shared library to
+    create Rust bindings.
+    We create a unified header pulling in (almost) all headers so they can
+    be consumed by just including libphosh.h freeing binding generators from
+    having to keep up with added/removed headers.
+    As installing these files is used for binding generation only atm we
+    make it depend on a new 'binding-lib' meson options.
+    These files are not (yet) meant as public interface so if using these
+    make sure to bundle libphosh with your project.
+  * ci: Trigger libphosh-rs build.
+    We only do this on commits to RUST_BINDINGS_BRANCH (default main) and if
+    src/ changes.
+    The branch triggered downstream is also RUST_BINDINGS_BRANCH. This makes
+    it simple to work on pipeline changes.
+  * resources: Sort ui files alphabetically
+  * wwan-mm: Add present and enabled properties to get_property.
+    Fixes 1a75bcb48 ("wwan-mm: Handle 'enabled' property")
+    Fixes 3a0e8eab6 ("wwan: Report modem presence")
+  * wwan-mm: Modernize property change emission.
+    Use the faster by_pspec variant. Shorten property names while at that.
+  * settings: Drop superfluous wifi_status_page
+  * settings: Use property binding for wifi's has-status
+  * settings: Use explicit notify for on-lockscreen.
+    This toggles multiple things so let's reduce the work done here.
+  * settings: Drop on_shell_locked.
+    We can do the work when setting the property.
+  * wifi-manager: Use automatic cleanup.
+    This way we don't need to cast away `const` either.
+  * wifi-manager: Drop len variable.
+    Using ap_cnx->len directly make it a tiny bit more obvious which
+    length were' looking at.
+  * main: Instantiate shell after the needed objects.
+    The shells object construction needs the Wayland object and the
+    background manager.
+    Fixes: 1bb5c8c63 ("shell: Allow shell singleton to be overidden")
+  * service: Adjust oom score.
+    This avoids the shell getting killed early in tight memory scenarios.
+    While at that tweak the restart behavior.
+  * session: Drop rootston.ini fallback.
+    This is from long gone times
+  * treewide: Drop support for --builtin session fallback.
+    Always use systemd as gnome 46's gnome-session doesn't support anything
+    else. Thanks dhjg2000 for figuring this out
+  * build: Remove thumbnail from tool sources.
+    We stub it so it should be in the classes not available to tools.
+  * tests: Move stubs into their own lib.
+    Preventing the rebuild of the stub sources for all tools and unit
+    tests brings down the number of targets to build by another 25%
+    (1184 before vs 885 now).
+  * tests: Test command line options.
+    We can test the options that exit early making sure they don't break
+    accidentally.
+  * wwan-manager: Split out wwan connection type comparison.
+    Will be used in a follow up commit
+  * wwan-manager: Add helper to (de)activate a data connection.
+    For that we add a helper to track the last active connection. This
+    allows us to check if there is a data connection available at all and
+    which one is the last active.
+  * data: Add mobile data icons.
+    Self sketeched and optimized with svgo.
+  * plugins: Add mobile data toggle.
+    This allows to toggle mobile data on/off. The plugin is marked inactive
+    if thre's no mobile data connection configured.
+    Closes: https://gitlab.gnome.org/World/Phosh/phosh/-/issues/691
+  * data: Use mobi domain for override file
+  * data: Make all overrides phosh specific
+  * data: Unlock SIM by default
+  * data: Disable ambient light adjustments by default.
+    The current algorithm confuses people on phones. We want to tweak that
+    in g-s-d before enabling it by default.
+  * data: Let g-s-d do nothing on power button press.
+    Phosh handles it.
+  * data: Add Firefox ESR and TextEditor to adaptive apps.
+    We assume that FF uses mobileconfig and TextEditor adapts nicely
+  * data: Set default idle-delay to 60 seconds.
+    It's more suitable than the defualt 5 minutes.
+  * background-manager: Don't try to get background for zero size.
+    Otherwise we crash on gnome_bg_slide_show_get_slide on e.g. 0 width or
+    height.
+    Closes: https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1069
+  * background: Avoid update when the layer surface isn't configured yet.
+    Otherwise we might feed bogus values to GnomeBg.
+    Closes: https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1069
+    Tested-by: Boud Roukema
+  * power-menu-manager: Sort actions alphabetically
+  * power-menu-manager: Listen for locked instead of shell state changes.
+    This triggers less often.
+  * power-menu: Add a property to show a suspend button.
+    If `TRUE` the suspend button is used. Otherwise the `power off` button
+    is shown.
+  * power-menu-manager: Allow to suspend from power menu.
+    If suspend is allowed we show the suspend action rather then disabling
+    the power off button.
+    This makes the power button menu more useful on the lock screen. And
+    since it's a non-destructive action there's no issue with allowing it.
+    Closes: https://gitlab.gnome.org/World/Phosh/phosh/-/issues/990
+  * top-panel: Don't show lock and menu button when locked.
+    They have no purpose and are hence thus confusing.
+  * screen-saver-manager: Half the long press timeout.
+    This should still be long enough to not trigger it accidentally.
+  * screen-saver-manager: Emit button-pressed feedback on long press.
+    This gives some haptic feedback when the even triggers
+  * screenshot-manager: Wire up screenshot keybinding.
+    Defaults to <shift><printscreen>
+    Closes: https://gitlab.gnome.org/World/Phosh/phosh/-/issues/931
+  * shell-manager: Simplify version setting.
+    No need to override the r/o property. We just need to set it once.
+  * shell-manager: Implement OverviewActive property.
+    This implements another property from that interface and helps
+    https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1068
+  * main: Use G_NORETURN. Makes clang happy
+  * main: Use automatic cleanup for err
+  * tools/custom-quick-setting: Accept list of plugins to show.
+    This allows to skip plugins the e.g. need the shell singleton
+  * tools/custom-quick-setting: Use newline when printing plugin name
+  * tools/custom-quick-setting: Top align flowbox.
+    This avoids vexpanding the quick settings itself.
+  * plugins/dark-mode: Add and use dark-mode-disabled icon
+  * app-tracker: Always extract pid
+  * app-tracker: Add cancellable.
+    We do this with other DBus calls, so do the same here too.
+  * app-tracker: Move launched processes to transient systemd scope.
+    Closes: https://gitlab.gnome.org/World/Phosh/phosh/-/issues/963
+  * launcher-item: Add has-data property.
+    This is TRUE when count or progress should be shown. It will be used to
+    toggle the visibility of the box displaying the data.
+  * launcher-row: Use width-request for status information.
+    With that we can align to the row's end as otherwise the items
+    look out of place.
+    In order to not truncate longer descriptions we only make the status
+    information box visible when needed.
+  * docs: Add note about DBus helpers in the tools/ directory
+  * tests: Add mock for ModemManager and NetworkManager.
+    This is helpful to test mobile data and other features on devices
+    without a modem
+    Helps: https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1051
+  * tests: Add checks for python helpers.
+    This will be reused when we use python based tests that run the mocks.
+    We use black and ruff or flake8 so devs have some leeway (e.g. ruff
+    isn't in Debian testing atm).
+  * doc: Mention NetworkManager and ModemManager DBus mock.
+    This way it's hopefully found.
+  * settings: Set default sound theme.
+    When installed this gives us improved sounds for incoming messages and
+    calls.
+  * plugins/dark-mode: Update icons.
+    The moon is overloaded and dark mode isn't only for the night.
+    This dark mode icon was suggested by Sam Hewitt.
+    Closes: https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1071
+  * media-player: Don't dim unsensitive button.
+    Fixes: 042c0f464 ("Add media-player widget") which got broken by
+           d79a379d5 ("style: Unified the button styles")
+    Closes: https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1073
+  * libphosh: Drop wwan-backend.h.
+    Fixes: bdcb925c6 ("enums: Introduce single header file to gather all enums")
+  * build: Prefix library include dir.
+    Use a lib_ prefix to distinguish this form paths we use for headers used
+    by plugins and tools that supplement the actual shell.
+  * build: Add dependency on phosh-settings.
+    We want the header (and don't want to duplicate it)
+  * build: Set a soname for the shared library.
+    We use the project version underscored droping micro revisions.
+  * build: Use a relative path to the enum headers.
+  * ci: Check 'meson dist'
+    We've been hitting tiny nits before release ever so often. Avoid these.
+
+  [ Sam Day ]
+  * shell: Make PhoshShell a derivable type.
+    Since this type is meant to be consumed by downstream libphosh
+    consumers, a bunch of vtable space is reserved for future expansion.
+  * shell: Allow shell singleton to be overidden.
+    This follows the pattern first established with
+    phosh_wall_clock_set_default.
+    This allows libphosh consumers to override the default shell singleton
+    with a custom subclass.
+  * lockscreen: Make PhoshLockscreen a derivable type.
+    Since this type is meant to be consumed by downstream libphosh
+    consumers, a bunch of vtable space is reserved for future expansion.
+  * lockscreen: Support construction of custom type
+    phosh_lockscreen_new now requires a GType parameter that should be a
+    type that derives from PhoshLockscreen (or is PhoshLockscreen itself).
+    This functionality is not fully exposed yet. PhoshLockscreenManager is
+    just passing a hardcoded PHOSH_TYPE_LOCKSCREEN to phosh_lockscreen_new.
+  * shell: Allow lockscreen type to be customized.
+    A virtual function is added to PhoshShell to determine which lockscreen
+    type should be constructed. PhoshLockscreenManager consumes this vfunc
+    via phosh_shell_get_lockscreen_type.
+    This change makes it possible for libphosh consumers to use a custom
+    lockscreen, exposed through their custom shell type.
+  * ci: Add "startup test" job.
+    This job runs the main app entry point, and confirms that the shell
+    startup signal handler is reached.
+
+  [ Artur S0 ]
+  * Update Russian translation
+
+  [ Scrambled 777 ]
+  * Update Hindi translation
+
+  [ Jiri Grönroos ]
+  * Update Finnish translation
+
+  [ Jordi Mas i Hernandez ]
+  * Update Catalan translation
+
+  [ Yuri Chornoivan ]
+  * Update Ukrainian translation
+
+  [ Daniel Rusek ]
+  * Update Czech translation
+
+  [ Martin ]
+  * Update Slovenian translation
+
+  [ Anders Jonsson ]
+  * Update Swedish translation
+
+  [ Ekaterine Papava ]
+  * Update Georgian translation
+
+  [ Daniel Șerbănescu ]
+  * Update Romanian translation
+
+  [ Teemu Ikonen ]
+  * plugins: Add dark mode toggle.
+    Toggles the "org.gnome.desktop.interface.color-scheme" enum between
+    'default' and 'prefer-dark' with a quick setting button.
+
+  [ Antonio Marin ]
+  * Update Romanian translation
+
+  [ Arun Mani J ]
+  * app-grid-folder-button: Force 16px as icon size.
+    Closes: https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1072
+  * app-grid-folder-button: Force pixel size of 24px.
+    Closes: https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1081
+
+  [ Yosef Or Boczko ]
+  * Update Hebrew translation
+
+  [ Danial Behzadi ]
+  * Update Persian translation
+
+  [ Gotam Gorabh ]
+  * enums: Introduce single header file to gather all enums.
+    The aim is to allow phosh-mobile-settings to use these to map GSettngs values.
+    This will bring all the enums into a single header file to tackle duplicacy as well.
+    Closes: https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1036
+
+ -- Guido Günther <agx@sigxcpu.org>  Mon, 24 Jun 2024 13:38:32 +0200
+
 phosh (0.39.0) experimental; urgency=medium
 
   [ Guido Günther ]

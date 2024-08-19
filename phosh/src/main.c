@@ -17,6 +17,9 @@
 #include "wall-clock.h"
 #include "background-cache.h"
 
+#include <call-ui.h>
+#include <handy.h>
+#include <libfeedback.h>
 
 #include <glib/gi18n.h>
 #include <glib-unix.h>
@@ -68,7 +71,7 @@ on_shutdown_signal (gpointer unused)
 }
 
 
-static void
+G_NORETURN static void
 print_version (void)
 {
   printf ("Phosh %s - A Wayland shell for mobile devices\n", PHOSH_VERSION);
@@ -89,17 +92,17 @@ on_shell_ready (PhoshShell *shell, GTimer *timer)
 }
 
 
-int main(int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
-  g_autoptr(GOptionContext) opt_context = NULL;
-  GError *err = NULL;
+  g_autoptr (GOptionContext) opt_context = NULL;
+  g_autoptr (GError) err = NULL;
   gboolean unlocked = FALSE, locked = FALSE, version = FALSE;
-  g_autoptr(PhoshWayland) wl = NULL;
-  g_autoptr(PhoshShell) shell = NULL;
+  g_autoptr (PhoshWayland) wl = NULL;
+  g_autoptr (PhoshShell) shell = NULL;
   g_autoptr (PhoshBackgroundCache) background_cache = NULL;
   g_autoptr (GTimer) timer = g_timer_new ();
   g_autoptr (PhoshWallClock) wall_clock = phosh_wall_clock_new ();
-
   const GOptionEntry options [] = {
     {"unlocked", 'U', 0, G_OPTION_ARG_NONE, &unlocked,
      "Don't start with screen locked", NULL},
@@ -115,21 +118,22 @@ int main(int argc, char *argv[])
   g_option_context_add_group (opt_context, gtk_get_option_group (FALSE));
   if (!g_option_context_parse (opt_context, &argc, &argv, &err)) {
     g_warning ("%s", err->message);
-    g_clear_error (&err);
     return 1;
   }
 
-  if (version) {
+  if (version)
     print_version ();
-  }
 
-  phosh_log_set_log_domains (g_getenv("G_MESSAGES_DEBUG"));
+  phosh_log_set_log_domains (g_getenv ("G_MESSAGES_DEBUG"));
 
   textdomain (GETTEXT_PACKAGE);
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
   gtk_init (&argc, &argv);
-  phosh_init ();
+
+  hdy_init ();
+  cui_init (TRUE);
+  lfb_init (PHOSH_APP_ID, NULL);
 
   g_unix_signal_add (SIGTERM, on_shutdown_signal, NULL);
   g_unix_signal_add (SIGINT, on_shutdown_signal, NULL);
@@ -143,7 +147,7 @@ int main(int argc, char *argv[])
 
   g_signal_connect (shell, "ready", G_CALLBACK (on_shell_ready), timer);
 
-  if (!(unlocked || phosh_shell_started_by_display_manager(shell)) || locked)
+  if (!(unlocked || phosh_shell_started_by_display_manager (shell)) || locked)
     phosh_shell_lock (shell);
 
   gtk_main ();

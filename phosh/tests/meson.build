@@ -1,15 +1,6 @@
 run_phoc_tests = false
 
-# Deps for all tests
-test_stub_deps = files(
-  'stubs/phosh.c',
-  'stubs/app-tracker.c',
-  'stubs/lockscreen-manager.c',
-  'stubs/background-manager.c',
-  'stubs/toplevel.c',
-  'stubs/toplevel-manager.c',
-  'stubs/thumbnail.c',
-)
+subdir('stubs')
 
 if get_option('tests')
 
@@ -137,6 +128,7 @@ tests_manager = [
   [ 'calls-manager', true, ],
   [ 'gtk-mount-manager', true, ],
   [ 'idle-manager', true, ],
+  [ 'lockscreen', true, ],
   [ 'monitor-manager', true, ],
   [ 'notify-manager', true, ],
   [ 'screenshot-manager', true, ],
@@ -145,11 +137,11 @@ tests_manager = [
 # Unit tests
 foreach test : tests
   t = executable('test-@0@'.format(test),
-                 test_stub_deps + ['test-@0@.c'.format(test)],
+                 ['test-@0@.c'.format(test)],
                  c_args: test_cflags,
                  pie: true,
                  link_args: test_link_args,
-                 dependencies: testlib_dep)
+                 dependencies: [testlib_dep, test_stubs_dep])
   test(test, t,
        env: test_env_unit,
        suite: ['unit'])
@@ -163,11 +155,11 @@ if run_phoc_tests
   # Unit tests
   foreach test : tests_phoc
     t = executable('test-@0@'.format(test),
-                   test_stub_deps + ['test-@0@.c'.format(test)],
+                   ['test-@0@.c'.format(test)],
                    c_args: test_cflags,
                    pie: true,
                    link_args: test_link_args,
-                   dependencies: testlib_dep)
+                   dependencies: [testlib_dep, test_stubs_dep])
     test(test, t,
          suite: ['unit', 'phoc'],
          env: test_env_phoc,
@@ -262,5 +254,57 @@ if run_phoc_tests
        timeout: 120,
       )
 endif
+
+foreach opt : ['--help', '--version']
+  test('phosh @0@'.format(opt), phosh,
+       args: opt,
+       env: test_env_unit,
+       suite: ['unit'],
+       timeout: 15,
+       is_parallel : true,
+  )
+endforeach
+
+flake8 = find_program('flake8', required: false)
+black = find_program('black', required: false)
+ruff = find_program('ruff', required: false)
+
+pyfiles = files(['mock-mm-nm.py'])
+foreach pyfile : pyfiles
+  if flake8.found()
+    test('flake8-@0@'.format(fs.name(pyfile)),
+      flake8,
+      args: ['--ignore', 'E501', pyfile],
+      env: test_env_unit,
+      suite: ['unit'],
+      timeout: 15,
+      is_parallel : true,
+    )
+  endif
+
+  if black.found()
+    test('black-@0@'.format(fs.name(pyfile)),
+      black,
+      args: ['--check', '--diff', pyfile],
+      env: test_env_unit,
+      suite: ['unit'],
+      timeout: 15,
+      is_parallel : true,
+     )
+  endif
+
+  if ruff.found()
+    test('ruff-@0@'.format(fs.name(pyfile)),
+      ruff,
+      args: ['check', '--no-cache', pyfile],
+      env: test_env_unit,
+      suite: ['unit'],
+      timeout: 15,
+      is_parallel : true,
+    )
+  endif
+
+endforeach
+
 
 endif # tests

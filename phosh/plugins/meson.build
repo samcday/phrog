@@ -42,8 +42,11 @@ lockscreen_plugins = [
 
 quick_setting_plugins = [
   'caffeine-quick-setting',
+  'dark-mode-quick-setting',
+  'mobile-data-quick-setting',
   'night-light-quick-setting',
   'simple-custom-quick-setting',
+  'wifi-hotspot-quick-setting',
 ]
 
 plugin_schema_dirs = []
@@ -72,6 +75,7 @@ if get_option('lockscreen-plugins') or get_option('quick-setting-plugins')
       gobject_dep,
       gtk_dep,
       libhandy_dep,
+      libnm_dep,
       phosh_plugins_dep,
     ],
   )
