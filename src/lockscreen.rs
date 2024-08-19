@@ -34,9 +34,10 @@ mod imp {
     use gtk::{gio, glib};
     use libphosh::prelude::*;
     use libphosh::subclass::lockscreen::LockscreenImpl;
-    use libphosh::LockscreenPage;
+    use libphosh::{LockscreenPage, Shell};
     use std::cell::{OnceCell, RefCell};
     use std::os::unix::net::UnixStream;
+    use std::process;
 
     #[derive(Default)]
     pub struct Lockscreen {
@@ -243,7 +244,13 @@ mod imp {
                 }
                 Response::Success => {
                     self.obj().set_unlock_status("Logging in...");
+                    Shell::default().fade_out(0);
+                    // Properly handling failure here would be nice.
+                    // We'd need a shell "uhh this is awkward fade back in now" method.
                     self.start_session().await.unwrap();
+                    // It would be better to signal from lockscreen in such a way that we can do
+                    // a proper graceful exit from main.
+                    process::exit(0);
                 }
                 Response::Error {
                     error_type: ErrorType::AuthError,
