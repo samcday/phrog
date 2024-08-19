@@ -141,6 +141,7 @@ mod test {
     use greetd_ipc::{Request, Response};
     use input_event_codes::*;
     use std::sync::{Arc, Once};
+    use std::thread::sleep;
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use wayland_client::Connection;
 
@@ -193,6 +194,7 @@ mod test {
 
                 match Request::read_from(&mut stream).unwrap() {
                     Request::StartSession { .. } => {
+                        sleep(Duration::from_millis(2500));
                         Response::Success.write_to(&mut stream).unwrap();
                         logged_in.store(true, Ordering::Relaxed);
                     }
@@ -256,7 +258,7 @@ mod test {
                 glib::timeout_future(Duration::from_millis(100)).await;
             }
 
-            glib::timeout_future(Duration::from_millis(1000)).await;
+            glib::timeout_future(Duration::from_millis(2500)).await;
             gtk::main_quit();
         }));
 
