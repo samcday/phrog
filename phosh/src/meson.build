@@ -23,7 +23,6 @@ phosh_resources = gnome.compile_resources(
   'phosh-resources',
   'phosh.gresources.xml',
 
-  extra_args: '--manual-register',
   c_name: 'phosh',
 )
 
@@ -260,7 +259,6 @@ libphosh_headers = files(
   'osk-button.h',
   'osk-manager.h',
   'top-panel.h',
-  'phosh-main.h',
   'plugin-shell.h',
   'polkit-auth-agent.h',
   'polkit-auth-prompt.h',
@@ -330,7 +328,6 @@ libphosh_sources = files(
   'osk-button.c',
   'osk-manager.c',
   'top-panel.c',
-  'phosh-main.c',
   'polkit-auth-agent.c',
   'polkit-auth-prompt.c',
   'portal-access-manager.c',

@@ -1191,7 +1191,6 @@ get_lockscreen_type (PhoshShell *self)
   return PHOSH_TYPE_LOCKSCREEN;
 }
 
-
 /* }}} */
 /* {{{ GObject init */
 
@@ -1207,7 +1206,6 @@ phosh_shell_class_init (PhoshShellClass *klass)
   object_class->get_property = phosh_shell_get_property;
 
   klass->get_lockscreen_type = get_lockscreen_type;
-  klass->load_extension_point = NULL;
 
   type_setup ();
 
@@ -2507,13 +2505,6 @@ phosh_shell_get_lockscreen_type (PhoshShell *self)
 {
   PhoshShellClass *klass = PHOSH_SHELL_GET_CLASS (self);
   return klass->get_lockscreen_type (self);
-}
-
-void
-phosh_shell_load_extension_point (PhoshShell *self, const char *extension_point) {
-  PhoshShellClass *klass = PHOSH_SHELL_GET_CLASS (self);
-  if (klass->load_extension_point)
-    klass->load_extension_point (self, extension_point);
 }
 
 /* }}} */

@@ -775,10 +775,6 @@ phosh_settings_constructed (GObject *object)
   g_signal_connect_object (self->plugin_settings, "changed::quick-settings",
                            G_CALLBACK (load_custom_quick_settings), self, G_CONNECT_SWAPPED);
 
-
-  phosh_shell_load_extension_point (phosh_shell_get_default (),
-                                    PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET);
-
   load_custom_quick_settings (self, NULL, NULL);
 }
 

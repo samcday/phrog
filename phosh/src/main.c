@@ -9,7 +9,6 @@
 #define G_LOG_DOMAIN "phosh-main"
 
 #include "phosh-config.h"
-#include "phosh-main.h"
 
 #include "log.h"
 #include "shell.h"
@@ -130,7 +129,6 @@ main (int argc, char *argv[])
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
   gtk_init (&argc, &argv);
-
   hdy_init ();
   cui_init (TRUE);
   lfb_init (PHOSH_APP_ID, NULL);
@@ -152,7 +150,7 @@ main (int argc, char *argv[])
 
   gtk_main ();
 
-  phosh_uninit ();
+  cui_uninit ();
 
   phosh_log_set_log_domains (NULL);
   return EXIT_SUCCESS;

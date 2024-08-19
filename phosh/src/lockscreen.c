@@ -477,8 +477,6 @@ carousel_page_changed_cb (PhoshLockscreen *self,
   gboolean osk_visible = phosh_osk_manager_get_visible (osk_manager);
   PhoshLockscreenPage page = phosh_lockscreen_get_page (self);
 
-  g_object_notify_by_pspec (G_OBJECT (self), props[PROP_PAGE]);
-
   if (page == PHOSH_LOCKSCREEN_PAGE_UNLOCK) {
     focus_pin_entry (self, osk_visible);
 
