@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: phosh\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/World/Phosh/phosh/issues\n"
-"POT-Creation-Date: 2024-03-08 15:48+0000\n"
-"PO-Revision-Date: 2024-03-09 17:04+0200\n"
+"POT-Creation-Date: 2024-07-27 09:02+0000\n"
+"PO-Revision-Date: 2024-07-27 17:54+0300\n"
 "Last-Translator: Jiri Grönroos <jiri.gronroos+l10n@iki.fi>\n"
 "Language-Team: Finnish\n"
 "Language: fi\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.4.4\n"
 
 #. Translators: this is the session name, no need to translate it
 #: data/phosh.session.desktop.in.in:4 data/wayland-sessions/phosh.desktop:3
@@ -50,6 +50,14 @@ msgstr "Kalenteri"
 msgid "A simple calendar widget"
 msgstr "Yksinkertainen kalenterisovelma"
 
+#: plugins/dark-mode-quick-setting/dark-mode-quick-setting.desktop.in.in:5
+msgid "Dark Mode / Color Scheme Quick Setting"
+msgstr "Tumman tilan / väriteeman pika-asetus"
+
+#: plugins/dark-mode-quick-setting/dark-mode-quick-setting.desktop.in.in:7
+msgid "Toggle dark mode"
+msgstr "Tumma tila päällä/pois"
+
 #: plugins/emergency-info/emergency-info.desktop.in.in:5
 msgid "Emergency Info"
 msgstr "Hätätilatiedot"
@@ -64,9 +72,25 @@ msgid "Launcher Box"
 msgstr "Käynnistinlaatikko"
 
 #: plugins/launcher-box/launcher-box.desktop.in.in:6
-msgid "Adds launchers to the lock screen <b>This plugin is experimental.</b>"
+msgid "Add launchers to the lock screen. <b>This plugin is experimental.</b>"
 msgstr ""
 "Lisää käynnistimiä lukitusnäytölle. <b>Tämä liitännäinen on kokeellinen.</b>"
+
+#: plugins/mobile-data-quick-setting/mobile-data-quick-setting.desktop.in.in:5
+msgid "Mobile Data Quick Setting"
+msgstr "Mobiilidatan pika-asetus"
+
+#: plugins/mobile-data-quick-setting/mobile-data-quick-setting.desktop.in.in:7
+msgid "Toggle mobile data on/off"
+msgstr "Mobiilidata päällä/pois"
+
+#: plugins/night-light-quick-setting/night-light-quick-setting.desktop.in.in:5
+msgid "Night Light Quick Setting"
+msgstr "Yövalon pika-asetus"
+
+#: plugins/night-light-quick-setting/night-light-quick-setting.desktop.in.in:7
+msgid "Toggle night light on/off"
+msgstr "Yövalo päällä/pois"
 
 #: plugins/ticket-box/ticket-box.desktop.in.in:4
 #: plugins/ticket-box/ticket-box.ui:14
@@ -87,28 +111,50 @@ msgstr "Tulevat tapahtumat"
 msgid "Show upcoming calendar events"
 msgstr "Näytä tulevat kalenteritapahtumat"
 
-#: src/app-grid-button.c:529
+#: src/app-grid-button.c:153
+msgid "Add to Folder"
+msgstr "Lisää kansioon"
+
+#: src/app-grid-button.c:177
+msgid "Create new folder"
+msgstr "Luo uusi kansio"
+
+#: src/app-grid-button.c:692 src/app-grid-button.c:749
 msgid "Application"
 msgstr "Sovellus"
 
-#: src/app-grid.c:138
+#: src/app-grid.c:263
 msgid "Show All Apps"
 msgstr "Näytä kaikki sovellukset"
 
-#: src/app-grid.c:141
+#: src/app-grid.c:266
 msgid "Show Only Mobile Friendly Apps"
 msgstr "Näytä vain mobiilille suunnatut sovellukset"
 
-#: src/bt-info.c:92
+#. Translators: a battery level in percent
+#: src/bt-device-row.c:72
+#, c-format
+msgid "Battery %.0f%%"
+msgstr "Akku %.0f%%"
+
+#: src/bt-info.c:95 src/ui/bt-status-page.ui:6
+msgid "Bluetooth"
+msgstr "Bluetooth"
+
+#: src/bt-info.c:123
 msgctxt "bluetooth:enabled"
 msgid "On"
 msgstr "Päällä"
 
-#: src/bt-info.c:94
-msgid "Bluetooth"
-msgstr "Bluetooth"
+#: src/bt-status-page.c:81
+msgid "Bluetooth disabled"
+msgstr "Bluetooth pois käytöstä"
 
-#: src/call-notification.c:61
+#: src/bt-status-page.c:89
+msgid "No connectable Bluetooth Devices found"
+msgstr "Yhdistettävissä olevia Bluetooth-laitteita ei löytynyt"
+
+#: src/call-notification.c:63
 msgid "Unknown caller"
 msgstr "Tuntematon soittaja"
 
@@ -133,33 +179,33 @@ msgstr "Hätäpuhelu ei onnistunut"
 msgid "Internal error"
 msgstr "Sisäinen virhe"
 
-#: src/end-session-dialog.c:173
+#: src/end-session-dialog.c:174
 msgid "Log Out"
 msgstr "Kirjaudu ulos"
 
-#: src/end-session-dialog.c:176
+#: src/end-session-dialog.c:177
 #, c-format
 msgid "%s will be logged out automatically in %d second."
 msgid_plural "%s will be logged out automatically in %d seconds."
 msgstr[0] "%s kirjataan ulos automaattisesti %d sekunnin kuluttua."
 msgstr[1] "%s kirjataan ulos automaattisesti %d sekunnin kuluttua."
 
-#: src/end-session-dialog.c:182
+#: src/end-session-dialog.c:183 src/ui/power-menu.ui:72
 msgid "Power Off"
 msgstr "Sammuta"
 
-#: src/end-session-dialog.c:183
+#: src/end-session-dialog.c:184
 #, c-format
 msgid "The system will power off automatically in %d second."
 msgid_plural "The system will power off automatically in %d seconds."
 msgstr[0] "Järjestelmä sammuu automaattisesti %d sekunnin kuluttua."
 msgstr[1] "Järjestelmä sammuu automaattisesti %d sekunnin kuluttua."
 
-#: src/end-session-dialog.c:189
+#: src/end-session-dialog.c:190
 msgid "Restart"
 msgstr "Käynnistä uudelleen"
 
-#: src/end-session-dialog.c:190
+#: src/end-session-dialog.c:191
 #, c-format
 msgid "The system will restart automatically in %d second."
 msgid_plural "The system will restart automatically in %d seconds."
@@ -205,29 +251,29 @@ msgstr "Kyllä"
 msgid "No"
 msgstr "Ei"
 
-#: src/lockscreen.c:175 src/ui/lockscreen.ui:245
+#: src/lockscreen.c:166 src/ui/lockscreen.ui:245
 msgid "Enter Passcode"
 msgstr "Syötä salasana"
 
-#: src/lockscreen.c:401
+#: src/lockscreen.c:392
 msgid "Checking…"
 msgstr "Tarkistetaan…"
 
-#: src/screenshot-manager.c:213
+#: src/screenshot-manager.c:221 src/ui/power-menu.ui:192
 msgid "Screenshot"
 msgstr "Kuvakaappaus"
 
-#: src/screenshot-manager.c:214
+#: src/screenshot-manager.c:222
 msgid "Screenshot copied to clipboard"
 msgstr "Kuvakaappaus kopioitu leikepöydälle"
 
 #. Translators: Used when the title of a song is unknown
-#: src/media-player.c:321 src/ui/media-player.ui:161
+#: src/media-player.c:446 src/ui/media-player.ui:213
 msgid "Unknown Title"
 msgstr "Tuntematon kappale"
 
 #. Translators: Used when the artist of a song is unknown
-#: src/media-player.c:329 src/ui/media-player.ui:148
+#: src/media-player.c:454 src/ui/media-player.ui:201
 msgid "Unknown Artist"
 msgstr "Tuntematon esittäjä"
 
@@ -273,95 +319,111 @@ msgstr "Avaa"
 msgid "Notification"
 msgstr "Ilmoitus"
 
-#. Translators: Timestamp seconds suffix
-#: src/notifications/timestamp-label.c:84
-msgctxt "timestamp-suffix-seconds"
-msgid "s"
-msgstr "s"
-
-#. Translators: Timestamp minute suffix
+#. Translators: Point in time, use a short word or abbreviation
+#. Please stick to a maximum of 7 chars
 #: src/notifications/timestamp-label.c:86
-msgctxt "timestamp-suffix-minute"
-msgid "m"
-msgstr "min"
-
-#. Translators: Timestamp minutes suffix
-#: src/notifications/timestamp-label.c:88
-msgctxt "timestamp-suffix-minutes"
-msgid "m"
-msgstr "min"
-
-#. Translators: Timestamp hour suffix
-#: src/notifications/timestamp-label.c:90
-msgctxt "timestamp-suffix-hour"
-msgid "h"
-msgstr "t"
-
-#. Translators: Timestamp hours suffix
-#: src/notifications/timestamp-label.c:92
-msgctxt "timestamp-suffix-hours"
-msgid "h"
-msgstr "t"
-
-#. Translators: Timestamp day suffix
-#: src/notifications/timestamp-label.c:94
-msgctxt "timestamp-suffix-day"
-msgid "d"
-msgstr "pv"
-
-#. Translators: Timestamp days suffix
-#: src/notifications/timestamp-label.c:96
-msgctxt "timestamp-suffix-days"
-msgid "d"
-msgstr "pv"
-
-#. Translators: Timestamp month suffix
-#: src/notifications/timestamp-label.c:98
-msgctxt "timestamp-suffix-month"
-msgid "mo"
-msgstr "kk"
-
-#. Translators: Timestamp months suffix
-#: src/notifications/timestamp-label.c:100
-msgctxt "timestamp-suffix-months"
-msgid "mos"
-msgstr "kk"
-
-#. Translators: Timestamp year suffix
-#: src/notifications/timestamp-label.c:102
-msgctxt "timestamp-suffix-year"
-msgid "y"
-msgstr "v"
-
-#. Translators: Timestamp years suffix
-#: src/notifications/timestamp-label.c:104
-msgctxt "timestamp-suffix-years"
-msgid "y"
-msgstr "v"
-
-#: src/notifications/timestamp-label.c:121
 msgid "now"
 msgstr "nyt"
 
-#. Translators: time difference "Over 5 years"
-#: src/notifications/timestamp-label.c:189
+#. Translators: abbreviated time difference "Less than 30 seconds"
+#. Please stick to a maximum of 7 chars
+#: src/notifications/timestamp-label.c:91
+#, c-format
+msgid "<30s"
+msgstr "<30s"
+
+#. Translators: abbreviated time difference "Less than one minute"
+#. Please stick to a maximum of 7 chars
+#: src/notifications/timestamp-label.c:96
+#, c-format
+msgid "<1m"
+msgstr "<1 min"
+
+#. Translators: abbreviated time difference "About one minute"
+#. Please stick to a maximum of 7 chars
+#: src/notifications/timestamp-label.c:101
+#, c-format
+msgid "~1m"
+msgstr "~1 min"
+
+#. Translators: abbreviated, exact time difference "1 minute ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:109
+#, c-format
+msgid "%dm"
+msgid_plural "%dm"
+msgstr[0] "%d min"
+msgstr[1] "%d min"
+
+#. Translators: abbreviated time difference "About 3 hours ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:117
+#, c-format
+msgid "~%dh"
+msgid_plural "~%dh"
+msgstr[0] "~%d t"
+msgstr[1] "~%d t"
+
+#. Translators: abbreviated time difference "About 1 day ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:122
+#, c-format
+msgid "~1d"
+msgstr "~1 pv"
+
+#. Translators: abbreviated, exact time difference "3 days ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:127
+#, c-format
+msgid "%dd"
+msgid_plural "%dd"
+msgstr[0] "%d pv"
+msgstr[1] "%d pv"
+
+#. Translators: abbreviated time difference "About 1 month ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:132
+#, c-format
+msgid "~1mo"
+msgstr "~1 kk"
+
+#. Translators: abbreviated, exact time difference "3 months ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:137
+#, c-format
+msgid "%dmo"
+msgid_plural "%dmos"
+msgstr[0] "%d kk"
+msgstr[1] "%d kk"
+
+#. Translators: abbreviated time difference "About 5 years ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:147
+#, c-format
+msgid "~%dy"
+msgid_plural "~%dy"
+msgstr[0] "~%d v"
+msgstr[1] "~%d v"
+
+#. Translators: abbreviated time difference "Over 5 years ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:151
 #, c-format
 msgid "Over %dy"
-msgstr "Yli %d v"
+msgid_plural "Over %dy"
+msgstr[0] "Yli %d v"
+msgstr[1] "Yli %d v"
 
-#. Translators: time difference "almost 5 years"
-#: src/notifications/timestamp-label.c:193
+#. Translators: abbreviated time difference "almost 5 years ago"
+#. Please stick to a maximum of 4 chars for the time unit
+#: src/notifications/timestamp-label.c:156
 #, c-format
 msgid "Almost %dy"
-msgstr "Melkein %d v"
+msgid_plural "Almost %dy"
+msgstr[0] "Melkein %d v"
+msgstr[1] "Melkein %d v"
 
-#. Translators: a time difference like '<5m', if in doubt leave untranslated
-#: src/notifications/timestamp-label.c:200
-#, c-format
-msgid "%s%d%s"
-msgstr "%s%d%s"
-
-#: src/polkit-auth-agent.c:227
+#: src/polkit-auth-agent.c:271
 msgid "Authentication dialog was dismissed by the user"
 msgstr "Tunnistautumisikkuna peruttu käyttäjän toimesta"
 
@@ -402,15 +464,15 @@ msgstr "Paina ESC sulkeaksesi"
 msgid "Running '%s' failed"
 msgstr "Kohteen '%s' suorittaminen epäonnistui"
 
-#: src/settings/audio-settings.c:373
+#: src/settings/audio-settings.c:376
 msgid "Phone Shell Volume Control"
 msgstr "Puhelimen käyttöliittymän äänihallinta"
 
-#: src/system-prompt.c:365
+#: src/system-prompt.c:376
 msgid "Passwords do not match."
 msgstr "Salasanat eivät täsmää."
 
-#: src/system-prompt.c:372
+#: src/system-prompt.c:383
 msgid "Password cannot be blank"
 msgstr "Salasana ei voi olla tyhjä"
 
@@ -428,23 +490,23 @@ msgstr "Muista valinta"
 msgid "Cancel"
 msgstr "Peru"
 
-#: src/ui/app-grid-button.ui:55
-msgid "App"
-msgstr "Sovellus"
-
-#: src/ui/app-grid-button.ui:79
+#: src/ui/app-grid-button.ui:23
 msgid "Remove from _Favorites"
 msgstr "Poista _suosikeista"
 
-#: src/ui/app-grid-button.ui:84
+#: src/ui/app-grid-button.ui:28
 msgid "Add to _Favorites"
 msgstr "Lisää _suosikkeihin"
 
-#: src/ui/app-grid-button.ui:89
+#: src/ui/app-grid-button.ui:33
 msgid "View _Details"
 msgstr "Näytä yk_sityiskohdat"
 
-#: src/ui/app-grid.ui:21
+#: src/ui/app-grid-button.ui:41
+msgid "_Remove from Folder"
+msgstr "_Poista kansiosta"
+
+#: src/ui/app-grid.ui:24
 msgid "Search apps…"
 msgstr "Etsi sovelluksia…"
 
@@ -459,6 +521,14 @@ msgstr "Sisääntulolaitteet"
 #: src/ui/audio-settings.ui:136
 msgid "Sound Settings"
 msgstr "Ääniasetukset"
+
+#: src/ui/bt-status-page.ui:39
+msgid "Enable Bluetooth"
+msgstr "Ota Bluetooth käyttöön"
+
+#: src/ui/bt-status-page.ui:60
+msgid "Bluetooth Settings"
+msgstr "Bluetooth-asetukset"
 
 #: src/ui/emergency-menu.ui:26
 msgid "Close the emergency call dialog"
@@ -534,31 +604,31 @@ msgstr "_Yhdistä"
 msgid "Authenticate"
 msgstr "Tunnistaudu"
 
-#: src/ui/power-menu.ui:69
-msgid "_Power Off"
-msgstr "_Sammuta"
+#: src/ui/power-menu.ui:109
+msgid "Suspend"
+msgstr "Valmiustila"
 
-#: src/ui/power-menu.ui:110
-msgid "_Lock"
-msgstr "_Lukitse"
+#: src/ui/power-menu.ui:153
+msgid "Lock"
+msgstr "Lukitse"
 
-#: src/ui/power-menu.ui:151
-msgid "_Screenshot"
-msgstr "K_uvakaappaus"
-
-#: src/ui/power-menu.ui:192
-msgid "_Emergency"
-msgstr "_Hätä"
+#: src/ui/power-menu.ui:231
+msgid "Emergency"
+msgstr "Hätä"
 
 #: src/ui/run-command-dialog.ui:6
 msgid "Run Command"
 msgstr "Suorita komento"
 
-#: src/ui/settings.ui:327
+#: src/ui/settings.ui:336
 msgid "No notifications"
 msgstr "Ei ilmoituksia"
 
 #: src/ui/settings.ui:367
+msgid "Notifications"
+msgstr "Ilmoitukset"
+
+#: src/ui/settings.ui:376
 msgid "Clear all"
 msgstr "Tyhjennä kaikki"
 
@@ -582,39 +652,47 @@ msgstr "_Valmiustila…"
 msgid "_Log Out…"
 msgstr "Kirjaudu _ulos…"
 
-#: src/ui/wifi-status-page.ui:32
+#: src/ui/wifi-status-page.ui:6 src/wifi-info.c:90
+msgid "Wi-Fi"
+msgstr "Wifi"
+
+#: src/ui/wifi-status-page.ui:21
 msgid "No Wi-Fi Device Found"
 msgstr "Wi-Fi-laitetta ei löydy"
 
-#: src/ui/wifi-status-page.ui:60
+#: src/ui/wifi-status-page.ui:31
 msgid "Wi-Fi Disabled"
 msgstr "Wi-Fi on pois käytöstä"
 
-#: src/ui/wifi-status-page.ui:97
+#: src/ui/wifi-status-page.ui:38
+msgid "Enable Wi-Fi"
+msgstr "Ota Wi-Fi käyttöön"
+
+#: src/ui/wifi-status-page.ui:51
 msgid "Wi-Fi Hotspot Active"
 msgstr "Wi-Fi-yhteyspiste aktiivisena"
 
-#: src/ui/wifi-status-page.ui:133
+#: src/ui/wifi-status-page.ui:70
 msgid "No Wi-Fi Hotspots Found"
 msgstr "Wi-Fi-yhteyspisteitä ei löydy"
 
-#: src/ui/wifi-status-page.ui:144
+#: src/ui/wifi-status-page.ui:76
 msgid "Scan"
 msgstr "Skannaa"
 
-#: src/ui/wifi-status-page.ui:176
+#: src/ui/wifi-status-page.ui:115
 msgid "Wi-Fi Settings"
 msgstr "Wi-Fi-asetukset"
-
-#. Translators: This is a time format for a date in
-#. long format
-#: src/util.c:342
-msgid "%A, %B %-e"
-msgstr "%A, %-e. %Bta"
 
 #: src/vpn-info.c:89
 msgid "VPN"
 msgstr "VPN"
+
+#. Translators: This is a time format for a date in
+#. long format
+#: src/wall-clock.c:222
+msgid "%A, %B %-e"
+msgstr "%A, %-e. %Bta"
 
 #: src/widget-box.c:54
 msgid "Plugin not found"
@@ -624,10 +702,6 @@ msgstr "Liitännäistä ei löytynyt"
 #, c-format
 msgid "The plugin '%s' could not be loaded."
 msgstr "Liitännäistä '%s' ei voitu ladata."
-
-#: src/wifi-info.c:90
-msgid "Wi-Fi"
-msgstr "Wifi"
 
 #. Translators: Refers to the cellular wireless network
 #: src/wwan-info.c:210
@@ -646,6 +720,18 @@ msgstr "Päällä"
 #: plugins/caffeine-quick-setting/caffeine-quick-setting.c:131
 msgid "Off"
 msgstr "Pois"
+
+#: plugins/dark-mode-quick-setting/dark-mode-quick-setting.c:35
+msgid "Default style"
+msgstr "Oletustyyli"
+
+#: plugins/dark-mode-quick-setting/dark-mode-quick-setting.c:36
+msgid "Dark mode"
+msgstr "Tumma tila"
+
+#: plugins/dark-mode-quick-setting/dark-mode-quick-setting.c:37
+msgid "Light mode"
+msgstr "Vaalea tila"
 
 #: plugins/emergency-info/emergency-info.ui:39
 #: plugins/emergency-info/prefs/emergency-info-prefs.ui:70
@@ -755,6 +841,22 @@ msgstr "Käynnistimiä ei ole määritetty"
 msgid "Launchers"
 msgstr "Käynnistimet"
 
+#: plugins/mobile-data-quick-setting/mobile-data-quick-setting.c:67
+msgid "Mobile Data On"
+msgstr "Mobiilidata päällä"
+
+#: plugins/mobile-data-quick-setting/mobile-data-quick-setting.c:67
+msgid "Mobile Data Off"
+msgstr "Mobiilidata pois"
+
+#: plugins/night-light-quick-setting/night-light-quick-setting.c:64
+msgid "Night Light On"
+msgstr "Yövalo päällä"
+
+#: plugins/night-light-quick-setting/night-light-quick-setting.c:64
+msgid "Night Light Off"
+msgstr "Yövalo ei päällä"
+
 #: plugins/ticket-box/ticket-box.ui:15
 msgid "No documents to display"
 msgstr "Ei näytettäviä asiakirjoja"
@@ -834,6 +936,63 @@ msgstr "Päättyy"
 #: plugins/upcoming-events/upcoming-event.c:400
 msgid "Untitled event"
 msgstr "Nimetön tapahtuma"
+
+#~ msgctxt "timestamp-suffix-seconds"
+#~ msgid "s"
+#~ msgstr "s"
+
+#~ msgctxt "timestamp-suffix-minute"
+#~ msgid "m"
+#~ msgstr "min"
+
+#~ msgctxt "timestamp-suffix-minutes"
+#~ msgid "m"
+#~ msgstr "min"
+
+#~ msgctxt "timestamp-suffix-hour"
+#~ msgid "h"
+#~ msgstr "t"
+
+#~ msgctxt "timestamp-suffix-hours"
+#~ msgid "h"
+#~ msgstr "t"
+
+#~ msgctxt "timestamp-suffix-day"
+#~ msgid "d"
+#~ msgstr "pv"
+
+#~ msgctxt "timestamp-suffix-days"
+#~ msgid "d"
+#~ msgstr "pv"
+
+#~ msgctxt "timestamp-suffix-month"
+#~ msgid "mo"
+#~ msgstr "kk"
+
+#~ msgctxt "timestamp-suffix-months"
+#~ msgid "mos"
+#~ msgstr "kk"
+
+#~ msgctxt "timestamp-suffix-year"
+#~ msgid "y"
+#~ msgstr "v"
+
+#~ msgctxt "timestamp-suffix-years"
+#~ msgid "y"
+#~ msgstr "v"
+
+#, c-format
+#~ msgid "%s%d%s"
+#~ msgstr "%s%d%s"
+
+#~ msgid "App"
+#~ msgstr "Sovellus"
+
+#~ msgid "_Power Off"
+#~ msgstr "_Sammuta"
+
+#~ msgid "_Screenshot"
+#~ msgstr "K_uvakaappaus"
 
 #~ msgid "Unknown application"
 #~ msgstr "Tuntematon sovellus"

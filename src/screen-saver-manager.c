@@ -21,7 +21,7 @@
 #include <glib/gstdio.h>
 #include <gio/gunixfdlist.h>
 
-#define LONG_PRESS_TIMEOUT 2 /* seconds */
+#define LONG_PRESS_TIMEOUT 1 /* seconds */
 
 /**
  * PhoshScreenSaverManager:
@@ -182,6 +182,7 @@ on_long_press (gpointer data)
 
   g_debug ("Power button long press detected");
 
+  phosh_trigger_feedback ("button-pressed");
   g_signal_emit (self, signals[PB_LONG_PRESS], 0);
 
   self->long_press_id = 0;
@@ -491,6 +492,21 @@ on_lockscreen_manager_wakeup_outputs (PhoshScreenSaverManager *self,
 
 
 static void
+on_locked_hint_set (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  PhoshDBusLoginSession *proxy = PHOSH_DBUS_LOGIN_SESSION (source_object);
+  g_autoptr (GError) err = NULL;
+  gboolean success;
+
+  success = phosh_dbus_login_session_call_set_locked_hint_finish (proxy,
+                                                                  res,
+                                                                  &err);
+  if (!success)
+    g_warning ("Failed to send locked hint: %s", err->message);
+}
+
+
+static void
 on_lockscreen_manager_locked_changed (PhoshScreenSaverManager *self)
 {
   gboolean locked;
@@ -498,6 +514,14 @@ on_lockscreen_manager_locked_changed (PhoshScreenSaverManager *self)
   g_return_if_fail (PHOSH_IS_SCREEN_SAVER_MANAGER (self));
 
   locked = phosh_lockscreen_manager_get_locked (self->lockscreen_manager);
+  if (self->logind_session_proxy) {
+    phosh_dbus_login_session_call_set_locked_hint (self->logind_session_proxy,
+                                                   locked,
+                                                   self->cancel,
+                                                   on_locked_hint_set,
+                                                   NULL);
+  }
+
   if (locked == TRUE)
     return;
 

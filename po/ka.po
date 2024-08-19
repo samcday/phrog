@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/World/Phosh/phosh/issues\n"
-"POT-Creation-Date: 2024-05-03 14:06+0000\n"
-"PO-Revision-Date: 2024-05-04 21:08+0200\n"
+"POT-Creation-Date: 2024-08-06 08:05+0000\n"
+"PO-Revision-Date: 2024-08-12 06:23+0200\n"
 "Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
 "Language-Team: Georgian <(nothing)>\n"
 "Language: ka\n"
@@ -51,6 +51,14 @@ msgstr "კალენდარი"
 msgid "A simple calendar widget"
 msgstr "მარტივი კალენდრის ვიჯეტი"
 
+#: plugins/dark-mode-quick-setting/dark-mode-quick-setting.desktop.in.in:5
+msgid "Dark Mode / Color Scheme Quick Setting"
+msgstr "ბნელი რეჟიმის / ფერების სქემის სწრაფი მორგება"
+
+#: plugins/dark-mode-quick-setting/dark-mode-quick-setting.desktop.in.in:7
+msgid "Toggle dark mode"
+msgstr "მუქი რეჟიმის გადართვა"
+
 #: plugins/emergency-info/emergency-info.desktop.in.in:5
 msgid "Emergency Info"
 msgstr "გადაუდებელი ინფორმაცია"
@@ -68,6 +76,14 @@ msgstr "გამშვების ფანჯარა"
 msgid "Add launchers to the lock screen. <b>This plugin is experimental.</b>"
 msgstr ""
 "გამშვებების დამატება დაბლოკილ ეკრანზე <b>ეს დამატება ექსპერიმენტულია.</b>"
+
+#: plugins/mobile-data-quick-setting/mobile-data-quick-setting.desktop.in.in:5
+msgid "Mobile Data Quick Setting"
+msgstr "მობილური ინტერნეტის სწრაფი ჩართ/გამორთ პარამეტრი"
+
+#: plugins/mobile-data-quick-setting/mobile-data-quick-setting.desktop.in.in:7
+msgid "Toggle mobile data on/off"
+msgstr "მობილური ინტერნეტის ჩართ/გამორთ"
 
 #: plugins/night-light-quick-setting/night-light-quick-setting.desktop.in.in:5
 msgid "Night Light Quick Setting"
@@ -116,14 +132,28 @@ msgstr "ყველა აპლიკაციის ჩვენება"
 msgid "Show Only Mobile Friendly Apps"
 msgstr "მხოლოდ მობილურზე მორგებული აპლიკაციების ჩვენება"
 
-#: src/bt-info.c:92
+#. Translators: a battery level in percent
+#: src/bt-device-row.c:72
+#, c-format
+msgid "Battery %.0f%%"
+msgstr "ელემენტი %.0f%%"
+
+#: src/bt-info.c:95 src/ui/bt-status-page.ui:6
+msgid "Bluetooth"
+msgstr "Bluetooth"
+
+#: src/bt-info.c:123
 msgctxt "bluetooth:enabled"
 msgid "On"
 msgstr "ჩართ"
 
-#: src/bt-info.c:94
-msgid "Bluetooth"
-msgstr "Bluetooth"
+#: src/bt-status-page.c:86
+msgid "No connectable Bluetooth Devices found"
+msgstr "მიერთებადი ბლუთუზის მოწყობილობები აღმოჩენილი არაა"
+
+#: src/bt-status-page.c:90
+msgid "Bluetooth disabled"
+msgstr "ბლუთუზი გამორთულია"
 
 #: src/call-notification.c:63
 msgid "Unknown caller"
@@ -160,7 +190,7 @@ msgid "%s will be logged out automatically in %d second."
 msgid_plural "%s will be logged out automatically in %d seconds."
 msgstr[0] "%s გამოვა ავტომატურად, %d წამში."
 
-#: src/end-session-dialog.c:183 src/ui/power-menu.ui:69
+#: src/end-session-dialog.c:183 src/ui/power-menu.ui:72
 msgid "Power Off"
 msgstr "გამორთვა"
 
@@ -217,29 +247,29 @@ msgstr "დიახ"
 msgid "No"
 msgstr "არა"
 
-#: src/lockscreen.c:172 src/ui/lockscreen.ui:245
+#: src/lockscreen.c:166 src/ui/lockscreen.ui:245
 msgid "Enter Passcode"
 msgstr "შეიყვანეთ კოდი"
 
-#: src/lockscreen.c:398
+#: src/lockscreen.c:392
 msgid "Checking…"
 msgstr "შემოწმება…"
 
-#: src/screenshot-manager.c:215 src/ui/power-menu.ui:147
+#: src/screenshot-manager.c:221 src/ui/power-menu.ui:192
 msgid "Screenshot"
 msgstr "ეკრანის ანაბეჭდი"
 
-#: src/screenshot-manager.c:216
+#: src/screenshot-manager.c:222
 msgid "Screenshot copied to clipboard"
 msgstr "ეკრანის ანაბეჭდის ბუფერში დაკოპირდა"
 
 #. Translators: Used when the title of a song is unknown
-#: src/media-player.c:324 src/ui/media-player.ui:161
+#: src/media-player.c:446 src/ui/media-player.ui:213
 msgid "Unknown Title"
 msgstr "უცნობი სათაური"
 
 #. Translators: Used when the artist of a song is unknown
-#: src/media-player.c:332 src/ui/media-player.ui:148
+#: src/media-player.c:454 src/ui/media-player.ui:201
 msgid "Unknown Artist"
 msgstr "უცნობი შემსრულებელი"
 
@@ -382,7 +412,7 @@ msgid "Almost %dy"
 msgid_plural "Almost %dy"
 msgstr[0] "თითქმის %dწ"
 
-#: src/polkit-auth-agent.c:227
+#: src/polkit-auth-agent.c:271
 msgid "Authentication dialog was dismissed by the user"
 msgstr "ავთენტიკაციის ფანჯარა დახურულია მომხმარებლის მიერ"
 
@@ -427,11 +457,11 @@ msgstr "%s-ის გაშვების შეცდომა"
 msgid "Phone Shell Volume Control"
 msgstr "ტელეფონის გარსის ხმის კონტროლი"
 
-#: src/system-prompt.c:365
+#: src/system-prompt.c:376
 msgid "Passwords do not match."
 msgstr "პაროლები არ ემთხვევა."
 
-#: src/system-prompt.c:372
+#: src/system-prompt.c:383
 msgid "Password cannot be blank"
 msgstr "პაროლები ცარიელი ვერ იქნება"
 
@@ -480,6 +510,14 @@ msgstr "შეტანის მოწყობილობები"
 #: src/ui/audio-settings.ui:136
 msgid "Sound Settings"
 msgstr "ხმის მორგება"
+
+#: src/ui/bt-status-page.ui:32
+msgid "Enable Bluetooth"
+msgstr "ბლუთუზის ჩართვა"
+
+#: src/ui/bt-status-page.ui:53
+msgid "Bluetooth Settings"
+msgstr "ბლუთუზის პარამეტრები"
 
 #: src/ui/emergency-menu.ui:26
 msgid "Close the emergency call dialog"
@@ -555,11 +593,15 @@ msgstr "_კავშირი"
 msgid "Authenticate"
 msgstr "ავთენტიკაცია"
 
-#: src/ui/power-menu.ui:108
+#: src/ui/power-menu.ui:109
+msgid "Suspend"
+msgstr "ძილი"
+
+#: src/ui/power-menu.ui:153
 msgid "Lock"
 msgstr "ჩაკეტვა"
 
-#: src/ui/power-menu.ui:186
+#: src/ui/power-menu.ui:231
 msgid "Emergency"
 msgstr "სასწრაფო"
 
@@ -567,11 +609,15 @@ msgstr "სასწრაფო"
 msgid "Run Command"
 msgstr "ბრძანების გაშვება"
 
-#: src/ui/settings.ui:327
+#: src/ui/settings.ui:329
 msgid "No notifications"
 msgstr "გაფრთხილების გარეშე"
 
-#: src/ui/settings.ui:367
+#: src/ui/settings.ui:360
+msgid "Notifications"
+msgstr "გაფრთხილებები"
+
+#: src/ui/settings.ui:369
 msgid "Clear all"
 msgstr "ყველას გასუფთავება"
 
@@ -595,27 +641,11 @@ msgstr "_ძილი…"
 msgid "_Log Out…"
 msgstr "გა_სვლა…"
 
-#: src/ui/wifi-status-page.ui:32
-msgid "No Wi-Fi Device Found"
-msgstr "Wi-Fi მოწყობილობა ვერ ვიპოვე"
+#: src/ui/wifi-status-page.ui:6 src/wifi-info.c:90
+msgid "Wi-Fi"
+msgstr "Wi-Fi"
 
-#: src/ui/wifi-status-page.ui:60
-msgid "Wi-Fi Disabled"
-msgstr "Wi-Fi გამორთულია"
-
-#: src/ui/wifi-status-page.ui:97
-msgid "Wi-Fi Hotspot Active"
-msgstr "Wi-Fi ჰოტსპოტი აქტიურია"
-
-#: src/ui/wifi-status-page.ui:133
-msgid "No Wi-Fi Hotspots Found"
-msgstr "Wi-Fi ჰოტსპოტები აღმოჩენილი არაა"
-
-#: src/ui/wifi-status-page.ui:144
-msgid "Scan"
-msgstr "სკანირება"
-
-#: src/ui/wifi-status-page.ui:176
+#: src/ui/wifi-status-page.ui:68
 msgid "Wi-Fi Settings"
 msgstr "Wi-Fi-ის მორგება"
 
@@ -625,7 +655,7 @@ msgstr "VPN"
 
 #. Translators: This is a time format for a date in
 #. long format
-#: src/wall-clock.c:218
+#: src/wall-clock.c:222
 msgid "%A, %B %-e"
 msgstr "%A, %B %-e"
 
@@ -638,9 +668,33 @@ msgstr "დამატება ვერ ვიპოვე"
 msgid "The plugin '%s' could not be loaded."
 msgstr "დამატება არ ჩაიტვირთულა: \"%s\"."
 
-#: src/wifi-info.c:90
-msgid "Wi-Fi"
-msgstr "Wi-Fi"
+#: src/wifi-status-page.c:51
+msgid "No Wi-Fi Device Found"
+msgstr "Wi-Fi მოწყობილობა ვერ ვიპოვე"
+
+#: src/wifi-status-page.c:55
+msgid "Wi-Fi Disabled"
+msgstr "Wi-Fi გამორთულია"
+
+#: src/wifi-status-page.c:56
+msgid "Enable Wi-Fi"
+msgstr "Wi-Fi-ის ჩართვა"
+
+#: src/wifi-status-page.c:59
+msgid "Wi-Fi Hotspot Active"
+msgstr "Wi-Fi ჰოტსპოტი აქტიურია"
+
+#: src/wifi-status-page.c:60
+msgid "Turn Off"
+msgstr "გამორთვა"
+
+#: src/wifi-status-page.c:63
+msgid "No Wi-Fi Hotspots"
+msgstr "Wi-Fi ჰოტსპოტების გარეშე"
+
+#: src/wifi-status-page.c:64
+msgid "Scan"
+msgstr "სკანირება"
 
 #. Translators: Refers to the cellular wireless network
 #: src/wwan-info.c:210
@@ -659,6 +713,18 @@ msgstr "ჩართ"
 #: plugins/caffeine-quick-setting/caffeine-quick-setting.c:131
 msgid "Off"
 msgstr "გამორთ"
+
+#: plugins/dark-mode-quick-setting/dark-mode-quick-setting.c:35
+msgid "Default style"
+msgstr "ნაგულისხმევი სტილი"
+
+#: plugins/dark-mode-quick-setting/dark-mode-quick-setting.c:36
+msgid "Dark mode"
+msgstr "მუქი რეჟიმი"
+
+#: plugins/dark-mode-quick-setting/dark-mode-quick-setting.c:37
+msgid "Light mode"
+msgstr "ღია რეჟიმი"
 
 #: plugins/emergency-info/emergency-info.ui:39
 #: plugins/emergency-info/prefs/emergency-info-prefs.ui:70
@@ -768,6 +834,14 @@ msgstr "გამშვებები მორგებული არაა"
 msgid "Launchers"
 msgstr "გამშვებები"
 
+#: plugins/mobile-data-quick-setting/mobile-data-quick-setting.c:66
+msgid "Mobile Data On"
+msgstr "მობილური ინტერნეტი ჩართ"
+
+#: plugins/mobile-data-quick-setting/mobile-data-quick-setting.c:66
+msgid "Mobile Data Off"
+msgstr "მობილური ინტერნეტი გამორთ"
+
 #: plugins/night-light-quick-setting/night-light-quick-setting.c:64
 msgid "Night Light On"
 msgstr "ღამის ფერები ჩართულია"
@@ -854,6 +928,14 @@ msgstr "მთავრდება"
 #: plugins/upcoming-events/upcoming-event.c:400
 msgid "Untitled event"
 msgstr "უსახელო მოვლენა"
+
+#: plugins/wifi-hotspot-quick-setting/wifi-hotspot-quick-setting.c:62
+msgid "Hotspot On"
+msgstr "ჰოტსპოტი ჩართ"
+
+#: plugins/wifi-hotspot-quick-setting/wifi-hotspot-quick-setting.c:64
+msgid "Hotspot Off"
+msgstr "ჰოტსპოტი გამორთ"
 
 #~ msgctxt "timestamp-suffix-seconds"
 #~ msgid "s"

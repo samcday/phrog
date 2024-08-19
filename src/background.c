@@ -233,7 +233,7 @@ image_background (PhoshBackgroundImage    *image,
   case G_DESKTOP_BACKGROUND_STYLE_STRETCHED:
   case G_DESKTOP_BACKGROUND_STYLE_SPANNED:
     g_warning ("Unimplemented style %d, using zoom", style);
-    /* fallthrough */
+    G_GNUC_FALLTHROUGH;
   case G_DESKTOP_BACKGROUND_STYLE_ZOOM:
   default:
     scaled_bg = pb_scale_to_min (phosh_background_image_get_pixbuf (image), width, height);
@@ -447,13 +447,20 @@ phosh_background_set_primary (PhoshBackground *self, gboolean primary)
  * phosh_background_needs_update:
  * @self: The background
  *
- * Marks the background's data as dirty, needing an update. This will make the update
- * it's background image.
+ * Marks the background's data as dirty, needing an update. This will make the
+ * `PhoshBackground` update it's background image.
  */
 void
 phosh_background_needs_update (PhoshBackground *self)
 {
   g_return_if_fail (PHOSH_IS_BACKGROUND (self));
+
+  /* Skip update if layer surface isn't yet configured, it will
+   * trigger on layer_surface.configured anyway */
+  if (phosh_layer_surface_get_configured_width (PHOSH_LAYER_SURFACE (self)) <= 0 ||
+      phosh_layer_surface_get_configured_height (PHOSH_LAYER_SURFACE (self)) <= 0) {
+    return;
+  }
 
   trigger_update (self);
 }

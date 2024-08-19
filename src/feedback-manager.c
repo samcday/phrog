@@ -13,7 +13,6 @@
 #include "feedback-manager.h"
 #include "shell.h"
 
-#define LIBFEEDBACK_USE_UNSTABLE_API
 #include <libfeedback.h>
 
 /**
@@ -240,6 +239,16 @@ phosh_feedback_manager_get_profile (PhoshFeedbackManager *self)
 
 
 void
+phosh_feedback_manager_set_profile (PhoshFeedbackManager *self, const char *profile)
+{
+  g_return_if_fail (PHOSH_IS_FEEDBACK_MANAGER (self));
+
+  g_debug ("Setting feedback profile to %s", profile);
+  lfb_set_feedback_profile (profile);
+}
+
+
+void
 phosh_feedback_manager_toggle (PhoshFeedbackManager *self)
 {
   const char *profile = "silent", *old;
@@ -253,8 +262,7 @@ phosh_feedback_manager_toggle (PhoshFeedbackManager *self)
   else if (!g_strcmp0 (old, "full"))
     profile = "quiet";
 
-  g_debug ("Setting feedback profile to %s, was %s", profile, old);
-  lfb_set_feedback_profile (profile);
+  phosh_feedback_manager_set_profile (self, profile);
 }
 
 

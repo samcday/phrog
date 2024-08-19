@@ -26,11 +26,6 @@ desktopconf = configuration_data()
 desktopconf.set('bindir', bindir)
 desktopconf.set('libexecdir', libexecdir)
 desktopconf.set('required_components', ';'.join(desktop_required_components) + ';')
-if get_option('systemd')
-  desktopconf.set('hidden_under_systemd', 'X-GNOME-HiddenUnderSystemd=true')
-else
-  desktopconf.set('hidden_under_systemd', '')
-endif
 
 desktop_utils = find_program('desktop-file-validate', required: false)
 desktop_files = {
@@ -85,12 +80,6 @@ runconf.set('version', meson.project_version())
 runconf.set('wlrootsdir', join_paths(libexecdir, 'wlroots'))
 runconf.set('compositor', get_option('compositor'))
 
-if get_option('systemd')
-  runconf.set('session_manager', '--systemd')
-else
-  runconf.set('session_manager', '--builtin')
-endif
-
 configure_file(
   input: 'phosh-session.in',
   output: 'phosh-session',
@@ -101,10 +90,7 @@ configure_file(
 
 # Generate XML enum definitions for GSettings schema
 schema_enum_headers = files(
-  meson.project_source_root() / 'src' / 'app-grid.h',
-  meson.project_source_root() / 'src' / 'layout-manager.h',
-  meson.project_source_root() / 'src' / 'wwan' / 'phosh-wwan-backend.h',
-  meson.project_source_root() / 'src' / 'notifications' / 'notify-feedback.h',
+  '..' / 'src' / 'phosh-settings-enums.h',
 )
 generate_enums_schema = gnome.mkenums('sm.puri.phosh.enums.xml',
   sources: schema_enum_headers,
@@ -135,7 +121,7 @@ compile_schemas = custom_target('glib-compile-schemas',
   depends: [generate_enums_schema, copy_schema]
 )
 
-overrides = ['00_sm.puri.Phosh.gschema.override']
+overrides = ['00_mobi.Phosh.gschema.override']
 
 install_data(
   schemas + overrides,

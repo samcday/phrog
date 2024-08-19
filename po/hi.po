@@ -9,21 +9,21 @@ msgid ""
 msgstr ""
 "Project-Id-Version: phosh main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/World/Phosh/phosh/issues\n"
-"POT-Creation-Date: 2024-04-17 12:08+0000\n"
-"PO-Revision-Date: 2024-04-21 22:35+0530\n"
+"POT-Creation-Date: 2024-08-06 08:05+0000\n"
+"PO-Revision-Date: 2024-08-07 17:21+0530\n"
 "Last-Translator: Scrambled777 <weblate.scrambled777@simplelogin.com>\n"
-"Language-Team: Hindi\n"
+"Language-Team: Hindi <indlinux-hindi@lists.sourceforge.net>\n"
 "Language: hi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Gtranslator 46.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Gtranslator 46.1\n"
 
 #. Translators: this is the session name, no need to translate it
 #: data/phosh.session.desktop.in.in:4 data/wayland-sessions/phosh.desktop:3
 msgid "Phosh"
-msgstr "Phosh"
+msgstr "फ़ॉश"
 
 #: data/sm.puri.Phosh.desktop.in.in:4 data/wayland-sessions/phosh.desktop:4
 msgid "Phone Shell"
@@ -35,7 +35,7 @@ msgstr "मोबाइल के लिए विंडो प्रबंध�
 
 #: data/wayland-sessions/phosh.desktop:5
 msgid "This session logs you into Phosh"
-msgstr "यह सत्र आपको Phosh में ले जाता है"
+msgstr "यह सत्र आपको फ़ॉश में ले जाता है"
 
 #: plugins/caffeine-quick-setting/caffeine-quick-setting.desktop.in.in:5
 msgid "Caffeine Quick Setting"
@@ -52,6 +52,14 @@ msgstr "पंचांग"
 #: plugins/calendar/calendar.desktop.in.in:7
 msgid "A simple calendar widget"
 msgstr "एक साधारण कैलेंडर विजेट"
+
+#: plugins/dark-mode-quick-setting/dark-mode-quick-setting.desktop.in.in:5
+msgid "Dark Mode / Color Scheme Quick Setting"
+msgstr "गहरा मोड / रंग योजना त्वरित सेटिंग"
+
+#: plugins/dark-mode-quick-setting/dark-mode-quick-setting.desktop.in.in:7
+msgid "Toggle dark mode"
+msgstr "गहरा मोड टॉगल करें"
 
 #: plugins/emergency-info/emergency-info.desktop.in.in:5
 msgid "Emergency Info"
@@ -70,6 +78,22 @@ msgstr "प्रक्षेपक बॉक्स"
 msgid "Add launchers to the lock screen. <b>This plugin is experimental.</b>"
 msgstr "लॉक स्क्रीन पर लॉन्चर जोड़ें। <b>यह प्लगइन प्रायोगिक है।</b>"
 
+#: plugins/mobile-data-quick-setting/mobile-data-quick-setting.desktop.in.in:5
+msgid "Mobile Data Quick Setting"
+msgstr "मोबाइल डेटा त्वरित सेटिंग"
+
+#: plugins/mobile-data-quick-setting/mobile-data-quick-setting.desktop.in.in:7
+msgid "Toggle mobile data on/off"
+msgstr "मोबाइल डेटा चालू/बंद करें"
+
+#: plugins/night-light-quick-setting/night-light-quick-setting.desktop.in.in:5
+msgid "Night Light Quick Setting"
+msgstr "रात्रि प्रकाश त्वरित सेटिंग"
+
+#: plugins/night-light-quick-setting/night-light-quick-setting.desktop.in.in:7
+msgid "Toggle night light on/off"
+msgstr "रात्रि प्रकाश को चालू/बंद करें"
+
 #: plugins/ticket-box/ticket-box.desktop.in.in:4
 #: plugins/ticket-box/ticket-box.ui:14
 msgid "Ticket Box"
@@ -77,7 +101,7 @@ msgstr "टिकट बक्सा"
 
 #: plugins/ticket-box/ticket-box.desktop.in.in:6
 msgid "Show PDFs on the lock screen. <b>This plugin is experimental.</b>"
-msgstr "लॉक स्क्रीन पर PDF दिखाएं। <b>यह प्लगिन प्रायोगिक है।</b>"
+msgstr "लॉक स्क्रीन पर पीडीएफ दिखाएं। <b>यह प्लगिन प्रायोगिक है।</b>"
 
 #: plugins/upcoming-events/upcoming-events.desktop.in.in:4
 msgid "Upcoming Events"
@@ -87,28 +111,50 @@ msgstr "आगामी कार्यक्रम"
 msgid "Show upcoming calendar events"
 msgstr "आगामी पंचांग कार्यक्रम दिखाएं"
 
-#: src/app-grid-button.c:533 src/app-grid-button.c:590
+#: src/app-grid-button.c:153
+msgid "Add to Folder"
+msgstr "फोल्डर में जोड़ें"
+
+#: src/app-grid-button.c:177
+msgid "Create new folder"
+msgstr "नया फोल्डर बनाएं"
+
+#: src/app-grid-button.c:692 src/app-grid-button.c:749
 msgid "Application"
 msgstr "अनुप्रयोग"
 
-#: src/app-grid.c:254
+#: src/app-grid.c:263
 msgid "Show All Apps"
 msgstr "सभी ऐप्स दिखाएं"
 
-#: src/app-grid.c:257
+#: src/app-grid.c:266
 msgid "Show Only Mobile Friendly Apps"
 msgstr "केवल मोबाइल मैत्रीपूर्ण ऐप्स दिखाएं"
 
-#: src/bt-info.c:92
+#. Translators: a battery level in percent
+#: src/bt-device-row.c:72
+#, c-format
+msgid "Battery %.0f%%"
+msgstr "बैटरी %.0f%%"
+
+#: src/bt-info.c:95 src/ui/bt-status-page.ui:6
+msgid "Bluetooth"
+msgstr "ब्लूटूथ"
+
+#: src/bt-info.c:123
 msgctxt "bluetooth:enabled"
 msgid "On"
 msgstr "सक्रिय"
 
-#: src/bt-info.c:94
-msgid "Bluetooth"
-msgstr "ब्लूटूथ"
+#: src/bt-status-page.c:86
+msgid "No connectable Bluetooth Devices found"
+msgstr "कनेक्ट करने योग्य कोई ब्लूटूथ उपकरण नहीं मिला"
 
-#: src/call-notification.c:61
+#: src/bt-status-page.c:90
+msgid "Bluetooth disabled"
+msgstr "ब्लूटूथ अक्षम"
+
+#: src/call-notification.c:63
 msgid "Unknown caller"
 msgstr "अज्ञात कॉलर"
 
@@ -133,38 +179,38 @@ msgstr "आपातकालीन कॉल करने में असम�
 msgid "Internal error"
 msgstr "आंतरिक त्रुटि"
 
-#: src/end-session-dialog.c:173
+#: src/end-session-dialog.c:174
 msgid "Log Out"
 msgstr "लॉग आउट"
 
-#: src/end-session-dialog.c:176
+#: src/end-session-dialog.c:177
 #, c-format
 msgid "%s will be logged out automatically in %d second."
 msgid_plural "%s will be logged out automatically in %d seconds."
 msgstr[0] "%s को %d सेकेंड में स्वतः लॉग आउट कर दिया जाएगा।"
 msgstr[1] "%s को %d सेकेंडों में स्वतः लॉग आउट कर दिया जाएगा।"
 
-#: src/end-session-dialog.c:182
+#: src/end-session-dialog.c:183 src/ui/power-menu.ui:72
 msgid "Power Off"
 msgstr "बंद करें"
 
-#: src/end-session-dialog.c:183
+#: src/end-session-dialog.c:184
 #, c-format
 msgid "The system will power off automatically in %d second."
 msgid_plural "The system will power off automatically in %d seconds."
-msgstr[0] "यह तंत्र %d सेकेंड में स्वतः बंद हो जाएगा।"
-msgstr[1] "यह तंत्र %d सेकेंडों में स्वतः बंद हो जाएगा।"
+msgstr[0] "यह सिस्टम %d सेकेंड में स्वतः बंद हो जाएगा।"
+msgstr[1] "यह सिस्टम %d सेकेंडों में स्वतः बंद हो जाएगा।"
 
-#: src/end-session-dialog.c:189
+#: src/end-session-dialog.c:190
 msgid "Restart"
 msgstr "फिर आरंभ करें"
 
-#: src/end-session-dialog.c:190
+#: src/end-session-dialog.c:191
 #, c-format
 msgid "The system will restart automatically in %d second."
 msgid_plural "The system will restart automatically in %d seconds."
-msgstr[0] "यह तंत्र %d सेकेंड में स्वतः पुन: आरंभ हो जाएगा।"
-msgstr[1] "यह तंत्र %d सेकेंडों में स्वतः पुन: आरंभ हो जाएगा।"
+msgstr[0] "यह सिस्टम %d सेकेंड में स्वतः पुन: आरंभ हो जाएगा।"
+msgstr[1] "यह सिस्टम %d सेकेंडों में स्वतः पुन: आरंभ हो जाएगा।"
 
 #. Translators: quiet and silent are fbd profiles names:
 #. see https://source.puri.sm/Librem5/feedbackd#profiles
@@ -203,29 +249,29 @@ msgstr "हाँ"
 msgid "No"
 msgstr "नहीं"
 
-#: src/lockscreen.c:175 src/ui/lockscreen.ui:245
+#: src/lockscreen.c:166 src/ui/lockscreen.ui:245
 msgid "Enter Passcode"
 msgstr "पासकोड दर्ज करें"
 
-#: src/lockscreen.c:401
+#: src/lockscreen.c:392
 msgid "Checking…"
-msgstr "जाँच हो रही है…"
+msgstr "जांच हो रही है…"
 
-#: src/screenshot-manager.c:213
+#: src/screenshot-manager.c:221 src/ui/power-menu.ui:192
 msgid "Screenshot"
 msgstr "स्क्रीनशॉट"
 
-#: src/screenshot-manager.c:214
+#: src/screenshot-manager.c:222
 msgid "Screenshot copied to clipboard"
 msgstr "स्क्रीनशॉट को क्लिपबोर्ड पर कॉपी किया गया"
 
 #. Translators: Used when the title of a song is unknown
-#: src/media-player.c:322 src/ui/media-player.ui:161
+#: src/media-player.c:446 src/ui/media-player.ui:213
 msgid "Unknown Title"
 msgstr "अज्ञात शीर्षक"
 
 #. Translators: Used when the artist of a song is unknown
-#: src/media-player.c:330 src/ui/media-player.ui:148
+#: src/media-player.c:454 src/ui/media-player.ui:201
 msgid "Unknown Artist"
 msgstr "अज्ञात कलाकार"
 
@@ -282,21 +328,21 @@ msgstr "अभी"
 #: src/notifications/timestamp-label.c:91
 #, c-format
 msgid "<30s"
-msgstr "<30s"
+msgstr "<30 सेकंड"
 
 #. Translators: abbreviated time difference "Less than one minute"
 #. Please stick to a maximum of 7 chars
 #: src/notifications/timestamp-label.c:96
 #, c-format
 msgid "<1m"
-msgstr "<1m"
+msgstr "<1 मिनट"
 
 #. Translators: abbreviated time difference "About one minute"
 #. Please stick to a maximum of 7 chars
 #: src/notifications/timestamp-label.c:101
 #, c-format
 msgid "~1m"
-msgstr "~1m"
+msgstr "~1 मिनट"
 
 #. Translators: abbreviated, exact time difference "1 minute ago"
 #. Please stick to a maximum of 4 chars for the time unit
@@ -304,24 +350,24 @@ msgstr "~1m"
 #, c-format
 msgid "%dm"
 msgid_plural "%dm"
-msgstr[0] "%dm"
-msgstr[1] "%dm"
+msgstr[0] "%d मिनट"
+msgstr[1] "%d मिनट"
 
-#. Translators: abbreviated time difference "About 3 days ago"
+#. Translators: abbreviated time difference "About 3 hours ago"
 #. Please stick to a maximum of 4 chars for the time unit
 #: src/notifications/timestamp-label.c:117
 #, c-format
 msgid "~%dh"
 msgid_plural "~%dh"
-msgstr[0] "~%dh"
-msgstr[1] "~%dh"
+msgstr[0] "~%d घंटे"
+msgstr[1] "~%d घंटे"
 
 #. Translators: abbreviated time difference "About 1 day ago"
 #. Please stick to a maximum of 4 chars for the time unit
 #: src/notifications/timestamp-label.c:122
 #, c-format
 msgid "~1d"
-msgstr "~1d"
+msgstr "~1 दिन"
 
 #. Translators: abbreviated, exact time difference "3 days ago"
 #. Please stick to a maximum of 4 chars for the time unit
@@ -329,15 +375,15 @@ msgstr "~1d"
 #, c-format
 msgid "%dd"
 msgid_plural "%dd"
-msgstr[0] "%dd"
-msgstr[1] "%dd"
+msgstr[0] "%d दिन"
+msgstr[1] "%d दिन"
 
 #. Translators: abbreviated time difference "About 1 month ago"
 #. Please stick to a maximum of 4 chars for the time unit
 #: src/notifications/timestamp-label.c:132
 #, c-format
 msgid "~1mo"
-msgstr "~1mo"
+msgstr "~1 महीना"
 
 #. Translators: abbreviated, exact time difference "3 months ago"
 #. Please stick to a maximum of 4 chars for the time unit
@@ -345,8 +391,8 @@ msgstr "~1mo"
 #, c-format
 msgid "%dmo"
 msgid_plural "%dmos"
-msgstr[0] "%dmo"
-msgstr[1] "%dmos"
+msgstr[0] "%d महीना"
+msgstr[1] "%d महीने"
 
 #. Translators: abbreviated time difference "About 5 years ago"
 #. Please stick to a maximum of 4 chars for the time unit
@@ -354,8 +400,8 @@ msgstr[1] "%dmos"
 #, c-format
 msgid "~%dy"
 msgid_plural "~%dy"
-msgstr[0] "~%dy"
-msgstr[1] "~%dy"
+msgstr[0] "~%d वर्ष"
+msgstr[1] "~%d वर्षों"
 
 #. Translators: abbreviated time difference "Over 5 years ago"
 #. Please stick to a maximum of 4 chars for the time unit
@@ -363,8 +409,8 @@ msgstr[1] "~%dy"
 #, c-format
 msgid "Over %dy"
 msgid_plural "Over %dy"
-msgstr[0] "%dy से ज़्यादा"
-msgstr[1] "%dy से ज़्यादा"
+msgstr[0] "%d वर्ष से ज़्यादा"
+msgstr[1] "%d वर्षों से ज़्यादा"
 
 #. Translators: abbreviated time difference "almost 5 years ago"
 #. Please stick to a maximum of 4 chars for the time unit
@@ -372,12 +418,12 @@ msgstr[1] "%dy से ज़्यादा"
 #, c-format
 msgid "Almost %dy"
 msgid_plural "Almost %dy"
-msgstr[0] "लगभग %dy"
-msgstr[1] "लगभग %dy"
+msgstr[0] "लगभग %d वर्ष"
+msgstr[1] "लगभग %d वर्षों"
 
-#: src/polkit-auth-agent.c:227
+#: src/polkit-auth-agent.c:271
 msgid "Authentication dialog was dismissed by the user"
-msgstr "सत्यापन संवाद को उपयोक्ता के द्वारा खारिज़ कर दिया गया"
+msgstr "सत्यापन संवाद को उपयोक्ता के द्वारा खारिज कर दिया गया"
 
 #: src/polkit-auth-prompt.c:278 src/ui/gtk-mount-prompt.ui:20
 #: src/ui/network-auth-prompt.ui:82 src/ui/polkit-auth-prompt.ui:56
@@ -387,7 +433,7 @@ msgstr "पासवर्ड:"
 
 #: src/polkit-auth-prompt.c:325
 msgid "Sorry, that didn’t work. Please try again."
-msgstr "माफ़ करें, वह काम नहीं किया। कृपया दोबारा कोशिश करें।"
+msgstr "माफ करें, वह काम नहीं किया। कृपया दोबारा कोशिश करें।"
 
 #: src/rotateinfo.c:102
 msgid "Portrait"
@@ -416,15 +462,15 @@ msgstr "बंद करने के लिए ESC दबाएं"
 msgid "Running '%s' failed"
 msgstr "'%s' को चलाना विफल हुआ"
 
-#: src/settings/audio-settings.c:373
+#: src/settings/audio-settings.c:376
 msgid "Phone Shell Volume Control"
 msgstr "फोन शैल आवाज़ नियंत्रण"
 
-#: src/system-prompt.c:365
+#: src/system-prompt.c:376
 msgid "Passwords do not match."
 msgstr "पासवर्ड मेल नहीं खाते।"
 
-#: src/system-prompt.c:372
+#: src/system-prompt.c:383
 msgid "Password cannot be blank"
 msgstr "पासवर्ड खाली नहीं हो सकता है"
 
@@ -454,9 +500,13 @@ msgstr "पसंदीदा में जोड़े (_F)"
 msgid "View _Details"
 msgstr "विवरण देखें (_D)"
 
+#: src/ui/app-grid-button.ui:41
+msgid "_Remove from Folder"
+msgstr "फोल्डर से हटाएं (_R)"
+
 #: src/ui/app-grid.ui:24
 msgid "Search apps…"
-msgstr "एप्स खोजें…"
+msgstr "ऐप्स खोजें…"
 
 #: src/ui/audio-settings.ui:84
 msgid "Output Devices"
@@ -469,6 +519,14 @@ msgstr "आगत यंत्र"
 #: src/ui/audio-settings.ui:136
 msgid "Sound Settings"
 msgstr "ध्वनि सेटिंग्स"
+
+#: src/ui/bt-status-page.ui:32
+msgid "Enable Bluetooth"
+msgstr "ब्लूटूथ सक्षम करें"
+
+#: src/ui/bt-status-page.ui:53
+msgid "Bluetooth Settings"
+msgstr "ब्लूटूथ सेटिंग"
 
 #: src/ui/emergency-menu.ui:26
 msgid "Close the emergency call dialog"
@@ -534,7 +592,7 @@ msgstr "सत्यापन आवश्यक"
 #: src/ui/network-auth-prompt.ui:40
 #: plugins/ticket-box/prefs/ticket-box-prefs.c:90
 msgid "_Cancel"
-msgstr "रद्द (_C)"
+msgstr "रद्द करें (_C)"
 
 #: src/ui/network-auth-prompt.ui:58
 msgid "C_onnect"
@@ -544,31 +602,31 @@ msgstr "जुड़ें (_o)"
 msgid "Authenticate"
 msgstr "सत्यापित करें"
 
-#: src/ui/power-menu.ui:69
-msgid "_Power Off"
-msgstr "पावर बंद करें (_P)"
+#: src/ui/power-menu.ui:109
+msgid "Suspend"
+msgstr "निलंबित करें"
 
-#: src/ui/power-menu.ui:110
-msgid "_Lock"
-msgstr "ताला लगायें (_L)"
+#: src/ui/power-menu.ui:153
+msgid "Lock"
+msgstr "ताला लगायें"
 
-#: src/ui/power-menu.ui:151
-msgid "_Screenshot"
-msgstr "स्क्रीनशॉट (_S)"
-
-#: src/ui/power-menu.ui:192
-msgid "_Emergency"
-msgstr "आपातकाल (_E)"
+#: src/ui/power-menu.ui:231
+msgid "Emergency"
+msgstr "आपातकाल"
 
 #: src/ui/run-command-dialog.ui:6
 msgid "Run Command"
 msgstr "कमांड चलाएं"
 
-#: src/ui/settings.ui:327
+#: src/ui/settings.ui:329
 msgid "No notifications"
 msgstr "कोई अधिसूचना नहीं"
 
-#: src/ui/settings.ui:367
+#: src/ui/settings.ui:360
+msgid "Notifications"
+msgstr "अधिसूचनाएं"
+
+#: src/ui/settings.ui:369
 msgid "Clear all"
 msgstr "सभी साफ करें"
 
@@ -592,39 +650,25 @@ msgstr "निलंबित करें (_S)…"
 msgid "_Log Out…"
 msgstr "लॉग आउट (_L)…"
 
-#: src/ui/wifi-status-page.ui:32
-msgid "No Wi-Fi Device Found"
-msgstr "कोई वाई-फ़ाई उपकरण नहीं मिला"
+#: src/ui/wifi-status-page.ui:6 src/wifi-info.c:90
+msgid "Wi-Fi"
+msgstr "वाई-फाई"
 
-#: src/ui/wifi-status-page.ui:60
-msgid "Wi-Fi Disabled"
-msgstr "वाई-फाई अक्षम"
-
-#: src/ui/wifi-status-page.ui:97
-msgid "Wi-Fi Hotspot Active"
-msgstr "वाई-फाई हॉटस्पॉट सक्रिय"
-
-#: src/ui/wifi-status-page.ui:133
-msgid "No Wi-Fi Hotspots Found"
-msgstr "कोई वाई-फाई हॉटस्पॉट नहीं मिला"
-
-#: src/ui/wifi-status-page.ui:144
-msgid "Scan"
-msgstr "स्कैन"
-
-#: src/ui/wifi-status-page.ui:176
+#: src/ui/wifi-status-page.ui:68
 msgid "Wi-Fi Settings"
 msgstr "वाई-फाई सेटिंग्स"
 
-#. Translators: This is a time format for a date in
-#. long format
-#: src/util.c:344
-msgid "%A, %B %-e"
-msgstr "%A, %B %-e"
-
 #: src/vpn-info.c:89
 msgid "VPN"
-msgstr "VPN"
+msgstr "वीपीएन"
+
+# Adapted for Hindi Locale.
+# Scrambled777
+#. Translators: This is a time format for a date in
+#. long format
+#: src/wall-clock.c:222
+msgid "%A, %B %-e"
+msgstr "%A, %-e %B"
 
 #: src/widget-box.c:54
 msgid "Plugin not found"
@@ -635,9 +679,33 @@ msgstr "प्लगिन नहीं मिला"
 msgid "The plugin '%s' could not be loaded."
 msgstr "प्लगिन '%s' लोड नहीं किया जा सका।"
 
-#: src/wifi-info.c:90
-msgid "Wi-Fi"
-msgstr "वाई-फाई"
+#: src/wifi-status-page.c:51
+msgid "No Wi-Fi Device Found"
+msgstr "कोई वाई-फ़ाई उपकरण नहीं मिला"
+
+#: src/wifi-status-page.c:55
+msgid "Wi-Fi Disabled"
+msgstr "वाई-फाई अक्षम"
+
+#: src/wifi-status-page.c:56
+msgid "Enable Wi-Fi"
+msgstr "वाई-फाई सक्षम करें"
+
+#: src/wifi-status-page.c:59
+msgid "Wi-Fi Hotspot Active"
+msgstr "वाई-फाई हॉटस्पॉट सक्रिय"
+
+#: src/wifi-status-page.c:60
+msgid "Turn Off"
+msgstr "बंद करें"
+
+#: src/wifi-status-page.c:63
+msgid "No Wi-Fi Hotspots"
+msgstr "कोई वाई-फाई हॉटस्पॉट नहीं"
+
+#: src/wifi-status-page.c:64
+msgid "Scan"
+msgstr "स्कैन"
 
 #. Translators: Refers to the cellular wireless network
 #: src/wwan-info.c:210
@@ -647,7 +715,7 @@ msgstr "सेलुलर"
 #. Translators: Phosh prevents the session from going idle because the caffeine quick setting is toggled
 #: plugins/caffeine-quick-setting/caffeine-quick-setting.c:52
 msgid "Phosh on caffeine"
-msgstr "कैफ़ीन पर Phosh"
+msgstr "कैफ़ीन पर फ़ॉश"
 
 #: plugins/caffeine-quick-setting/caffeine-quick-setting.c:131
 msgid "On"
@@ -656,6 +724,18 @@ msgstr "सक्रिय"
 #: plugins/caffeine-quick-setting/caffeine-quick-setting.c:131
 msgid "Off"
 msgstr "अक्षम"
+
+#: plugins/dark-mode-quick-setting/dark-mode-quick-setting.c:35
+msgid "Default style"
+msgstr "तयशुदा शैली"
+
+#: plugins/dark-mode-quick-setting/dark-mode-quick-setting.c:36
+msgid "Dark mode"
+msgstr "गहरा मोड"
+
+#: plugins/dark-mode-quick-setting/dark-mode-quick-setting.c:37
+msgid "Light mode"
+msgstr "हल्का मोड"
 
 #: plugins/emergency-info/emergency-info.ui:39
 #: plugins/emergency-info/prefs/emergency-info-prefs.ui:70
@@ -765,9 +845,25 @@ msgstr "कोई प्रक्षेपक विन्यस्त नही
 msgid "Launchers"
 msgstr "प्रक्षेपक"
 
+#: plugins/mobile-data-quick-setting/mobile-data-quick-setting.c:66
+msgid "Mobile Data On"
+msgstr "मोबाइल डेटा चालू"
+
+#: plugins/mobile-data-quick-setting/mobile-data-quick-setting.c:66
+msgid "Mobile Data Off"
+msgstr "मोबाइल डेटा बंद"
+
+#: plugins/night-light-quick-setting/night-light-quick-setting.c:64
+msgid "Night Light On"
+msgstr "रात्रि प्रकाश चालू"
+
+#: plugins/night-light-quick-setting/night-light-quick-setting.c:64
+msgid "Night Light Off"
+msgstr "रात्रि प्रकाश बंद"
+
 #: plugins/ticket-box/ticket-box.ui:15
 msgid "No documents to display"
-msgstr "दिखाने के लिए कोई दस्तावेज़ नहीं है"
+msgstr "दिखाने के लिए कोई दस्तावेज नहीं है"
 
 #: plugins/ticket-box/ticket-box.ui:83
 msgid "Tickets"
@@ -787,7 +883,7 @@ msgstr "टिकट बॉक्स प्राथमिकताएं"
 
 #: plugins/ticket-box/prefs/ticket-box-prefs.ui:13
 msgid "Paths"
-msgstr "पाथ"
+msgstr "पथ"
 
 #: plugins/ticket-box/prefs/ticket-box-prefs.ui:18
 msgid "Folder Settings"
@@ -795,7 +891,7 @@ msgstr "फोल्डर सेटिंग्स"
 
 #: plugins/ticket-box/prefs/ticket-box-prefs.ui:19
 msgid "Where Phosh looks for your tickets"
-msgstr "जहाँ Phosh आपके टिकट ढूँढता है"
+msgstr "जहां फ़ॉश आपके टिकट खोजता है"
 
 #: plugins/ticket-box/prefs/ticket-box-prefs.ui:22
 msgid "Ticket Folder"
@@ -846,62 +942,10 @@ msgstr "समाप्त होता है"
 msgid "Untitled event"
 msgstr "अनाम कार्यक्रम"
 
-#~ msgid "Unknown application"
-#~ msgstr "अज्ञात एप्लिकेशन"
+#: plugins/wifi-hotspot-quick-setting/wifi-hotspot-quick-setting.c:62
+msgid "Hotspot On"
+msgstr "हॉटस्पॉट चालू"
 
-#~ msgctxt "timestamp-suffix-seconds"
-#~ msgid "s"
-#~ msgstr "से"
-
-#~ msgctxt "timestamp-suffix-minute"
-#~ msgid "m"
-#~ msgstr "मि"
-
-#~ msgctxt "timestamp-suffix-minutes"
-#~ msgid "m"
-#~ msgstr "मि"
-
-#~ msgctxt "timestamp-suffix-hour"
-#~ msgid "h"
-#~ msgstr "घ"
-
-#~ msgctxt "timestamp-suffix-hours"
-#~ msgid "h"
-#~ msgstr "घ"
-
-#~ msgctxt "timestamp-suffix-day"
-#~ msgid "d"
-#~ msgstr "दि"
-
-#~ msgctxt "timestamp-suffix-days"
-#~ msgid "d"
-#~ msgstr "दि"
-
-#~ msgctxt "timestamp-suffix-month"
-#~ msgid "mo"
-#~ msgstr "माह"
-
-#~ msgctxt "timestamp-suffix-months"
-#~ msgid "mos"
-#~ msgstr "माह"
-
-#~ msgctxt "timestamp-suffix-year"
-#~ msgid "y"
-#~ msgstr "सा"
-
-#~ msgctxt "timestamp-suffix-years"
-#~ msgid "y"
-#~ msgstr "सा"
-
-#, c-format
-#~ msgid "%s%d%s"
-#~ msgstr "%s%d%s"
-
-#~ msgid "App"
-#~ msgstr "एप"
-
-#~ msgid "Lock Screen"
-#~ msgstr "लॉक स्क्रीन"
-
-#~ msgid "Logout"
-#~ msgstr "लॉग आउट"
+#: plugins/wifi-hotspot-quick-setting/wifi-hotspot-quick-setting.c:64
+msgid "Hotspot Off"
+msgstr "हॉटस्पॉट बंद"
