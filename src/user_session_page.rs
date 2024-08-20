@@ -59,7 +59,7 @@ mod imp {
     use std::sync::OnceLock;
 
     #[derive(CompositeTemplate, Default)]
-    #[template(resource = "/com/samcday/phrog/lockscreen-user-session.ui")]
+    #[template(resource = "/mobi/phosh/phrog/lockscreen-user-session.ui")]
     pub struct UserSessionPage {
         #[template_child]
         pub box_users: TemplateChild<ListBox>,

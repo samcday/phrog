@@ -16,7 +16,7 @@
 //     use libphosh::subclass::quick_setting::QuickSettingImpl;
 //
 //     #[derive(CompositeTemplate, Default)]
-//     #[template(resource = "/com/samcday/phrog/shuffle-keypad-quick-setting.ui")]
+//     #[template(resource = "/mobi/phosh/phrog/shuffle-keypad-quick-setting.ui")]
 //     pub struct ShuffleKeypadQuickSetting {
 //         #[template_child]
 //         pub info: TemplateChild<libphosh::StatusIcon>,

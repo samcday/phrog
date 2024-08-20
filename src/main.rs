@@ -20,7 +20,7 @@ use libphosh::WallClock;
 use std::io::{BufRead, BufReader};
 use std::process::Stdio;
 
-pub const APP_ID: &str = "com.samcday.phrog";
+pub const APP_ID: &str = "mobi.phosh.phrog";
 
 const PHOC_RUNNING_PREFIX: &str = "Running compositor on wayland display '";
 

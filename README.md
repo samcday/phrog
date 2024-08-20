@@ -65,7 +65,7 @@ Make sure the local project schema is installed:
 
 ```
 mkdir -p $HOME/.local/share/glib-2.0/schemas
-cp resources/com.samcday.phrog.gschema.xml $HOME/.local/share/glib-2.0/schemas/
+cp resources/mobi.phosh.phrog.gschema.xml $HOME/.local/share/glib-2.0/schemas/
 glib-compile-schemas $HOME/.local/share/glib-2.0/schemas/
 ```
 
