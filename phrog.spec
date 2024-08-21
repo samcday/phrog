@@ -37,7 +37,7 @@ Provides:       greetd-%{name} = %{version}
 
 %install
 install -d %{buildroot}%{_datadir}/glib-2.0/schemas/
-%{__install} -Dpm 0644 resources/com.samcday.phrog.gschema.xml %{buildroot}%{_datadir}/glib-2.0/schemas/
+%{__install} -Dpm 0644 resources/mobi.phosh.phrog.gschema.xml %{buildroot}%{_datadir}/glib-2.0/schemas/
 %cargo_install
 
 %if %{with check}

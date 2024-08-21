@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <schemalist>
-    <schema id="com.samcday.phrog" path="/com/samcday/phrog/">
+    <schema id="mobi.phosh.phrog" path="/mobi/phosh/phrog/">
         <key name="last-user" type="s">
             <default>""</default>
             <summary>The last user that successfully launched a session</summary>
