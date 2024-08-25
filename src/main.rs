@@ -13,7 +13,7 @@ mod virtual_pointer;
 
 use crate::shell::Shell;
 use clap::Parser;
-use gtk::glib::g_info;
+use gtk::glib::{g_info, Object};
 use gtk::{gdk, gio, Application};
 use libphosh::prelude::*;
 use libphosh::WallClock;
@@ -27,13 +27,15 @@ const PHOC_RUNNING_PREFIX: &str = "Running compositor on wayland display '";
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
-    #[arg(
-        short,
-        long,
-        default_value = "phoc",
-        help = "Launch nested phoc compositor if necessary"
+    #[arg(short, long, default_value = "false",
+        help = "Launch nested phoc compositor"
     )]
-    phoc: Option<String>,
+    phoc: bool,
+
+    #[arg(short, long, default_value = "false",
+        help = "Fake interactions with greetd (useful for local testing)"
+    )]
+    fake: bool,
 }
 
 pub fn init(phoc: Option<String>) {
@@ -70,14 +72,12 @@ pub fn spawn_phoc(binary: &str) -> Option<String> {
 
     // Wait for startup message.
     let mut display = None;
-    for line in BufReader::new(phoc.stdout.as_mut().unwrap()).lines() {
+    for line in BufReader::new(phoc.stdout.as_mut()?).lines() {
         let line = line.unwrap();
         if line.starts_with(PHOC_RUNNING_PREFIX) {
             display = Some(
-                line.strip_prefix(PHOC_RUNNING_PREFIX)
-                    .unwrap()
-                    .strip_suffix('\'')
-                    .unwrap()
+                line.strip_prefix(PHOC_RUNNING_PREFIX)?
+                    .strip_suffix('\'')?
                     .to_string(),
             );
             break;
@@ -95,20 +95,19 @@ pub fn spawn_phoc(binary: &str) -> Option<String> {
 
 fn main() {
     let mut args = Args::parse();
-    args.phoc = args
-        .phoc
-        .and_then(|v| if v.is_empty() { None } else { Some(v) });
 
     // TODO: check XDG_RUNTIME_DIR here? Angry if not set? Default?
 
-    init(args.phoc);
+    init(if args.phoc { Some(String::from("phoc")) } else { None });
 
     let _app = Application::builder().application_id(APP_ID).build();
 
     let wall_clock = WallClock::new();
     wall_clock.set_default();
 
-    let shell = Shell::new();
+    let shell: Shell = Object::builder()
+        .property("fake-greetd", args.fake)
+        .build();
     shell.set_default();
 
     shell.connect_ready(|_| {
@@ -141,7 +140,6 @@ mod test {
     use greetd_ipc::{Request, Response};
     use input_event_codes::*;
     use std::sync::{Arc, Once};
-    use std::thread::sleep;
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use wayland_client::Connection;
 
@@ -194,7 +192,6 @@ mod test {
 
                 match Request::read_from(&mut stream).unwrap() {
                     Request::StartSession { .. } => {
-                        sleep(Duration::from_millis(2500));
                         Response::Success.write_to(&mut stream).unwrap();
                         logged_in.store(true, Ordering::Relaxed);
                     }

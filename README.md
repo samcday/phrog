@@ -14,6 +14,8 @@ This is a fork of [phog](https://gitlab.com/mobian1/phog).
 
 ```
 sudo dnf copr enable samcday/phrog
+# If you want to test the latest and/or greatest
+# sudo dnf copr enable samcday/phrog-nightly
 sudo dnf install phrog
 ```
 
@@ -23,20 +25,18 @@ For now, you must build from source, see the Development section below.
 
 ### Running
 
-`phrog` is primarily intended to run via greetd. That is, your `/etc/greetd/config.toml` should
-look something like this:
+`phrog` is primarily intended to run via greetd - your `/etc/greetd/config.toml` should
+look like this:
 
 ```
 [default_session]
 command = "systemd-cat --identifier=phrog phoc -E phrog"
-# or this if you are using postmarketOS:
-command = "dbus-run-session phoc -E phrog"
 ```
 
-You can also run it directly in a `greetd-fakegreet` session, assuming you have that binary installed:
+You can also run/test it directly in a faked greetd session:
 
 ```
-FAKEGREET=1 phoc -E "fakegreet phrog"
+phrog --fake
 ```
 
 ## Development
@@ -75,10 +75,10 @@ Build the app.
 cargo build
 ```
 
-Have a fake conversation with greetd.
+Run the app in test mode.
 
 ```
-FAKEGREET=1 phoc -E "fakegreet ./target/debug/phrog"
+./target/debug/phrog --fake
 ```
 
 [phosh-deps]: https://gitlab.gnome.org/World/Phosh/phosh#dependencies
