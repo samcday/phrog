@@ -1,4 +1,7 @@
 use glib::Object;
+use greetd_ipc::AuthMessageType::Secret;
+use greetd_ipc::ErrorType::AuthError;
+use greetd_ipc::{Request, Response};
 use gtk::glib;
 
 glib::wrapper! {
@@ -19,6 +22,8 @@ impl Default for Lockscreen {
 }
 
 mod imp {
+    use crate::lockscreen::fake_greetd_interaction;
+    use crate::shell::Shell;
     use crate::user_session_page::UserSessionPage;
     use crate::APP_ID;
     use anyhow::{anyhow, Context};
@@ -26,15 +31,17 @@ mod imp {
     use greetd_ipc::codec::SyncCodec;
     use greetd_ipc::{AuthMessageType, ErrorType, Request, Response};
     use gtk::gio::Settings;
-    use gtk::glib::{clone, closure_local, g_critical, g_warning, ObjectExt};
+    use gtk::glib::{clone, closure_local, g_critical, g_warning, ObjectExt, Properties};
     use gtk::prelude::SettingsExtManual;
+    use gtk::prelude::*;
+    use gtk::glib::PropertySet;
     use gtk::subclass::prelude::{ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt};
     use gtk::subclass::widget::WidgetImpl;
     use gtk::traits::WidgetExt;
     use gtk::{gio, glib};
     use libphosh::prelude::*;
     use libphosh::subclass::lockscreen::LockscreenImpl;
-    use libphosh::{LockscreenPage, Shell};
+    use libphosh::LockscreenPage;
     use std::cell::{OnceCell, RefCell};
     use std::os::unix::net::UnixStream;
     use std::process;
@@ -42,8 +49,7 @@ mod imp {
     #[derive(Default)]
     pub struct Lockscreen {
         user_session_page: OnceCell<UserSessionPage>,
-        greetd_sender: OnceCell<Sender<Request>>,
-        greetd_receiver: OnceCell<Receiver<Response>>,
+        greetd: RefCell<Option<(Sender<Request>, Receiver<Response>)>>,
         session: RefCell<Option<String>>,
     }
 
@@ -59,24 +65,20 @@ mod imp {
         let (greetd_resp_send, greetd_resp_recv) = async_channel::bounded(1);
 
         gio::spawn_blocking(move || {
-            let mut sock = UnixStream::connect(std::env::var("GREETD_SOCK").unwrap()).unwrap();
-
+            let mut sock = std::env::var("GREETD_SOCK").ok().and_then(|path| UnixStream::connect(path).ok());
             while let Ok(req) = greetd_req_recv.recv_blocking() {
-                if let Err(err) = req.write_to(&mut sock) {
-                    g_critical!("greetd", "error sending request: {}", err);
+                let resp = if let Some(ref mut sock) = sock {
+                    req.write_to(sock)
+                        .and_then(|_| { Response::read_from(sock) })
+                        .unwrap_or_else(|err| Response::Error {
+                            error_type: ErrorType::Error, description: err.to_string() })
+                } else {
+                    Response::Error {error_type: ErrorType::Error, description: "Greetd not connected".into()}
+                };
+
+                if let Err(err) = greetd_resp_send.send_blocking(resp) {
+                    g_critical!("greetd", "error sending greetd response on channel: {}", err);
                     continue;
-                }
-                match Response::read_from(&mut sock) {
-                    Err(err) => {
-                        g_critical!("greetd", "error receiving response: {}", err);
-                        continue;
-                    }
-                    Ok(resp) => {
-                        if let Err(err) = greetd_resp_send.send_blocking(resp) {
-                            g_critical!("greetd", "error sending response on channel: {}", err);
-                            continue;
-                        }
-                    }
                 }
             }
         });
@@ -92,10 +94,6 @@ mod imp {
                 .add_extra_page(self.user_session_page.get().unwrap());
             self.obj().set_default_page(LockscreenPage::Extra);
 
-            let (greetd_sender, greetd_receiver) = run_greetd();
-
-            self.greetd_sender.set(greetd_sender.clone()).unwrap();
-            self.greetd_receiver.set(greetd_receiver.clone()).unwrap();
             self.obj()
                 .connect_page_notify(clone!(@weak self as this => move |ls| {
                     glib::spawn_future_local(clone!(@weak ls => async move {
@@ -178,23 +176,26 @@ mod imp {
                     format!("GDMSESSION={}", session.id()),
                 ],
             })
-            .await
-            .context("start session")?;
+                .await
+                .context("start session")?;
 
-            return Ok(());
+            Ok(())
         }
 
         async fn greetd_req(&self, req: Request) -> anyhow::Result<Response> {
-            self.greetd_sender
-                .get()
-                .unwrap()
+            if libphosh::Shell::default().downcast::<Shell>().unwrap().fake_greetd() {
+                return fake_greetd_interaction(req);
+            }
+            if self.greetd.borrow().is_none() {
+                self.greetd.set(Some(run_greetd()));
+            }
+            let mut borrow = self.greetd.borrow_mut();
+            let (sender, receiver) = borrow.as_mut().unwrap();
+            sender
                 .send(req)
                 .await
                 .context("send greetd request")?;
-            match self
-                .greetd_receiver
-                .get()
-                .unwrap()
+            match receiver
                 .recv()
                 .await
                 .context("receive greetd response")?
@@ -209,13 +210,14 @@ mod imp {
 
         async fn greetd_interaction(&self, req: Request) -> Option<Request> {
             let resp = self.greetd_req(req).await;
+
             if let Err(err) = resp {
                 g_critical!("greetd", "failed to send greetd request: {:?}", err);
+                self.obj().set_unlock_status("Greetd error, check logs");
                 return None;
             }
-            let resp = resp.unwrap();
 
-            match resp {
+            match resp.unwrap() {
                 Response::AuthMessage {
                     auth_message_type,
                     auth_message,
@@ -243,14 +245,9 @@ mod imp {
                     }
                 }
                 Response::Success => {
-                    self.obj().set_unlock_status("Logging in...");
-                    Shell::default().fade_out(0);
-                    // Properly handling failure here would be nice.
-                    // We'd need a shell "uhh this is awkward fade back in now" method.
+                    self.obj().set_unlock_status("Success. Logging in...");
                     self.start_session().await.unwrap();
-                    // It would be better to signal from lockscreen in such a way that we can do
-                    // a proper graceful exit from main.
-                    process::exit(0);
+                    libphosh::Shell::default().fade_out(0);
                 }
                 Response::Error {
                     error_type: ErrorType::AuthError,
@@ -284,5 +281,25 @@ mod imp {
                 this.obj().clear_pin_entry();
             }));
         }
+    }
+}
+
+fn fake_greetd_interaction(req: Request) -> anyhow::Result<Response> {
+    match req {
+        Request::CreateSession { .. } => anyhow::Ok(Response::AuthMessage {
+            auth_message_type: Secret,
+            auth_message: "Password:".into(),
+        }),
+        Request::PostAuthMessageResponse { response } => {
+            if response.is_none() || response.unwrap() != "0" {
+                anyhow::Ok(Response::Error {
+                    error_type: AuthError,
+                    description: String::from("0"),
+                })
+            } else {
+                anyhow::Ok(Response::Success)
+            }
+        }
+        _ => anyhow::Ok(Response::Success),
     }
 }

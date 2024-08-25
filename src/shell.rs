@@ -12,23 +12,24 @@ impl Shell {
     }
 }
 
-impl Default for Shell {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 mod imp {
+    use std::cell::Cell;
     // use crate::keypad_shuffle::ShuffleKeypadQuickSetting;
     use crate::lockscreen::Lockscreen;
-    use gtk::glib::Type;
+    use gtk::glib::{Properties, Type};
     use gtk::prelude::StaticType;
     use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass};
-    use gtk::{gio, glib};
+    use gtk::glib;
+    use gtk::prelude::*;
+    use gtk::subclass::prelude::*;
     use libphosh::subclass::shell::ShellImpl;
 
-    #[derive(Default)]
-    pub struct Shell;
+    #[derive(Default, Properties)]
+    #[properties(wrapper_type = super::Shell)]
+    pub struct Shell {
+        #[property(get, set)]
+        fake_greetd: Cell<bool>,
+    }
 
     #[glib::object_subclass]
     impl ObjectSubclass for Shell {
@@ -37,6 +38,7 @@ mod imp {
         type ParentType = libphosh::Shell;
     }
 
+    #[glib::derived_properties]
     impl ObjectImpl for Shell {}
 
     impl ShellImpl for Shell {
