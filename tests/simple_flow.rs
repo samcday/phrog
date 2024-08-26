@@ -8,23 +8,114 @@ use libphosh::prelude::WallClockExt;
 use libphosh::WallClock;
 use std::env::temp_dir;
 use std::os::unix::net::UnixListener;
-
+use std::path::{Path, PathBuf};
+use std::process::{Child, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use virtual_keyboard::VirtualKeyboard;
-use virtual_pointer::VirtualPointer;
 use greetd_ipc::codec::SyncCodec;
 use greetd_ipc::AuthMessageType::Secret;
 use greetd_ipc::{Request, Response};
 use input_event_codes::*;
-use std::sync::Arc;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use wayland_client::Connection;
 use phrog::shell::Shell;
+use std::sync::Arc;
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use anyhow::Context;
+use virtual_keyboard::VirtualKeyboard;
+use virtual_pointer::VirtualPointer;
+use wayland_client::Connection;
+use zbus::zvariant::ObjectPath;
+
+fn system_dbus(tmpdir: &Path) -> Child {
+    let config_path = tmpdir.join("system-dbus.xml");
+    let sock_path = tmpdir.join("system.sock");
+    let dbus_path = format!("unix:path={}", sock_path.display());
+    std::fs::write(&config_path, format!(r#"
+    <!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-Bus Bus Configuration 1.0//EN"
+     "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
+    <busconfig>
+      <type>system</type>
+      <keep_umask/>
+      <listen>{}</listen>
+      <policy context="default">
+        <allow send_destination="*" eavesdrop="true"/>
+        <allow eavesdrop="true"/>
+        <allow own="*"/>
+      </policy>
+    </busconfig>
+    "#, dbus_path)).expect("failed to write system dbus config");
+
+    std::env::set_var("DBUS_SYSTEM_BUS_ADDRESS", dbus_path);
+    let child = std::process::Command::new("dbus-daemon")
+        .arg(format!("--config-file={}", config_path.to_str().unwrap()))
+        .stdout(Stdio::inherit())
+        .stdin(Stdio::null())
+        .stderr(Stdio::inherit())
+        .spawn()
+        .expect("failed to launch dbus-daemon");
+
+    let start = Instant::now();
+    while !sock_path.exists() {
+        if start.elapsed() > Duration::from_secs(5) {
+            panic!("dbus-daemon failed to launch");
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
+
+    child
+}
+
+struct AccountsFixture {}
+struct UserFixture {}
+
+#[zbus::interface(name = "org.freedesktop.Accounts")]
+impl AccountsFixture {
+    async fn list_cached_users(&self) -> Vec<ObjectPath> {
+        vec![ObjectPath::from_static_str_unchecked("/org/freedesktop/Accounts/1")]
+    }
+}
+
+#[zbus::interface(name = "org.freedesktop.Accounts.User")]
+impl UserFixture {
+    #[zbus(property)]
+    async fn real_name(&self) -> &str {
+        "Phoshi"
+    }
+    #[zbus(property)]
+    async fn user_name(&self) -> &str {
+        "phoshi"
+    }
+    #[zbus(property)]
+    async fn icon_file(&self) -> String {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/phoshi.png").display().to_string()
+    }
+}
+
+async fn run_accounts_fixture() -> anyhow::Result<zbus::Connection> {
+    let connection = zbus::Connection::system().await.context("failed to connect to system bus")?;
+    connection
+        .object_server()
+        .at("/org/freedesktop/Accounts", AccountsFixture {})
+        .await.context("failed to serve org.freedesktop.Accounts")?;
+    connection
+        .object_server()
+        .at("/org/freedesktop/Accounts/1", UserFixture {})
+        .await.context("failed to serve org.freedesktop.Accounts.User")?;
+    connection
+        .request_name("org.freedesktop.Accounts")
+        .await.context("failed to request name")?;
+    Ok(connection)
+}
 
 #[test]
 fn test_simple_flow() {
+    let tmp = tempdir::TempDir::new("phrog-test-system-dbus").unwrap();
+    let _system_dbus = system_dbus(tmp.path());
+
     let nested_phoc = phrog::init(Some("phoc".into()));
+
+    let _conn = async_global_executor::block_on(async move {
+        run_accounts_fixture().await.unwrap()
+    });
 
     let logged_in = Arc::new(AtomicBool::new(false));
     fake_greetd(&logged_in);
@@ -41,52 +132,52 @@ fn test_simple_flow() {
     let ready_called = Arc::new(AtomicBool::new(false));
     let (ready_tx, ready_rx) = async_channel::bounded(1);
     shell.connect_ready(clone!(@strong ready_called => move |_| {
-            ready_called.store(true, Ordering::Relaxed);
-            ready_tx.send_blocking(()).expect("notify ready failed");
-        }));
+        ready_called.store(true, Ordering::Relaxed);
+        ready_tx.send_blocking(()).expect("notify ready failed");
+    }));
+
     glib::spawn_future_local(clone!(@weak shell => async move {
-            ready_rx.recv().await.unwrap();
-            glib::timeout_future(Duration::from_millis(2000)).await;
+        ready_rx.recv().await.unwrap();
+        glib::timeout_future(Duration::from_millis(2000)).await;
+        // Move the mouse to where the main user selection should be.
+        // TODO: calculate this somehow?
+        // If we had access to the Gtk.Widget ref I think it's straightforward to determine
+        // absolute (screen) coords...
+        let (_, _, width, height) = shell.usable_area();
+        let width = width as u32;
+        let height = height as u32;
+        let x = width / 2;
+        let y = height / 2 - 25; // 25 pixel nudge upwards
+        vp.move_to(x, y, width, height).await;
 
-            // Move the mouse to where the main user selection should be.
-            // TODO: calculate this somehow?
-            // If we had access to the Gtk.Widget ref I think it's straightforward to determine
-            // absolute (screen) coords...
-            let (_, _, width, height) = shell.usable_area();
-            let width = width as u32;
-            let height = height as u32;
-            let x = width / 2;
-            let y = height / 2 - 25; // 25 pixel nudge upwards
-            vp.move_to(x, y, width, height).await;
+        // wait a few millis after mouse move - for improved observation in recordings
+        glib::timeout_future(Duration::from_millis(250)).await;
+        // then click the main user
+        vp.click();
 
-            // wait a few millis after mouse move - for improved observation in recordings
-            glib::timeout_future(Duration::from_millis(250)).await;
-            // then click the main user
-            vp.click();
+        // wait for keypad page to slide in
+        glib::timeout_future(Duration::from_millis(500)).await;
 
-            // wait for keypad page to slide in
-            glib::timeout_future(Duration::from_millis(500)).await;
+        // type password (uh, literally)
+        let keys = [
+            KEY_P!(),
+            KEY_A!(),
+            KEY_S!(),
+            KEY_S!(),
+            KEY_W!(),
+            KEY_O!(),
+            KEY_R!(),
+            KEY_D!(),
+            KEY_ENTER!(),
+        ];
+        for key in keys {
+            kb.keypress(key).await;
+            glib::timeout_future(Duration::from_millis(100)).await;
+        }
 
-            // type password (uh, literally)
-            let keys = [
-                KEY_P!(),
-                KEY_A!(),
-                KEY_S!(),
-                KEY_S!(),
-                KEY_W!(),
-                KEY_O!(),
-                KEY_R!(),
-                KEY_D!(),
-                KEY_ENTER!(),
-            ];
-            for key in keys {
-                kb.keypress(key).await;
-                glib::timeout_future(Duration::from_millis(100)).await;
-            }
-
-            glib::timeout_future(Duration::from_millis(2500)).await;
-            gtk::main_quit();
-        }));
+        glib::timeout_future(Duration::from_millis(2500)).await;
+        gtk::main_quit();
+    }));
 
     gtk::main();
 

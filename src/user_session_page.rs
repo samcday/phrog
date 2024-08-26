@@ -45,18 +45,21 @@ impl UserSessionPage {
 
 mod imp {
     use crate::session_object::SessionObject;
-    use crate::{sessions, users, APP_ID};
+    use crate::{sessions, APP_ID};
     use glib::subclass::InitializingObject;
     use gtk::gio::{ListStore, Settings};
     use gtk::glib::subclass::Signal;
     use gtk::glib::{clone, g_info, g_warning};
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
-    use gtk::{glib, CompositeTemplate, ListBox};
+    use gtk::{glib, CompositeTemplate, Image, ListBox};
     use libhandy::prelude::*;
     use libhandy::ActionRow;
     use std::cell::OnceCell;
     use std::sync::OnceLock;
+    use gtk::gdk_pixbuf::Pixbuf;
+    use crate::accounts::AccountsProxyBlocking;
+    use crate::user::UserProxyBlocking;
 
     #[derive(CompositeTemplate, Default)]
     #[template(resource = "/mobi/phosh/phrog/lockscreen-user-session.ui")]
@@ -94,15 +97,22 @@ mod imp {
             let last_user = settings.string("last-user").to_string();
             let last_session = settings.string("last-session").to_string();
 
-            for user in users::users() {
+            let conn = zbus::blocking::Connection::system().unwrap();
+            let accounts = AccountsProxyBlocking::new(&conn).unwrap();
+            for path in accounts.list_cached_users().unwrap() {
+                let user = UserProxyBlocking::builder(&conn)
+                    .path(path).unwrap().build().unwrap();
+                let user_name = user.user_name().unwrap();
                 let row = ActionRow::builder()
-                    .title(user.1)
-                    .subtitle(user.0.clone())
+                    .title(user.real_name().unwrap())
+                    .subtitle(&user_name)
                     .activatable(true)
                     .build();
+                let pixbuf = Pixbuf::from_file_at_scale(&user.icon_file().unwrap(), 32, 32, true).ok();
+                row.add_prefix(&Image::from_pixbuf(pixbuf.as_ref()));
                 self.box_users.add(&row);
                 // use last-user setting as default for user selection
-                if user.0 == last_user {
+                if user_name == last_user {
                     g_warning!(
                         "user-session-page",
                         "defaulting user selection to {}",

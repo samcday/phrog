@@ -37,12 +37,11 @@ fn main() -> anyhow::Result<()> {
         .property("fake-greetd", args.fake)
         .build();
     shell.set_default();
+    shell.set_locked(true);
 
     shell.connect_ready(|_| {
         println!("Shell is ready");
     });
-
-    shell.set_locked(true);
 
     gtk::main();
 

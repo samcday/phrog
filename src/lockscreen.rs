@@ -257,7 +257,7 @@ mod imp {
                     self.cancel_session().await;
                     glib::timeout_future_seconds(1).await;
                     return Some(Request::CreateSession {
-                        username: self.user_session_page.get().unwrap().username().unwrap(),
+                        username: self.user_session_page.get()?.username()?,
                     });
                 }
                 v => g_critical!("greetd", "unexpected response to start session: {:?}", v),
