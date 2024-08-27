@@ -1,5 +1,6 @@
 mod keypad_shuffle;
 mod lockscreen;
+mod nested_phoc;
 mod session_object;
 mod sessions;
 mod shell;
@@ -17,12 +18,10 @@ use gtk::glib::{g_info, Object};
 use gtk::{gdk, gio, Application};
 use libphosh::prelude::*;
 use libphosh::WallClock;
-use std::io::{BufRead, BufReader};
-use std::process::Stdio;
+use std::io::{BufRead};
+use crate::nested_phoc::NestedPhoc;
 
 pub const APP_ID: &str = "mobi.phosh.phrog";
-
-const PHOC_RUNNING_PREFIX: &str = "Running compositor on wayland display '";
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -38,12 +37,14 @@ struct Args {
     fake: bool,
 }
 
-pub fn init(phoc: Option<String>) {
+pub fn init(phoc: Option<String>) -> Option<NestedPhoc> {
     gio::resources_register_include!("phrog.gresource").expect("Failed to register resources.");
 
-    let display = if let Some(phoc_binary) = phoc {
-        let display_name = spawn_phoc(&phoc_binary).expect("failed to spawn phoc");
-        g_info!("phrog", "spawned phoc on {}", display_name);
+    let mut nested_phoc = if let Some(phoc_binary) = phoc {
+        Some(NestedPhoc::new(&phoc_binary))
+    } else { None };
+    let display = if let Some(nested_phoc) = nested_phoc.as_mut() {
+        let display_name = nested_phoc.wait_for_startup();
         std::env::set_var("WAYLAND_DISPLAY", &display_name);
         gdk::set_allowed_backends("wayland");
         gdk::init();
@@ -60,37 +61,7 @@ pub fn init(phoc: Option<String>) {
 
     gtk::init().unwrap();
     libhandy::init();
-}
-
-pub fn spawn_phoc(binary: &str) -> Option<String> {
-    let mut phoc = std::process::Command::new(binary)
-        .stdout(Stdio::piped())
-        .stdin(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn()
-        .unwrap();
-
-    // Wait for startup message.
-    let mut display = None;
-    for line in BufReader::new(phoc.stdout.as_mut()?).lines() {
-        let line = line.unwrap();
-        if line.starts_with(PHOC_RUNNING_PREFIX) {
-            display = Some(
-                line.strip_prefix(PHOC_RUNNING_PREFIX)?
-                    .strip_suffix('\'')?
-                    .to_string(),
-            );
-            break;
-        }
-    }
-
-    ctrlc::set_handler(move || {
-        phoc.kill().unwrap();
-        phoc.wait().unwrap();
-    })
-    .unwrap();
-
-    display
+    nested_phoc
 }
 
 fn main() {
@@ -98,7 +69,7 @@ fn main() {
 
     // TODO: check XDG_RUNTIME_DIR here? Angry if not set? Default?
 
-    init(if args.phoc { Some(String::from("phoc")) } else { None });
+    let _nested_phoc = init(if args.phoc { Some(String::from("phoc")) } else { None });
 
     let _app = Application::builder().application_id(APP_ID).build();
 
@@ -143,62 +114,12 @@ mod test {
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use wayland_client::Connection;
 
-    static START: Once = Once::new();
-    fn test_setup() {
-        START.call_once(|| {
-            init(None);
-        });
-    }
-
     #[test]
     fn test_simple_flow() {
-        test_setup();
+        let nested_phoc = init(Some("phoc".into()));
 
         let logged_in = Arc::new(AtomicBool::new(false));
-        // run a fake greetd server
-        std::thread::spawn(clone!(@strong logged_in => move || {
-            let path = temp_dir().join(format!(
-                ".phrog-test-greetd-{}.sock",
-                SystemTime::now()
-                    .duration_since(UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs()
-            ));
-            std::env::set_var("GREETD_SOCK", &path);
-            let listener = UnixListener::bind(&path).unwrap();
-            loop {
-                let (mut stream, _addr) = listener
-                    .accept()
-                    .expect("failed to accept greetd connection");
-                match Request::read_from(&mut stream).unwrap() {
-                    Request::CreateSession { .. } => Response::AuthMessage {
-                        auth_message_type: Secret,
-                        auth_message: "Password:".to_string(),
-                    }
-                    .write_to(&mut stream)
-                    .unwrap(),
-                    req => panic!("wrong request: {:?}", req),
-                }
-
-                match Request::read_from(&mut stream).unwrap() {
-                    Request::PostAuthMessageResponse {
-                        response: Some(password),
-                    } => {
-                        assert_eq!(password, "password");
-                        Response::Success.write_to(&mut stream).unwrap();
-                    }
-                    req => panic!("wrong request: {:?}", req),
-                }
-
-                match Request::read_from(&mut stream).unwrap() {
-                    Request::StartSession { .. } => {
-                        Response::Success.write_to(&mut stream).unwrap();
-                        logged_in.store(true, Ordering::Relaxed);
-                    }
-                    req => panic!("wrong request: {:?}", req),
-                }
-            }
-        }));
+        fake_greetd(&logged_in);
 
         let wall_clock = WallClock::new();
         wall_clock.set_default();
@@ -263,5 +184,51 @@ mod test {
 
         assert!(ready_called.load(Ordering::Relaxed));
         assert!(logged_in.load(Ordering::Relaxed));
+    }
+
+    fn fake_greetd(logged_in: &Arc<AtomicBool>) {
+        let path = temp_dir().join(format!(
+            ".phrog-test-greetd-{}.sock",
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_secs()
+        ));
+        std::env::set_var("GREETD_SOCK", &path);
+        std::thread::spawn(clone!(@strong logged_in => move || {
+            let listener = UnixListener::bind(&path).unwrap();
+            loop {
+                let (mut stream, _addr) = listener
+                    .accept()
+                    .expect("failed to accept greetd connection");
+                match Request::read_from(&mut stream).unwrap() {
+                    Request::CreateSession { .. } => Response::AuthMessage {
+                        auth_message_type: Secret,
+                        auth_message: "Password:".to_string(),
+                    }
+                    .write_to(&mut stream)
+                    .unwrap(),
+                    req => panic!("wrong request: {:?}", req),
+                }
+
+                match Request::read_from(&mut stream).unwrap() {
+                    Request::PostAuthMessageResponse {
+                        response: Some(password),
+                    } => {
+                        assert_eq!(password, "password");
+                        Response::Success.write_to(&mut stream).unwrap();
+                    }
+                    req => panic!("wrong request: {:?}", req),
+                }
+
+                match Request::read_from(&mut stream).unwrap() {
+                    Request::StartSession { .. } => {
+                        Response::Success.write_to(&mut stream).unwrap();
+                        logged_in.store(true, Ordering::Relaxed);
+                    }
+                    req => panic!("wrong request: {:?}", req),
+                }
+            }
+        }));
     }
 }
