@@ -66,6 +66,11 @@ jobs:
           # for phrog tests
           sudo apt update
           sudo apt-get install -y xvfb wf-recorder phoc
+      - name: cache phosh build
+        uses: actions/cache@v4
+        with:
+          path: phosh/_build
+          key: ${{ runner.os }}-phosh
       - name: build phosh (temporary until libphosh is packaged upstream)
         run: |
           set -uexo pipefail
