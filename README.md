@@ -30,13 +30,13 @@ look like this:
 
 ```
 [default_session]
-command = "systemd-cat --identifier=phrog phoc -E phrog"
+command = "systemd-cat --identifier=phrog phrog -p"
 ```
 
 You can also run/test it directly in a faked greetd session:
 
 ```
-phrog --fake
+phrog --phoc --fake
 ```
 
 ## Development
@@ -78,7 +78,7 @@ cargo build
 Run the app in test mode.
 
 ```
-./target/debug/phrog --fake
+cargo run -- --phoc --fake
 ```
 
 [phosh-deps]: https://gitlab.gnome.org/World/Phosh/phosh#dependencies
