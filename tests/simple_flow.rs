@@ -46,7 +46,7 @@ fn test_simple_flow() {
         }));
     glib::spawn_future_local(clone!(@weak shell => async move {
             ready_rx.recv().await.unwrap();
-            glib::timeout_future(Duration::from_millis(500)).await;
+            glib::timeout_future(Duration::from_millis(2000)).await;
 
             // Move the mouse to where the main user selection should be.
             // TODO: calculate this somehow?
