@@ -11,6 +11,7 @@ async-channel = "2.2.1"
 anyhow = "1.0.82"
 libphosh = { path = "libphosh-rs/libphosh" }
 clap = { version = "4.5.4", features = ["derive"] }
+wayland-client = "0.31.3"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
