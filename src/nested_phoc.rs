@@ -20,6 +20,7 @@ impl NestedPhoc {
     pub fn new(binary: &str) -> Self {
         Self {
             process: std::process::Command::new(binary)
+                .arg("-S")
                 .stdout(Stdio::piped())
                 .stdin(Stdio::null())
                 .stderr(Stdio::null())
