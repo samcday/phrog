@@ -106,6 +106,21 @@ async fn run_accounts_fixture() -> anyhow::Result<zbus::Connection> {
     Ok(connection)
 }
 
+fn start_recording(name: &str) -> Option<Child> {
+    if let Ok(base_path) = std::env::var("RECORD_TESTS") {
+        if let Ok(child) = std::process::Command::new("wf-recorder")
+            .arg("-f")
+            .arg(PathBuf::from(base_path).join(format!("{}.mp4", name)))
+            .stdout(Stdio::null())
+            .stdin(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()
+        { Some(child) } else { None }
+    } else {
+        None
+    }
+}
+
 #[test]
 fn test_simple_flow() {
     let tmp = tempdir::TempDir::new("phrog-test-system-dbus").unwrap();
@@ -179,6 +194,7 @@ fn test_simple_flow() {
         gtk::main_quit();
     }));
 
+    let _recording = start_recording("simple-flow");
     gtk::main();
 
     assert!(ready_called.load(Ordering::Relaxed));
