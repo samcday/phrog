@@ -25,9 +25,6 @@ impl wayland_client::Dispatch<wl_registry::WlRegistry, ()> for DetectPhoc {
         _: &wayland_client::Connection,
         _: &wayland_client::QueueHandle<DetectPhoc>,
     ) {
-        // When receiving events from the wl_registry, we are only interested in the
-        // `global` event, which signals a new available global.
-        // When receiving this event, we just print its characteristics in this example.
         if let wl_registry::Event::Global { interface, .. } = event {
             if interface == "phosh_private" {
                 state.0 = true;
@@ -38,15 +35,8 @@ impl wayland_client::Dispatch<wl_registry::WlRegistry, ()> for DetectPhoc {
 
 fn is_phoc_detected() -> anyhow::Result<bool> {
     let conn = wayland_client::Connection::connect_to_env()?;
-
-    // Retrieve the WlDisplay Wayland object from the connection. This object is
-    // the starting point of any Wayland program, from which all other objects will
-    // be created.
     let display = conn.display();
-
-    // Create an event queue for our event processing
     let mut event_queue = conn.new_event_queue();
-    // And get its handle to associate new objects to it
     let qh = event_queue.handle();
     let _registry = display.get_registry(&qh, ());
     let detect = &mut DetectPhoc(false);
