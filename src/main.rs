@@ -4,7 +4,6 @@ use gtk::glib::Object;
 use gtk::Application;
 use libphosh::prelude::*;
 use libphosh::WallClock;
-use wayland_client::protocol::wl_registry;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -21,7 +20,7 @@ struct Args {
 }
 
 fn main() -> anyhow::Result<()> {
-    let mut args = Args::parse();
+    let args = Args::parse();
 
     // TODO: check XDG_RUNTIME_DIR here? Angry if not set? Default?
 

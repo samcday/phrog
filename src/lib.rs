@@ -28,7 +28,7 @@ impl wayland_client::Dispatch<wl_registry::WlRegistry, ()> for DetectPhoc {
         // When receiving events from the wl_registry, we are only interested in the
         // `global` event, which signals a new available global.
         // When receiving this event, we just print its characteristics in this example.
-        if let wl_registry::Event::Global { name, interface, version } = event {
+        if let wl_registry::Event::Global { interface, .. } = event {
             if interface == "phosh_private" {
                 state.0 = true;
             }

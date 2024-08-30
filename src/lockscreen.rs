@@ -31,7 +31,7 @@ mod imp {
     use greetd_ipc::codec::SyncCodec;
     use greetd_ipc::{AuthMessageType, ErrorType, Request, Response};
     use gtk::gio::Settings;
-    use gtk::glib::{clone, closure_local, g_critical, g_warning, ObjectExt, Properties};
+    use gtk::glib::{clone, closure_local, g_critical, g_warning, ObjectExt};
     use gtk::prelude::SettingsExtManual;
     use gtk::prelude::*;
     use gtk::glib::PropertySet;
@@ -44,7 +44,6 @@ mod imp {
     use libphosh::LockscreenPage;
     use std::cell::{OnceCell, RefCell};
     use std::os::unix::net::UnixStream;
-    use std::process;
 
     #[derive(Default)]
     pub struct Lockscreen {
