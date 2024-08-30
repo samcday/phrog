@@ -89,7 +89,7 @@ jobs:
           cp resources/mobi.phosh.phrog.gschema.xml $HOME/.local/share/glib-2.0/schemas/
           glib-compile-schemas $HOME/.local/share/glib-2.0/schemas/
           # start phoc + wf-recorder
-          dbus-run-session xvfb-run -a -s -noreset phoc -E "wf-recorder -f tests.mp4" &
+          dbus-run-session xvfb-run -a -s -noreset phoc -S -E "wf-recorder -f tests.mp4" &
           export WAYLAND_DISPLAY=wayland-0
           trap "pkill phoc; sleep 1" EXIT
           # wait some moments for compositor startup. would be better to properly parse out the
