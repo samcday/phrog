@@ -3,13 +3,14 @@ use gtk::{gdk, gio};
 use wayland_client::protocol::wl_registry;
 use crate::nested_phoc::NestedPhoc;
 
+mod accounts;
 mod keypad_shuffle;
 mod lockscreen;
 pub mod nested_phoc;
 mod session_object;
 mod sessions;
 pub mod shell;
-mod users;
+mod user;
 mod user_session_page;
 
 pub const APP_ID: &str = "mobi.phosh.phrog";

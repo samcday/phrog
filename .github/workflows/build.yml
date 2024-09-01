@@ -88,15 +88,11 @@ jobs:
           mkdir -p $HOME/.local/share/glib-2.0/schemas/
           cp resources/mobi.phosh.phrog.gschema.xml $HOME/.local/share/glib-2.0/schemas/
           glib-compile-schemas $HOME/.local/share/glib-2.0/schemas/
-          # start phoc + wf-recorder
-          dbus-run-session xvfb-run -a -s -noreset phoc -S -E "wf-recorder -f tests.mp4" &
-          export WAYLAND_DISPLAY=wayland-0
-          trap "pkill phoc; sleep 1" EXIT
-          # wait some moments for compositor startup. would be better to properly parse out the
-          # display name and readiness state from phoc stdout.
-          sleep 3
+
           # run tests
-          cargo test --verbose -- --test-threads=1 --nocapture
+          mkdir -p test-recordings/
+          export RECORD_TESTS=`pwd`/test-recordings/
+          dbus-run-session xvfb-run -a -s -noreset phoc -S -E "cargo test --verbose -- --test-threads=1 --nocapture"
       - uses: actions/upload-artifact@v4
         with:
           name: x86-64-debug
@@ -104,5 +100,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: tests-recording
-          path: tests.mp4
+          name: tests-recordings
+          path: test-recordings/
