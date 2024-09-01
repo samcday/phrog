@@ -3,5 +3,6 @@
     <gresource prefix="/mobi/phosh/phrog/">
         <file compressed="true" preprocess="xml-stripblanks">lockscreen-user-session.ui</file>
         <file compressed="true" preprocess="xml-stripblanks">shuffle-keypad-quick-setting.ui</file>
+        <file compressed="true">phrog.css</file>
     </gresource>
 </gresources>
