@@ -67,17 +67,13 @@ jobs:
           # for phrog tests
           sudo apt update
           sudo apt-get install -y xvfb wf-recorder phoc
-      - name: build phosh (temporary until libphosh is packaged upstream)
-        run: |
-          set -uexo pipefail
-          cd phosh
-          sudo apt-get build-dep -t trixie-nightly -y ./
-          meson setup --prefix=/usr -Dbindings-lib=true _build .
-          sudo meson install -C _build
+          # TODO: why is this necessary?
+          sudo apt-get install -y libgmobile-dev
+          sudo apt-get build-dep -t trixie-nightly -y ./phosh/
       - name: Build
         run: |
           set -uexo pipefail
-          cargo build --all-targets --verbose
+          cargo build --features=static --all-targets --verbose
       - name: Test
         run: |
           set -uexo pipefail
@@ -92,7 +88,7 @@ jobs:
           # run tests
           mkdir -p test-recordings/
           export RECORD_TESTS=`pwd`/test-recordings/
-          dbus-run-session xvfb-run -a -s -noreset phoc -S -E "cargo test --verbose -- --test-threads=1 --nocapture"
+          dbus-run-session xvfb-run -a -s -noreset phoc -S -E "cargo test --features=static --verbose -- --test-threads=1 --nocapture"
       - uses: actions/upload-artifact@v4
         with:
           name: x86-64-debug

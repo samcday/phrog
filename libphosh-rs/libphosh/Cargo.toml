@@ -15,6 +15,7 @@ keywords = ["phosh", "gnome"]
 name = "libphosh"
 
 [features]
+static = ["ffi/static"]
 
 [package.metadata.docs.rs]
 all-features = true

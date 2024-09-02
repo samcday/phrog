@@ -993,6 +993,7 @@ dependencies = [
  "libc",
  "libhandy-sys",
  "pango-sys",
+ "pkg-config",
  "system-deps",
 ]
 
