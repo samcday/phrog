@@ -1,23 +1,23 @@
-phosh-lockscreen list {
+phrog-user-session-page list {
     background-color: transparent;
 }
 
-phosh-lockscreen row:not(:selected):not(:focus) {
+phrog-user-session-page row:not(:selected):not(:focus) {
     background-color: @phosh_button_bg_color;
 }
 
-phosh-lockscreen row:first-child {
+phrog-user-session-page row:first-child {
     -gtk-outline-top-left-radius: 7px;
     -gtk-outline-top-right-radius: 7px;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
 }
 
-phosh-lockscreen row:not(:last-child) {
+phrog-user-session-page row:not(:last-child) {
     border-width: 1px 1px 0px 1px;
 }
 
-phosh-lockscreen row:last-child {
+phrog-user-session-page row:last-child {
     -gtk-outline-bottom-left-radius: 7px;
     -gtk-outline-bottom-right-radius: 7px;
     border-bottom-left-radius: 8px;
