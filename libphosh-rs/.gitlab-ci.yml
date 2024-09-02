@@ -41,7 +41,7 @@ variables:
     - eatmydata apt install -y --no-install-recommends $DEPS
     - rustup default $RUST_VERSION
     - git submodule update --checkout
-    - meson subprojects download
+    - meson subprojects download phosh
     - if [ -n "$UPSTREAM_BRANCH" ]; then cd subprojects/phosh && git fetch origin "$UPSTREAM_BRANCH" && git checkout FETCH_HEAD && git show HEAD && cd -; fi
     - cd subprojects/phosh && eatmydata apt -y --no-install-recommends build-dep . && cd -
 
@@ -67,18 +67,7 @@ build-doc:
     RUST_VERSION: nightly
   <<: *common_before_script
   script:
-    - git checkout -f *.gir
-    - ./fix.sh
-    # generate the docs
-    - export PATH=$HOME/.cargo/bin:$PATH
-    - curl --proto '=https' --tlsv1.2 -sSf -o gir-rustdoc.py
-      https://gitlab.gnome.org/World/Rust/gir-rustdoc/-/raw/main/gir-rustdoc.py
-    - chmod +x gir-rustdoc.py
-    - cargo install rustdoc-stripper
-    - ./generator.py --embed-docs
-    - eval $(./gir-rustdoc.py --branch=$CI_COMMIT_BRANCH pre-docs)
-    - cargo doc --all-features --no-deps
-    - ./gir-rustdoc.py html-index
+    - ./build-doc.sh
     - mv target/doc/ docs
   artifacts:
     paths:

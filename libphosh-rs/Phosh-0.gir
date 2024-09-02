@@ -2373,9 +2373,9 @@ the #PhoshBtInfo:enabled property can be useful.</doc>
 
 #PhoshBtManager tracks the Bluetooth status that
 is whether the adapter is present and enabled.</doc>
-      <source-position filename="src/bt-manager.h" line="20"/>
+      <source-position filename="src/bt-manager.h" line="21"/>
       <constructor name="new" c:identifier="phosh_bt_manager_new">
-        <source-position filename="src/bt-manager.h" line="22"/>
+        <source-position filename="src/bt-manager.h" line="23"/>
         <return-value transfer-ownership="full">
           <type name="BtManager" c:type="PhoshBtManager*"/>
         </return-value>
@@ -2383,7 +2383,7 @@ is whether the adapter is present and enabled.</doc>
       <method name="connect_device_async"
               c:identifier="phosh_bt_manager_connect_device_async"
               glib:finish-func="connect_device_finish">
-        <source-position filename="src/bt-manager.h" line="30"/>
+        <source-position filename="src/bt-manager.h" line="31"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
         </return-value>
@@ -2422,7 +2422,7 @@ is whether the adapter is present and enabled.</doc>
       <method name="connect_device_finish"
               c:identifier="phosh_bt_manager_connect_device_finish"
               throws="1">
-        <source-position filename="src/bt-manager.h" line="36"/>
+        <source-position filename="src/bt-manager.h" line="37"/>
         <return-value transfer-ownership="none">
           <type name="gboolean" c:type="gboolean"/>
         </return-value>
@@ -2440,7 +2440,7 @@ is whether the adapter is present and enabled.</doc>
         <doc xml:space="preserve"
              filename="src/bt-manager.c"
              line="507">Gets the currently connectable devices.</doc>
-        <source-position filename="src/bt-manager.h" line="27"/>
+        <source-position filename="src/bt-manager.h" line="28"/>
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/bt-manager.c"
@@ -2459,7 +2459,7 @@ is whether the adapter is present and enabled.</doc>
       <method name="get_enabled"
               c:identifier="phosh_bt_manager_get_enabled"
               glib:get-property="enabled">
-        <source-position filename="src/bt-manager.h" line="24"/>
+        <source-position filename="src/bt-manager.h" line="25"/>
         <return-value transfer-ownership="none">
           <type name="gboolean" c:type="gboolean"/>
         </return-value>
@@ -2472,7 +2472,7 @@ is whether the adapter is present and enabled.</doc>
       <method name="get_icon_name"
               c:identifier="phosh_bt_manager_get_icon_name"
               glib:get-property="icon-name">
-        <source-position filename="src/bt-manager.h" line="23"/>
+        <source-position filename="src/bt-manager.h" line="24"/>
         <return-value transfer-ownership="none">
           <type name="utf8" c:type="const char*"/>
         </return-value>
@@ -2485,7 +2485,7 @@ is whether the adapter is present and enabled.</doc>
       <method name="get_info"
               c:identifier="phosh_bt_manager_get_info"
               glib:get-property="info">
-        <source-position filename="src/bt-manager.h" line="29"/>
+        <source-position filename="src/bt-manager.h" line="30"/>
         <return-value transfer-ownership="none">
           <type name="utf8" c:type="const char*"/>
         </return-value>
@@ -2498,7 +2498,7 @@ is whether the adapter is present and enabled.</doc>
       <method name="get_n_connected"
               c:identifier="phosh_bt_manager_get_n_connected"
               glib:get-property="n-connected">
-        <source-position filename="src/bt-manager.h" line="28"/>
+        <source-position filename="src/bt-manager.h" line="29"/>
         <return-value transfer-ownership="none">
           <type name="guint" c:type="guint"/>
         </return-value>
@@ -2511,7 +2511,7 @@ is whether the adapter is present and enabled.</doc>
       <method name="get_present"
               c:identifier="phosh_bt_manager_get_present"
               glib:get-property="present">
-        <source-position filename="src/bt-manager.h" line="26"/>
+        <source-position filename="src/bt-manager.h" line="27"/>
         <return-value transfer-ownership="none">
           <type name="gboolean" c:type="gboolean"/>
         </return-value>
@@ -2522,7 +2522,7 @@ is whether the adapter is present and enabled.</doc>
         </parameters>
       </method>
       <method name="set_enabled" c:identifier="phosh_bt_manager_set_enabled">
-        <source-position filename="src/bt-manager.h" line="25"/>
+        <source-position filename="src/bt-manager.h" line="26"/>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
         </return-value>
@@ -2581,7 +2581,7 @@ is whether the adapter is present and enabled.</doc>
     <record name="BtManagerClass"
             c:type="PhoshBtManagerClass"
             glib:is-gtype-struct-for="BtManager">
-      <source-position filename="src/bt-manager.h" line="20"/>
+      <source-position filename="src/bt-manager.h" line="21"/>
       <field name="parent_class">
         <type name="ManagerClass" c:type="PhoshManagerClass"/>
       </field>
@@ -42389,14 +42389,14 @@ and unlock keypad.
         <return-value transfer-ownership="none">
           <doc xml:space="preserve"
                filename="src/lockscreen.c"
-               line="1057">The #PhoshLockscreenPage that is currently shown</doc>
+               line="1073">The #PhoshLockscreenPage that is currently shown</doc>
           <type name="LockscreenPage" c:type="PhoshLockscreenPage"/>
         </return-value>
         <parameters>
           <instance-parameter name="self" transfer-ownership="none">
             <doc xml:space="preserve"
                  filename="src/lockscreen.c"
-                 line="1055">The #PhoshLockscreen</doc>
+                 line="1071">The #PhoshLockscreen</doc>
             <type name="Lockscreen" c:type="PhoshLockscreen*"/>
           </instance-parameter>
         </parameters>
@@ -42481,7 +42481,7 @@ and unlock keypad.
                 default-value="PHOSH_LOCKSCREEN_PAGE_UNLOCK">
         <doc xml:space="preserve"
              filename="src/lockscreen.c"
-             line="937">The currently active carousel page</doc>
+             line="952">The currently active carousel page</doc>
         <type name="LockscreenPage"/>
       </property>
       <field name="parent_instance">
@@ -42495,7 +42495,7 @@ and unlock keypad.
       <glib:signal name="wakeup-output" when="last">
         <doc xml:space="preserve"
              filename="src/lockscreen.c"
-             line="953">Emitted when the output showing the lock screen should be woken
+             line="968">Emitted when the output showing the lock screen should be woken
 up.</doc>
         <return-value transfer-ownership="none">
           <type name="none" c:type="void"/>
@@ -70590,6 +70590,12 @@ The properties are overridden in the order they are defined.</doc>
         </parameter>
       </parameters>
     </function>
+    <function name="init" c:identifier="phosh_init">
+      <source-position filename="src/phosh-main.h" line="9"/>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+    </function>
     <function name="log_set_log_domains"
               c:identifier="phosh_log_set_log_domains">
       <doc xml:space="preserve"
@@ -71066,6 +71072,12 @@ The properties are overridden in the order they are defined.</doc>
         </parameter>
       </parameters>
     </function>
+    <function name="register_resource" c:identifier="phosh_register_resource">
+      <source-position filename="src/phosh-resources.h" line="8"/>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+    </function>
     <function name="rfkill_dbus_rfkill_interface_info"
               c:identifier="phosh_rfkill_dbus_rfkill_interface_info"
               moved-to="RfkillDBusRfkill.interface_info">
@@ -71256,6 +71268,19 @@ The properties are overridden in the order they are defined.</doc>
           <type name="utf8" c:type="const char*"/>
         </parameter>
       </parameters>
+    </function>
+    <function name="uninit" c:identifier="phosh_uninit">
+      <source-position filename="src/phosh-main.h" line="10"/>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+    </function>
+    <function name="unregister_resource"
+              c:identifier="phosh_unregister_resource">
+      <source-position filename="src/phosh-resources.h" line="9"/>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
     </function>
     <function name="util_append_to_strv"
               c:identifier="phosh_util_append_to_strv">

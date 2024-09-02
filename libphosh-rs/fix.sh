@@ -39,3 +39,12 @@ xmlstarlet ed -L \
 xmlstarlet ed -L \
 	   -d '///_:function[@name="create_shm_file"]' \
 	Phosh-0.gir
+
+# GnomeBluetooth is complicated at present. No direct need for it in bindings (atm).
+xmlstarlet ed -L \
+	   -d '///_:class[@name="BtDeviceRow"]' \
+	   -d '///_:class[@name="BtManager"]' \
+	   -d '///_:method[@c:identifier="phosh_shell_get_bt_manager"]' \
+	   -d '///_:record[@name="BtManagerClass"]' \
+	   -d '///_:include[@name="GnomeBluetooth"]' \
+	Phosh-0.gir

@@ -57,7 +57,7 @@ def update_submodule(submodule_path, conf):
     if any(submodule_path.iterdir()):
         return False
     print("=> Initializing {} submodule...".format(submodule_path))
-    run_command(["git", "submodule", "update", "--init", submodule_path])
+    run_command(["git", "submodule", "update", "--init", "--checkout", submodule_path])
     print("<= Done!")
 
     if ask_yes_no_question(

@@ -147,12 +147,6 @@ pub trait ShellExt: IsA<Shell> + sealed::Sealed + 'static {
         }
     }
 
-    //#[doc(alias = "phosh_shell_get_bt_manager")]
-    //#[doc(alias = "get_bt_manager")]
-    //fn bt_manager(&self) -> /*Ignored*/BtManager {
-    //    unsafe { TODO: call ffi:phosh_shell_get_bt_manager() }
-    //}
-
     //#[doc(alias = "phosh_shell_get_builtin_monitor")]
     //#[doc(alias = "get_builtin_monitor")]
     //fn builtin_monitor(&self) -> /*Ignored*/Option<Monitor> {
