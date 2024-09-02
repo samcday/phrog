@@ -19,7 +19,7 @@ mod imp {
     use gtk::glib::{Properties, Type};
     use gtk::prelude::StaticType;
     use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass};
-    use gtk::glib;
+    use gtk::{gdk, glib, CssProvider, StyleContext};
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
     use libphosh::subclass::shell::ShellImpl;
@@ -36,6 +36,15 @@ mod imp {
         const NAME: &'static str = "PhrogShell";
         type Type = super::Shell;
         type ParentType = libphosh::Shell;
+        fn class_init(_klass: &mut Self::Class) {
+            let provider = CssProvider::new();
+            provider.load_from_resource("/mobi/phosh/phrog/phrog.css");
+            StyleContext::add_provider_for_screen(
+                &gdk::Screen::default().unwrap(),
+                &provider,
+                gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
+            );
+        }
     }
 
     #[glib::derived_properties]
