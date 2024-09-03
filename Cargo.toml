@@ -36,5 +36,6 @@ wayland-protocols-wlr = { version = "0.3.1", features = ["client"] }
 tempdir = "0.3.7"
 
 [features]
-static = ["libphosh/static"]
+keypad-shuffle = []
+static = ["libphosh/static", "keypad-shuffle"]
 test = []

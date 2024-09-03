@@ -1,5 +1,6 @@
 use gtk::{glib, Widget};
 use std::time::{Duration, Instant, SystemTime};
+use gtk::glib::g_info;
 use gtk::prelude::*;
 use wayland_client::protocol::wl_pointer::ButtonState;
 use wayland_client::protocol::wl_registry;
@@ -77,13 +78,12 @@ impl VirtualPointer {
     }
 
     pub async fn click_on(&self, widget: &impl IsA<Widget>) {
-        let window = widget.window().unwrap();
-        let (_, mut x, y) = window.origin();
-        x += window.width() / 2;
-        self.move_to(x as _, y as _).await;
+        let (mut x, mut y) = widget.translate_coordinates(&widget.toplevel().unwrap(), 0, 0).unwrap();
+        x += widget.allocated_width() / 2;
+        self.click_at(x as _, y as _).await;
     }
 
-    pub async fn move_to(&self, x: u32, y: u32) {
+    pub async fn click_at(&self, x: u32, y: u32) {
         self.ptr.motion_absolute(
             self.ts.elapsed().unwrap().as_millis() as _,
             x,

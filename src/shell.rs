@@ -14,14 +14,16 @@ impl Shell {
 
 mod imp {
     use std::cell::Cell;
-    // use crate::keypad_shuffle::ShuffleKeypadQuickSetting;
+    use std::collections::HashSet;
     use crate::lockscreen::Lockscreen;
-    use gtk::glib::{Properties, Type};
+    use gtk::glib::{GString, Properties, Type};
     use gtk::prelude::StaticType;
     use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass};
     use gtk::{gdk, glib, CssProvider, StyleContext};
+    use gtk::gio::{IOExtensionPoint, Settings};
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
+    use libphosh::ffi::PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET;
     use libphosh::subclass::shell::ShellImpl;
 
     #[derive(Default, Properties)]
@@ -47,24 +49,35 @@ mod imp {
         }
     }
 
+    impl Shell {
+        #[cfg(feature = "keypad-shuffle")]
+        fn enable_keypad_shuffle(&self) {
+            IOExtensionPoint::implement(
+                std::str::from_utf8(PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET).unwrap(),
+                crate::keypad_shuffle::ShuffleKeypadQuickSetting::static_type(),
+                "keypad-shuffle",
+                10
+            ).expect("failed to implement plugin point");
+
+            let settings = Settings::new("sm.puri.phosh.plugins");
+            let mut qs: HashSet<GString> = HashSet::from_iter(settings.strv("quick-settings"));
+            qs.insert(GString::from("keypad-shuffle"));
+            settings.set_strv("quick-settings", qs.iter().collect::<Vec<&GString>>()).expect("failed to enable keypad-shuffle");
+        }
+    }
+
     #[glib::derived_properties]
-    impl ObjectImpl for Shell {}
+    impl ObjectImpl for Shell {
+        fn constructed(&self) {
+            self.parent_constructed();
+            #[cfg(feature = "keypad-shuffle")]
+            self.enable_keypad_shuffle();
+        }
+    }
 
     impl ShellImpl for Shell {
         fn get_lockscreen_type(&self) -> Type {
             Lockscreen::static_type()
         }
-
-        // fn load_extension_point(&self, extension_point: String) {
-        //     if extension_point == "phosh-quick-setting-widget" {
-        //         gio::IOExtensionPoint::implement(
-        //             extension_point,
-        //             ShuffleKeypadQuickSetting::static_type(),
-        //             "keypad-shuffle",
-        //             10,
-        //         )
-        //         .unwrap();
-        //     }
-        // }
     }
 }

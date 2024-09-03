@@ -4,7 +4,8 @@ use wayland_client::protocol::wl_registry;
 use crate::nested_phoc::NestedPhoc;
 
 mod accounts;
-mod keypad_shuffle;
+#[cfg(feature = "keypad-shuffle")]
+pub mod keypad_shuffle;
 pub mod lockscreen;
 pub mod nested_phoc;
 mod session_object;
