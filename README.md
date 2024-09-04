@@ -2,9 +2,10 @@
 
 Greetd-compatible greeter for mobile phones
 
-This is a fork of [phog](https://gitlab.com/mobian1/phog).
 
-`phrog` uses Phosh to handle a greetd conversation
+`phrog` uses Phosh to handle a [greetd][] conversation
+
+It is the spiritual successor of [phog][].
 
 ## Usage
 
@@ -25,7 +26,7 @@ For now, you must build from source, see the Development section below.
 
 ### Running
 
-`phrog` is primarily intended to run via greetd - your `/etc/greetd/config.toml` should
+`phrog` is primarily intended to run via [greetd][] - your `/etc/greetd/config.toml` should
 look like this:
 
 ```
@@ -33,7 +34,7 @@ look like this:
 command = "systemd-cat --identifier=phrog phrog"
 ```
 
-You can also run/test it directly in a faked greetd session:
+You can also run/test it directly with a faked session, run this from a terminal in your favourite (Wayland) desktop environment:
 
 ```
 phrog --fake
@@ -41,25 +42,29 @@ phrog --fake
 
 ## Development
 
-Right now, this project depends on unversioned/WIP upstream changes. `phosh` and `libphosh-rs`
-are subtrees of this repo.
+If your system has `libphosh` packaged and available, you should be able to simply:
 
-You must first build the libphosh fork:
+```sh
+# Run 🐸 from source
+cargo run -- --fake
 
-(so, hey, fam. this means you need to do all the stuff [over here][phosh-deps], alright? okay cool.)
-
-```
-meson setup -Dbindings-lib=true _build-phosh phosh
-meson install --destdir=install -C _build-phosh
+# Run 🐸 tests
+cargo test
 ```
 
-Now you can build with these flags:
+You can also run with the locally vendored libphosh source, statically linked. This is useful if you want to work on a feature that also requires changes to upstream libphosh.
 
+```sh
+# Install the (many) Phosh build dependencies:
+# Fedora: sudo dnf4 build-dep --define 'with_static 1' ./phrog.spec
+# Debian (trixie): sudo apt-get build-dep -y ./phosh/
+
+# Then it's mostly the same as before.
+# More features may be visible and more tests may run, since the local tree pulls ahead of upstream.
+cargo run --features=static -- --fake
+cargo test --features=static
 ```
-export LD_LIBRARY_PATH=$(pwd)/_build-phosh/install/usr/local/lib64
-export SYSTEM_DEPS_LIBPHOSH_0_SEARCH_NATIVE=$(pwd)/_build-phosh/install/usr/local/lib64
-export PKG_CONFIG_PATH=$(pwd)/_build-phosh/install/usr/local/lib64/pkgconfig
-```
+
 
 Make sure the local project schema is installed:
 
@@ -81,4 +86,6 @@ Run the app in test mode.
 cargo run -- --fake
 ```
 
+[phog]: https://gitlab.com/mobian1/phog
+[greetd]: https://sr.ht/~kennylevinsen/greetd/
 [phosh-deps]: https://gitlab.gnome.org/World/Phosh/phosh#dependencies

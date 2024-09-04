@@ -14,6 +14,7 @@ external_libraries = [
    "Pango",
    "Handy",
 ]
+split_build_rs = true
 
 ignore = [
     "Phosh.Ambient",
