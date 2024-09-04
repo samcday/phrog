@@ -1,9 +1,11 @@
-use phrog::shell::Shell;
+use std::ffi::CString;
 use clap::Parser;
-use gtk::glib::Object;
+use gtk::glib::*;
 use gtk::Application;
+use gtk::prelude::{StyleContextExt, WidgetExt};
 use libphosh::prelude::*;
 use libphosh::WallClock;
+use phrog::shell::Shell;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -41,6 +43,31 @@ fn main() -> anyhow::Result<()> {
 
     shell.connect_ready(|_| {
         println!("Shell is ready");
+    });
+
+    // TODO: 10 is USR1, couldn't find a const in of crates currently in scope?
+    const SIGUSR1: i32 = 10;
+    let mut debug_mode = false;
+    unix_signal_add(SIGUSR1, move || {
+        // static only because libphosh isn't exporting phosh_log_set_log_domains (yet?)
+        #[cfg(feature = "static")]
+        {
+            let shell = libphosh::Shell::default().downcast::<Shell>().unwrap();
+            if debug_mode {
+                g_warning!("🐸", "Ribbit ribbit!");
+                debug_mode = false;
+                let prev = CString::new(
+                    std::env::var("G_MESSAGES_DEBUG").unwrap_or(String::new())).unwrap();
+                unsafe { libphosh::ffi::phosh_log_set_log_domains(prev.as_ptr()); }
+                shell.top_panel().style_context().remove_class("debug");
+            } else {
+                g_warning!("🐸", "Ribbit!");
+                debug_mode = true;
+                unsafe { libphosh::ffi::phosh_log_set_log_domains(c"all".as_ptr()); }
+                shell.top_panel().style_context().add_class("debug");
+            }
+        }
+        ControlFlow::Continue
     });
 
     gtk::main();

@@ -1,3 +1,15 @@
+phosh-top-panel.debug {
+    background-color: red;
+    animation: red-pulse 2s linear infinite;
+}
+
+@keyframes red-pulse
+{
+    0%   {background-color: @phosh_bg_color;}
+    50% {background-color: red;}
+    100%   {background-color: @phosh_bg_color;}
+}
+
 phrog-user-session-page list {
     background-color: transparent;
 }
