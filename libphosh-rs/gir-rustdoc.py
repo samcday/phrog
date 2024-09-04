@@ -433,6 +433,9 @@ def parse_args():
 
     args = parser.parse_args()
 
+    if not args.project_url:
+        parser.error(f"No project URL given")
+
     if args.func == pre_docs and not args.branch:
         parser.error(f"Command 'pre-docs' requires a branch to be specified. '{args.branch}' was given.")
 
