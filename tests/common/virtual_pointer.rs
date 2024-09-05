@@ -1,5 +1,6 @@
-use gtk::glib;
-use std::time::{Duration, SystemTime};
+use gtk::{glib, Widget};
+use std::time::{Duration, Instant, SystemTime};
+use gtk::prelude::*;
 use wayland_client::protocol::wl_pointer::ButtonState;
 use wayland_client::protocol::wl_registry;
 use wayland_client::protocol::wl_seat::WlSeat;
@@ -18,6 +19,8 @@ pub struct VirtualPointer {
     state: State,
     event_queue: EventQueue<State>,
     ptr: ZwlrVirtualPointerV1,
+    width: u32,
+    height: u32,
 }
 
 impl Dispatch<wl_registry::WlRegistry, ()> for State {
@@ -50,10 +53,11 @@ impl Dispatch<wl_registry::WlRegistry, ()> for State {
 }
 
 impl VirtualPointer {
-    pub fn new(conn: Connection) -> Self {
+    pub fn new(conn: Connection, width: u32, height: u32) -> Self {
         let mut event_queue = conn.new_event_queue();
         let mut state: State = Default::default();
         let _ = conn.display().get_registry(&event_queue.handle(), ());
+        let ts = SystemTime::now();
         event_queue.roundtrip(&mut state).unwrap();
 
         let ptr = state
@@ -63,26 +67,33 @@ impl VirtualPointer {
             .create_virtual_pointer(state.seat.as_ref(), &event_queue.handle(), ());
 
         Self {
-            ts: SystemTime::now(),
+            ts,
             event_queue: conn.new_event_queue(),
             state,
             ptr,
+            width,
+            height,
         }
     }
 
-    pub async fn move_to(&self, x: u32, y: u32, width: u32, height: u32) {
-        // Move mouse to 100 pixels below the target.
+    pub async fn click_on(&self, widget: &impl IsA<Widget>) {
+        let window = widget.window().unwrap();
+        let (_, mut x, y) = window.origin();
+        x += window.width() / 2;
+        self.move_to(x as _, y as _).await;
+    }
+
+    pub async fn move_to(&self, x: u32, y: u32) {
         self.ptr.motion_absolute(
             self.ts.elapsed().unwrap().as_millis() as _,
             x,
             y + 75,
-            width,
-            height,
+            self.width,
+            self.height,
         );
         self.ptr.frame();
         self.event_queue.flush().unwrap();
 
-        // Animate mouse up.
         let mut cur_y = y as f64 + 75.0;
         while cur_y > y as f64 {
             cur_y -= 0.5;
@@ -92,6 +103,9 @@ impl VirtualPointer {
             self.event_queue.flush().unwrap();
             glib::timeout_future(Duration::from_millis(1)).await;
         }
+
+        glib::timeout_future(Duration::from_millis(250)).await;
+        self.click();
     }
 
     pub fn click(&self) {

@@ -37,3 +37,4 @@ tempdir = "0.3.7"
 
 [features]
 static = ["libphosh/static"]
+test = []
