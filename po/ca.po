@@ -1,0 +1,135 @@
+# Catalan translation for libcall-ui.
+# Copyright (C) 2021 libcall-ui's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libcall-ui package.
+# maite <maite.guix@gmail.com>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libcall-ui main\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/World/Phosh/libcall-ui/"
+"issues/\n"
+"POT-Creation-Date: 2023-01-23 19:55+0000\n"
+"PO-Revision-Date: 2023-05-29 22:09+0200\n"
+"Last-Translator: maite guix <maite.guix@me.com>\n"
+"Language-Team: Catalan <gnome@llistes.softcatala.org>\n"
+"Language: ca\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.2\n"
+
+#: src/cui-call.c:308
+msgid "Call active"
+msgstr "Trucada activa"
+
+#: src/cui-call.c:310
+msgid "Call held"
+msgstr "Trucada en espera"
+
+#: src/cui-call.c:312
+msgid "Calling…"
+msgstr "S'està trucant…"
+
+#: src/cui-call.c:314
+msgid "Incoming call"
+msgstr "Trucada entrant"
+
+#: src/cui-call.c:316
+msgid "Call ended"
+msgstr "La trucada ha finalitzat"
+
+#: src/cui-call.c:319 src/cui-call-display.c:305
+msgid "Unknown"
+msgstr "Desconegut"
+
+#: src/cui-call-display.c:99
+msgid "Accepting call…"
+msgstr "S'està acceptant la trucada…"
+
+#: src/cui-call-display.c:114
+msgid "Hanging up…"
+msgstr "S'està penjant…"
+
+#: src/cui-call-display.ui:182
+msgid "Mute"
+msgstr "Silencia"
+
+#: src/cui-call-display.ui:198
+msgid "Speaker"
+msgstr "Altaveu"
+
+#: src/cui-call-display.ui:214
+msgid "Add call"
+msgstr "Afegeix una trucada"
+
+#: src/cui-call-display.ui:264
+msgid "Hold"
+msgstr "Posa en espera"
+
+#: src/cui-call-display.ui:306
+msgid "Dial Pad"
+msgstr "Teclat"
+
+#: src/cui-dialpad.ui:24
+msgid "Enter a number"
+msgstr "Introduïu un número"
+
+#: src/cui-dialpad.ui:25
+msgid "Type a phone number"
+msgstr "Introduïu un número de telèfon"
+
+#: src/cui-dialpad.ui:50
+msgid "Call that phone number"
+msgstr "Truca a aquest número de telèfon"
+
+#: src/cui-encryption-indicator.ui:21
+msgid "This call is not encrypted"
+msgstr "Aquesta trucada no està xifrada"
+
+#: src/cui-encryption-indicator.ui:42
+msgid "This call is encrypted"
+msgstr "Aquesta trucada està xifrada"
+
+#~ msgid "Call-UI Demo"
+#~ msgstr "Demostració de trucada-UI"
+
+#~ msgid "Back"
+#~ msgstr "Torna"
+
+#~ msgid "Welcome to Call-UI Demo"
+#~ msgstr "Benvinguts a la demostració de trucada-UI"
+
+#~ msgid "This is a tour of the features the library has to offer."
+#~ msgstr ""
+#~ "Aquest és un recorregut per les característiques que ofereix la "
+#~ "biblioteca."
+
+#~ msgid "Welcome"
+#~ msgstr "Benvingut"
+
+#~ msgid "Call Display"
+#~ msgstr "Visualització de trucada"
+
+#~ msgid "A simple dial pad to enter phone numbers."
+#~ msgstr "Un teclat de marcatge senzill per introduir números de telèfon."
+
+#~ msgid "Keypad"
+#~ msgstr "Teclat numèric"
+
+#~ msgid "A number keypad."
+#~ msgstr "Un teclat numèric."
+
+#~ msgid "Show letters"
+#~ msgstr "Mostra les lletres"
+
+#~ msgid "Show symbols"
+#~ msgstr "Mostra els símbols"
+
+#~ msgid "Key pad"
+#~ msgstr "Teclat numèric"
+
+#~ msgid "Answer"
+#~ msgstr "Contesta"
+
+#~ msgid "Hide the dial pad"
+#~ msgstr "Amaga el teclat"

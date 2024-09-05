@@ -1,0 +1,6 @@
+# List of source files containing translatable strings.
+src/cui-call.c
+src/cui-call-display.c
+src/cui-call-display.ui
+src/cui-dialpad.ui
+src/cui-encryption-indicator.ui

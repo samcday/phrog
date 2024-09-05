@@ -1,0 +1,99 @@
+# Polish translation for libcall-ui.
+# Copyright © 2022 the libcall-ui authors.
+# This file is distributed under the same license as the libcall-ui package.
+# Piotr Drąg <piotrdrag@gmail.com>, 2022.
+# Aviary.pl <community-poland@mozilla.org>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libcall-ui\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/World/Phosh/libcall-ui/"
+"issues/\n"
+"POT-Creation-Date: 2022-09-02 12:31+0000\n"
+"PO-Revision-Date: 2022-09-04 13:23+0200\n"
+"Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
+"Language-Team: Polish <community-poland@mozilla.org>\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+
+#: src/cui-call.c:310
+msgid "Call active"
+msgstr "Połączenie jest aktywne"
+
+#: src/cui-call.c:312
+msgid "Call held"
+msgstr "Połączenie jest zawieszone"
+
+#. Deprecated
+#: src/cui-call.c:315
+msgid "Calling…"
+msgstr "Dzwonienie…"
+
+#. Deprecated
+#: src/cui-call.c:318
+msgid "Incoming call"
+msgstr "Połączenie przychodzące"
+
+#: src/cui-call.c:320
+msgid "Call ended"
+msgstr "Połączenie zostało zakończone"
+
+#: src/cui-call.c:323 src/cui-call-display.c:319
+msgid "Unknown"
+msgstr "Nieznany"
+
+#: src/cui-call-display.c:100
+msgid "Accepting call…"
+msgstr "Odbieranie połączenia…"
+
+#: src/cui-call-display.c:115
+msgid "Hanging up…"
+msgstr "Rozłączanie się…"
+
+#: src/cui-call-display.ui:28
+msgid "Incoming phone call"
+msgstr "Przychodzące połączenie telefoniczne"
+
+#: src/cui-call-display.ui:194
+msgid "Mute"
+msgstr "Wycisz"
+
+#: src/cui-call-display.ui:210
+msgid "Speaker"
+msgstr "Głośnik"
+
+#: src/cui-call-display.ui:226
+msgid "Add call"
+msgstr "Dodaj połączenie"
+
+#: src/cui-call-display.ui:276
+msgid "Hold"
+msgstr "Zawieś"
+
+#: src/cui-call-display.ui:318
+msgid "Dial Pad"
+msgstr "Klawiatura"
+
+#: src/cui-dialpad.ui:24
+msgid "Enter a number"
+msgstr "Wpisz numer"
+
+#: src/cui-dialpad.ui:25
+msgid "Type a phone number"
+msgstr "Wpisz numer telefonu"
+
+#: src/cui-dialpad.ui:49
+msgid "Call that phone number"
+msgstr "Dzwoni na ten numer telefonu"
+
+#: src/cui-encryption-indicator.ui:21
+msgid "This call is not encrypted"
+msgstr "To połączenie nie jest zaszyfrowane"
+
+#: src/cui-encryption-indicator.ui:42
+msgid "This call is encrypted"
+msgstr "To połączenie jest zaszyfrowane"
