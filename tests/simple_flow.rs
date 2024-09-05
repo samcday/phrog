@@ -1,5 +1,4 @@
-mod virtual_keyboard;
-mod virtual_pointer;
+mod common;
 
 use gtk::{glib, Window};
 use gtk::glib::clone;
@@ -23,8 +22,7 @@ use anyhow::Context;
 use gtk::prelude::ListBoxExt;
 use gtk::subclass::prelude::ObjectSubclassIsExt;
 use gtk::traits::WidgetExt;
-use virtual_keyboard::VirtualKeyboard;
-use virtual_pointer::VirtualPointer;
+use common::*;
 use wayland_client::Connection;
 use zbus::zvariant::ObjectPath;
 
