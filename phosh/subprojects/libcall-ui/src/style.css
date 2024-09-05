@@ -1,0 +1,34 @@
+cui-keypad .digit { font-size: 200%; font-weight: bold; }
+
+cui-keypad .letters { font-size: 70%; }
+
+cui-keypad .symbol { font-size: 160%; }
+
+cui-call-display .image-button,
+cui-keypad > grid > button,
+cui-dialpad .dial-button,
+cui-dialpad .delete-button {
+  border-radius: 9999px;
+  -gtk-outline-radius: 9999px;
+}
+
+cui-dialpad      .dial-button {
+  padding: 19px 42px;
+}
+
+cui-dialpad      .delete-button {
+  padding: 8px 12px;
+}
+
+cui-call-display .phone-number-entry,
+cui-dialpad      .phone-number-entry {
+  font-size: 24px;
+}
+
+#cui_call_display_status {
+  font-feature-settings: "tnum";
+}
+
+#cui_call_buttons {
+  font-size: 10pt;
+}

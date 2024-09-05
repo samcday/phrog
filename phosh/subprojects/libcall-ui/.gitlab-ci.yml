@@ -1,0 +1,87 @@
+stages:
+  - build
+  - tests
+  - deploy
+
+variables:
+  DIST: bookworm
+  DEPS: >-
+    ccache build-essential libgtk-3-dev libcallaudio-dev libhandy-1-dev meson
+    python3-toml python3-jinja2 python3-typogrify libgirepository1.0-dev git
+    xvfb gcovr libxml2-utils gi-docgen
+
+before_script:
+  - echo "man-db man-db/auto-update boolean false" | debconf-set-selections
+  - export DEBIAN_FRONTEND=noninteractive
+  - apt-get -y update
+  - apt-get -y install eatmydata
+  - eatmydata apt-get -y install $DEPS
+
+.build: &build_steps
+    echo "BUILD_OPTS=${BUILD_OPTS}" &&
+    export LC_ALL=C.UTF-8 &&
+    meson ${BUILD_OPTS} . _build  &&
+    ninja -C _build
+
+build-debian-gcc:
+  image: debian:bookworm
+  stage: build
+  variables:
+    BUILD_OPTS: -Db_coverage=true --werror
+  script:
+    - *build_steps
+  artifacts:
+    when: always
+    paths:
+      - _build
+
+# TODO: move to prebuilt container
+doc:
+  image: debian:bookworm
+  stage: build
+  variables:
+    BUILD_OPTS: >-
+      -Dtests=false
+      -Dgtk_doc=true
+  script:
+    - meson ${BUILD_OPTS} _build
+    - ninja -C _build
+    - mv _build/doc/libcall-ui-0 _doc/
+  artifacts:
+    paths:
+      - _doc/
+
+check-po:
+  image: debian:bookworm
+  stage: tests
+  before_script:
+    - apt-get -y update
+    - apt-get -y install intltool gettext
+  script:
+    - tools/check-po
+
+tests:
+  image: debian:bookworm
+  stage: tests
+  variables:
+  needs: ['build-debian-gcc']
+  script:
+    - meson ${BUILD_OPTS} _build
+    - xvfb-run meson test -C _build --print-errorlogs
+    - ninja -C _build coverage
+  coverage: '/^lines:\s+([\d.]+\%)\s+/'
+  artifacts:
+    reports:
+      junit: _build/meson-logs/testlog.junit.xml
+
+pages:
+  stage: deploy
+  before_script: []
+  needs: ['doc']
+  script:
+    - mv _doc/ public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - main

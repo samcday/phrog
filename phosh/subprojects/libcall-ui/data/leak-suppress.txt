@@ -1,0 +1,11 @@
+# Use via environment variable LSAN_OPTIONS=suppressions=data/leak-suppress.txt
+
+# Ignore fontconfig reported leaks. It's caches cause false positives.
+leak:libfontconfig.so.1
+
+#
+# Glib
+#
+# Quarks stay around
+leak:g_quark_init
+

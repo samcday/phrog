@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface domain="call-ui">
+  <requires lib="gtk+" version="3.24"/>
+  <requires lib="libhandy" version="0.0"/>
+  <template class="CuiDialpad" parent="GtkBin">
+    <property name="visible">True</property>
+    <child>
+      <object class="HdyClamp">
+        <property name="visible">True</property>
+        <property name="maximum-size">300</property>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="margin-start">24</property>
+            <property name="margin-end">24</property>
+            <property name="margin-top">16</property>
+            <property name="margin-bottom">16</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkEntry" id="keypad_entry">
+                <property name="visible">True</property>
+                <property name="hexpand">True</property>
+                <property name="xalign">0.5</property>
+                <property name="placeholder-text" translatable="yes">Enter a number</property>
+                <property name="tooltip-text" translatable="yes">Type a phone number</property>
+                <signal name="activate" handler="dial_clicked_or_activated_cb" swapped="yes"/>
+                <style>
+                  <class name="phone-number-entry"/>
+                </style>
+              </object>
+            </child>
+            <child>
+              <object class="CuiKeypad" id="keypad">
+                <property name="visible">True</property>
+                <property name="halign">center</property>
+                <property name="margin-top">18</property>
+                <property name="margin-bottom">18</property>
+                <property name="row-spacing">10</property>
+                <property name="column-spacing">16</property>
+                <property name="entry">keypad_entry</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox" id="control_box">
+                <property name="visible">True</property>
+                <child type="center">
+                  <object class="GtkButton" id="dial">
+                    <property name="visible">True</property>
+                    <property name="receives-default">True</property>
+                    <property name="tooltip-text" translatable="yes">Call that phone number</property>
+                    <signal name="clicked" handler="dial_clicked_or_activated_cb" swapped="yes"/>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="visible">True</property>
+                        <property name="icon-name">call-start-symbolic</property>
+                        <property name="icon_size">5</property>
+                      </object>
+                    </child>
+                    <style>
+                      <class name="dial-button"/>
+                      <class name="suggested-action"/>
+                      <class name="image-button"/>
+                    </style>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton" id="backspace">
+                    <property name="visible">True</property>
+                    <property name="receives-default">True</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="margin-end">15</property>
+                    <signal name="clicked" handler="backspace_clicked_cb" swapped="yes"/>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="visible">True</property>
+                        <property name="icon-name">edit-clear-symbolic</property>
+                      </object>
+                    </child>
+                    <style>
+                      <class name="delete-button"/>
+                    </style>
+                  </object>
+                  <packing>
+                    <property name="pack-type">end</property>
+                  </packing>
+                </child>
+              </object>
+            </child>
+            <focus-chain>
+              <widget name="keypad_entry"/>
+              <widget name="control_box"/>
+              <widget name="keypad"/>
+            </focus-chain>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+  <object class="GtkGestureLongPress" id="long_press_backspace_gesture">
+    <property name="widget">backspace</property>
+    <signal name="pressed" handler="long_press_backspace_cb" object="CuiDialpad" swapped="true"/>
+  </object>
+</interface>
