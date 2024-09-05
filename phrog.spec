@@ -54,6 +54,13 @@ BuildRequires:	/usr/bin/xauth
 BuildRequires:	dbus-daemon
 BuildRequires:	desktop-file-utils
 BuildRequires:	systemd-rpm-macros
+
+# Statically linking phosh requires these. No idea why.
+BuildRequires:	jbigkit-devel
+BuildRequires:	pkgconfig(com_err)
+BuildRequires:	pkgconfig(krb5-gssapi)
+BuildRequires:	pkgconfig(Lerc)
+BuildRequires:	libunistring-devel
 %endif
 
 Requires:       greetd >= 0.6
