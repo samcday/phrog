@@ -5,7 +5,7 @@ use crate::nested_phoc::NestedPhoc;
 
 mod accounts;
 mod keypad_shuffle;
-mod lockscreen;
+pub mod lockscreen;
 pub mod nested_phoc;
 mod session_object;
 mod sessions;

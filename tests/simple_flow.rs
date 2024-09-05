@@ -1,7 +1,7 @@
 mod virtual_keyboard;
 mod virtual_pointer;
 
-use gtk::glib;
+use gtk::{glib, Window};
 use gtk::glib::clone;
 use libphosh::prelude::ShellExt;
 use libphosh::prelude::WallClockExt;
@@ -20,6 +20,9 @@ use phrog::shell::Shell;
 use std::sync::Arc;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use anyhow::Context;
+use gtk::prelude::ListBoxExt;
+use gtk::subclass::prelude::ObjectSubclassIsExt;
+use gtk::traits::WidgetExt;
 use virtual_keyboard::VirtualKeyboard;
 use virtual_pointer::VirtualPointer;
 use wayland_client::Connection;
@@ -141,34 +144,25 @@ fn test_simple_flow() {
     shell.set_default();
     shell.set_locked(true);
 
-    let vp = VirtualPointer::new(Connection::connect_to_env().unwrap());
-    let kb = VirtualKeyboard::new(Connection::connect_to_env().unwrap());
-
     let ready_called = Arc::new(AtomicBool::new(false));
     let (ready_tx, ready_rx) = async_channel::bounded(1);
-    shell.connect_ready(clone!(@strong ready_called => move |_| {
+    shell.connect_ready(clone!(@strong ready_called => move |shell| {
         ready_called.store(true, Ordering::Relaxed);
-        ready_tx.send_blocking(()).expect("notify ready failed");
+
+        let (_, _, width, height) = shell.usable_area();
+        let vp = VirtualPointer::new(Connection::connect_to_env().unwrap(), width as _, height as _);
+        let kb = VirtualKeyboard::new(Connection::connect_to_env().unwrap());
+        ready_tx.send_blocking((vp, kb)).expect("notify ready failed");
     }));
 
     glib::spawn_future_local(clone!(@weak shell => async move {
-        ready_rx.recv().await.unwrap();
+        let (vp, kb) = ready_rx.recv().await.unwrap();
         glib::timeout_future(Duration::from_millis(2000)).await;
-        // Move the mouse to where the main user selection should be.
-        // TODO: calculate this somehow?
-        // If we had access to the Gtk.Widget ref I think it's straightforward to determine
-        // absolute (screen) coords...
-        let (_, _, width, height) = shell.usable_area();
-        let width = width as u32;
-        let height = height as u32;
-        let x = width / 2;
-        let y = height / 2 - 25; // 25 pixel nudge upwards
-        vp.move_to(x, y, width, height).await;
+        // Move the mouse to first user ro  w and click on it.
+        let lockscreen = unsafe { phrog::lockscreen::INSTANCE.as_mut().unwrap() };
+        let usp = lockscreen.imp().user_session_page.get().unwrap();
 
-        // wait a few millis after mouse move - for improved observation in recordings
-        glib::timeout_future(Duration::from_millis(250)).await;
-        // then click the main user
-        vp.click();
+        vp.click_on(usp.imp().box_users.selected_row().as_ref().unwrap()).await;
 
         // wait for keypad page to slide in
         glib::timeout_future(Duration::from_millis(500)).await;

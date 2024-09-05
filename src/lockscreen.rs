@@ -9,6 +9,9 @@ glib::wrapper! {
         @extends libphosh::Lockscreen, gtk::Widget;
 }
 
+#[cfg(feature = "test")]
+pub static mut INSTANCE: Option<Lockscreen> = None;
+
 impl Lockscreen {
     pub fn new() -> Self {
         Object::builder().build()
@@ -47,7 +50,7 @@ mod imp {
 
     #[derive(Default)]
     pub struct Lockscreen {
-        user_session_page: OnceCell<UserSessionPage>,
+        pub user_session_page: OnceCell<UserSessionPage>,
         greetd: RefCell<Option<(Sender<Request>, Receiver<Response>)>>,
         session: RefCell<Option<String>>,
     }
@@ -118,6 +121,8 @@ mod imp {
             );
 
             self.parent_constructed();
+            #[cfg(feature = "test")]
+            unsafe { crate::lockscreen::INSTANCE = Some(self.obj().clone()) };
         }
     }
 
