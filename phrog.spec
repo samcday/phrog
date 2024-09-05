@@ -9,13 +9,6 @@ License:        GPL-3.0-only
 URL:            https://github.com/samcday/phrog
 Source:         %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
-%if %{with static}
-%global gvc_commit 5f9768a2eac29c1ed56f1fbb449a77a3523683b6
-%global libcall_ui_version 0.1.3
-Source:	https://gitlab.gnome.org/GNOME/libgnome-volume-control/-/archive/%{gvc_commit}/libgnome-volume-control-%{gvc_commit}.tar.gz
-Source:	https://gitlab.gnome.org/World/Phosh/libcall-ui/-/archive/v%{libcall_ui_version}/libcall-ui-v%{libcall_ui_version}.tar.gz
-%endif
-
 BuildRequires:  cargo-rpm-macros >= 24
 BuildRequires:  pkgconfig(libphosh-0)
 
@@ -78,10 +71,6 @@ Provides:       greetd-%{name} = %{version}
 %prep
 %autosetup -p1
 %cargo_prep
-%if %{with static}
-mv libgnome-volume-control-%{gvc_commit} phosh/subprojects/gvc
-mv libcall-ui-v%{libcall_ui_version} phosh/subprojects/libcall-ui
-%endif
 
 %generate_buildrequires
 %cargo_generate_buildrequires
