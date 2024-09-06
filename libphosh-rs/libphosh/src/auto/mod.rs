@@ -15,6 +15,9 @@ pub use self::shell::Shell;
 mod status_icon;
 pub use self::status_icon::StatusIcon;
 
+mod top_panel;
+pub use self::top_panel::TopPanel;
+
 mod wall_clock;
 pub use self::wall_clock::WallClock;
 
@@ -33,4 +36,5 @@ pub(crate) mod builders {
     pub use super::quick_setting::QuickSettingBuilder;
     pub use super::shell::ShellBuilder;
     pub use super::status_icon::StatusIconBuilder;
+    pub use super::top_panel::TopPanelBuilder;
 }

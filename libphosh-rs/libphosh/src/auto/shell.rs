@@ -3,6 +3,7 @@
 // from ../gir-files
 // DO NOT EDIT
 
+use crate::{TopPanel};
 use glib::{prelude::*,signal::{connect_raw, SignalHandlerId},translate::*};
 use std::{boxed::Box as Box_};
 
@@ -298,6 +299,14 @@ pub trait ShellExt: IsA<Shell> + sealed::Sealed + 'static {
     //fn state(&self) -> /*Ignored*/ShellStateFlags {
     //    unsafe { TODO: call ffi:phosh_shell_get_state() }
     //}
+
+    #[doc(alias = "phosh_shell_get_top_panel")]
+    #[doc(alias = "get_top_panel")]
+    fn top_panel(&self) -> TopPanel {
+        unsafe {
+            from_glib_none(ffi::phosh_shell_get_top_panel(self.as_ref().to_glib_none().0))
+        }
+    }
 
     //#[doc(alias = "phosh_shell_get_toplevel_manager")]
     //#[doc(alias = "get_toplevel_manager")]
