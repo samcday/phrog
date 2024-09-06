@@ -11,6 +11,7 @@
 #include "launcher-entry-manager.h"
 #include "monitor-manager.h"
 #include "session-manager.h"
+#include "top-panel.h"
 #include "wifi-manager.h"
 #include "wwan/phosh-wwan-iface.h"
 
@@ -49,5 +50,6 @@ PhoshSessionManager       *phosh_shell_get_session_manager (PhoshShell *self);
 PhoshWifiManager          *phosh_shell_get_wifi_manager    (PhoshShell *self);
 PhoshWWan                 *phosh_shell_get_wwan            (PhoshShell *self);
 
+PhoshTopPanel             *phosh_shell_get_top_panel       (PhoshShell *self);
 
 G_END_DECLS

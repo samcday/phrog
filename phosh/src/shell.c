@@ -2012,6 +2012,27 @@ phosh_shell_get_wwan (PhoshShell *self)
   return priv->wwan;
 }
 
+
+/**
+ * phosh_shell_get_top_panel:
+ * @self: The shell singleton
+ *
+ * Get the top panel
+ *
+ * Returns: (transfer none): The top panel
+ */
+PhoshTopPanel *
+phosh_shell_get_top_panel (PhoshShell *self)
+{
+  PhoshShellPrivate *priv;
+
+  g_return_val_if_fail (PHOSH_IS_SHELL (self), NULL);
+  priv = phosh_shell_get_instance_private (self);
+
+  return PHOSH_TOP_PANEL (priv->top_panel);
+}
+
+
 /**
  * phosh_shell_get_usable_area:
  * @self: The shell
