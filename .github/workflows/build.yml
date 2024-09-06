@@ -78,16 +78,10 @@ jobs:
         run: |
           set -uexo pipefail
 
-          export G_MESSAGES_DEBUG=all
-
-          # Install phrog schemas so the tests can run.
-          mkdir -p $HOME/.local/share/glib-2.0/schemas/
-          cp resources/mobi.phosh.phrog.gschema.xml $HOME/.local/share/glib-2.0/schemas/
-          glib-compile-schemas $HOME/.local/share/glib-2.0/schemas/
-
           # run tests
           mkdir -p test-recordings/
           export RECORD_TESTS=`pwd`/test-recordings/
+          export G_MESSAGES_DEBUG=all
           dbus-run-session xvfb-run -a -s -noreset phoc -S -E "cargo test --features=static,test --verbose -- --test-threads=1 --nocapture"
       - uses: actions/upload-artifact@v4
         with:
