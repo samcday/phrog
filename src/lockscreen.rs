@@ -236,16 +236,12 @@ mod imp {
                     // TODO: it would be nice to override the GtkEntry input-purpose depending on
                     // AuthMessageType.
                     self.obj().set_sensitive(true);
-                    // If this is an Info message, wait 1 sec and then encourage the caller to
-                    // progress the conversation with some awkward silence.
-                    if let AuthMessageType::Info = auth_message_type {
-                        // TODO: detecting fingerprint prompt phrases could be done here.
-                        // show a visual cue (fingerprint icon) somewhere to indicate fprint
-                        // liveness or something?
-                        glib::timeout_future_seconds(1).await;
-                        return Some(Request::PostAuthMessageResponse {
-                            response: Some(String::from("\n")),
-                        });
+                    match auth_message_type {
+                        AuthMessageType::Info | AuthMessageType::Error =>
+                            return Some(Request::PostAuthMessageResponse {
+                                response: None,
+                            }),
+                        _ => {}
                     }
                 }
                 Response::Success => {
