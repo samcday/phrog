@@ -233,15 +233,24 @@ mod imp {
                         auth_message
                     );
                     self.obj().set_unlock_status(&auth_message);
-                    // TODO: it would be nice to override the GtkEntry input-purpose depending on
-                    // AuthMessageType.
                     self.obj().set_sensitive(true);
+
                     match auth_message_type {
-                        AuthMessageType::Info | AuthMessageType::Error =>
+                        AuthMessageType::Info | AuthMessageType::Error => {
+                            #[cfg(feature = "static")]
+                            self.obj().set_pin_entry_secret(true);
                             return Some(Request::PostAuthMessageResponse {
                                 response: None,
-                            }),
-                        _ => {}
+                            });
+                        }
+                        AuthMessageType::Visible => {
+                            #[cfg(feature = "static")]
+                            self.obj().set_pin_entry_secret(false);
+                        }
+                        AuthMessageType::Secret => {
+                            #[cfg(feature = "static")]
+                            self.obj().set_pin_entry_secret(true);
+                        }
                     }
                 }
                 Response::Success => {
