@@ -25,6 +25,7 @@ features = ["v1_6"]
 
 [build-dependencies]
 glib-build-tools = "0.18.0"
+homedir = "0.3.3"
 
 [dev-dependencies]
 async-global-executor = "2.4.1"
