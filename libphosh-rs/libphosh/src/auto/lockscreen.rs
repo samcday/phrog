@@ -303,6 +303,13 @@ pub trait LockscreenExt: IsA<Lockscreen> + sealed::Sealed + 'static {
         }
     }
 
+    #[doc(alias = "phosh_lockscreen_set_pin_entry_secret")]
+    fn set_pin_entry_secret(&self, secret: bool) {
+        unsafe {
+            ffi::phosh_lockscreen_set_pin_entry_secret(self.as_ref().to_glib_none().0, secret.into_glib());
+        }
+    }
+
     #[doc(alias = "phosh_lockscreen_set_unlock_status")]
     fn set_unlock_status(&self, status: &str) {
         unsafe {
