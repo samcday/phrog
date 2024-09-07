@@ -26,9 +26,9 @@ jobs:
         run: |
           apk add alpine-sdk
           abuild -F deps
-        shell: alpine.sh {0}
+        shell: alpine.sh --root {0}
       - name: build package
         run: |
           abuild-keygen -a -i
           abuild -F
-        shell: alpine.sh {0}
+        shell: alpine.sh --root {0}
