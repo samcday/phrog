@@ -3,9 +3,9 @@ name: alpine-apk
 on:
   push:
     branches: [main]
-    paths:
-      - 'APKBUILD'
-      - '.github/workflows/alpine.yml'
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -33,7 +33,7 @@ jobs:
           RSA_PRIV: ${{ secrets.RSA_PRIVATE_KEY }}
           RSA_PUB: ${{ secrets.RSA_PUBLIC_KEY }}
         run: |
-          mkdir -p ~/.abuild ~/package
+          mkdir -p ~/.abuild
           echo "$RSA_PRIV" > ~/.abuild/key.rsa
           echo "$RSA_PUB" > ~/.abuild/key.rsa.pub
           cp ~/.abuild/key.rsa.pub /etc/apk/keys/key.rsa.pub
@@ -42,6 +42,8 @@ jobs:
       - name: build package
         run: |
           export PACKAGER_PRIVKEY=$HOME/.abuild/key.rsa
+          sed -i -e "s/_commit=main/_commit=$GITHUB_SHA/" APKBUILD
+          abuild -F checksum
           abuild -F -P /packages
           chmod -R 777 /packages
         shell: alpine.sh --root {0}
