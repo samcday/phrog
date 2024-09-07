@@ -4,7 +4,7 @@ pkgname=greetd-phrog
 pkgver=0.7.0_git
 _commit=main
 pkgrel=1
-pkgdesc="Greetd-compatible greeter for mobile phones"
+pkgdesc="Mobile device greeter"
 url="https://github.com/samcday/phrog"
 # riscv64: blocked by greetd
 # s390x: blocked by greetd & phosh
@@ -52,14 +52,16 @@ else
 makedepends="$makedepends
 	libphosh-dev"
 fi
+checkdepends="xvfb-run"
 
 source="${url}/archive/$_commit/phrog-$_commit.tar.gz"
 subpackages="$pkgname-schemas::noarch"
+builddir="$srcdir/phrog-$_commit"
+options="net" # cargo fetch
 
 export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix=$builddir=/build/"
 
 prepare() {
-    cd phrog-$_commit
 	cargo fetch --target="$CTARGET" --locked
 }
 
@@ -70,8 +72,15 @@ build() {
 }
 
 package() {
-	install -Dm755 src/phrog-$_commit/resources/mobi.phosh.phrog.gschema.xml -t "$pkgdir"/usr/share/glib-2.0/schemas/
-	install -Dm755 src/phrog-$_commit/target/release/phrog -t "$pkgdir"/usr/bin/
+	install -Dm755 resources/mobi.phosh.phrog.gschema.xml -t "$pkgdir"/usr/share/glib-2.0/schemas/
+	install -Dm755 target/release/phrog -t "$pkgdir"/usr/bin/
+}
+
+check() {
+    features=""
+    [ -n "$_static" ] && features="$features --features=static,test"
+    export XDG_RUNTIME_DIR=/tmp
+	dbus-run-session xvfb-run -a phoc -E "cargo test $features --frozen"
 }
 
 schemas() {
