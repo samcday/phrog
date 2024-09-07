@@ -1,6 +1,6 @@
 # Maintainer: Sam Day <me@samcday.com>
 pkgname=greetd-phrog
-pkgver=0.4.0
+pkgver=0.7.0
 pkgrel=1
 pkgdesc="Greetd-compatible greeter for mobile phones"
 url="https://github.com/samcday/phrog"
@@ -17,30 +17,7 @@ depends="
 makedepends="
 	cargo
 	cargo-auditable
-	callaudiod-dev
-	elogind-dev
-	evince-dev
-	evolution-data-server-dev
-	feedbackd-dev
-	gcr-dev
-	gettext-dev
-	glib-dev
-	gmobile-dev
-	gnome-desktop-dev
-	gtk+3.0-dev
-	libadwaita-dev
-	libgudev-dev
-	libhandy1-dev
-	libsecret-dev
-	linux-pam-dev
-	meson
-	networkmanager-dev
-	polkit-elogind-dev
-	pulseaudio-dev
-	py3-docutils
-	upower-dev
-	wayland-dev
-	wayland-protocols
+	libphosh-dev
 	"
 source="${url}/archive/$pkgver/phrog-$pkgver.tar.gz"
 subpackages="$pkgname-schemas::noarch"
@@ -49,18 +26,15 @@ export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix=$builddir=/build/"
 
 prepare() {
     cd phrog-$pkgver
-	export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
 	cargo fetch --target="$CTARGET" --locked
 }
 
 build() {
-	export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
-
 	cargo auditable build --release --frozen
 }
 
 package() {
-	install -Dm755 src/phrog-$pkgver/resources/com.samcday.phrog.gschema.xml -t "$pkgdir"/usr/share/glib-2.0/schemas/
+	install -Dm755 src/phrog-$pkgver/resources/mobi.phosh.phrog.gschema.xml -t "$pkgdir"/usr/share/glib-2.0/schemas/
 	install -Dm755 src/phrog-$pkgver/target/release/phrog -t "$pkgdir"/usr/bin/
 }
 
@@ -71,5 +45,5 @@ schemas() {
 }
 
 sha512sums="
-c1cac554df49048f2713ed371d186d80b559b0877ffa15c8c94b1957d3ccdacf0c3386457c4660718839eee09d1ca2eb996da14d9200f6d9f68c130fe5fc1da9  phrog-0.4.0.tar.gz
+d1ccf6c1d2ce0a4d6df4283cce720a70ac47d6da12b193bf492be7944c120c108b2db49afb1b44f3b651966c4592c623671d8dc6212081de3598fc2cc7e09faf  phrog-0.7.0.tar.gz
 "
