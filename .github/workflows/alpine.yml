@@ -35,7 +35,8 @@ jobs:
           apk add alpine-sdk
           mkdir -p ~/.abuild ~/package
           echo $RSA_PRIV > ~/.abuild/key
-          echo $RSA_PUB > /etc/apk/keys/key.pub
+          echo $RSA_PUB > ~/.abuild/key.pub
+          cp ~/.abuild/key.pub /etc/apk/keys/key.pub
           abuild -F deps
         shell: alpine.sh --root {0}
       - name: build package
