@@ -27,12 +27,12 @@ jobs:
         with:
           arch: ${{ matrix.arch }}
           branch: edge
+          packages: alpine-sdk
       - name: setup
         env:
           RSA_PRIV: ${{ secrets.RSA_PRIVATE_KEY }}
           RSA_PUB: ${{ secrets.RSA_PUBLIC_KEY }}
         run: |
-          apk add alpine-sdk
           mkdir -p ~/.abuild ~/package
           echo "$RSA_PRIV" > ~/.abuild/key.rsa
           echo "$RSA_PUB" > ~/.abuild/key.rsa.pub
@@ -42,15 +42,10 @@ jobs:
       - name: build package
         run: |
           export PACKAGER_PRIVKEY=$HOME/.abuild/key.rsa
-          abuild -F
+          abuild -F -P /packages
+          chmod -R 777 /packages
         shell: alpine.sh --root {0}
-      - name: copy packages
-        env:
-          ALPINE_ROOT_PATH: ${{ steps.alpine.outputs.root-path }}
-        run: |
-          sudo cp -R $ALPINE_ROOT_PATH/root/packages ./
-          sudo chown -R `whoami` ./packages
       - uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.arch }}
-          path: packages/
+          path: ${{ steps.alpine.outputs.root-path }}/packages/
