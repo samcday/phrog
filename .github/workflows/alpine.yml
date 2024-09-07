@@ -36,7 +36,7 @@ jobs:
           mkdir -p ~/.abuild ~/package
           echo "$RSA_PRIV" > ~/.abuild/key.rsa
           echo "$RSA_PUB" > ~/.abuild/key.rsa.pub
-          cp ~/.abuild/key.rsa.pub /etc/apk/keys/key.pub
+          cp ~/.abuild/key.rsa.pub /etc/apk/keys/key.rsa.pub
           abuild -F deps
         shell: alpine.sh --root {0}
       - name: build package
