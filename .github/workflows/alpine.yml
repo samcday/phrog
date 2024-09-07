@@ -45,6 +45,8 @@ jobs:
           abuild -F
         shell: alpine.sh --root {0}
       - name: copy packages
+        env:
+          ALPINE_ROOT_PATH: ${{ steps.alpine.outputs.root-path }}
         run: |
           sudo cp -R $ALPINE_ROOT_PATH/root/packages ./
           sudo chown -R `whoami` ./packages
