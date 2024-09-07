@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ivanvc/abuild-releaser-action@v1.1.1
+      - uses: ivanvc/abuild-releaser-action@707e40a3e62d4f68096dda8ab537cde8fc16aa33
         with:
           author: Sam Day <me@samcday.com>
           rsa_public_key: ${{ secrets.RSA_PUBLIC_KEY }}

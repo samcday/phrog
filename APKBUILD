@@ -13,7 +13,8 @@ license="GPL-3.0-only"
 depends="
 	phosh
 	greetd
-	greetd-phrog-schemas"
+	greetd-phrog-schemas
+	libphosh"
 makedepends="
 	cargo
 	cargo-auditable
@@ -45,5 +46,5 @@ schemas() {
 }
 
 sha512sums="
-d1ccf6c1d2ce0a4d6df4283cce720a70ac47d6da12b193bf492be7944c120c108b2db49afb1b44f3b651966c4592c623671d8dc6212081de3598fc2cc7e09faf  phrog-0.7.0.tar.gz
+b637aeb79834e134a1c47f579098c48d4631213a6b8ecab7566ead5403eaa6104df6524c0d9bbee79a53663415aa92967b3ffaac5fc24f8224edc9e8527ab1c5  phrog-0.7.0.tar.gz
 "
