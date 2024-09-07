@@ -34,14 +34,14 @@ jobs:
         run: |
           apk add alpine-sdk
           mkdir -p ~/.abuild ~/package
-          echo $RSA_PRIV > ~/.abuild/key
-          echo $RSA_PUB > ~/.abuild/key.pub
+          echo "$RSA_PRIV" > ~/.abuild/key.rsa
+          echo "$RSA_PUB" > ~/.abuild/key.rsa.pub
           cp ~/.abuild/key.pub /etc/apk/keys/key.pub
           abuild -F deps
         shell: alpine.sh --root {0}
       - name: build package
         run: |
-          export PACKAGER_PRIVKEY=$HOME/.abuild/key
+          export PACKAGER_PRIVKEY=$HOME/.abuild/key.rsa
           abuild -F
         shell: alpine.sh --root {0}
       - uses: actions/upload-artifact@v4
