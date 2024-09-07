@@ -47,4 +47,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.arch }}
-          path: ${{ steps.alpine.outputs.root-path }}/packages
+          path: ${{ steps.alpine.outputs.root-path }}/root/packages
