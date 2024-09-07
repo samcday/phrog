@@ -1,4 +1,4 @@
-name: alpine-apk
+name: alpine
 
 on:
   push:
@@ -15,7 +15,7 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  alpine:
     runs-on: ubuntu-latest
     strategy:
       matrix:
