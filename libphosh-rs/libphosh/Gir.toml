@@ -25,6 +25,7 @@ generate = [
   "Phosh.Lockscreen",
   "Phosh.LockscreenPage",
   "Phosh.StatusIcon",
+  "Phosh.TopPanel",
   "Phosh.QuickSetting",
   "Phosh.WallClock",
 ]
@@ -220,7 +221,6 @@ ignore = [
     "Phosh.SystemPrompt",
     "Phosh.Thumbnail",
     "Phosh.TimestampLabel",
-    "Phosh.TopPanel",
     "Phosh.Toplevel",
     "Phosh.ToplevelManager",
     "Phosh.ToplevelThumbnail",

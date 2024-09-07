@@ -44,7 +44,8 @@ mod imp {
             StyleContext::add_provider_for_screen(
                 &gdk::Screen::default().unwrap(),
                 &provider,
-                gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
+                // Slightly hacky, we want to be above phosh to override some stuff
+                gtk::STYLE_PROVIDER_PRIORITY_APPLICATION + 5,
             );
         }
     }
