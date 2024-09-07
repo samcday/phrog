@@ -19,13 +19,11 @@ jobs:
         with:
           branch: edge
       - name: install deps
-        uses:
         run: |
           apk add alpine-sdk
           abuild -F deps
         shell: alpine.sh {0}
       - name: build package
-        uses:
         run: |
           abuild-keygen -a -i
           abuild -F
