@@ -2,7 +2,7 @@
 %bcond static 0
 
 Name:           phrog
-Version:        0.8.0
+Version:        0.8.1
 Release:        %autorelease
 Summary:        Greetd-compatible greeter for mobile phones
 License:        GPL-3.0-only

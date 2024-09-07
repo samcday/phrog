@@ -1,7 +1,7 @@
 # Maintainer: Sam Day <me@samcday.com>
 _static=1
 pkgname=greetd-phrog
-pkgver=0.8.0_git
+pkgver=0.8.1_git
 _commit=main
 pkgrel=1
 pkgdesc="Mobile device greeter"
