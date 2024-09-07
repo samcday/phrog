@@ -29,6 +29,6 @@ jobs:
         shell: alpine.sh --root {0}
       - name: build package
         run: |
-          abuild-keygen -a -i
+          abuild-keygen -n -a -i
           abuild -F
         shell: alpine.sh --root {0}
