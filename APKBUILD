@@ -80,7 +80,7 @@ check() {
     features=""
     [ -n "$_static" ] && features="$features --features=static,test"
     export XDG_RUNTIME_DIR=/tmp
-	dbus-run-session xvfb-run -a phoc -E "cargo test $features --frozen"
+	dbus-run-session xvfb-run -a phoc -E "cargo test $features --release --frozen"
 }
 
 schemas() {
