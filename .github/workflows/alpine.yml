@@ -44,7 +44,11 @@ jobs:
           export PACKAGER_PRIVKEY=$HOME/.abuild/key.rsa
           abuild -F
         shell: alpine.sh --root {0}
+      - name: copy packages
+        run: |
+          sudo cp -R $ALPINE_ROOT_PATH/root/packages ./
+          sudo chown -R `whoami` ./packages
       - uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.arch }}
-          path: ${{ steps.alpine.outputs.root-path }}/root/packages
+          path: packages/
