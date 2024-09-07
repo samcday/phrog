@@ -1,0 +1,75 @@
+# Maintainer: Sam Day <me@samcday.com>
+pkgname=greetd-phrog
+pkgver=0.4.0
+pkgrel=1
+pkgdesc="Greetd-compatible greeter for mobile phones"
+url="https://github.com/samcday/phrog"
+# riscv64: blocked by greetd
+# s390x: blocked by greetd & phosh
+# ppc64le: blocked by phosh
+# armhf: blocked by phosh
+arch="all !s390x !riscv64 !armhf !ppc64le"
+license="GPL-3.0-only"
+depends="
+	phosh
+	greetd
+	greetd-phrog-schemas"
+makedepends="
+	cargo
+	cargo-auditable
+	callaudiod-dev
+	elogind-dev
+	evince-dev
+	evolution-data-server-dev
+	feedbackd-dev
+	gcr-dev
+	gettext-dev
+	glib-dev
+	gmobile-dev
+	gnome-desktop-dev
+	gtk+3.0-dev
+	libadwaita-dev
+	libgudev-dev
+	libhandy1-dev
+	libsecret-dev
+	linux-pam-dev
+	meson
+	networkmanager-dev
+	polkit-elogind-dev
+	pulseaudio-dev
+	py3-docutils
+	upower-dev
+	wayland-dev
+	wayland-protocols
+	"
+source="${url}/archive/$pkgver/phrog-$pkgver.tar.gz"
+subpackages="$pkgname-schemas::noarch"
+
+export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix=$builddir=/build/"
+
+prepare() {
+    cd phrog-$pkgver
+	export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
+	cargo fetch --target="$CTARGET" --locked
+}
+
+build() {
+	export SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL=auto
+
+	cargo auditable build --release --frozen
+}
+
+package() {
+	install -Dm755 src/phrog-$pkgver/resources/com.samcday.phrog.gschema.xml -t "$pkgdir"/usr/share/glib-2.0/schemas/
+	install -Dm755 src/phrog-$pkgver/target/release/phrog -t "$pkgdir"/usr/bin/
+}
+
+schemas() {
+    pkgdesc="Phrog schema files"
+    depends=""
+    amove usr/share/glib-2.0/schemas
+}
+
+sha512sums="
+c1cac554df49048f2713ed371d186d80b559b0877ffa15c8c94b1957d3ccdacf0c3386457c4660718839eee09d1ca2eb996da14d9200f6d9f68c130fe5fc1da9  phrog-0.4.0.tar.gz
+"
