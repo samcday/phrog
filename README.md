@@ -22,19 +22,20 @@ sudo dnf install phrog
 
 #### Alpine
 
-Hopefully this makes it into Alpine repos soon. For now:
+The package has been [requested](https://gitlab.alpinelinux.org/alpine/aports/-/issues/16430) in Alpine.
+
+For now, you must build it yourself:
 
 ```
 sudo apk add alpine-sdk
-cd dist/alpine
 abuild deps
-abuild
+abuild -K
 sudo apk add ~/packages/dist/$(uname -m)/greetd-phrog-*.apk
 ```
 
 #### Other
 
-For now, you must build from source, see the Development section below.
+You must build from source, see the Development section below.
 
 ### Running
 
@@ -59,6 +60,7 @@ If your system has `libphosh` packaged and available:
 ```sh
 # Install libphosh:
 # Fedora: sudo dnf install -y libphosh-devel
+# Alpine (edge): sudo apk add libphosh
 
 # Run 🐸 from source
 cargo run -- --fake
@@ -73,6 +75,7 @@ You can also run with a statically linked libphosh from the vendored `./phosh/` 
 # Install the (many) Phosh build dependencies:
 # Fedora: sudo dnf4 build-dep --define 'with_static 1' ./phrog.spec
 # Debian (trixie): sudo apt-get build-dep -y ./phosh/
+# Alpine: abuild deps
 
 # Then it's mostly the same as before.
 # More features may be visible and more tests may run, since the local tree pulls ahead of upstream.
