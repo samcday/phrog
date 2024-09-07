@@ -17,18 +17,33 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [x86_64, aarch64]
     steps:
       - uses: actions/checkout@v4
       - uses: jirutka/setup-alpine@v1
+        id: alpine
         with:
+          arch: ${{ matrix.arch }}
           branch: edge
-      - name: install deps
+      - name: setup
+        env:
+          RSA_PRIV: ${{ secrets.RSA_PRIVATE_KEY }}
+          RSA_PUB: ${{ secrets.RSA_PUBLIC_KEY }}
         run: |
           apk add alpine-sdk
+          mkdir -p ~/.abuild ~/package
+          echo $RSA_PRIV > ~/.abuild/key
+          echo $RSA_PUB >> /etc/apk/keys
           abuild -F deps
         shell: alpine.sh --root {0}
       - name: build package
         run: |
-          abuild-keygen -n -a -i
+          export PACKAGER_PRIVKEY=$HOME/.abuild/key
           abuild -F
         shell: alpine.sh --root {0}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ matrix.arch }}
+          path: ${{ steps.alpine.outputs.root-path }}/packages
