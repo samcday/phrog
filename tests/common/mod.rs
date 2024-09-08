@@ -13,12 +13,15 @@ use greetd_ipc::{Request, Response};
 use greetd_ipc::AuthMessageType::Secret;
 use greetd_ipc::codec::SyncCodec;
 use gtk::glib::clone;
+use nix::sys::signal::SIGTERM;
+use nix::unistd::Pid;
 pub use virtual_pointer::VirtualPointer;
 pub use virtual_keyboard::VirtualKeyboard;
 
 pub fn kill(child: &mut Child) {
-    child.kill().expect(&format!("failed to kill process {:?}", child.id()));
-    child.wait().expect(&format!("failed to wait for process {:?} to exit", child.id()));
+    let pid = child.id();
+    nix::sys::signal::kill(Pid::from_raw(pid as _), SIGTERM).expect(&format!("failed to kill process {:?}", pid));
+    child.wait().expect(&format!("failed to wait for process {:?} to exit", pid));
 }
 
 pub struct SupervisedChild(Child);
