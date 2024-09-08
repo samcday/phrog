@@ -33,7 +33,7 @@ jobs:
       - name: disable statically linked libphosh
         if: ${{ matrix.arch != 'x86_64' }}
         run: |
-          sed -i -e 's/_static=1/_static=0/' APKBUILD
+          sed -i -e 's/_static=1/_static=/' APKBUILD
       - name: setup
         env:
           RSA_PRIV: ${{ secrets.RSA_PRIVATE_KEY }}
