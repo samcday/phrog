@@ -75,7 +75,7 @@ pub fn fake_greetd(logged_in: &Arc<AtomicBool>) {
                     Request::PostAuthMessageResponse {
                         response: Some(password),
                     } => {
-                        assert_eq!(password, "password");
+                        assert_eq!(password, "0451");
                         Response::Success.write_to(&mut stream).unwrap();
                     }
                     req => panic!("wrong request: {:?}", req),
