@@ -20,9 +20,8 @@ use wayland_client::Connection;
 #[test]
 fn test_simple_flow() {
     let tmp = tempdir::TempDir::new("phrog-test-system-dbus").unwrap();
-    let _system_dbus = dbus::system_dbus(tmp.path());
-
     let _nested_phoc = phrog::init(Some("phoc".into()));
+    let _system_dbus = dbus::system_dbus(tmp.path());
 
     let _conn = async_global_executor::block_on(async move {
         dbus::run_accounts_fixture().await.unwrap()

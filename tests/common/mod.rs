@@ -16,7 +16,19 @@ use gtk::glib::clone;
 pub use virtual_pointer::VirtualPointer;
 pub use virtual_keyboard::VirtualKeyboard;
 
-pub fn start_recording(name: &str) -> Option<Child> {
+pub fn kill(child: &mut Child) {
+    child.kill().expect(&format!("failed to kill process {:?}", child.id()));
+    child.wait().expect(&format!("failed to wait for process {:?} to exit", child.id()));
+}
+
+pub struct SupervisedChild(Child);
+impl Drop for SupervisedChild {
+    fn drop(&mut self) {
+        kill(&mut self.0);
+    }
+}
+
+pub fn start_recording(name: &str) -> Option<SupervisedChild> {
     if let Ok(base_path) = std::env::var("RECORD_TESTS") {
         if let Ok(child) = std::process::Command::new("wf-recorder")
             .arg("-f")
@@ -25,7 +37,7 @@ pub fn start_recording(name: &str) -> Option<Child> {
             .stdin(Stdio::null())
             .stderr(Stdio::null())
             .spawn()
-        { Some(child) } else { None }
+        { Some(SupervisedChild(child)) } else { None }
     } else {
         None
     }

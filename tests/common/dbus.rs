@@ -3,8 +3,9 @@ use std::process::{Child, Stdio};
 use std::time::{Duration, Instant};
 use anyhow::Context;
 use zbus::zvariant::ObjectPath;
+use crate::common::SupervisedChild;
 
-pub fn system_dbus(tmpdir: &Path) -> Child {
+pub fn system_dbus(tmpdir: &Path) -> SupervisedChild {
     let config_path = tmpdir.join("system-dbus.xml");
     let sock_path = tmpdir.join("system.sock");
     let dbus_path = format!("unix:path={}", sock_path.display());
@@ -26,9 +27,9 @@ pub fn system_dbus(tmpdir: &Path) -> Child {
     std::env::set_var("DBUS_SYSTEM_BUS_ADDRESS", dbus_path);
     let child = std::process::Command::new("dbus-daemon")
         .arg(format!("--config-file={}", config_path.to_str().unwrap()))
-        .stdout(Stdio::inherit())
+        .stdout(Stdio::null())
         .stdin(Stdio::null())
-        .stderr(Stdio::inherit())
+        .stderr(Stdio::null())
         .spawn()
         .expect("failed to launch dbus-daemon");
 
@@ -40,7 +41,7 @@ pub fn system_dbus(tmpdir: &Path) -> Child {
         std::thread::sleep(Duration::from_millis(50));
     }
 
-    child
+    SupervisedChild(child)
 }
 
 struct AccountsFixture {}

@@ -22,9 +22,8 @@ use wayland_client::Connection;
 #[test]
 fn keypad_shuffle() {
     let tmp = tempdir::TempDir::new("phrog-test-system-dbus").unwrap();
-    let _system_dbus = dbus::system_dbus(tmp.path());
-
     let _nested_phoc = phrog::init(Some("phoc".into()));
+    let _system_dbus = dbus::system_dbus(tmp.path());
 
     let _conn = async_global_executor::block_on(async move {
         dbus::run_accounts_fixture().await.unwrap()
