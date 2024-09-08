@@ -48,9 +48,7 @@ fn test_simple_flow() {
 
     glib::spawn_future_local(clone!(@weak shell => async move {
         let mut vp = ready_rx.recv().await.unwrap();
-        // This is fairly long because PhoshShell delays the ready signal to phoc for 1 sec, and
-        // then that fade-in takes time.
-        glib::timeout_future(Duration::from_millis(2500)).await;
+        glib::timeout_future(Duration::from_millis(500)).await;
         // Move the mouse to first user row and click on it.
         let lockscreen = unsafe { phrog::lockscreen::INSTANCE.as_mut().unwrap() };
 
