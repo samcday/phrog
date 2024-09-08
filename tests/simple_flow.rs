@@ -1,6 +1,6 @@
 mod common;
 
-use gtk::{glib, Button, Label, Revealer};
+use gtk::{glib, Button, Revealer};
 use gtk::glib::clone;
 use libphosh::prelude::{LockscreenExt, ShellExt};
 use libphosh::prelude::WallClockExt;
@@ -8,7 +8,6 @@ use libphosh::{LockscreenPage, WallClock};
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use greetd_ipc::codec::SyncCodec;
-use input_event_codes::*;
 use phrog::shell::Shell;
 use std::sync::Arc;
 use std::time::Duration;
@@ -46,12 +45,11 @@ fn test_simple_flow() {
 
         let (_, _, width, height) = shell.usable_area();
         let vp = VirtualPointer::new(Connection::connect_to_env().unwrap(), width as _, height as _);
-        let kb = VirtualKeyboard::new(Connection::connect_to_env().unwrap());
-        ready_tx.send_blocking((vp, kb)).expect("notify ready failed");
+        ready_tx.send_blocking(vp).expect("notify ready failed");
     }));
 
     glib::spawn_future_local(clone!(@weak shell => async move {
-        let (vp, kb) = ready_rx.recv().await.unwrap();
+        let mut vp = ready_rx.recv().await.unwrap();
         glib::timeout_future(Duration::from_millis(2000)).await;
         // Move the mouse to first user row and click on it.
         let lockscreen = unsafe { phrog::lockscreen::INSTANCE.as_mut().unwrap() };
@@ -83,6 +81,7 @@ fn test_simple_flow() {
         vp.click_on(&keypad.child_at(0, 0).unwrap()).await; // 1
 
         vp.click_on(&submit_btn).await;
+        glib::timeout_future(Duration::from_millis(50)).await;
     }));
 
     let _recording = start_recording("simple-flow");
