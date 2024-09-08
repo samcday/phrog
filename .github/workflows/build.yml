@@ -82,7 +82,11 @@ jobs:
           mkdir -p test-recordings/
           export RECORD_TESTS=`pwd`/test-recordings/
           export G_MESSAGES_DEBUG=all
-          dbus-run-session xvfb-run -a -s -noreset phoc -S -E "cargo test --features=static,test --verbose -- --test-threads=1 --nocapture"
+          cat > phoc.ini <<HERE
+          [output:X11-1]
+          mode = 720x1440
+          HERE
+          dbus-run-session xvfb-run -a -s -noreset phoc -C phoc.ini -S -E "cargo test --features=static,test --verbose -- --test-threads=1 --nocapture"
       - uses: actions/upload-artifact@v4
         with:
           name: x86-64-debug
