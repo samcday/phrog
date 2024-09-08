@@ -1,8 +1,8 @@
 use std::fs::File;
 use std::os::fd::AsFd;
 use std::os::unix::fs::MetadataExt;
-use std::time::SystemTime;
-
+use std::time::{Duration, SystemTime};
+use gtk::glib;
 use wayland_client::protocol::wl_keyboard::KeymapFormat::XkbV1;
 use wayland_client::protocol::wl_registry;
 use wayland_client::protocol::wl_seat::WlSeat;
@@ -82,11 +82,17 @@ impl VirtualKeyboard {
         }
     }
 
+    pub fn modifiers(&self, mods: u32) {
+        self.kb
+            .modifiers(mods, 0, 0, 0);
+        self.event_queue.flush().unwrap();
+    }
+
     pub async fn keypress(&self, keycode: u32) {
         self.kb
             .key(self.ts.elapsed().unwrap().as_millis() as _, keycode, 1);
-
         self.event_queue.flush().unwrap();
+        glib::timeout_future(Duration::from_millis(25)).await;
         self.kb
             .key(self.ts.elapsed().unwrap().as_millis() as _, keycode, 0);
         self.event_queue.flush().unwrap();

@@ -2,7 +2,7 @@
 mod common;
 
 use gtk::glib;
-use gtk::glib::{clone, g_warning};
+use gtk::glib::clone;
 use libphosh::prelude::ShellExt;
 use libphosh::prelude::WallClockExt;
 use libphosh::WallClock;
@@ -13,11 +13,12 @@ use phrog::shell::Shell;
 use std::sync::Arc;
 use std::time::Duration;
 use gtk::gio::Settings;
-use gtk::prelude::{ListBoxExt, SettingsExt, WidgetExt};
+use gtk::prelude::*;
 use gtk::subclass::prelude::ObjectSubclassIsExt;
-use input_event_codes::{KEY_ESC, KEY_SPACE};
+use input_event_codes::*;
 use common::*;
 use wayland_client::Connection;
+use crate::common::virtual_keyboard::VirtualKeyboard;
 
 #[test]
 fn keypad_shuffle() {
@@ -38,6 +39,8 @@ fn keypad_shuffle() {
     shell.set_default();
     shell.set_locked(true);
 
+    let settings = Settings::new("sm.puri.phosh.lockscreen");
+    settings.set_boolean("shuffle-keypad", false).unwrap();
     let ready_called = Arc::new(AtomicBool::new(false));
     let (ready_tx, ready_rx) = async_channel::bounded(1);
     shell.connect_ready(clone!(@strong ready_called => move |shell| {
@@ -51,33 +54,46 @@ fn keypad_shuffle() {
 
     glib::spawn_future_local(clone!(@weak shell => async move {
         let (mut vp, kb) = ready_rx.recv().await.unwrap();
-        glib::timeout_future(Duration::from_millis(2000)).await;
+        glib::timeout_future(Duration::from_millis(2500)).await;
 
         kb.keypress(KEY_SPACE!()).await;
-        glib::timeout_future(Duration::from_millis(2000)).await;
+        glib::timeout_future(Duration::from_millis(1000)).await;
 
-        // Open the top panel and click on keypad shuffle icon
-        vp.click_at(10, 10).await;
+        // Open top panel
+        kb.modifiers(1 << 6);
+        kb.keypress(KEY_M!()).await;
+        kb.modifiers(0);
+        glib::timeout_future(Duration::from_millis(500)).await;
+
+        // click on keypad shuffle icon
+        vp.click_on(&unsafe { phrog::keypad_shuffle::INSTANCE.clone() }.unwrap().imp().info.clone()).await;
+        glib::timeout_future(Duration::from_millis(500)).await;
+
+        assert!(settings.boolean("shuffle-keypad"));
+
+        // close top panel
+        kb.keypress(KEY_ESC!()).await;
+        glib::timeout_future(Duration::from_millis(500)).await;
+
+        // click on center keypad button for dramatical flair
+        let lockscreen = unsafe { phrog::lockscreen::INSTANCE.as_mut().unwrap() };
+        let (keypad, _) = get_lockscreen_bits(lockscreen);
+        vp.click_on(&keypad.child_at(1, 1).unwrap()).await;
+
+        glib::timeout_future(Duration::from_millis(1000)).await;
+
+        vp.click_at((shell.usable_area().2 / 2) as _, 0).await;
         glib::timeout_future(Duration::from_millis(500)).await;
         vp.click_on(&unsafe { phrog::keypad_shuffle::INSTANCE.clone() }.unwrap().imp().info.clone()).await;
         glib::timeout_future(Duration::from_millis(500)).await;
 
-        assert!(Settings::new("sm.puri.phosh.lockscreen").boolean("shuffle-keypad"));
+        assert!(!settings.boolean("shuffle-keypad"));
 
         kb.keypress(KEY_ESC!()).await;
         glib::timeout_future(Duration::from_millis(500)).await;
-        kb.keypress(KEY_SPACE!()).await;
 
-        glib::timeout_future(Duration::from_millis(1000)).await;
-
-        vp.click_at(10, 10).await;
+        vp.click_on(&keypad.child_at(1, 1).unwrap()).await;
         glib::timeout_future(Duration::from_millis(500)).await;
-        vp.click_on(&unsafe { phrog::keypad_shuffle::INSTANCE.clone() }.unwrap().imp().info.clone()).await;
-        glib::timeout_future(Duration::from_millis(500)).await;
-
-        assert!(!Settings::new("sm.puri.phosh.lockscreen").boolean("shuffle-keypad"));
-        kb.keypress(KEY_ESC!()).await;
-        glib::timeout_future(Duration::from_millis(1000)).await;
 
         gtk::main_quit();
     }));
