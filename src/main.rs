@@ -5,6 +5,7 @@ use gtk::Application;
 use gtk::prelude::{StyleContextExt, WidgetExt};
 use libphosh::prelude::*;
 use libphosh::WallClock;
+use nix::libc::SIGUSR1;
 use phrog::shell::Shell;
 
 #[derive(Parser, Debug)]
@@ -45,8 +46,6 @@ fn main() -> anyhow::Result<()> {
         println!("Shell is ready");
     });
 
-    // TODO: 10 is USR1, couldn't find a const in of crates currently in scope?
-    const SIGUSR1: i32 = 10;
     let mut debug_mode = false;
     unix_signal_add(SIGUSR1, move || {
         // static only because libphosh isn't exporting phosh_log_set_log_domains (yet?)
