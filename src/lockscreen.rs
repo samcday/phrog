@@ -34,7 +34,7 @@ mod imp {
     use greetd_ipc::codec::SyncCodec;
     use greetd_ipc::{AuthMessageType, ErrorType, Request, Response};
     use gtk::gio::Settings;
-    use gtk::glib::{clone, closure_local, g_critical, g_warning, ObjectExt};
+    use gtk::glib::{clone, closure_local, g_critical, g_warning, timeout_add_once, ObjectExt};
     use gtk::prelude::SettingsExtManual;
     use gtk::prelude::*;
     use gtk::glib::PropertySet;
@@ -47,6 +47,7 @@ mod imp {
     use libphosh::LockscreenPage;
     use std::cell::{OnceCell, RefCell};
     use std::os::unix::net::UnixStream;
+    use std::time::Duration;
 
     #[derive(Default)]
     pub struct Lockscreen {
@@ -248,6 +249,10 @@ mod imp {
                     self.obj().set_unlock_status("Success. Logging in...");
                     self.start_session().await.unwrap();
                     libphosh::Shell::default().fade_out(0);
+                    // Keep this timeout in sync with fadeout animation duration in phrog.css
+                    timeout_add_once(Duration::from_millis(500), || {
+                        gtk::main_quit();
+                    });
                 }
                 Response::Error {
                     error_type: ErrorType::AuthError,

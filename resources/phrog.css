@@ -3,6 +3,10 @@ phosh-top-panel.debug {
     animation: red-pulse 2s linear infinite;
 }
 
+.phosh-fader-default-fade {
+    animation-duration: 500ms;
+}
+
 @keyframes red-pulse
 {
     0%   {background-color: @phosh_bg_color;}

@@ -75,9 +75,6 @@ fn test_simple_flow() {
             kb.keypress(key).await;
             glib::timeout_future(Duration::from_millis(100)).await;
         }
-
-        glib::timeout_future(Duration::from_millis(2500)).await;
-        gtk::main_quit();
     }));
 
     let _recording = start_recording("simple-flow");

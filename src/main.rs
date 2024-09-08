@@ -1,11 +1,12 @@
 use std::ffi::CString;
+use std::time::Duration;
 use clap::Parser;
 use gtk::glib::*;
 use gtk::Application;
 use gtk::prelude::{StyleContextExt, WidgetExt};
 use libphosh::prelude::*;
 use libphosh::WallClock;
-use nix::libc::SIGUSR1;
+use nix::libc::{SIGTERM, SIGUSR1};
 use phrog::shell::Shell;
 
 #[derive(Parser, Debug)]
@@ -44,6 +45,10 @@ fn main() -> anyhow::Result<()> {
 
     shell.connect_ready(|_| {
         println!("Shell is ready");
+    });
+
+    unix_signal_add_local_once(SIGTERM, || {
+        gtk::main_quit();
     });
 
     let mut debug_mode = false;
