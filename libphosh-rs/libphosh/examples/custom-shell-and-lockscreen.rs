@@ -130,6 +130,7 @@ mod custom_lockscreen {
         }
 
         impl WidgetImpl for CustomLockscreen {}
+        impl ContainerImpl for CustomLockscreen {}
         impl LockscreenImpl for CustomLockscreen {}
     }
 }

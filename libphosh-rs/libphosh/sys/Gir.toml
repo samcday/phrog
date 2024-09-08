@@ -113,7 +113,6 @@ ignore = [
     "Phosh.IdleDBusObjectSkeleton",
     "Phosh.IdleManager",
     "Phosh.KeyboardEvents",
-    "Phosh.Keypad",
     "Phosh.LauncherEntryManager",
     "Phosh.LayoutManager",
     "Phosh.LocationInfo",

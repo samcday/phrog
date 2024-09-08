@@ -9,7 +9,7 @@ use std::{boxed::Box as Box_};
 
 glib::wrapper! {
     #[doc(alias = "PhoshLockscreen")]
-    pub struct Lockscreen(Object<ffi::PhoshLockscreen, ffi::PhoshLockscreenClass>) @extends gtk::Widget;
+    pub struct Lockscreen(Object<ffi::PhoshLockscreen, ffi::PhoshLockscreenClass>) @extends gtk::Container, gtk::Widget;
 
     match fn {
         type_ => || ffi::phosh_lockscreen_get_type(),
@@ -57,6 +57,18 @@ pub struct LockscreenBuilder {
 
                             //pub fn calls_manager(self, calls_manager: /*Ignored*/&CallsManager) -> Self {
                         //    Self { builder: self.builder.property("calls-manager", calls_manager), }
+                        //}
+
+                            pub fn border_width(self, border_width: u32) -> Self {
+                            Self { builder: self.builder.property("border-width", border_width), }
+                        }
+
+                            pub fn child(self, child: &impl IsA<gtk::Widget>) -> Self {
+                            Self { builder: self.builder.property("child", child.clone().upcast()), }
+                        }
+
+                            //pub fn resize_mode(self, resize_mode: /*Ignored*/gtk::ResizeMode) -> Self {
+                        //    Self { builder: self.builder.property("resize-mode", resize_mode), }
                         //}
 
                             pub fn app_paintable(self, app_paintable: bool) -> Self {
@@ -192,9 +204,9 @@ pub struct LockscreenBuilder {
                             Self { builder: self.builder.property("opacity", opacity), }
                         }
 
-                            //pub fn parent(self, parent: &impl IsA</*Ignored*/gtk::Container>) -> Self {
-                        //    Self { builder: self.builder.property("parent", parent.clone().upcast()), }
-                        //}
+                            pub fn parent(self, parent: &impl IsA<gtk::Container>) -> Self {
+                            Self { builder: self.builder.property("parent", parent.clone().upcast()), }
+                        }
 
                             pub fn receives_default(self, receives_default: bool) -> Self {
                             Self { builder: self.builder.property("receives-default", receives_default), }
