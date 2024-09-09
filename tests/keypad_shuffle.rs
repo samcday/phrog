@@ -67,7 +67,7 @@ fn keypad_shuffle() {
         glib::timeout_future(Duration::from_millis(500)).await;
 
         // click on keypad shuffle icon
-        vp.click_on(&unsafe { phrog::keypad_shuffle::INSTANCE.clone() }.unwrap().imp().info.clone()).await;
+        vp.click_on(&shell.keypad_shuffle_qs().unwrap().imp().info.clone()).await;
         glib::timeout_future(Duration::from_millis(500)).await;
 
         assert!(settings.boolean("shuffle-keypad"));
@@ -85,7 +85,7 @@ fn keypad_shuffle() {
 
         vp.click_at((shell.usable_area().2 / 2) as _, 0).await;
         glib::timeout_future(Duration::from_millis(500)).await;
-        vp.click_on(&unsafe { phrog::keypad_shuffle::INSTANCE.clone() }.unwrap().imp().info.clone()).await;
+        vp.click_on(&shell.keypad_shuffle_qs().unwrap().imp().info.clone()).await;
         glib::timeout_future(Duration::from_millis(500)).await;
 
         assert!(!settings.boolean("shuffle-keypad"));

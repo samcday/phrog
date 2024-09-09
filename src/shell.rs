@@ -13,7 +13,7 @@ impl Shell {
 }
 
 mod imp {
-    use std::cell::Cell;
+    use std::cell::{Cell, RefCell};
     use std::collections::HashSet;
     use crate::lockscreen::Lockscreen;
     use gtk::glib::{GString, Properties, Type};
@@ -31,6 +31,10 @@ mod imp {
     pub struct Shell {
         #[property(get, set)]
         fake_greetd: Cell<bool>,
+
+        #[cfg(feature = "keypad-shuffle")]
+        #[property(get, set)]
+        keypad_shuffle_qs: RefCell<Option<crate::keypad_shuffle::ShuffleKeypadQuickSetting>>,
     }
 
     #[glib::object_subclass]
