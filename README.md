@@ -8,8 +8,6 @@ Greetd-compatible greeter for mobile phones
 
 It is the spiritual successor of [phog][].
 
-<br clear="right"/>
-
 ### Installation
 
 #### Fedora
@@ -37,6 +35,8 @@ sudo apk add ~/packages/dist/$(uname -m)/greetd-phrog-*.apk
 #### Other
 
 You must build from source, see the Development section below.
+
+<br clear="right"/>
 
 ## Running
 
