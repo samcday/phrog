@@ -58,9 +58,9 @@ mod imp {
     use std::cell::OnceCell;
     use std::sync::OnceLock;
     use gtk::gdk_pixbuf::Pixbuf;
-    use crate::accounts::AccountsProxy;
     use crate::shell::Shell;
-    use crate::user::UserProxy;
+    use crate::dbus::accounts::AccountsProxy;
+    use crate::dbus::user::UserProxy;
 
     #[derive(CompositeTemplate, Default)]
     #[template(resource = "/mobi/phosh/phrog/lockscreen-user-session.ui")]
