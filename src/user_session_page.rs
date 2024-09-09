@@ -1,7 +1,7 @@
 use crate::session_object::SessionObject;
-use gtk::glib;
+use gtk::{glib, ListBoxRow};
 use gtk::glib::{Cast, CastNone, Object};
-use gtk::prelude::ListModelExt;
+use gtk::prelude::*;
 use gtk::subclass::prelude::ObjectSubclassIsExt;
 use gtk::traits::ListBoxExt;
 use libhandy::prelude::ActionRowExt;
@@ -22,6 +22,25 @@ impl Default for UserSessionPage {
 impl UserSessionPage {
     pub fn new() -> Self {
         Object::builder().build()
+    }
+
+    pub fn select_user(&self, username: &str) {
+        for w in self.imp().box_users.children() {
+            if let Ok(row) = w.downcast::<ActionRow>() {
+                if row.subtitle().filter(|v| v == username).is_some() {
+                    self.imp().box_users.select_row(Some(&row));
+                }
+            }
+        }
+        self.imp().box_users.select_row(self.imp().box_users.children().first().and_then(|v| v.downcast_ref::<ListBoxRow>()));
+    }
+
+    pub fn select_session(&self, name: &str) {
+        for (idx, session) in self.imp().sessions.get().unwrap().iter::<SessionObject>().flatten().enumerate() {
+            if session.id() == name {
+                self.imp().row_sessions.set_selected_index(idx as _);
+            }
+        }
     }
 
     pub fn session(&self) -> SessionObject {
@@ -45,11 +64,11 @@ impl UserSessionPage {
 
 mod imp {
     use crate::session_object::SessionObject;
-    use crate::{sessions, APP_ID};
+    use crate::sessions;
     use glib::subclass::InitializingObject;
-    use gtk::gio::{ListStore, Settings};
+    use gtk::gio::ListStore;
     use gtk::glib::subclass::Signal;
-    use gtk::glib::{clone, g_info};
+    use gtk::glib::clone;
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
     use gtk::{glib, CompositeTemplate, Image, ListBox};
@@ -96,10 +115,6 @@ mod imp {
 
             let shell = libphosh::Shell::default().downcast::<Shell>().unwrap();
             let conn = shell.imp().dbus_connection.clone().into_inner().unwrap();
-            let settings = Settings::new(APP_ID);
-
-            let last_user = settings.string("last-user").to_string();
-            let last_session = settings.string("last-session").to_string();
 
             self.box_users
                 .connect_row_activated(clone!(@weak self as this => move |_, _| {
@@ -123,19 +138,6 @@ mod imp {
                 })),
             );
 
-            // use last-session setting as default for session selection
-            for (idx, session) in session_list.iter().enumerate() {
-                if session.id() == last_session {
-                    g_info!(
-                        "user-session-page",
-                        "defaulting session selection to {}",
-                        session.id()
-                    );
-                    self.row_sessions.set_selected_index(idx as i32);
-                    break;
-                }
-            }
-
             let users = ListStore::new::<User>();
 
             self.box_users.bind_model(Some(&users), |v| {
@@ -158,19 +160,6 @@ mod imp {
 
                 for path in accounts.list_cached_users().await.unwrap() {
                     users.append(&User::new(conn.clone(), path));
-                    // // use last-user setting as default for user selection
-                    // if user_name == last_user {
-                    //     g_warning!(
-                    //         "user-session-page",
-                    //         "defaulting user selection to {}",
-                    //         last_user
-                    //     );
-                    //     this.box_users.select_row(Some(&row));
-                    // }
-                }
-                if this.box_users.selected_row().is_none() {
-                    this.box_users
-                        .select_row(this.box_users.row_at_index(0).as_ref());
                 }
             }));
         }

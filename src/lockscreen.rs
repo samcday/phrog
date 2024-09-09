@@ -31,10 +31,9 @@ mod imp {
     use greetd_ipc::codec::SyncCodec;
     use greetd_ipc::{AuthMessageType, ErrorType, Request, Response};
     use gtk::gio::Settings;
-    use gtk::glib::{clone, closure_local, g_critical, g_warning, timeout_add_once, ObjectExt};
+    use gtk::glib::{clone, closure_local, g_critical, g_warning, timeout_add_once, ObjectExt, Properties};
     use gtk::prelude::SettingsExtManual;
     use gtk::prelude::*;
-    use gtk::glib::PropertySet;
     use gtk::subclass::prelude::*;
     use gtk::traits::WidgetExt;
     use gtk::{gio, glib};
@@ -45,8 +44,10 @@ mod imp {
     use std::os::unix::net::UnixStream;
     use std::time::Duration;
 
-    #[derive(Default)]
+    #[derive(Default, Properties)]
+    #[properties(wrapper_type = super::Lockscreen)]
     pub struct Lockscreen {
+        #[property(get, set)]
         pub user_session_page: OnceCell<UserSessionPage>,
         greetd: RefCell<Option<(Sender<Request>, Receiver<Response>)>>,
         session: RefCell<Option<String>>,
@@ -85,6 +86,7 @@ mod imp {
         (greetd_req_send, greetd_resp_recv)
     }
 
+    #[glib::derived_properties]
     impl ObjectImpl for Lockscreen {
         fn constructed(&self) {
             self.user_session_page.set(UserSessionPage::new()).unwrap();

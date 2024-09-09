@@ -24,7 +24,9 @@ mod imp {
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
     use libphosh::ffi::PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET;
+    use libphosh::prelude::ShellExt;
     use libphosh::subclass::shell::ShellImpl;
+    use crate::APP_ID;
 
     #[derive(Default, Properties)]
     #[properties(wrapper_type = super::Shell)]
@@ -86,6 +88,16 @@ mod imp {
 
             #[cfg(feature = "keypad-shuffle")]
             self.enable_keypad_shuffle();
+
+            self.obj().connect_ready(move |shell| {
+                let lockscreen = shell.lockscreen_manager().lockscreen()
+                    .and_then(|v| v.downcast::<Lockscreen>().ok())
+                    .expect("failed to get lockscreen");
+                let user_session_page = lockscreen.user_session_page();
+                let settings = Settings::new(APP_ID);
+                user_session_page.select_user(&settings.string("last-user"));
+                user_session_page.select_session(&settings.string("last-session"));
+            });
         }
     }
 
