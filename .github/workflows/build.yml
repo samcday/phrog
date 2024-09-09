@@ -3,6 +3,7 @@ name: build
 on:
   push:
     branches: [main]
+    tags: ['*']
   pull_request:
     branches: [main]
   workflow_dispatch: {}
@@ -97,13 +98,26 @@ jobs:
         with:
           name: test-recordings
           path: demo-video/recordings
-      - name: demo.gif
+      - name: demo.mp4
         run: |
           set -uexo pipefail
           docker run \
             -v `pwd`/demo-video:/work -i ghcr.io/samcday/editly:latest \
-            bash -c 'cd /work; editly --json editly.json5 --out demo.gif --width 180 --height 360 --fps 30'
+            bash -c 'cd /work; editly --json editly.json5; \
+            ffmpeg -i demo.mp4 -vcodec libwebp -filter:v fps=fps=60 -lossless 0 -loop 0 -preset default -an -vsync 0 -s 160:320 demo.webp'
       - uses: actions/upload-artifact@v4
         with:
-          name: demo.gif
-          path: demo-video/demo.gif
+          name: demo.mp4
+          path: demo-video/demo.mp4
+      - name: prepare release artifacts
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          cp target/debug/phrog phrog-x86_64
+      - name: upload release artifacts
+        uses: softprops/action-gh-release@v2
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        with:
+          files: |
+            demo.mp4
+            demo.webp
+            phrog-x86_64

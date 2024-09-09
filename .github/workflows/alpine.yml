@@ -3,6 +3,7 @@ name: alpine
 on:
   push:
     branches: [main]
+    tags: ['*']
   pull_request:
     branches: [main]
   workflow_dispatch: {}
@@ -19,7 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [x86_64, aarch64]
+        # Always build x64 in main + PRs, but only other architectures for tagged releases
+        arch: ${{ startsWith(github.ref, 'refs/tags/') && fromJSON('["x86_64", "aarch64"]') || fromJSON('["x86_64"]') }}
     steps:
       - uses: actions/checkout@v4
       - uses: jirutka/setup-alpine@v1
@@ -56,4 +58,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.arch }}
-          path: ${{ steps.alpine.outputs.root-path }}/packages/
+          path: ${{ steps.alpine.outputs.root-path }}/packages/phrog/${{ matrix.arch }}/

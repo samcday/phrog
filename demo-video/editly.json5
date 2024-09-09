@@ -2,6 +2,7 @@
   width: 360,
   height: 720,
   fps: 60,
+  outPath: './demo.mp4',
   clips: [
     { duration: 0.5, layers: [
       { type: 'fill-color', color: 'black' },

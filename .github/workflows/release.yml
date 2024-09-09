@@ -1,0 +1,19 @@
+name: release
+
+on:
+  push:
+    tags: ['*']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          cat > body.md <<HERE
+          <img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/${GITHUB_REF_NAME}/demo.webp">
+          HERE
+      - uses: softprops/action-gh-release@v2
+        with:
+          body_path: body.md
+          generate_release_notes: true
