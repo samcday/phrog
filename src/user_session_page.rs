@@ -29,6 +29,7 @@ impl UserSessionPage {
             if let Ok(row) = w.downcast::<ActionRow>() {
                 if row.subtitle().filter(|v| v == username).is_some() {
                     self.imp().box_users.select_row(Some(&row));
+                    return;
                 }
             }
         }
@@ -39,6 +40,7 @@ impl UserSessionPage {
         for (idx, session) in self.imp().sessions.get().unwrap().iter::<SessionObject>().flatten().enumerate() {
             if session.id() == name {
                 self.imp().row_sessions.set_selected_index(idx as _);
+                return;
             }
         }
     }
@@ -76,9 +78,12 @@ mod imp {
     use libhandy::ActionRow;
     use std::cell::OnceCell;
     use std::sync::OnceLock;
+    use futures_util::select;
     use crate::shell::Shell;
     use crate::dbus::accounts::AccountsProxy;
     use crate::user::User;
+    use futures_util::StreamExt;
+    use zbus::zvariant::OwnedObjectPath;
 
     #[derive(CompositeTemplate, Default)]
     #[template(resource = "/mobi/phosh/phrog/lockscreen-user-session.ui")]
@@ -156,10 +161,33 @@ mod imp {
 
             self.users.set(users.clone()).unwrap();
             glib::spawn_future_local(clone!(@weak self as this => async move {
-                let accounts = AccountsProxy::new(&conn).await.unwrap();
+                let accounts_proxy = AccountsProxy::new(&conn).await.unwrap();
 
-                for path in accounts.list_cached_users().await.unwrap() {
-                    users.append(&User::new(conn.clone(), path));
+                for path in accounts_proxy.list_cached_users().await.unwrap() {
+                    users.append(&User::new(conn.clone(), path.into()));
+                }
+
+                let mut added_stream = accounts_proxy.receive_user_added().await.unwrap();
+                let mut deleted_stream = accounts_proxy.receive_user_deleted().await.unwrap();
+
+                loop {
+                    select! {
+                        added = added_stream.next() => if let Some(added) = added {
+                            if let Some(path) = added.args().ok().and_then(|v| Some(v.user)) {
+                                users.append(&User::new(conn.clone(), path.into()));
+                            }
+                        },
+                        deleted = deleted_stream.next() => if let Some(deleted) = deleted {
+                            if let Some(path) = deleted.args().ok().and_then(|v| Some(v.user)) {
+                                for (idx, user) in users.iter::<User>().flatten().enumerate() {
+                                    if user.path() == path.as_str() {
+                                        users.remove(idx as _);
+                                        break;
+                                    }
+                                }
+                            }
+                        },
+                    }
                 }
             }));
         }

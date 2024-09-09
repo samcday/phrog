@@ -8,16 +8,19 @@ use gtk::prelude::FileExt;
 use gtk::subclass::prelude::ObjectSubclassIsExt;
 use gtk::{gio, glib};
 use zbus::export::futures_util::StreamExt;
-use zbus::zvariant::OwnedObjectPath;
+use zbus::zvariant::{ObjectPath, OwnedObjectPath};
 
 glib::wrapper! {
     pub struct User(ObjectSubclass<imp::User>);
 }
 
 impl User {
-    pub fn new(conn: zbus::Connection, path: OwnedObjectPath) -> Self {
-        let obj: Self = Object::builder().build();
+    pub fn new(conn: zbus::Connection, path: ObjectPath) -> Self {
+        let obj: Self = Object::builder()
+            .property("path", path.as_str())
+            .build();
 
+        let path = OwnedObjectPath::from(path);
         spawn_future_local(clone!(@weak obj => async move {
             let user_proxy = if let Ok(proxy) = UserProxy::builder(&conn)
                 .path(&path)
@@ -90,6 +93,8 @@ mod imp {
     #[derive(Properties, Default)]
     #[properties(wrapper_type = super::User)]
     pub struct User {
+        #[property(get, set)]
+        path: RefCell<String>,
         #[property(get, set)]
         name: RefCell<String>,
         #[property(get, set)]
