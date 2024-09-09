@@ -121,6 +121,6 @@ jobs:
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         with:
           files: |
-            demo.mp4
-            demo.webp
+            demo-video/demo.mp4
+            demo-video/demo.webp
             phrog-x86_64
