@@ -7,70 +7,202 @@ use glib::{prelude::*,signal::{connect_raw, SignalHandlerId},translate::*};
 use std::{boxed::Box as Box_};
 
 glib::wrapper! {
-    #[doc(alias = "PhoshStatusIcon")]
-    pub struct StatusIcon(Object<ffi::PhoshStatusIcon, ffi::PhoshStatusIconClass>) @extends gtk::Container, gtk::Widget;
+    #[doc(alias = "PhoshKeypad")]
+    pub struct Keypad(Object<ffi::PhoshKeypad, ffi::PhoshKeypadClass>) @extends gtk::Grid, gtk::Container, gtk::Widget;
 
     match fn {
-        type_ => || ffi::phosh_status_icon_get_type(),
+        type_ => || ffi::phosh_keypad_get_type(),
     }
 }
 
-impl StatusIcon {
-        pub const NONE: Option<&'static StatusIcon> = None;
-    
-
-    #[doc(alias = "phosh_status_icon_new")]
-    pub fn new() -> StatusIcon {
+impl Keypad {
+    #[doc(alias = "phosh_keypad_new")]
+    pub fn new() -> Keypad {
         assert_initialized_main_thread!();
         unsafe {
-            gtk::Widget::from_glib_none(ffi::phosh_status_icon_new()).unsafe_cast()
+            gtk::Widget::from_glib_none(ffi::phosh_keypad_new()).unsafe_cast()
         }
     }
 
             // rustdoc-stripper-ignore-next
-            /// Creates a new builder-pattern struct instance to construct [`StatusIcon`] objects.
+            /// Creates a new builder-pattern struct instance to construct [`Keypad`] objects.
             ///
-            /// This method returns an instance of [`StatusIconBuilder`](crate::builders::StatusIconBuilder) which can be used to create [`StatusIcon`] objects.
-            pub fn builder() -> StatusIconBuilder {
-                StatusIconBuilder::new()
+            /// This method returns an instance of [`KeypadBuilder`](crate::builders::KeypadBuilder) which can be used to create [`Keypad`] objects.
+            pub fn builder() -> KeypadBuilder {
+                KeypadBuilder::new()
             }
         
+
+    #[doc(alias = "phosh_keypad_distribute")]
+    pub fn distribute(&self) {
+        unsafe {
+            ffi::phosh_keypad_distribute(self.to_glib_none().0);
+        }
+    }
+
+    #[doc(alias = "phosh_keypad_get_end_action")]
+    #[doc(alias = "get_end_action")]
+    pub fn end_action(&self) -> Option<gtk::Widget> {
+        unsafe {
+            from_glib_none(ffi::phosh_keypad_get_end_action(self.to_glib_none().0))
+        }
+    }
+
+    //#[doc(alias = "phosh_keypad_get_entry")]
+    //#[doc(alias = "get_entry")]
+    //pub fn entry(&self) -> /*Ignored*/gtk::Entry {
+    //    unsafe { TODO: call ffi:phosh_keypad_get_entry() }
+    //}
+
+    #[doc(alias = "phosh_keypad_get_shuffle")]
+    #[doc(alias = "get_shuffle")]
+    pub fn is_shuffle(&self) -> bool {
+        unsafe {
+            from_glib(ffi::phosh_keypad_get_shuffle(self.to_glib_none().0))
+        }
+    }
+
+    #[doc(alias = "phosh_keypad_get_start_action")]
+    #[doc(alias = "get_start_action")]
+    pub fn start_action(&self) -> Option<gtk::Widget> {
+        unsafe {
+            from_glib_none(ffi::phosh_keypad_get_start_action(self.to_glib_none().0))
+        }
+    }
+
+    #[doc(alias = "phosh_keypad_set_end_action")]
+    pub fn set_end_action(&self, end_action: Option<&impl IsA<gtk::Widget>>) {
+        unsafe {
+            ffi::phosh_keypad_set_end_action(self.to_glib_none().0, end_action.map(|p| p.as_ref()).to_glib_none().0);
+        }
+    }
+
+    //#[doc(alias = "phosh_keypad_set_entry")]
+    //pub fn set_entry(&self, entry: /*Ignored*/Option<&gtk::Entry>) {
+    //    unsafe { TODO: call ffi:phosh_keypad_set_entry() }
+    //}
+
+    #[doc(alias = "phosh_keypad_set_shuffle")]
+    pub fn set_shuffle(&self, shuffle: bool) {
+        unsafe {
+            ffi::phosh_keypad_set_shuffle(self.to_glib_none().0, shuffle.into_glib());
+        }
+    }
+
+    #[doc(alias = "phosh_keypad_set_start_action")]
+    pub fn set_start_action(&self, start_action: Option<&impl IsA<gtk::Widget>>) {
+        unsafe {
+            ffi::phosh_keypad_set_start_action(self.to_glib_none().0, start_action.map(|p| p.as_ref()).to_glib_none().0);
+        }
+    }
+
+    #[doc(alias = "end-action")]
+    pub fn connect_end_action_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_end_action_trampoline<F: Fn(&Keypad) + 'static>(this: *mut ffi::PhoshKeypad, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+            let f: &F = &*(f as *const F);
+            f(&from_glib_borrow(this))
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"notify::end-action\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_end_action_trampoline::<F> as *const ())), Box_::into_raw(f))
+        }
+    }
+
+    #[doc(alias = "entry")]
+    pub fn connect_entry_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_entry_trampoline<F: Fn(&Keypad) + 'static>(this: *mut ffi::PhoshKeypad, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+            let f: &F = &*(f as *const F);
+            f(&from_glib_borrow(this))
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"notify::entry\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_entry_trampoline::<F> as *const ())), Box_::into_raw(f))
+        }
+    }
+
+    #[doc(alias = "shuffle")]
+    pub fn connect_shuffle_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_shuffle_trampoline<F: Fn(&Keypad) + 'static>(this: *mut ffi::PhoshKeypad, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+            let f: &F = &*(f as *const F);
+            f(&from_glib_borrow(this))
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"notify::shuffle\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_shuffle_trampoline::<F> as *const ())), Box_::into_raw(f))
+        }
+    }
+
+    #[doc(alias = "start-action")]
+    pub fn connect_start_action_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_start_action_trampoline<F: Fn(&Keypad) + 'static>(this: *mut ffi::PhoshKeypad, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+            let f: &F = &*(f as *const F);
+            f(&from_glib_borrow(this))
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"notify::start-action\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_start_action_trampoline::<F> as *const ())), Box_::into_raw(f))
+        }
+    }
 }
 
-impl Default for StatusIcon {
+impl Default for Keypad {
                      fn default() -> Self {
                          Self::new()
                      }
                  }
 
 // rustdoc-stripper-ignore-next
-        /// A [builder-pattern] type to construct [`StatusIcon`] objects.
+        /// A [builder-pattern] type to construct [`Keypad`] objects.
         ///
         /// [builder-pattern]: https://doc.rust-lang.org/1.0.0/style/ownership/builders.html
 #[must_use = "The builder must be built to be used"]
-pub struct StatusIconBuilder {
-            builder: glib::object::ObjectBuilder<'static, StatusIcon>,
+pub struct KeypadBuilder {
+            builder: glib::object::ObjectBuilder<'static, Keypad>,
         }
 
-        impl StatusIconBuilder {
+        impl KeypadBuilder {
         fn new() -> Self {
             Self { builder: glib::object::Object::builder() }
         }
 
-                            pub fn extra_widget(self, extra_widget: &impl IsA<gtk::Widget>) -> Self {
-                            Self { builder: self.builder.property("extra-widget", extra_widget.clone().upcast()), }
+                            pub fn end_action(self, end_action: &impl IsA<gtk::Widget>) -> Self {
+                            Self { builder: self.builder.property("end-action", end_action.clone().upcast()), }
                         }
 
-                            pub fn icon_name(self, icon_name: impl Into<glib::GString>) -> Self {
-                            Self { builder: self.builder.property("icon-name", icon_name.into()), }
-                        }
-
-                            //pub fn icon_size(self, icon_size: /*Ignored*/gtk::IconSize) -> Self {
-                        //    Self { builder: self.builder.property("icon-size", icon_size), }
+                            //pub fn entry(self, entry: &impl IsA</*Ignored*/gtk::Entry>) -> Self {
+                        //    Self { builder: self.builder.property("entry", entry.clone().upcast()), }
                         //}
 
-                            pub fn info(self, info: impl Into<glib::GString>) -> Self {
-                            Self { builder: self.builder.property("info", info.into()), }
+                            pub fn shuffle(self, shuffle: bool) -> Self {
+                            Self { builder: self.builder.property("shuffle", shuffle), }
+                        }
+
+                            pub fn start_action(self, start_action: &impl IsA<gtk::Widget>) -> Self {
+                            Self { builder: self.builder.property("start-action", start_action.clone().upcast()), }
+                        }
+
+                            pub fn baseline_row(self, baseline_row: i32) -> Self {
+                            Self { builder: self.builder.property("baseline-row", baseline_row), }
+                        }
+
+                            pub fn column_homogeneous(self, column_homogeneous: bool) -> Self {
+                            Self { builder: self.builder.property("column-homogeneous", column_homogeneous), }
+                        }
+
+                            pub fn column_spacing(self, column_spacing: i32) -> Self {
+                            Self { builder: self.builder.property("column-spacing", column_spacing), }
+                        }
+
+                            pub fn row_homogeneous(self, row_homogeneous: bool) -> Self {
+                            Self { builder: self.builder.property("row-homogeneous", row_homogeneous), }
+                        }
+
+                            pub fn row_spacing(self, row_spacing: i32) -> Self {
+                            Self { builder: self.builder.property("row-spacing", row_spacing), }
                         }
 
                             pub fn border_width(self, border_width: u32) -> Self {
@@ -273,140 +405,8 @@ pub struct StatusIconBuilder {
                         }
 
     // rustdoc-stripper-ignore-next
-    /// Build the [`StatusIcon`].
+    /// Build the [`Keypad`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
-    pub fn build(self) -> StatusIcon {
+    pub fn build(self) -> Keypad {
     self.builder.build() }
 }
-
-mod sealed {
-    pub trait Sealed {}
-    impl<T: super::IsA<super::StatusIcon>> Sealed for T {}
-}
-
-pub trait StatusIconExt: IsA<StatusIcon> + sealed::Sealed + 'static {
-    #[doc(alias = "phosh_status_icon_get_extra_widget")]
-    #[doc(alias = "get_extra_widget")]
-    fn extra_widget(&self) -> Option<gtk::Widget> {
-        unsafe {
-            from_glib_none(ffi::phosh_status_icon_get_extra_widget(self.as_ref().to_glib_none().0))
-        }
-    }
-
-    #[doc(alias = "phosh_status_icon_get_icon_name")]
-    #[doc(alias = "get_icon_name")]
-    fn icon_name(&self) -> glib::GString {
-        unsafe {
-            from_glib_full(ffi::phosh_status_icon_get_icon_name(self.as_ref().to_glib_none().0))
-        }
-    }
-
-    //#[doc(alias = "phosh_status_icon_get_icon_size")]
-    //#[doc(alias = "get_icon_size")]
-    //fn icon_size(&self) -> /*Ignored*/gtk::IconSize {
-    //    unsafe { TODO: call ffi:phosh_status_icon_get_icon_size() }
-    //}
-
-    #[doc(alias = "phosh_status_icon_get_info")]
-    #[doc(alias = "get_info")]
-    fn info(&self) -> glib::GString {
-        unsafe {
-            from_glib_full(ffi::phosh_status_icon_get_info(self.as_ref().to_glib_none().0))
-        }
-    }
-
-    #[doc(alias = "phosh_status_icon_get_show_always")]
-    #[doc(alias = "get_show_always")]
-    fn shows_always(&self) -> bool {
-        unsafe {
-            from_glib(ffi::phosh_status_icon_get_show_always(self.as_ref().to_glib_none().0))
-        }
-    }
-
-    #[doc(alias = "phosh_status_icon_set_extra_widget")]
-    fn set_extra_widget(&self, widget: &impl IsA<gtk::Widget>) {
-        unsafe {
-            ffi::phosh_status_icon_set_extra_widget(self.as_ref().to_glib_none().0, widget.as_ref().to_glib_none().0);
-        }
-    }
-
-    #[doc(alias = "phosh_status_icon_set_icon_name")]
-    fn set_icon_name(&self, icon_name: &str) {
-        unsafe {
-            ffi::phosh_status_icon_set_icon_name(self.as_ref().to_glib_none().0, icon_name.to_glib_none().0);
-        }
-    }
-
-    //#[doc(alias = "phosh_status_icon_set_icon_size")]
-    //fn set_icon_size(&self, size: /*Ignored*/gtk::IconSize) {
-    //    unsafe { TODO: call ffi:phosh_status_icon_set_icon_size() }
-    //}
-
-    #[doc(alias = "phosh_status_icon_set_info")]
-    fn set_info(&self, info: &str) {
-        unsafe {
-            ffi::phosh_status_icon_set_info(self.as_ref().to_glib_none().0, info.to_glib_none().0);
-        }
-    }
-
-    #[doc(alias = "phosh_status_icon_set_show_always")]
-    fn set_show_always(&self, show_always: bool) {
-        unsafe {
-            ffi::phosh_status_icon_set_show_always(self.as_ref().to_glib_none().0, show_always.into_glib());
-        }
-    }
-
-    #[doc(alias = "extra-widget")]
-    fn connect_extra_widget_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn notify_extra_widget_trampoline<P: IsA<StatusIcon>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshStatusIcon, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
-            let f: &F = &*(f as *const F);
-            f(StatusIcon::from_glib_borrow(this).unsafe_cast_ref())
-        }
-        unsafe {
-            let f: Box_<F> = Box_::new(f);
-            connect_raw(self.as_ptr() as *mut _, b"notify::extra-widget\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_extra_widget_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
-        }
-    }
-
-    #[doc(alias = "icon-name")]
-    fn connect_icon_name_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn notify_icon_name_trampoline<P: IsA<StatusIcon>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshStatusIcon, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
-            let f: &F = &*(f as *const F);
-            f(StatusIcon::from_glib_borrow(this).unsafe_cast_ref())
-        }
-        unsafe {
-            let f: Box_<F> = Box_::new(f);
-            connect_raw(self.as_ptr() as *mut _, b"notify::icon-name\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_icon_name_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
-        }
-    }
-
-    #[doc(alias = "icon-size")]
-    fn connect_icon_size_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn notify_icon_size_trampoline<P: IsA<StatusIcon>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshStatusIcon, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
-            let f: &F = &*(f as *const F);
-            f(StatusIcon::from_glib_borrow(this).unsafe_cast_ref())
-        }
-        unsafe {
-            let f: Box_<F> = Box_::new(f);
-            connect_raw(self.as_ptr() as *mut _, b"notify::icon-size\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_icon_size_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
-        }
-    }
-
-    #[doc(alias = "info")]
-    fn connect_info_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn notify_info_trampoline<P: IsA<StatusIcon>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshStatusIcon, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
-            let f: &F = &*(f as *const F);
-            f(StatusIcon::from_glib_borrow(this).unsafe_cast_ref())
-        }
-        unsafe {
-            let f: Box_<F> = Box_::new(f);
-            connect_raw(self.as_ptr() as *mut _, b"notify::info\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_info_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
-        }
-    }
-}
-
-impl<O: IsA<StatusIcon>> StatusIconExt for O {}

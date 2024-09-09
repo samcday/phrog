@@ -22,6 +22,7 @@ external_libraries = [
 ]
 
 generate = [
+  "Phosh.Keypad",
   "Phosh.Lockscreen",
   "Phosh.LockscreenPage",
   "Phosh.StatusIcon",
@@ -35,6 +36,8 @@ manual = [
   "Gio.AsyncReadyCallback",
   "Gio.AsyncResult",
   "Gio.Cancellable",
+  "Gtk.Container",
+  "Gtk.Grid",
   "Gtk.Widget",
 ]
 
@@ -136,7 +139,6 @@ ignore = [
     "Phosh.IdleDBusObjectSkeleton",
     "Phosh.IdleManager",
     "Phosh.KeyboardEvents",
-    "Phosh.Keypad",
     "Phosh.LauncherEntryManager",
     "Phosh.LayoutManager",
     "Phosh.LocationInfo",

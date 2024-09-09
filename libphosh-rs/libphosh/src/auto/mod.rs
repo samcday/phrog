@@ -3,6 +3,9 @@
 // from ../gir-files
 // DO NOT EDIT
 
+mod keypad;
+pub use self::keypad::Keypad;
+
 mod lockscreen;
 pub use self::lockscreen::Lockscreen;
 
@@ -32,6 +35,7 @@ pub(crate) mod traits {
     pub use super::wall_clock::WallClockExt;
 }
 pub(crate) mod builders {
+    pub use super::keypad::KeypadBuilder;
     pub use super::lockscreen::LockscreenBuilder;
     pub use super::quick_setting::QuickSettingBuilder;
     pub use super::shell::ShellBuilder;

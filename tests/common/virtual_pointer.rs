@@ -22,6 +22,8 @@ pub struct VirtualPointer {
     ptr: ZwlrVirtualPointerV1,
     width: u32,
     height: u32,
+    x: u32,
+    y: u32,
 }
 
 impl Dispatch<wl_registry::WlRegistry, ()> for State {
@@ -67,6 +69,18 @@ impl VirtualPointer {
             .unwrap()
             .create_virtual_pointer(state.seat.as_ref(), &event_queue.handle(), ());
 
+        let x = width / 2;
+        let y = height / 2;
+        ptr.motion_absolute(
+            ts.elapsed().unwrap().as_millis() as _,
+            x,
+            y,
+            width,
+            height,
+        );
+        ptr.frame();
+        event_queue.flush().unwrap();
+
         Self {
             ts,
             event_queue: conn.new_event_queue(),
@@ -74,41 +88,36 @@ impl VirtualPointer {
             ptr,
             width,
             height,
+            x,
+            y,
         }
     }
 
-    pub async fn click_on(&self, widget: &impl IsA<Widget>) {
+    pub async fn click_on(&mut self, widget: &impl IsA<Widget>) {
         let (mut x, mut y) = widget.translate_coordinates(&widget.toplevel().unwrap(), 0, 0).unwrap();
         x += widget.allocated_width() / 2;
         self.click_at(x as _, y as _).await;
     }
 
-    pub async fn click_at(&self, x: u32, y: u32) {
-        self.ptr.motion_absolute(
-            self.ts.elapsed().unwrap().as_millis() as _,
-            x,
-            y + 75,
-            self.width,
-            self.height,
-        );
-        self.ptr.frame();
-        self.event_queue.flush().unwrap();
-
-        let mut cur_y = y as f64 + 75.0;
-        while cur_y > y as f64 {
-            cur_y -= 0.5;
-            self.ptr
-                .motion(self.ts.elapsed().unwrap().as_millis() as _, 0.0, -0.5);
+    pub async fn click_at(&mut self, x: u32, y: u32) {
+        while self.x != x || self.y != y {
+            let step_x = if self.x > x { -1. } else if self.x < x { 1. } else { 0. };
+            let step_y = if self.y > y { -1. } else if self.y < y { 1. } else { 0. };
+            self.ptr.motion(self.ts.elapsed().unwrap().as_millis() as _,
+                            step_x,
+                            step_y);
             self.ptr.frame();
             self.event_queue.flush().unwrap();
+            self.x = (self.x as f64 + step_x) as _;
+            self.y = (self.y as f64 + step_y) as _;
             glib::timeout_future(Duration::from_millis(1)).await;
         }
 
-        glib::timeout_future(Duration::from_millis(250)).await;
-        self.click();
+        glib::timeout_future(Duration::from_millis(150)).await;
+        self.click().await;
     }
 
-    pub fn click(&self) {
+    pub async fn click(&self) {
         // I found this magic 272 constant in moverest/wl-kbptr sources.
         // TODO: demystify this voodoo number
         self.ptr.button(
@@ -117,6 +126,8 @@ impl VirtualPointer {
             ButtonState::Pressed,
         );
         self.ptr.frame();
+        self.event_queue.flush().unwrap();
+        glib::timeout_future(Duration::from_millis(50)).await;
         self.ptr.button(
             self.ts.elapsed().unwrap().as_millis() as _,
             272,

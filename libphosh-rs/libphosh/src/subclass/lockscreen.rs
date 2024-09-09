@@ -1,9 +1,9 @@
 use glib::{Cast, Class, subclass::prelude::*};
 use glib::translate::ToGlibPtr;
-use gtk::subclass::prelude::WidgetImpl;
+use gtk::subclass::prelude::{ContainerImpl, WidgetImpl};
 use crate::Lockscreen;
 
-pub trait LockscreenImpl: LockscreenImplExt + ObjectImpl + WidgetImpl {
+pub trait LockscreenImpl: LockscreenImplExt + ObjectImpl + WidgetImpl + ContainerImpl {
     fn unlock_submit(&self) {
         self.parent_unlock_submit();
     }

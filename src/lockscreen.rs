@@ -6,7 +6,7 @@ use gtk::glib;
 
 glib::wrapper! {
     pub struct Lockscreen(ObjectSubclass<imp::Lockscreen>)
-        @extends libphosh::Lockscreen, gtk::Widget;
+        @extends libphosh::Lockscreen, gtk::Widget, gtk::Window, gtk::Bin;
 }
 
 #[cfg(feature = "test")]
@@ -38,8 +38,7 @@ mod imp {
     use gtk::prelude::SettingsExtManual;
     use gtk::prelude::*;
     use gtk::glib::PropertySet;
-    use gtk::subclass::prelude::{ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt};
-    use gtk::subclass::widget::WidgetImpl;
+    use gtk::subclass::prelude::*;
     use gtk::traits::WidgetExt;
     use gtk::{gio, glib};
     use libphosh::prelude::*;
@@ -273,6 +272,9 @@ mod imp {
     }
 
     impl WidgetImpl for Lockscreen {}
+    impl ContainerImpl for Lockscreen {}
+    impl BinImpl for Lockscreen {}
+    impl WindowImpl for Lockscreen {}
     impl LockscreenImpl for Lockscreen {
         fn unlock_submit(&self) {
             glib::spawn_future_local(clone!(@weak self as this => async move {

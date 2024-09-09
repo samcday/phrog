@@ -1,0 +1,18 @@
+{
+  width: 360,
+  height: 720,
+  fps: 60,
+  clips: [
+    { duration: 0.5, layers: [
+      { type: 'fill-color', color: 'black' },
+    ], transition: { name: 'luminance_melt' } },
+
+    { duration: 2, layers: [
+      { type: 'gl', fragmentPath: './shader.frag', speed: 20 },
+      { type: 'image-overlay', path: './frog-sunglasses.svg', position: 'center', width: 0.75 }
+    ], transition: { name: 'CrossZoom' } },
+    { layers:  [
+      { type: 'video', path: './recordings/simple-flow.mp4' }
+    ]},
+  ],
+}
