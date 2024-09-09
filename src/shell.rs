@@ -35,6 +35,8 @@ mod imp {
         #[cfg(feature = "keypad-shuffle")]
         #[property(get, set)]
         keypad_shuffle_qs: RefCell<Option<crate::keypad_shuffle::ShuffleKeypadQuickSetting>>,
+
+        provider: Cell<CssProvider>,
     }
 
     #[glib::object_subclass]
@@ -42,16 +44,6 @@ mod imp {
         const NAME: &'static str = "PhrogShell";
         type Type = super::Shell;
         type ParentType = libphosh::Shell;
-        fn class_init(_klass: &mut Self::Class) {
-            let provider = CssProvider::new();
-            provider.load_from_resource("/mobi/phosh/phrog/phrog.css");
-            StyleContext::add_provider_for_screen(
-                &gdk::Screen::default().unwrap(),
-                &provider,
-                // Slightly hacky, we want to be above phosh to override some stuff
-                gtk::STYLE_PROVIDER_PRIORITY_APPLICATION + 5,
-            );
-        }
     }
 
     impl Shell {
@@ -75,6 +67,18 @@ mod imp {
     impl ObjectImpl for Shell {
         fn constructed(&self) {
             self.parent_constructed();
+
+            let provider = CssProvider::new();
+            provider.load_from_resource("/mobi/phosh/phrog/phrog.css");
+            StyleContext::add_provider_for_screen(
+                &gdk::Screen::default().unwrap(),
+                &provider,
+                // Slightly hacky, we want to be above phosh to override some stuff
+                gtk::STYLE_PROVIDER_PRIORITY_APPLICATION + 5,
+            );
+
+            self.provider.set(provider);
+
             #[cfg(feature = "keypad-shuffle")]
             self.enable_keypad_shuffle();
         }
