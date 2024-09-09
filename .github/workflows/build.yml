@@ -74,13 +74,17 @@ jobs:
         run: |
           set -uexo pipefail
           cargo build --features=static,test --all-targets --verbose
+      - uses: actions/upload-artifact@v4
+        with:
+          name: x86-64-debug
+          path: target/debug/phrog
       - name: Test
         run: |
           set -uexo pipefail
 
           # run tests
           mkdir -p test-recordings/
-          export RECORD_TESTS=`pwd`/test-recordings/
+          export RECORD_TESTS=`pwd`/demo-video/recordings/
           export G_MESSAGES_DEBUG=all
           cat > phoc.ini <<HERE
           [output:X11-1]
@@ -88,11 +92,17 @@ jobs:
           HERE
           dbus-run-session xvfb-run -a -s -noreset phoc -C phoc.ini -S -E "cargo test --features=static,test --verbose -- --test-threads=1 --nocapture"
       - uses: actions/upload-artifact@v4
-        with:
-          name: x86-64-debug
-          path: target/debug/phrog
-      - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: tests-recordings
-          path: test-recordings/
+          name: test-recordings
+          path: demo-video/recordings
+      - name: demo.gif
+        run: |
+          set -uexo pipefail
+          docker run \
+            -v `pwd`/demo-video:/work -i ghcr.io/samcday/editly:latest \
+            bash -c 'cd /work; editly --json editly.json5 --out demo.gif --width 180 --height 360 --fps 30'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: demo.gif
+          path: demo-video/demo.gif
