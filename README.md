@@ -8,11 +8,11 @@ Greetd-compatible greeter for mobile phones
 
 It is the spiritual successor of [phog][].
 
-<br clear="left"/>
+<br clear="right"/>
 
-## Installation
+### Installation
 
-### Fedora
+#### Fedora
 
 ```
 sudo dnf copr enable samcday/phrog
@@ -21,7 +21,7 @@ sudo dnf copr enable samcday/phrog
 sudo dnf install phrog
 ```
 
-### Alpine
+#### Alpine
 
 The package has been [requested](https://gitlab.alpinelinux.org/alpine/aports/-/issues/16430) in Alpine.
 
@@ -34,7 +34,7 @@ abuild -K
 sudo apk add ~/packages/dist/$(uname -m)/greetd-phrog-*.apk
 ```
 
-### Other
+#### Other
 
 You must build from source, see the Development section below.
 
