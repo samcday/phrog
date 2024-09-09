@@ -1,6 +1,6 @@
-<img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/0.8.2/demo.gif">
-
 ## 🐸
+
+<img float="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/0.8.2/demo.gif">
 
 Greetd-compatible greeter for mobile phones
 
