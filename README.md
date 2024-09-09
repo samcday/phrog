@@ -1,11 +1,14 @@
+<img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/0.8.2/demo.gif">
+
 # 🐸
 
 Greetd-compatible greeter for mobile phones
 
-
 `phrog` uses Phosh to handle a [greetd][] conversation
 
 It is the spiritual successor of [phog][].
+
+<br clear="left"/>
 
 ## Usage
 
