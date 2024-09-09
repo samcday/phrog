@@ -9,6 +9,9 @@ pub use self::keypad::Keypad;
 mod lockscreen;
 pub use self::lockscreen::Lockscreen;
 
+mod lockscreen_manager;
+pub use self::lockscreen_manager::LockscreenManager;
+
 mod quick_setting;
 pub use self::quick_setting::QuickSetting;
 
@@ -37,6 +40,7 @@ pub(crate) mod traits {
 pub(crate) mod builders {
     pub use super::keypad::KeypadBuilder;
     pub use super::lockscreen::LockscreenBuilder;
+    pub use super::lockscreen_manager::LockscreenManagerBuilder;
     pub use super::quick_setting::QuickSettingBuilder;
     pub use super::shell::ShellBuilder;
     pub use super::status_icon::StatusIconBuilder;
