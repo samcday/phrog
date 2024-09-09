@@ -9,9 +9,6 @@ glib::wrapper! {
         @extends libphosh::Lockscreen, gtk::Widget, gtk::Window, gtk::Bin;
 }
 
-#[cfg(feature = "test")]
-pub static mut INSTANCE: Option<Lockscreen> = None;
-
 impl Lockscreen {
     pub fn new() -> Self {
         Object::builder().build()
@@ -121,8 +118,6 @@ mod imp {
             );
 
             self.parent_constructed();
-            #[cfg(feature = "test")]
-            unsafe { crate::lockscreen::INSTANCE = Some(self.obj().clone()) };
         }
     }
 

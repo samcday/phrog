@@ -16,6 +16,7 @@ use gtk::subclass::prelude::*;
 use gtk::traits::BinExt;
 use common::*;
 use wayland_client::Connection;
+use phrog::lockscreen::Lockscreen;
 
 #[test]
 fn test_simple_flow() {
@@ -50,7 +51,7 @@ fn test_simple_flow() {
         let mut vp = ready_rx.recv().await.unwrap();
         glib::timeout_future(Duration::from_millis(500)).await;
         // Move the mouse to first user row and click on it.
-        let lockscreen = unsafe { phrog::lockscreen::INSTANCE.as_mut().unwrap() };
+        let mut lockscreen = shell.lockscreen_manager().lockscreen().unwrap().downcast::<Lockscreen>().unwrap();
 
         let usp = lockscreen.imp().user_session_page.get().unwrap();
 
@@ -61,7 +62,7 @@ fn test_simple_flow() {
 
         assert_eq!(lockscreen.page(), LockscreenPage::Unlock);
 
-        let (keypad, submit_btn) = get_lockscreen_bits(lockscreen);
+        let (keypad, submit_btn) = get_lockscreen_bits(&mut lockscreen);
 
         vp.click_on(&keypad.child_at(1, 3).unwrap()).await; // 0
         vp.click_on(&keypad.child_at(0, 1).unwrap()).await; // 4
