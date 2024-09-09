@@ -1,4 +1,4 @@
-## 🐸
+## 🐸 (phrog)
 
 <img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/0.8.2/demo.gif">
 
@@ -6,9 +6,9 @@
 <br />
 <br />
 
-Greetd-compatible greeter for mobile phones
+A greeter that works on mobile devices and also other kinds of computers.
 
-`phrog` uses Phosh to handle a [greetd][] conversation
+🤓 `phrog` uses [Phosh][] to conduct a [greetd][] conversation.
 
 It is the spiritual successor of [phog][].
 
@@ -89,5 +89,5 @@ cargo test --features=static
 ```
 
 [phog]: https://gitlab.com/mobian1/phog
+[Phosh]: https://gitlab.gnome.org/World/Phosh/phosh
 [greetd]: https://sr.ht/~kennylevinsen/greetd/
-[phosh-deps]: https://gitlab.gnome.org/World/Phosh/phosh#dependencies
