@@ -1,6 +1,6 @@
 <img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/0.8.2/demo.gif">
 
-# 🐸
+## 🐸
 
 Greetd-compatible greeter for mobile phones
 
@@ -10,11 +10,9 @@ It is the spiritual successor of [phog][].
 
 <br clear="left"/>
 
-## Usage
+## Installation
 
-### Installation
-
-#### Fedora
+### Fedora
 
 ```
 sudo dnf copr enable samcday/phrog
@@ -23,7 +21,7 @@ sudo dnf copr enable samcday/phrog
 sudo dnf install phrog
 ```
 
-#### Alpine
+### Alpine
 
 The package has been [requested](https://gitlab.alpinelinux.org/alpine/aports/-/issues/16430) in Alpine.
 
@@ -36,11 +34,11 @@ abuild -K
 sudo apk add ~/packages/dist/$(uname -m)/greetd-phrog-*.apk
 ```
 
-#### Other
+### Other
 
 You must build from source, see the Development section below.
 
-### Running
+## Running
 
 `phrog` is primarily intended to run via [greetd][] - your `/etc/greetd/config.toml` should
 look like this:
