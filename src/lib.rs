@@ -7,6 +7,7 @@ mod session_object;
 mod sessions;
 pub mod shell;
 mod user_session_page;
+mod user;
 
 use anyhow::{anyhow, Context};
 use gtk::{gdk, gio};

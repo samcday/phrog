@@ -49,7 +49,7 @@ mod imp {
     use glib::subclass::InitializingObject;
     use gtk::gio::{ListStore, Settings};
     use gtk::glib::subclass::Signal;
-    use gtk::glib::{clone, g_info, g_warning};
+    use gtk::glib::{clone, g_info};
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
     use gtk::{glib, CompositeTemplate, Image, ListBox};
@@ -57,10 +57,9 @@ mod imp {
     use libhandy::ActionRow;
     use std::cell::OnceCell;
     use std::sync::OnceLock;
-    use gtk::gdk_pixbuf::Pixbuf;
     use crate::shell::Shell;
     use crate::dbus::accounts::AccountsProxy;
-    use crate::dbus::user::UserProxy;
+    use crate::user::User;
 
     #[derive(CompositeTemplate, Default)]
     #[template(resource = "/mobi/phosh/phrog/lockscreen-user-session.ui")]
@@ -71,6 +70,7 @@ mod imp {
         #[template_child]
         pub row_sessions: TemplateChild<libhandy::ComboRow>,
 
+        users: OnceCell<ListStore>,
         pub sessions: OnceCell<ListStore>,
     }
 
@@ -94,45 +94,12 @@ mod imp {
         fn constructed(&self) {
             self.parent_constructed();
 
+            let shell = libphosh::Shell::default().downcast::<Shell>().unwrap();
+            let conn = shell.imp().dbus_connection.clone().into_inner().unwrap();
             let settings = Settings::new(APP_ID);
 
             let last_user = settings.string("last-user").to_string();
             let last_session = settings.string("last-session").to_string();
-
-            glib::spawn_future_local(clone!(@weak self as this => async move {
-                let shell = libphosh::Shell::default().downcast::<Shell>().unwrap();
-                let conn = shell.imp().dbus_connection.clone().into_inner().unwrap();
-                let accounts = AccountsProxy::new(&conn).await.unwrap();
-
-                for path in accounts.list_cached_users().await.unwrap() {
-                    let user = UserProxy::builder(&conn)
-                        .path(path).unwrap().build().await.unwrap();
-                    let user_name = user.user_name().await.unwrap();
-                    let row = ActionRow::builder()
-                        .title(user.real_name().await.unwrap())
-                        .subtitle(&user_name)
-                        .activatable(true)
-                        .build();
-                    let pixbuf = Pixbuf::from_file_at_scale(&user.icon_file().await.unwrap(), 32, 32, true).ok();
-                    row.add_prefix(&Image::from_pixbuf(pixbuf.as_ref()));
-                    this.box_users.add(&row);
-                    // use last-user setting as default for user selection
-                    if user_name == last_user {
-                        g_warning!(
-                            "user-session-page",
-                            "defaulting user selection to {}",
-                            last_user
-                        );
-                        this.box_users.select_row(Some(&row));
-                    }
-                }
-                this.box_users.show_all();
-                if this.box_users.selected_row().is_none() {
-                    this.box_users
-                        .select_row(this.box_users.row_at_index(0).as_ref());
-                }
-            }));
-
 
             self.box_users
                 .connect_row_activated(clone!(@weak self as this => move |_, _| {
@@ -168,6 +135,44 @@ mod imp {
                     break;
                 }
             }
+
+            let users = ListStore::new::<User>();
+
+            self.box_users.bind_model(Some(&users), |v| {
+                let user = v.downcast_ref::<User>().unwrap();
+                let row = ActionRow::builder()
+                    .activatable(true)
+                    .build();
+                user.bind_property("username", &row, "subtitle").build();
+                user.bind_property("name", &row, "title").build();
+                let image = Image::new();
+                row.add_prefix(&image);
+                image.show();
+                user.bind_property("icon-pixbuf", &image, "pixbuf").build();
+                row.upcast()
+            });
+
+            self.users.set(users.clone()).unwrap();
+            glib::spawn_future_local(clone!(@weak self as this => async move {
+                let accounts = AccountsProxy::new(&conn).await.unwrap();
+
+                for path in accounts.list_cached_users().await.unwrap() {
+                    users.append(&User::new(conn.clone(), path));
+                    // // use last-user setting as default for user selection
+                    // if user_name == last_user {
+                    //     g_warning!(
+                    //         "user-session-page",
+                    //         "defaulting user selection to {}",
+                    //         last_user
+                    //     );
+                    //     this.box_users.select_row(Some(&row));
+                    // }
+                }
+                if this.box_users.selected_row().is_none() {
+                    this.box_users
+                        .select_row(this.box_users.row_at_index(0).as_ref());
+                }
+            }));
         }
 
         fn signals() -> &'static [Signal] {
@@ -177,8 +182,6 @@ mod imp {
     }
 
     impl WidgetImpl for UserSessionPage {}
-
     impl ContainerImpl for UserSessionPage {}
-
     impl BoxImpl for UserSessionPage {}
 }
