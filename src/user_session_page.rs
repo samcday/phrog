@@ -58,8 +58,9 @@ mod imp {
     use std::cell::OnceCell;
     use std::sync::OnceLock;
     use gtk::gdk_pixbuf::Pixbuf;
-    use crate::accounts::AccountsProxyBlocking;
-    use crate::user::UserProxyBlocking;
+    use crate::accounts::AccountsProxy;
+    use crate::shell::Shell;
+    use crate::user::UserProxy;
 
     #[derive(CompositeTemplate, Default)]
     #[template(resource = "/mobi/phosh/phrog/lockscreen-user-session.ui")]
@@ -98,35 +99,40 @@ mod imp {
             let last_user = settings.string("last-user").to_string();
             let last_session = settings.string("last-session").to_string();
 
-            let conn = zbus::blocking::Connection::system().unwrap();
-            let accounts = AccountsProxyBlocking::new(&conn).unwrap();
-            for path in accounts.list_cached_users().unwrap() {
-                let user = UserProxyBlocking::builder(&conn)
-                    .path(path).unwrap().build().unwrap();
-                let user_name = user.user_name().unwrap();
-                let row = ActionRow::builder()
-                    .title(user.real_name().unwrap())
-                    .subtitle(&user_name)
-                    .activatable(true)
-                    .build();
-                let pixbuf = Pixbuf::from_file_at_scale(&user.icon_file().unwrap(), 32, 32, true).ok();
-                row.add_prefix(&Image::from_pixbuf(pixbuf.as_ref()));
-                self.box_users.add(&row);
-                // use last-user setting as default for user selection
-                if user_name == last_user {
-                    g_warning!(
-                        "user-session-page",
-                        "defaulting user selection to {}",
-                        last_user
-                    );
-                    self.box_users.select_row(Some(&row));
+            glib::spawn_future_local(clone!(@weak self as this => async move {
+                let shell = libphosh::Shell::default().downcast::<Shell>().unwrap();
+                let conn = shell.imp().dbus_connection.clone().into_inner().unwrap();
+                let accounts = AccountsProxy::new(&conn).await.unwrap();
+
+                for path in accounts.list_cached_users().await.unwrap() {
+                    let user = UserProxy::builder(&conn)
+                        .path(path).unwrap().build().await.unwrap();
+                    let user_name = user.user_name().await.unwrap();
+                    let row = ActionRow::builder()
+                        .title(user.real_name().await.unwrap())
+                        .subtitle(&user_name)
+                        .activatable(true)
+                        .build();
+                    let pixbuf = Pixbuf::from_file_at_scale(&user.icon_file().await.unwrap(), 32, 32, true).ok();
+                    row.add_prefix(&Image::from_pixbuf(pixbuf.as_ref()));
+                    this.box_users.add(&row);
+                    // use last-user setting as default for user selection
+                    if user_name == last_user {
+                        g_warning!(
+                            "user-session-page",
+                            "defaulting user selection to {}",
+                            last_user
+                        );
+                        this.box_users.select_row(Some(&row));
+                    }
                 }
-            }
-            self.box_users.show_all();
-            if self.box_users.selected_row().is_none() {
-                self.box_users
-                    .select_row(self.box_users.row_at_index(0).as_ref());
-            }
+                this.box_users.show_all();
+                if this.box_users.selected_row().is_none() {
+                    this.box_users
+                        .select_row(this.box_users.row_at_index(0).as_ref());
+                }
+            }));
+
 
             self.box_users
                 .connect_row_activated(clone!(@weak self as this => move |_, _| {

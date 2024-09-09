@@ -13,7 +13,7 @@ impl Shell {
 }
 
 mod imp {
-    use std::cell::{Cell, RefCell};
+    use std::cell::{Cell, OnceCell, RefCell};
     use std::collections::HashSet;
     use crate::lockscreen::Lockscreen;
     use gtk::glib::{GString, Properties, Type};
@@ -37,6 +37,8 @@ mod imp {
         keypad_shuffle_qs: RefCell<Option<crate::keypad_shuffle::ShuffleKeypadQuickSetting>>,
 
         provider: Cell<CssProvider>,
+
+        pub dbus_connection: OnceCell<zbus::Connection>,
     }
 
     #[glib::object_subclass]
@@ -66,6 +68,9 @@ mod imp {
     #[glib::derived_properties]
     impl ObjectImpl for Shell {
         fn constructed(&self) {
+            let system_dbus = async_global_executor::block_on(zbus::Connection::system()).unwrap();
+            self.dbus_connection.set(system_dbus).unwrap();
+
             self.parent_constructed();
 
             let provider = CssProvider::new();
