@@ -101,8 +101,22 @@ impl VirtualPointer {
 
     pub async fn click_at(&mut self, x: u32, y: u32) {
         while self.x != x || self.y != y {
-            let step_x = if self.x > x { -1. } else if self.x < x { 1. } else { 0. };
-            let step_y = if self.y > y { -1. } else if self.y < y { 1. } else { 0. };
+            fn step(distance: f64) -> f64 {
+                let abs = distance.abs();
+                let step = distance * (1. / abs);
+                (if abs == 0. {
+                    0.
+                } else if abs > 10. {
+                    step * 3.
+                } else {
+                    step
+                }).floor()
+            }
+            let distance_x = x as f64 - self.x as f64;
+            let distance_y = y as f64 - self.y as f64;
+
+            let step_x = step(distance_x);
+            let step_y = step(distance_y);
             self.ptr.motion(self.ts.elapsed().unwrap().as_millis() as _,
                             step_x,
                             step_y);
