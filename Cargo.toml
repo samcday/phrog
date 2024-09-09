@@ -39,4 +39,3 @@ tempdir = "0.3.7"
 [features]
 keypad-shuffle = []
 static = ["libphosh/static", "keypad-shuffle"]
-test = []

@@ -77,7 +77,7 @@ jobs:
       - name: Build
         run: |
           set -uexo pipefail
-          cargo build --features=static,test --all-targets --verbose
+          cargo build --features=static --all-targets --verbose
       - uses: actions/upload-artifact@v4
         with:
           name: x86-64-debug
@@ -95,7 +95,7 @@ jobs:
           mode = 720x1440
           scale = 2
           HERE
-          dbus-run-session xvfb-run -a -s -noreset phoc -C phoc.ini -S -E "cargo test --features=static,test --verbose -- --test-threads=1 --nocapture"
+          dbus-run-session xvfb-run -a -s -noreset phoc -C phoc.ini -S -E "cargo test --features=static --verbose -- --test-threads=1 --nocapture"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
