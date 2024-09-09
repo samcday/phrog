@@ -89,6 +89,7 @@ jobs:
           cat > phoc.ini <<HERE
           [output:X11-1]
           mode = 720x1440
+          scale = 2
           HERE
           dbus-run-session xvfb-run -a -s -noreset phoc -C phoc.ini -S -E "cargo test --features=static,test --verbose -- --test-threads=1 --nocapture"
       - uses: actions/upload-artifact@v4
