@@ -1,9 +1,9 @@
 # Maintainer: Sam Day <me@samcday.com>
 _static=1
 pkgname=greetd-phrog
-pkgver=0.8.2_git
+pkgver=0.9.0_git
 _commit=main
-pkgrel=1
+pkgrel=0
 pkgdesc="Mobile device greeter"
 url="https://github.com/samcday/phrog"
 # riscv64: blocked by greetd
