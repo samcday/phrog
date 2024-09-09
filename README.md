@@ -10,6 +10,8 @@ It is the spiritual successor of [phog][].
 
 There is clearly more text required here to justify the flashy hero video that it's supposed to be placed to the left of. So how's your day going anyway, friend?
 
+At some point I suppose I'll bow to peer pressure and fill this space with a bunch of useless little green badges that signify to you, the critical GitHub critic, that this is a Very Legitimate Project that deserves your attention.
+
 <br clear="right"/>
 
 ## Installation
