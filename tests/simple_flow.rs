@@ -11,6 +11,7 @@ use greetd_ipc::codec::SyncCodec;
 use phrog::shell::Shell;
 use std::sync::Arc;
 use std::time::Duration;
+use gtk::gio::Settings;
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
 use gtk::traits::BinExt;
@@ -23,6 +24,9 @@ fn test_simple_flow() {
     let tmp = tempdir::TempDir::new("phrog-test-system-dbus").unwrap();
     let _nested_phoc = phrog::init(Some("phoc".into()));
     let _system_dbus = dbus::system_dbus(tmp.path());
+
+    let settings = Settings::new("sm.puri.phosh.lockscreen");
+    settings.set_boolean("shuffle-keypad", false).unwrap();
 
     let _conn = async_global_executor::block_on(async move {
         dbus::run_accounts_fixture().await.unwrap()

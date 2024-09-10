@@ -17,24 +17,10 @@ use gtk::glib::clone;
 use gtk::prelude::*;
 use libhandy::{Carousel, Deck};
 use libphosh::Keypad;
-use nix::sys::signal::SIGTERM;
-use nix::unistd::Pid;
 use phrog::lockscreen::Lockscreen;
 pub use virtual_pointer::VirtualPointer;
 use libhandy::prelude::*;
-
-pub fn kill(child: &mut Child) {
-    let pid = child.id();
-    nix::sys::signal::kill(Pid::from_raw(pid as _), SIGTERM).expect(&format!("failed to kill process {:?}", pid));
-    child.wait().expect(&format!("failed to wait for process {:?} to exit", pid));
-}
-
-pub struct SupervisedChild(Child);
-impl Drop for SupervisedChild {
-    fn drop(&mut self) {
-        kill(&mut self.0);
-    }
-}
+use phrog::supervised_child::SupervisedChild;
 
 pub fn start_recording(name: &str) -> Option<SupervisedChild> {
     if let Ok(base_path) = std::env::var("RECORD_TESTS") {
@@ -45,7 +31,7 @@ pub fn start_recording(name: &str) -> Option<SupervisedChild> {
             .stdin(Stdio::null())
             .stderr(Stdio::null())
             .spawn()
-        { Some(SupervisedChild(child)) } else { None }
+        { Some(SupervisedChild::new("wf-recorder", child)) } else { None }
     } else {
         None
     }
@@ -66,6 +52,7 @@ pub fn fake_greetd(logged_in: &Arc<AtomicBool>) {
                 let (mut stream, _addr) = listener
                     .accept()
                     .expect("failed to accept greetd connection");
+
                 match Request::read_from(&mut stream).unwrap() {
                     Request::CreateSession { .. } => Response::AuthMessage {
                         auth_message_type: Secret,

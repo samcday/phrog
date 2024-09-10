@@ -41,7 +41,7 @@ pub fn system_dbus(tmpdir: &Path) -> SupervisedChild {
         std::thread::sleep(Duration::from_millis(50));
     }
 
-    SupervisedChild(child)
+    SupervisedChild::new("dbus-daemon", child)
 }
 
 struct AccountsFixture {}

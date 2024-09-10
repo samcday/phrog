@@ -6,6 +6,7 @@ pub mod nested_phoc;
 mod session_object;
 mod sessions;
 pub mod shell;
+pub mod supervised_child;
 mod user_session_page;
 mod user;
 
