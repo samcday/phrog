@@ -1,6 +1,6 @@
 ## 🐸 (phrog)
 
-<img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/0.9.0/demo.webp">
+<img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/0.10.0/demo.webp">
 
 <br />
 <br />
