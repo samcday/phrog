@@ -5,18 +5,16 @@ glib::wrapper! {
         @extends libphosh::QuickSetting, gtk::Button;
 }
 
-#[cfg(feature = "test")]
-pub static mut INSTANCE: Option<ShuffleKeypadQuickSetting> = None;
-
 mod imp {
     use gtk::gio::Settings;
     use gtk::glib::clone;
     use gtk::glib::subclass::InitializingObject;
-    use gtk::prelude::{ButtonExt, InitializingWidgetExt, SettingsExt, SettingsExtManual};
+    use gtk::prelude::*;
     use gtk::subclass::prelude::*;
     use gtk::{glib, CompositeTemplate};
     use libphosh::prelude::{QuickSettingExt, StatusIconExt};
     use libphosh::subclass::quick_setting::QuickSettingImpl;
+    use crate::shell::Shell;
 
     #[derive(CompositeTemplate, Default)]
     #[template(resource = "/mobi/phosh/phrog/shuffle-keypad-quick-setting.ui")]
@@ -57,8 +55,7 @@ mod imp {
     impl ObjectImpl for ShuffleKeypadQuickSetting {
         fn constructed(&self) {
             self.parent_constructed();
-            #[cfg(feature = "test")]
-            unsafe { crate::keypad_shuffle::INSTANCE = Some(self.obj().clone()) };
+            libphosh::Shell::default().downcast::<Shell>().unwrap().set_keypad_shuffle_qs(self.obj().clone());
 
             let settings = Settings::new("sm.puri.phosh.lockscreen");
             settings

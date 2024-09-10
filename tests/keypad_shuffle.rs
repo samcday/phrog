@@ -18,6 +18,7 @@ use gtk::subclass::prelude::ObjectSubclassIsExt;
 use input_event_codes::*;
 use common::*;
 use wayland_client::Connection;
+use phrog::lockscreen::Lockscreen;
 use crate::common::virtual_keyboard::VirtualKeyboard;
 
 #[test]
@@ -66,7 +67,7 @@ fn keypad_shuffle() {
         glib::timeout_future(Duration::from_millis(500)).await;
 
         // click on keypad shuffle icon
-        vp.click_on(&unsafe { phrog::keypad_shuffle::INSTANCE.clone() }.unwrap().imp().info.clone()).await;
+        vp.click_on(&shell.keypad_shuffle_qs().unwrap().imp().info.clone()).await;
         glib::timeout_future(Duration::from_millis(500)).await;
 
         assert!(settings.boolean("shuffle-keypad"));
@@ -76,15 +77,15 @@ fn keypad_shuffle() {
         glib::timeout_future(Duration::from_millis(500)).await;
 
         // click on center keypad button for dramatical flair
-        let lockscreen = unsafe { phrog::lockscreen::INSTANCE.as_mut().unwrap() };
-        let (keypad, _) = get_lockscreen_bits(lockscreen);
+        let mut lockscreen = shell.lockscreen_manager().lockscreen().unwrap().downcast::<Lockscreen>().unwrap();
+        let (keypad, _) = get_lockscreen_bits(&mut lockscreen);
         vp.click_on(&keypad.child_at(1, 1).unwrap()).await;
 
         glib::timeout_future(Duration::from_millis(1000)).await;
 
         vp.click_at((shell.usable_area().2 / 2) as _, 0).await;
         glib::timeout_future(Duration::from_millis(500)).await;
-        vp.click_on(&unsafe { phrog::keypad_shuffle::INSTANCE.clone() }.unwrap().imp().info.clone()).await;
+        vp.click_on(&shell.keypad_shuffle_qs().unwrap().imp().info.clone()).await;
         glib::timeout_future(Duration::from_millis(500)).await;
 
         assert!(!settings.boolean("shuffle-keypad"));

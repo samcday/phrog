@@ -24,6 +24,7 @@ external_libraries = [
 generate = [
   "Phosh.Keypad",
   "Phosh.Lockscreen",
+  "Phosh.LockscreenManager",
   "Phosh.LockscreenPage",
   "Phosh.StatusIcon",
   "Phosh.TopPanel",
@@ -143,7 +144,6 @@ ignore = [
     "Phosh.LayoutManager",
     "Phosh.LocationInfo",
     "Phosh.LocationManager",
-    "Phosh.LockscreenManager",
     "Phosh.Lockshield",
     "Phosh.MMDBusModemModem3gppProxy",
     "Phosh.MMDBusModemModem3gppSkeleton",

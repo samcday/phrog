@@ -1,9 +1,4 @@
-use anyhow::{anyhow, Context};
-use gtk::{gdk, gio};
-use wayland_client::protocol::wl_registry;
-use crate::nested_phoc::NestedPhoc;
-
-mod accounts;
+mod dbus;
 #[cfg(feature = "keypad-shuffle")]
 pub mod keypad_shuffle;
 pub mod lockscreen;
@@ -11,8 +6,14 @@ pub mod nested_phoc;
 mod session_object;
 mod sessions;
 pub mod shell;
-mod user;
+pub mod supervised_child;
 mod user_session_page;
+mod user;
+
+use anyhow::{anyhow, Context};
+use gtk::{gdk, gio};
+use wayland_client::protocol::wl_registry;
+use crate::nested_phoc::NestedPhoc;
 
 pub const APP_ID: &str = "mobi.phosh.phrog";
 

@@ -77,8 +77,8 @@ package() {
 }
 
 check() {
-    features="--features=test"
-    [ -n "$_static" ] && features="$features,static"
+    features=""
+    [ -n "$_static" ] && features="$features --features=static"
     export XDG_RUNTIME_DIR=/tmp
 	dbus-run-session xvfb-run -a phoc -E "cargo test $features --release --frozen"
 }

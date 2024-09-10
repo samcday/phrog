@@ -1092,6 +1092,7 @@ dependencies = [
  "async-channel",
  "async-global-executor",
  "clap",
+ "futures-util",
  "glib-build-tools",
  "glob",
  "greetd_ipc",
