@@ -1,0 +1,4 @@
+debian/bin/phrog usr/bin
+debian/config/greetd/phrog.toml etc/greetd
+debian/config/phoc.ini usr/share/phrog
+debian/config/systemd/phrog.conf usr/lib/systemd/system/greetd.service.d

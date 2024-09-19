@@ -1,0 +1,14 @@
+phrog for Debian
+================
+
+The upstream source repo for phrog contains vendored copies of both Phosh and
+its Rust bindings. For Debian, we prefer using the packaged versions of those
+software, so we repack the original source by removing the `phosh/` and
+`libphosh-rs/` folders.
+
+The `demo-video/` folder, also present in upstream sources, is actually not
+useful to us and contains one file with dubious copyright information. In
+order to keep us out of trouble, this folder is also excluded from the Debian
+orig tarball.
+
+ -- Arnaud Ferraris <aferraris@debian.org>  Sun, 13 Oct 2024 01:38:21 +0200
