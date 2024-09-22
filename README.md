@@ -25,11 +25,18 @@ sudo dnf copr enable samcday/phrog
 sudo dnf install phrog
 ```
 
-### Alpine
+### Alpine/postmarketOS
 
-The package has been [requested](https://gitlab.alpinelinux.org/alpine/aports/-/issues/16430) in Alpine.
+The package has been [requested](https://gitlab.alpinelinux.org/alpine/aports/-/issues/16430) in Alpine, but has not yet landed in the Alpine package repositories.
 
-For now, you must build it yourself:
+If you're using postmarketOS, you can install the latest build from the [in-flight merge request to aports](https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/71596):
+
+```sh
+sudo apk add mrtest
+mrtest add --alpine 71596
+```
+
+Otherwise, you must build the package yourself:
 
 ```
 sudo apk add alpine-sdk
