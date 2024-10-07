@@ -73,7 +73,7 @@ mod custom_lockscreen {
 
     glib::wrapper! {
         pub struct CustomLockscreen(ObjectSubclass<imp::CustomLockscreen>)
-            @extends libphosh::Lockscreen, gtk::Widget;
+            @extends libphosh::Lockscreen;
     }
 
     impl CustomLockscreen {
@@ -131,6 +131,8 @@ mod custom_lockscreen {
 
         impl WidgetImpl for CustomLockscreen {}
         impl ContainerImpl for CustomLockscreen {}
+        impl BinImpl for CustomLockscreen {}
+        impl WindowImpl for CustomLockscreen {}
         impl LockscreenImpl for CustomLockscreen {}
     }
 }

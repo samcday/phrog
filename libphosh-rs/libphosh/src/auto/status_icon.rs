@@ -8,7 +8,7 @@ use std::{boxed::Box as Box_};
 
 glib::wrapper! {
     #[doc(alias = "PhoshStatusIcon")]
-    pub struct StatusIcon(Object<ffi::PhoshStatusIcon, ffi::PhoshStatusIconClass>) @extends gtk::Container, gtk::Widget;
+    pub struct StatusIcon(Object<ffi::PhoshStatusIcon, ffi::PhoshStatusIconClass>) @extends gtk::Bin, gtk::Container, gtk::Widget;
 
     match fn {
         type_ => || ffi::phosh_status_icon_get_type(),

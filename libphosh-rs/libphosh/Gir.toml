@@ -26,9 +26,9 @@ generate = [
   "Phosh.Lockscreen",
   "Phosh.LockscreenManager",
   "Phosh.LockscreenPage",
+  "Phosh.QuickSetting",
   "Phosh.StatusIcon",
   "Phosh.TopPanel",
-  "Phosh.QuickSetting",
   "Phosh.WallClock",
 ]
 
@@ -37,9 +37,12 @@ manual = [
   "Gio.AsyncReadyCallback",
   "Gio.AsyncResult",
   "Gio.Cancellable",
+  "Gtk.Bin",
+  "Gtk.Button",
   "Gtk.Container",
   "Gtk.Grid",
   "Gtk.Widget",
+  "Gtk.Window",
 ]
 
 ignore = [

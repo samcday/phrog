@@ -1,6 +1,6 @@
 [package]
 name = "libphosh-sys"
-version = "0.0.2"
+version = "0.0.3"
 edition = "2021"
 build = "build.rs"
 authors = ["Guido Günther <agx@sigxcpu.org>"]
@@ -9,9 +9,9 @@ keywords = ["phosh", "gnome"]
 description = "FFI bindings for libphosh"
 license = "MIT"
 
-[package.metadata.system-deps.libphosh_0]
-name = "libphosh-0"
-version = "0.38"
+[package.metadata.system-deps.libphosh_0_42]
+name = "libphosh-0.42"
+version = "0.42"
 
 [package.metadata.docs.rs]
 rustc-args = ["--cfg", "docsrs"]
