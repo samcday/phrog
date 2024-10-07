@@ -14,6 +14,7 @@ external_libraries = [
    "Pango",
    "Handy",
 ]
+split_build_rs = true
 
 ignore = [
     "Phosh.Ambient",
@@ -81,7 +82,6 @@ ignore = [
     "Phosh.DBusSessionManagerSkeleton",
     "Phosh.DockedInfo",
     "Phosh.DockedManager",
-    "Phosh.DragSurface",
     "Phosh.EmergencyCallsManager",
     "Phosh.EmergencyCallsProxy",
     "Phosh.EmergencyCallsSkeleton",
@@ -113,12 +113,10 @@ ignore = [
     "Phosh.IdleDBusObjectSkeleton",
     "Phosh.IdleManager",
     "Phosh.KeyboardEvents",
-    "Phosh.Keypad",
     "Phosh.LauncherEntryManager",
     "Phosh.LayoutManager",
     "Phosh.LocationInfo",
     "Phosh.LocationManager",
-    "Phosh.LockscreenManager",
     "Phosh.Lockshield",
     "Phosh.MMDBusModemModem3gppProxy",
     "Phosh.MMDBusModemModem3gppSkeleton",
@@ -172,7 +170,6 @@ ignore = [
     "Phosh.PowerMenu",
     "Phosh.PowerMenuManager",
     "Phosh.Proximity",
-    "Phosh.QuickSetting",
     "Phosh.RfkillDBusRfkillProxy",
     "Phosh.RfkillDBusRfkillSkeleton",
     "Phosh.RotateInfo",
@@ -198,7 +195,6 @@ ignore = [
     "Phosh.SystemPrompt",
     "Phosh.Thumbnail",
     "Phosh.TimestampLabel",
-    "Phosh.TopPanel",
     "Phosh.Toplevel",
     "Phosh.ToplevelManager",
     "Phosh.ToplevelThumbnail",
@@ -221,7 +217,6 @@ ignore = [
     "Phosh.ThumbnailClass",
     "Phosh.ManagerClass",
     "Phosh.NotificationClass",
-    "Phosh.DragSurfaceClass",
     # So we don't need to pull in gvc-mixer-control
     "Phosh.AudioDevicesClass",
     # This lack proper alignment as e.g. parents are missing	
@@ -235,7 +230,6 @@ ignore = [
     "Phosh.ModeManagerClass",
     "Phosh.MountNotificationClass",
     "Phosh.SuspendManagerClass",
-    "Phosh.TopPanelClass",
     "Phosh.ToplevelThumbnailClass",
     "Phosh.TorchManagerClass",
     # Ingore as we don't want to bother with libgnome-desktop
@@ -243,11 +237,18 @@ ignore = [
     # Ingore as they use raw Wayland types
     "Phosh.WlBuffer",
     "Phosh.HeadMode",
+    "Phosh.HeadStatePending",
     # Not actual types
     "Phosh.PhysicalSize",
     "Phosh.LogicalSize",
     # Not needed constants:
     "Phosh.ModeDeviceType",
+    # gnome-bluetooth has no Rust bindings
+    "Phosh.BtDeviceRowClass",
+    "Phosh.BtDeviceRow",
+    "Phosh.BtStatusPage",
+    "Phosh.BtStatusPageClass",
+    "GnomeBluetooth.Device",
 ]
 
 [[object]]

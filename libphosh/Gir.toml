@@ -22,9 +22,14 @@ external_libraries = [
 ]
 
 generate = [
+  "Phosh.Keypad",
   "Phosh.Lockscreen",
-  "Phosh.WallClock",
+  "Phosh.LockscreenManager",
   "Phosh.LockscreenPage",
+  "Phosh.QuickSetting",
+  "Phosh.StatusIcon",
+  "Phosh.TopPanel",
+  "Phosh.WallClock",
 ]
 
 manual = [
@@ -32,7 +37,12 @@ manual = [
   "Gio.AsyncReadyCallback",
   "Gio.AsyncResult",
   "Gio.Cancellable",
+  "Gtk.Bin",
+  "Gtk.Button",
+  "Gtk.Container",
+  "Gtk.Grid",
   "Gtk.Widget",
+  "Gtk.Window",
 ]
 
 ignore = [
@@ -133,12 +143,10 @@ ignore = [
     "Phosh.IdleDBusObjectSkeleton",
     "Phosh.IdleManager",
     "Phosh.KeyboardEvents",
-    "Phosh.Keypad",
     "Phosh.LauncherEntryManager",
     "Phosh.LayoutManager",
     "Phosh.LocationInfo",
     "Phosh.LocationManager",
-    "Phosh.LockscreenManager",
     "Phosh.Lockshield",
     "Phosh.MMDBusModemModem3gppProxy",
     "Phosh.MMDBusModemModem3gppSkeleton",
@@ -192,7 +200,6 @@ ignore = [
     "Phosh.PowerMenu",
     "Phosh.PowerMenuManager",
     "Phosh.Proximity",
-    "Phosh.QuickSetting",
     "Phosh.Revealer",
     "Phosh.RfkillDBusRfkillProxy",
     "Phosh.RfkillDBusRfkillSkeleton",
@@ -211,7 +218,6 @@ ignore = [
     "Phosh.SessionPresenceDBusPresenceSkeleton",
     "Phosh.Splash",
     "Phosh.SplashManager",
-    "Phosh.StatusIcon",
     "Phosh.StatusPage",
     "Phosh.SuspendManager",
     "Phosh.SwipeAwayBin",
@@ -220,7 +226,6 @@ ignore = [
     "Phosh.SystemPrompt",
     "Phosh.Thumbnail",
     "Phosh.TimestampLabel",
-    "Phosh.TopPanel",
     "Phosh.Toplevel",
     "Phosh.ToplevelManager",
     "Phosh.ToplevelThumbnail",

@@ -3,6 +3,7 @@
 // from ../gir-files
 // DO NOT EDIT
 
+use crate::{LockscreenManager};
 use glib::{prelude::*,signal::{connect_raw, SignalHandlerId},translate::*};
 use std::{boxed::Box as Box_};
 
@@ -147,12 +148,6 @@ pub trait ShellExt: IsA<Shell> + sealed::Sealed + 'static {
         }
     }
 
-    //#[doc(alias = "phosh_shell_get_bt_manager")]
-    //#[doc(alias = "get_bt_manager")]
-    //fn bt_manager(&self) -> /*Ignored*/BtManager {
-    //    unsafe { TODO: call ffi:phosh_shell_get_bt_manager() }
-    //}
-
     //#[doc(alias = "phosh_shell_get_builtin_monitor")]
     //#[doc(alias = "get_builtin_monitor")]
     //fn builtin_monitor(&self) -> /*Ignored*/Option<Monitor> {
@@ -229,11 +224,13 @@ pub trait ShellExt: IsA<Shell> + sealed::Sealed + 'static {
         }
     }
 
-    //#[doc(alias = "phosh_shell_get_lockscreen_manager")]
-    //#[doc(alias = "get_lockscreen_manager")]
-    //fn lockscreen_manager(&self) -> /*Ignored*/LockscreenManager {
-    //    unsafe { TODO: call ffi:phosh_shell_get_lockscreen_manager() }
-    //}
+    #[doc(alias = "phosh_shell_get_lockscreen_manager")]
+    #[doc(alias = "get_lockscreen_manager")]
+    fn lockscreen_manager(&self) -> LockscreenManager {
+        unsafe {
+            from_glib_none(ffi::phosh_shell_get_lockscreen_manager(self.as_ref().to_glib_none().0))
+        }
+    }
 
     #[doc(alias = "phosh_shell_get_lockscreen_type")]
     #[doc(alias = "get_lockscreen_type")]

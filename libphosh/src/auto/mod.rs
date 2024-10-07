@@ -3,11 +3,26 @@
 // from ../gir-files
 // DO NOT EDIT
 
+mod keypad;
+pub use self::keypad::Keypad;
+
 mod lockscreen;
 pub use self::lockscreen::Lockscreen;
 
+mod lockscreen_manager;
+pub use self::lockscreen_manager::LockscreenManager;
+
+mod quick_setting;
+pub use self::quick_setting::QuickSetting;
+
 mod shell;
 pub use self::shell::Shell;
+
+mod status_icon;
+pub use self::status_icon::StatusIcon;
+
+mod top_panel;
+pub use self::top_panel::TopPanel;
 
 mod wall_clock;
 pub use self::wall_clock::WallClock;
@@ -17,10 +32,17 @@ pub use self::enums::LockscreenPage;
 
 pub(crate) mod traits {
     pub use super::lockscreen::LockscreenExt;
+    pub use super::quick_setting::QuickSettingExt;
     pub use super::shell::ShellExt;
+    pub use super::status_icon::StatusIconExt;
     pub use super::wall_clock::WallClockExt;
 }
 pub(crate) mod builders {
+    pub use super::keypad::KeypadBuilder;
     pub use super::lockscreen::LockscreenBuilder;
+    pub use super::lockscreen_manager::LockscreenManagerBuilder;
+    pub use super::quick_setting::QuickSettingBuilder;
     pub use super::shell::ShellBuilder;
+    pub use super::status_icon::StatusIconBuilder;
+    pub use super::top_panel::TopPanelBuilder;
 }
