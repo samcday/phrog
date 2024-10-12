@@ -1,5 +1,0 @@
-[wrap-git]
-directory=gmobile
-url=https://gitlab.gnome.org/World/Phosh/gmobile.git
-revision=v0.1.0
-depth=1

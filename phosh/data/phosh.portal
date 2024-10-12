@@ -1,4 +1,0 @@
-[portal]
-DBusName=sm.puri.Phosh.Portal
-Interfaces=org.freedesktop.impl.portal.Access
-UseIn=phosh
