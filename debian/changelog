@@ -1,5 +1,5 @@
-phrog (0.10.0+ds1-1) UNRELEASED; urgency=medium
+phrog (0.10.0+ds1-1) unstable; urgency=medium
 
   * Initial Debian packaging (Closes: #1082766)
 
- -- Arnaud Ferraris <aferraris@debian.org>  Thu, 19 Sep 2024 11:32:50 +0200
+ -- Arnaud Ferraris <aferraris@debian.org>  Wed, 18 Dec 2024 09:12:27 +0100
