@@ -27,7 +27,7 @@ version = "0.11"
 features = ["v1_6"]
 
 [build-dependencies]
-glib-build-tools = "0.20"
+glib-build-tools = "0"
 
 [dev-dependencies]
 input-event-codes = "6.2.0"
