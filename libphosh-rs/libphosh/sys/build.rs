@@ -3,6 +3,7 @@
 // from ../../gir-files (@ 6cd7b656acd6)
 // DO NOT EDIT
 
+use std::fmt::format;
 use std::path::{Path, PathBuf};
 #[cfg(not(docsrs))]
 use std::process;
@@ -16,16 +17,16 @@ fn main() {} // prevent linking libraries to avoid documentation failure
 fn main() {
     if let Ok(val) = std::env::var("CARGO_FEATURE_STATIC") {
         if val == "1" {
-            std::env::set_var("SYSTEM_DEPS_LIBPHOSH_0_BUILD_INTERNAL", "always");
+            std::env::set_var("SYSTEM_DEPS_LIBPHOSH_0_42_BUILD_INTERNAL", "always");
         }
     }
 
     let out_dir = std::env::var("OUT_DIR").unwrap();
 
     if let Err(s) = system_deps::Config::new()
-        .add_build_internal("libphosh-0", move |_, version| {
+        .add_build_internal("libphosh-0.42", move |name, version| {
             // We're going to build and statically link phosh.
-            println!("cargo:rustc-link-lib=static=phosh");
+            println!("cargo:rustc-link-lib=static={}", format!("phosh-{}", version));
 
             // $PHOSH_SRC controls where to find a Phosh Meson project root.
             let mut path = std::env::var("PHOSH_SRC").ok();
@@ -70,10 +71,14 @@ fn main() {
             assert!(status.success());
 
             let build_dir = build_dir.display().to_string();
+
             // Set search path to private build.
             println!("cargo:rustc-link-search=native={}/src", build_dir);
 
-            system_deps::Library::from_internal_pkg_config(format!("{}/meson-private", build_dir), "libphosh-0", version)
+            system_deps::Library::from_internal_pkg_config(
+                    format!("{}/meson-private", build_dir),
+                    name,
+                    version)
         })
         .probe()
     {
