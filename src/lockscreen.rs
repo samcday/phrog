@@ -215,6 +215,7 @@ mod imp {
             if let Err(err) = resp {
                 g_critical!("greetd", "failed to send greetd request: {:?}", err);
                 self.obj().set_unlock_status("Greetd error, check logs");
+                self.obj().set_sensitive(true);
                 return None;
             }
 
