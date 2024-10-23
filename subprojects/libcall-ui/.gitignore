@@ -1,0 +1,6 @@
+_build/
+subprojects/gi-docgen/
+po/call-ui.pot
+po/messages.mo
+po/missing
+

@@ -1,84 +1,120 @@
-# 🐸
+# Phosh
 
-Greetd-compatible greeter for mobile phones
+a pure wayland shell for mobile devices like Purism's Librem 5.
 
-This is a fork of [phog](https://gitlab.com/mobian1/phog).
+## License
 
-`phrog` uses Phosh to handle a greetd conversation
+phosh is licensed under the GPL-3.0-or-later licence.
 
-## Usage
+## Getting the source
 
-### Installation
-
-#### Fedora
-
-```
-sudo dnf copr enable samcday/phrog
-# If you want to test the latest and/or greatest
-# sudo dnf copr enable samcday/phrog-nightly
-sudo dnf install phrog
+```sh
+git clone https://gitlab.gnome.org/World/Phosh/phosh
+cd phosh
+git submodule update --init --recursive
 ```
 
-#### Other
+The [main][] branch has the current development version.
 
-For now, you must build from source, see the Development section below.
+## Dependencies
 
-### Running
+On a Debian based system run
 
-`phrog` is primarily intended to run via greetd - your `/etc/greetd/config.toml` should
-look like this:
-
-```
-[default_session]
-command = "systemd-cat --identifier=phrog phrog"
+```sh
+sudo apt-get -y install build-essential
+sudo apt-get -y build-dep .
 ```
 
-You can also run/test it directly in a faked greetd session:
+For an explicit list of dependencies check the `Build-Depends` entry in the
+[debian/control][] file.
 
-```
-phrog --fake
-```
+## Building
 
-## Development
+We use the meson (and thereby Ninja) build system for phosh.  The quickest
+way to get going is to do the following:
 
-Right now, this project depends on unversioned/WIP upstream changes. `phosh` and `libphosh-rs`
-are subtrees of this repo.
-
-You must first build the libphosh fork:
-
-(so, hey, fam. this means you need to do all the stuff [over here][phosh-deps], alright? okay cool.)
-
-```
-meson setup -Dbindings-lib=true _build-phosh phosh
-meson install --destdir=install -C _build-phosh
+```sh
+meson setup _build
+meson compile -C _build
 ```
 
-Now you can build with these flags:
+## Testing
 
-```
-export LD_LIBRARY_PATH=$(pwd)/_build-phosh/install/usr/local/lib64
-export SYSTEM_DEPS_LIBPHOSH_0_SEARCH_NATIVE=$(pwd)/_build-phosh/install/usr/local/lib64
-export PKG_CONFIG_PATH=$(pwd)/_build-phosh/install/usr/local/lib64/pkgconfig
-```
+To run the tests run
 
-Make sure the local project schema is installed:
-
-```
-mkdir -p $HOME/.local/share/glib-2.0/schemas
-cp resources/mobi.phosh.phrog.gschema.xml $HOME/.local/share/glib-2.0/schemas/
-glib-compile-schemas $HOME/.local/share/glib-2.0/schemas/
+```sh
+xvfb-run meson test --no-suite screenshots -C _build
 ```
 
-Build the app.
+For details see the [.gitlab-ci.yml][] file.
 
-```
-cargo build
+## Running
+
+### Running from the source tree
+
+When running from the source tree start the compositor *[phoc][]*.
+Then start *phosh* using:
+
+```sh
+_build/run
 ```
 
-Run the app in test mode.
+or (if you built *phoc* from source in *../phoc*) in one command:
 
-```
-cargo run -- --fake
+```sh
+../phoc/_build/run -C ./data/phoc.ini -E _build/run
 ```
 
-[phosh-deps]: https://gitlab.gnome.org/World/Phosh/phosh#dependencies
+This will make sure the needed gsettings schema is found. Note that there's no
+need to install any files outside the source tree.
+
+The result should look something like this:
+
+![phosh](screenshots/phosh-overview.png)
+
+### Running from the Debian packages
+
+If you're running a display manager like GDM or LightDM you can select the
+`Phosh` session from the display managers menu. If you want run without a
+display manager but nevertheless start phosh at system boot there's a systemd
+unit file in */lib/systemd/system/phosh* which is disabled by default:
+
+```sh
+systemctl enable phosh
+systemctl start phosh
+```
+
+This runs *phosh* as the user with user id 1000 (which needs to exist). If you
+don't have that user and don't want to create one you can make systemd
+run *phosh* as any user by using an override file:
+
+```sh
+cat <<EOF > /etc/systemd/system/phosh.service.d/override.conf
+[Service]
+User=<your_user>
+EOF
+```
+
+All of the above use the `/usr/bin/phosh` script to start compositor and shell
+under the hood so if you just want to start phosh from the system console once
+invoke that script directly.
+
+## Translations
+
+This is handled via GNOMEs infra, see
+<https://wiki.gnome.org/TranslationProject> and
+<https://l10n.gnome.org/module/phosh/>.
+
+## Getting in Touch
+
+* Issue tracker: <https://gitlab.gnome.org/World/Phosh/phosh/issues>
+* Matrix: <https://im.puri.sm/#/room/#phosh:talk.puri.sm>
+
+## Development Documentation
+
+API documentation is at <https://world.pages.gitlab.gnome.org/Phosh/phosh>
+
+[main]: https://gitlab.gnome.org/World/Phosh/phosh/-/tree/main
+[.gitlab-ci.yml]: https://gitlab.gnome.org/World/Phosh/phosh/-/blob/main/.gitlab-ci.yml
+[debian/control]: https://gitlab.gnome.org/World/Phosh/phosh/-/blob/main/debian/control
+[phoc]: https://gitlab.gnome.org/World/Phosh/phoc
