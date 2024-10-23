@@ -1,5 +1,6 @@
 {
    phosh_shell_get_default;
+   phosh_shell_get_locked;
 
    # Plugins can inhibit session idleness
    phosh_shell_get_session_manager;
@@ -20,14 +21,17 @@
    phosh_wifi_manager_is_hotspot_master;
    phosh_wifi_manager_set_hotspot_master;
 
-   # Mobile Data wants wwan manager
+   # Mobile Data wants WWan Manager
    phosh_shell_get_wwan;
+   phosh_wwan_has_data;
+   phosh_wwan_is_enabled;
    phosh_wwan_set_data_enabled;
 
    # For custom quick setting plugins:
    phosh_quick_setting_get_type;
    phosh_quick_setting_set_active;
    phosh_quick_setting_get_active;
+   phosh_status_icon_get_type;
    phosh_status_icon_set_icon_name;
    phosh_status_icon_set_info;
 

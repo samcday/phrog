@@ -7,7 +7,7 @@ subdir('gtk-list-models')
 
 phosh_enums_header_subdir = 'phosh'
 
-install_headers('phosh-settings-enums.h', subdir : phosh_enums_header_subdir)
+install_headers(schema_enum_headers, subdir : phosh_enums_header_subdir)
 
 pkgconfig.generate(
   requires : gsettings_desktop_schemas_dep,
@@ -414,6 +414,7 @@ phosh_deps = [
   libnm_dep,
   libpolkit_agent_dep,
   libsystemd_dep,
+  mm_glib_dep,
   network_agent_dep,
   upower_glib_dep,
   wayland_client_dep,
@@ -455,12 +456,12 @@ phosh_tool_dep = declare_dependency(
   dependencies: phosh_deps)
 
 # A library containing everything
-phosh_lib = both_libraries('phosh',
+phosh_lib = both_libraries('phosh-@0@'.format(libversion),
   libphosh_private_headers,
   libphosh_sources,
   include_directories: phosh_lib_inc,
   dependencies: [phosh_tool_dep, phosh_deps],
-  soversion: soversion,
+  soversion: 0,
   install: bindings_lib,
 )
 
@@ -481,6 +482,7 @@ if enable_introspection
                         libphosh_tool_sources,
                         libphosh_glib_generated_sources,
                         libphosh_glib_generated_headers,
+                        phosh_enum_headers,
                       ]
 
   phosh_gir_extra_args = [
@@ -492,7 +494,7 @@ if enable_introspection
                 sources : phosh_gir_sources,
               nsversion : '0',
               namespace : 'Phosh',
-        export_packages : 'libphosh-0',
+        export_packages : 'libphosh-@0@'.format(libversion),
           symbol_prefix : 'phosh',
       identifier_prefix : 'Phosh',
               link_with : phosh_lib,
@@ -508,10 +510,10 @@ if bindings_lib
   pkgconfig.generate(
     phosh_lib,
     name: 'libphosh',
-    subdirs: 'libphosh-0',
-    filebase: 'libphosh-0',
+    subdirs: 'libphosh-@0@'.format(libversion),
+    filebase: 'libphosh-@0@'.format(libversion),
     version : meson.project_version(),
-    description: 'Private library for building external components',
+    description: 'Library for building components embedding Phosh',
     requires: 'phosh-settings',
     url: 'https://world.pages.gitlab.gnome.org/Phosh/phosh/',
   )

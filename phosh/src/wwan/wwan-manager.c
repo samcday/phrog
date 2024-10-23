@@ -2,9 +2,13 @@
  * Copyright (C) 2021 Purism SPC
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Author: Guido Günther <agx@sigxcpu.org>
  */
 
 #define G_LOG_DOMAIN "phosh-wwan-manager"
+
+#include "phosh-config.h"
 
 #include "phosh-wwan-iface.h"
 #include "wwan-manager.h"
@@ -28,10 +32,10 @@ static GParamSpec *props[PROP_LAST_PROP];
 /**
  * PhoshWWanManager:
  *
- * Base class for #PhoshWWan interface implementations
+ * Base class for `PhoshWWan` interface implementations
  *
  * Common code for implementors of the #PhoshWWan interface covering
- * NetworkManager related bits.
+ * NetworkManager related bits for the mobile data connection.
  */
 typedef struct _PhoshWWanManagerPrivate {
   NMClient           *nmclient;
@@ -400,7 +404,14 @@ phosh_wwan_manager_set_enabled (PhoshWWanManager *self, gboolean enabled)
                                DEFAULT_TIMEOUT_MSEC, NULL, NULL, NULL);
 }
 
-
+/**
+ * phosh_wwan_manager_get_data_enabled:
+ * @self: The wwan manager
+ *
+ * Get whether the mobile data connection is enabled.
+ *
+ * Returns: `TRUE` if a mobile data connection is enabled otherwise `FALSE`.
+ */
 gboolean
 phosh_wwan_manager_get_data_enabled (PhoshWWanManager *self)
 {
@@ -417,7 +428,8 @@ phosh_wwan_manager_get_data_enabled (PhoshWWanManager *self)
  * @self: The wwan manager
  * @enabled: Whether to enable or disable the mobile data connection
  *
- * Connect to or disconnect from mobile data.
+ * Connect to or disconnect from mobile data. When `enabled` is `TRUE`
+ * connects the last active mobile data connection.
  */
 void
 phosh_wwan_manager_set_data_enabled (PhoshWWanManager *self, gboolean enabled)
@@ -428,4 +440,25 @@ phosh_wwan_manager_set_data_enabled (PhoshWWanManager *self, gboolean enabled)
     phosh_wwan_manager_activate_last_connection (self);
   else
     phosh_wwan_manager_deactivate_all_connections (self);
+}
+
+/**
+ * phosh_wwan_manager_has_data:
+ * @self: The wwan manager
+ *
+ * Gets whether there's a data connection that could possibly be enabled.
+ * It doesn't take into account whether the connection is enabled or not.
+ * See [method@WWanManager.get_data_enabled].
+ *
+ * Returns: `TRUE` if there's a activatable data connection.
+ */
+gboolean
+phosh_wwan_manager_has_data (PhoshWWanManager *self)
+{
+  PhoshWWanManagerPrivate *priv;
+
+  g_return_val_if_fail (PHOSH_IS_WWAN_MANAGER (self), FALSE);
+  priv = phosh_wwan_manager_get_instance_private (self);
+
+  return priv->has_data;
 }

@@ -1,14 +1,14 @@
 project('phosh', 'c',
-          version: '0.41.0',
+          version: '0.42.0',
           license: 'GPL-3.0-or-later',
     meson_version: '>= 1.0.0',
   default_options: [ 'warning_level=1', 'buildtype=debugoptimized', 'c_std=gnu11' ],
 )
 
 app_id = 'sm.puri.Phosh'
-lib_inc_subdir = 'libphosh-0'
 ver_parts = meson.project_version().split('.')
-soversion = '@0@_@1@'.format(ver_parts[0], ver_parts[1])
+libversion = '@0@.@1@'.format(ver_parts[0], ver_parts[1])
+lib_inc_subdir = 'libphosh-@0@'.format(libversion)
 
 prefix = get_option('prefix')
 bindir = join_paths(prefix, get_option('bindir'))
@@ -157,7 +157,11 @@ libcall_ui = subproject('libcall-ui',
 libfeedback_dep = dependency('libfeedback-0.0',
   version: '>= 0.4.0',
   fallback: ['libfeedback', 'libfeedback_dep'],
-  default_options: ['introspection=disabled', 'daemon=false', 'gtk_doc=false']
+  default_options: [
+     'introspection=disabled',
+     'daemon=false',
+     'gtk_doc=false',
+     'tests=false'],
   )
 libgvc = subproject('gvc',
   default_options: [
@@ -177,9 +181,10 @@ libhandy_dep = dependency('libhandy-1',
   )
 libcall_ui_dep = libcall_ui.get_variable('libcall_ui_dep')
 libnm_dep = dependency('libnm', version: '>= 1.14')
-libpolkit_agent_dep = dependency('polkit-agent-1', version: '>= 0.105')
+libpolkit_agent_dep = dependency('polkit-agent-1', version: '>= 0.122')
 libsoup_dep = dependency('libsoup-3.0', version: '>= 3.0')
 libsystemd_dep = dependency('libsystemd', 'libelogind', version: '>= 241')
+mm_glib_dep = dependency('mm-glib')
 network_agent_dep = dependency('libsecret-1')
 upower_glib_dep = dependency('upower-glib', version: '>=0.99.1')
 wayland_client_dep = dependency('wayland-client', version: '>=1.14')
@@ -193,30 +198,6 @@ struct rfkill_event_ext e;
 have_rfkill_event_ext = cc.compiles(code, name : 'Have rfkill_event_ext')
 have_memfd_create = cc.has_function('memfd_create', prefix: '''#define _GNU_SOURCE
                                                                #include <sys/mman.h>''')
-
-have_polkit_subject_cleanup = cc.compiles('''
-#define POLKIT_AGENT_I_KNOW_API_IS_SUBJECT_TO_CHANGE
-#include <polkitagent/polkitagent.h>
-
-int main()
-{
-   g_autoptr (PolkitSubject) subj = NULL;
-}''',
-  name : 'Have PolkitSubject cleanup',
-  dependencies: libpolkit_agent_dep)
-
-
-have_polkit_agent_listener_cleanup = cc.compiles('''
-#define POLKIT_AGENT_I_KNOW_API_IS_SUBJECT_TO_CHANGE
-#include <polkitagent/polkitagent.h>
-
-int main()
-{
-   g_autoptr (PolkitAgentListener) listener = NULL;
-}''',
-  name : 'Have PolkitAgentListener cleanup',
-  dependencies: libpolkit_agent_dep)
-
 
 config_h = configuration_data()
 config_h.set_quoted('GETTEXT_PACKAGE', 'phosh')
@@ -233,8 +214,6 @@ config_h.set_quoted('PHOSH_DATA_DIR', datadir,
              description: 'Systemwide data dir')
 config_h.set_quoted('PHOSH_APP_ID', app_id)
 config_h.set_quoted('PHOSH_DBUS_PATH_PREFIX', '/' + app_id.replace('.', '/'))
-config_h.set('PHOSH_HAVE_POLKIT_SUBJECT_CLEANUP', have_polkit_subject_cleanup)
-config_h.set('PHOSH_HAVE_POLKIT_AGENT_LISTENER_CLEANUP', have_polkit_agent_listener_cleanup)
 
 configure_file(
   output: 'phosh-config.h',

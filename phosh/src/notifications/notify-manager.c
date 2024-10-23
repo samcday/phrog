@@ -8,7 +8,7 @@
 
 #define G_LOG_DOMAIN "phosh-notify-manager"
 
-#include "../phosh-config.h"
+#include "phosh-config.h"
 
 #include <gio/gdesktopappinfo.h>
 
@@ -21,6 +21,8 @@
 #include "phosh-enums.h"
 #include "util.h"
 
+#include <gmobile.h>
+
 #define NOTIFICATIONS_KEY_SHOW_BANNERS "show-banners"
 #define NOTIFICATIONS_KEY_APP_CHILDREN "application-children"
 
@@ -28,6 +30,7 @@
 #define NOTIFICATIONS_APP_PREFIX "/org/gnome/desktop/notifications/application"
 #define NOTIFICATIONS_APP_KEY_SHOW_BANNERS "show-banners"
 #define NOTIFICATIONS_APP_KEY_APP_ID "application-id"
+#define NOTIFICATIONS_APP_KEY_ENABLE "enable"
 
 #define NOTIFICATION_DEFAULT_TIMEOUT 5000 /* ms */
 #define NOTIFICATIONS_SPEC_VERSION "1.2"
@@ -164,27 +167,12 @@ on_notification_expired (PhoshNotifyManager *self,
 
 
 static void
-on_unlock_notify_ref_gone (gpointer data, GObject *gone)
-{
-  PhoshNotifyManager *self = PHOSH_NOTIFY_MANAGER (data);
-
-  g_return_if_fail (PHOSH_IS_NOTIFY_MANAGER (self));
-
-  self->unlock_notify.notification = NULL;
-  g_clear_pointer (&self->unlock_notify.action, g_free);
-}
-
-
-static void
 forget_unlock_notify (PhoshNotifyManager *self)
 {
   if (!self->unlock_notify.notification)
     return;
 
-  g_object_weak_unref (G_OBJECT (self->unlock_notify.notification),
-                       on_unlock_notify_ref_gone,
-                       self);
-  self->unlock_notify.notification = NULL;
+  g_clear_object (&self->unlock_notify.notification);
   g_clear_pointer (&self->unlock_notify.action, g_free);
 }
 
@@ -245,20 +233,15 @@ on_notification_actioned (PhoshNotifyManager *self,
    * https://gitlab.freedesktop.org/xdg/xdg-specs/-/issues/103
    */
   if (phosh_shell_get_locked (shell) && g_strcmp0 (action, "default") == 0) {
-    PhoshLockscreenManager *lm;
+    PhoshLockscreenManager *lm = phosh_shell_get_lockscreen_manager (shell);
 
     /* Forget any pending actions */
     forget_unlock_notify (self);
 
-    /* Clear out notification if it goes away in the meantime */
-    g_object_weak_ref (G_OBJECT (notification),
-                       on_unlock_notify_ref_gone,
-                       self);
-    self->unlock_notify.notification = notification;
+    self->unlock_notify.notification = g_object_ref (notification);
     self->unlock_notify.action = g_strdup (action);
 
     /* Scroll to unlock page */
-    lm = phosh_shell_get_lockscreen_manager (shell);
     phosh_lockscreen_manager_set_page (lm, PHOSH_LOCKSCREEN_PAGE_UNLOCK);
   } else {
     invoke_action (self, notification, action);
@@ -282,6 +265,34 @@ on_notification_closed (PhoshNotifyManager      *self,
 
   phosh_notify_dbus_notifications_emit_notification_closed (
     PHOSH_NOTIFY_DBUS_NOTIFICATIONS (self), id, reason);
+}
+
+
+static gboolean
+phosh_notify_manager_is_notification_enabled (PhoshNotification *notification)
+{
+  g_autofree char *munged_id = NULL;
+  g_autofree char *path = NULL;
+  g_autoptr (GSettings) settings = NULL;
+  GAppInfo *info;
+  const char *id;
+
+  info = phosh_notification_get_app_info (notification);
+  if (!info)
+    return TRUE;
+
+  id = g_app_info_get_id (info);
+  if (!info)
+    return TRUE;
+
+  if (gm_str_is_null_or_empty (id))
+    return TRUE;
+
+  munged_id = phosh_munge_app_id (id);
+  path = g_strconcat (NOTIFICATIONS_APP_PREFIX, "/", munged_id, "/", NULL);
+  settings = g_settings_new_with_path (NOTIFICATIONS_APP_SCHEMA_ID, path);
+
+  return g_settings_get_boolean (settings, NOTIFICATIONS_APP_KEY_ENABLE);
 }
 
 
@@ -829,13 +840,16 @@ phosh_notify_manager_get_notification_id (PhoshNotifyManager *self)
  */
 void
 phosh_notify_manager_add_notification (PhoshNotifyManager *self,
-                                       const gchar *source_id,
-                                       int expire_timeout,
-                                       PhoshNotification *notification)
+                                       const gchar        *source_id,
+                                       int                 expire_timeout,
+                                       PhoshNotification  *notification)
 {
   g_return_if_fail (PHOSH_IS_NOTIFY_MANAGER (self));
   g_return_if_fail (PHOSH_IS_NOTIFICATION (notification));
   g_return_if_fail (source_id);
+
+  if (!phosh_notify_manager_is_notification_enabled (notification))
+    return;
 
   if (expire_timeout == -1)
     expire_timeout = NOTIFICATION_DEFAULT_TIMEOUT;
@@ -858,9 +872,8 @@ phosh_notify_manager_add_notification (PhoshNotifyManager *self,
                            self,
                            G_CONNECT_SWAPPED);
 
-  if (expire_timeout) {
+  if (expire_timeout)
     phosh_notification_expires (notification, expire_timeout);
-  }
 
   g_signal_emit (self, signals[NEW_NOTIFICATION], 0, notification);
 }

@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <call-ui.h>
 #include <glib-object.h>
 #include <glib-unix.h>
 #include <glib/gi18n.h>
@@ -587,6 +588,14 @@ phosh_shell_dispose (GObject *object)
   g_clear_object (&priv->settings);
 
   G_OBJECT_CLASS (phosh_shell_parent_class)->dispose (object);
+}
+
+
+static void
+phosh_shell_finalize (GObject *object)
+{
+  cui_uninit ();
+  G_OBJECT_CLASS (phosh_shell_parent_class)->finalize (object);
 }
 
 
@@ -1181,6 +1190,7 @@ phosh_shell_class_init (PhoshShellClass *klass)
 
   object_class->constructed = phosh_shell_constructed;
   object_class->dispose = phosh_shell_dispose;
+  object_class->finalize = phosh_shell_finalize;
 
   object_class->set_property = phosh_shell_set_property;
   object_class->get_property = phosh_shell_get_property;
@@ -1244,6 +1254,13 @@ phosh_shell_class_init (PhoshShellClass *klass)
 
   g_object_class_install_properties (object_class, PROP_LAST_PROP, props);
 
+  /**
+   * PhoshShell::ready:
+   * @self: The shell object
+   *
+   * The ready signal is emitted once when the shell finished starting
+   * up.
+   */
   signals[READY] = g_signal_new ("ready",
                                  G_TYPE_FROM_CLASS (klass),
                                  G_SIGNAL_RUN_LAST, 0,
@@ -1269,12 +1286,14 @@ phosh_shell_init (PhoshShell *self)
   PhoshShellPrivate *priv = phosh_shell_get_instance_private (self);
   GtkSettings *gtk_settings;
 
+  cui_init (TRUE);
+
   g_io_extension_point_register (PHOSH_EXTENSION_POINT_LOCKSCREEN_WIDGET);
   g_io_extension_point_register (PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET);
 
-  debug_flags = g_parse_debug_string(g_getenv ("PHOSH_DEBUG"),
-                                     debug_keys,
-                                     G_N_ELEMENTS (debug_keys));
+  debug_flags = g_parse_debug_string (g_getenv ("PHOSH_DEBUG"),
+                                      debug_keys,
+                                      G_N_ELEMENTS (debug_keys));
 
   gtk_settings = gtk_settings_get_default ();
   g_object_set (G_OBJECT (gtk_settings), "gtk-application-prefer-dark-theme", TRUE, NULL);
@@ -1329,6 +1348,8 @@ phosh_shell_set_primary_monitor (PhoshShell *self, PhoshMonitor *monitor)
     g_signal_handlers_disconnect_by_func (priv->primary_monitor,
                                           G_CALLBACK (on_primary_monitor_configured),
                                           self);
+  }
+  if (priv->builtin_monitor) {
     g_signal_handlers_disconnect_by_func (priv->builtin_monitor,
                                           G_CALLBACK (on_primary_monitor_power_mode_changed),
                                           self);
