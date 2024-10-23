@@ -89,8 +89,8 @@ pub fn get_lockscreen_bits(lockscreen: &mut Lockscreen) -> (Keypad, Button) {
     // name of "art". We drill through to find the keypad, and then pick out the individual
     // digits + submit button to drive the UI interactions entirely via mouse.
     // This looks nice for the video recording.
-    let deck = lockscreen.child().unwrap().downcast::<Deck>().unwrap();
-    let carousel = deck.visible_child().unwrap().downcast::<Carousel>().unwrap();
+    let carousel = lockscreen.child().unwrap().downcast::<Carousel>().unwrap();
+
     let keypad_page = carousel.children().get(2).unwrap().clone().downcast::<gtk::Box>().unwrap();
     let keypad_revealer = keypad_page.children().get(2).unwrap().clone().downcast::<Revealer>().unwrap();
     let keypad = keypad_revealer.child().unwrap().downcast::<Keypad>().unwrap();
