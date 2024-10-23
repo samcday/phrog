@@ -95,6 +95,8 @@
 
 #include "phosh-settings-enums.h"
 
+#include "phosh-resources.h"
+
 #define WWAN_BACKEND_KEY "wwan-backend"
 
 /**
@@ -1283,8 +1285,16 @@ static GDebugKey debug_keys[] =
 static void
 phosh_shell_init (PhoshShell *self)
 {
+  static gsize resources_initialized = FALSE;
+
   PhoshShellPrivate *priv = phosh_shell_get_instance_private (self);
   GtkSettings *gtk_settings;
+
+
+  if (g_once_init_enter (&resources_initialized)) {
+    phosh_register_resource ();
+    g_once_init_leave (&resources_initialized, TRUE);
+  }
 
   cui_init (TRUE);
 

@@ -74,7 +74,5 @@ pub fn init(phoc: Option<String>) -> anyhow::Result<Option<NestedPhoc>> {
 
     gtk::init().unwrap();
     libhandy::init();
-    #[cfg(feature = "static")]
-    unsafe { libphosh::ffi::phosh_init(); }
     Ok(nested_phoc)
 }
