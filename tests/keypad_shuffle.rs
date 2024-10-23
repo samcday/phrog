@@ -23,7 +23,7 @@ use crate::common::virtual_keyboard::VirtualKeyboard;
 
 #[test]
 fn keypad_shuffle() {
-    let tmp = tempdir::TempDir::new("phrog-test-system-dbus").unwrap();
+    let tmp = tempfile::tempdir().unwrap();
     let _nested_phoc = phrog::init(Some("phoc".into()));
     let _system_dbus = dbus::system_dbus(tmp.path());
 

@@ -35,7 +35,7 @@ wayland-client = "0.31"
 wayland-protocols = { version = "0.31", features = ["client"] }
 wayland-protocols-misc = { version = "0.3.1", features = ["client"] }
 wayland-protocols-wlr = { version = "0.2", features = ["client"] }
-tempdir = "0.3.7"
+tempfile = "3"
 
 [features]
 keypad-shuffle = []

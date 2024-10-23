@@ -21,7 +21,7 @@ use phrog::lockscreen::Lockscreen;
 
 #[test]
 fn test_simple_flow() {
-    let tmp = tempdir::TempDir::new("phrog-test-system-dbus").unwrap();
+    let tmp = tempfile::tempdir().unwrap();
     let _nested_phoc = phrog::init(Some("phoc".into()));
     let _system_dbus = dbus::system_dbus(tmp.path());
 
