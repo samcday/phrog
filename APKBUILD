@@ -21,6 +21,7 @@ makedepends="
 	cargo
 	cargo-auditable"
 if [ -n "$_static" ]; then
+# keep in sync with phosh
 makedepends="$makedepends
 	callaudiod-dev
 	elogind-dev
@@ -41,6 +42,7 @@ makedepends="$makedepends
 	libunistring-dev
 	linux-pam-dev
 	meson
+	modemmanager-dev
 	networkmanager-dev
 	polkit-elogind-dev
 	pulseaudio-dev
