@@ -1,4 +1,5 @@
 %global cargo_install_lib 0
+%global phosh_ver 0.42
 %bcond static 0
 
 Name:           phrog
@@ -10,7 +11,7 @@ URL:            https://github.com/samcday/phrog
 Source:         %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  cargo-rpm-macros >= 24
-BuildRequires:  pkgconfig(libphosh-0)
+BuildRequires:  pkgconfig(libphosh-%{phosh_ver})
 
 %if %{with static}
 BuildRequires:	gcc
@@ -64,7 +65,7 @@ BuildRequires:	libunistring-devel
 %endif
 
 Requires:       greetd >= 0.6
-Requires:       libphosh >= 0.41
+Requires:       libphosh >= %{phosh_ver}
 
 # for dbus-launch
 Requires:       dbus-x11
