@@ -85,21 +85,21 @@ elif [ $base_version != "latest" ]; then
         base_version="v$base_version"
 fi
 
-if [ ! -x "$(command -v docker)" ] || docker --help |& grep -q podman; then
+#if [ ! -x "$(command -v docker)" ] || docker --help |& grep -q podman; then
         # Docker is actually implemented by podman, and its OCI output
         # is incompatible with some of the dockerd instances on GitLab
         # CI runners.
         echo "Using: Podman"
         format="--format docker"
         CMD="podman"
-else
-        echo "Using: Docker"
-        format=""
-        CMD="sudo docker"
-fi
+#else
+#        echo "Using: Docker"
+#        format=""
+#        CMD="sudo docker"
+#fi
 
-REGISTRY="registry.gitlab.gnome.org"
-REPO="world/phosh/phosh"
+REGISTRY="${REGISTRY:-registry.gitlab.gnome.org}"
+REPO="${REPO:-world/phosh/phosh}"
 TAG="${REGISTRY}/${REPO}/${base}:${base_version}"
 
 if [ $build == 1 ]; then
