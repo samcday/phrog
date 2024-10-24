@@ -16,15 +16,6 @@ It is the spiritual successor of [phog][].
 
 ## Installation
 
-### Fedora
-
-```
-sudo dnf copr enable samcday/phrog
-# If you want to test the latest and/or greatest
-# sudo dnf copr enable samcday/phrog-nightly
-sudo dnf install phrog
-```
-
 ### Alpine/postmarketOS
 
 The package has been [requested](https://gitlab.alpinelinux.org/alpine/aports/-/issues/16430) in Alpine, but has not yet landed in the Alpine package repositories.
@@ -43,6 +34,19 @@ sudo apk add alpine-sdk
 abuild deps
 abuild -K
 sudo apk add ~/packages/dist/$(uname -m)/greetd-phrog-*.apk
+```
+
+### Debian
+
+Not yet available in official repositories, but [an MR is pending](https://salsa.debian.org/DebianOnMobile-team/phrog/-/merge_requests/1).
+
+### Fedora
+
+Not yet available in official repositories, but [a COPR](https://copr.fedorainfracloud.org/coprs/samcday/phrog/) is maintained:
+
+```
+sudo dnf copr enable samcday/phrog
+sudo dnf install phrog
 ```
 
 ### Other
