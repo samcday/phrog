@@ -1,0 +1,34 @@
+name: build-image
+
+on:
+  push:
+    paths:
+      - .github/workflows/build-image.yml
+      - phosh/.gitlab-ci/debian.Dockerfile
+  pull_request:
+    paths:
+      - .github/workflows/build-image.yml
+      - phosh/.gitlab-ci/debian.Dockerfile
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: redhat-actions/podman-login@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io/${{ github.repository_owner }}/phrog-ci
+      - name: Build image
+        run: |
+          REGISTRY=ghcr.io REPO=${{ github.repository_owner }}/phrog-ci phosh/.gitlab-ci/run-docker.sh build --base debian --version 0.0.$(date --iso)
+          REGISTRY=ghcr.io REPO=${{ github.repository_owner }}/phrog-ci phosh/.gitlab-ci/run-docker.sh push --base debian --version 0.0.$(date --iso)
