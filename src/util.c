@@ -267,9 +267,19 @@ anonymous_shm_open (void)
   int fd = -1;
 
 #ifdef PHOSH_HAVE_MEMFD_CREATE
+/* For kernel headers before 6.3 */
+# ifndef MFD_NOEXEC_SEAL
+#  define MFD_NOEXEC_SEAL 0x0008U
+# endif
+  static unsigned int memfd_create_flags = MFD_CLOEXEC | MFD_ALLOW_SEALING | MFD_NOEXEC_SEAL;
   /* name is only for debugging, collisions don't matter */
   randname (name + strlen (name) - 6);
-  fd = memfd_create (name, MFD_CLOEXEC | MFD_ALLOW_SEALING);
+  fd = memfd_create (name, memfd_create_flags);
+  if (fd < 0 && errno == EINVAL) {
+    memfd_create_flags &= ~MFD_NOEXEC_SEAL;
+    g_warning ("memfd_create failed, retrying without MFD_NOEXEC_SEAL");
+    fd = memfd_create (name, memfd_create_flags);
+  }
   if (fd >= 0) {
     fcntl (fd, F_ADD_SEALS, F_SEAL_SHRINK);
     return fd;
@@ -477,25 +487,6 @@ phosh_util_toggle_style_class (GtkWidget *widget, const char *style_class, gbool
     gtk_style_context_add_class (context, style_class);
   else
     gtk_style_context_remove_class (context, style_class);
-}
-
-/**
- * phosh_util_get_stylesheet:
- * @theme_name: A theme name
- *
- * Returns: The stylesheet to be used for the given theme
- */
-const char *
-phosh_util_get_stylesheet (const char *theme_name)
-{
-  const char *style;
-
-  if (g_strcmp0 (theme_name, "HighContrast") == 0)
-    style = "/sm/puri/phosh/stylesheet/adwaita-hc-light.css";
-  else
-    style = "/sm/puri/phosh/stylesheet/adwaita-dark.css";
-
-  return style;
 }
 
 
@@ -708,4 +699,74 @@ phosh_util_remove_from_strv (GStrv array, const char *element)
     g_strv_builder_add (builder, array[i]);
   }
   return g_strv_builder_end (builder);
+}
+
+static void
+on_dbus_proxy_call_ready (GDBusProxy *proxy, GAsyncResult *res, gpointer user_data)
+{
+  g_autoptr (GError) err = NULL;
+  g_autoptr (GVariant) output = NULL;
+  g_autofree char* panel = user_data;
+
+  output = g_dbus_proxy_call_finish (proxy, res, &err);
+  if (output == NULL)
+    g_warning ("Can't open %s panel: %s", panel, err->message);
+
+  g_object_unref (proxy);
+}
+
+static void
+on_dbus_proxy_new_ready (GObject *source_object, GAsyncResult *res, char *panel)
+{
+  GDBusProxy *proxy;
+  g_autoptr (GError) err = NULL;
+  GVariantBuilder builder;
+  GVariant *params[3];
+  GVariant *array[1];
+
+  proxy = g_dbus_proxy_new_for_bus_finish (res, &err);
+
+  if (err != NULL) {
+    g_warning ("Can't open panel %s: %s", panel, err->message);
+    g_free (panel);
+    return;
+  }
+
+  g_variant_builder_init (&builder, G_VARIANT_TYPE ("av"));
+  g_variant_builder_add (&builder, "v", g_variant_new_string (""));
+
+  array[0] = g_variant_new ("v", g_variant_new ("(sav)", panel, &builder));
+
+  params[0] = g_variant_new_string ("launch-panel");
+  params[1] = g_variant_new_array (G_VARIANT_TYPE ("v"), array, 1);
+  params[2] = g_variant_new_array (G_VARIANT_TYPE ("{sv}"), NULL, 0);
+
+  g_dbus_proxy_call (proxy,
+                     "Activate",
+                     g_variant_new_tuple (params, 3),
+                     G_DBUS_CALL_FLAGS_NONE,
+                     -1,
+                     NULL,
+                     (GAsyncReadyCallback) on_dbus_proxy_call_ready,
+                     g_steal_pointer (&panel));
+}
+
+/**
+ * phosh_util_open_settings_panel:
+ * @panel: A settings panel name
+ *
+ * Open the settings panel corresponding to the given name.
+ */
+void
+phosh_util_open_settings_panel (const char *panel)
+{
+  g_dbus_proxy_new_for_bus (G_BUS_TYPE_SESSION,
+                            G_DBUS_PROXY_FLAGS_NONE,
+                            NULL,
+                            "org.gnome.Settings",
+                            "/org/gnome/Settings",
+                            "org.gtk.Actions",
+                            NULL,
+                            (GAsyncReadyCallback) on_dbus_proxy_new_ready,
+                            g_strdup (panel));
 }

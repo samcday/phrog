@@ -31,7 +31,8 @@ if get_option('lockscreen-plugins') or get_option('quick-setting-plugins') or to
                               '../src/plugin-loader.c',
                              ],
              c_args: ['-DBUILD_DIR="@0@"'.format(meson.project_build_root()),
-                      '-DPLUGINS="@0@"'.format(' '.join(lockscreen_plugins + quick_setting_plugins)),
+                      '-DLOCKSCREEN_PLUGINS="@0@"'.format(' '.join(lockscreen_plugins)),
+                      '-DQUICK_SETTING_PLUGINS="@0@"'.format(' '.join(quick_setting_plugins)),
                       '-DTEST_INSTALLED="@0@/install"'.format(meson.project_build_root()),
                      ],
              include_directories: [root_inc, phosh_inc],
@@ -62,6 +63,10 @@ if get_option('tools')
   )
 
   executable('dump-app-list', ['dump-app-list.c'],
+    dependencies: [ phosh_tool_dep, test_stubs_dep ],
+  )
+
+  executable('quick-settings-box-standalone', ['quick-settings-box-standalone.c'],
     dependencies: [ phosh_tool_dep, test_stubs_dep ],
   )
 

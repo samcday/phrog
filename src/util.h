@@ -32,7 +32,6 @@ char            *phosh_util_escape_markup (const char *markup, gboolean allow_ma
 gboolean         phosh_util_gesture_is_touch (GtkGestureSingle *gesture);
 gboolean         phosh_util_have_gnome_software (gboolean scan);
 void             phosh_util_toggle_style_class (GtkWidget *widget, const char *style_class, gboolean toggle);
-const char      *phosh_util_get_stylesheet (const char *theme_name);
 gboolean         phosh_clear_fd (int *fd, GError **err);
 const char      *phosh_util_get_icon_by_wifi_strength (guint strength, gboolean is_connecting);
 gboolean         phosh_util_file_equal (GFile *file1, GFile *file2);
@@ -40,3 +39,4 @@ GdkPixbuf       *phosh_util_data_uri_to_pixbuf (const char *uri, GError **error)
 gboolean         phosh_util_matches_app_info (GAppInfo *info, const char *search);
 GStrv            phosh_util_append_to_strv (GStrv array, const char *element);
 GStrv            phosh_util_remove_from_strv (GStrv array, const char *element);
+void             phosh_util_open_settings_panel (const char *panel);

@@ -137,12 +137,15 @@ libphosh_tool_headers = files(
   'overview.h',
   'password-entry.h',
   'osd-window.h',
-  'phosh-main.h',
   'plugin-loader.h',
   'power-menu.h',
   'power-menu-manager.h',
+  'quick-settings-box.h',
+  'quick-settings.h',
   'revealer.h',
   'status-icon.h',
+  'status-page.h',
+  'status-page-placeholder.h',
   'splash.h',
   'splash-manager.h',
   'suspend-manager.h',
@@ -151,6 +154,7 @@ libphosh_tool_headers = files(
   'vpn-info.h',
   'vpn-manager.h',
   'quick-setting.h',
+  'quick-settings-box.h',
   'phosh-wayland.h',
   'swipe-away-bin.h',
   'util.h',
@@ -159,7 +163,7 @@ libphosh_tool_headers = files(
   'wl-buffer.h',
 )
 
-# Symbols from these available in tools and unit tests
+# Available in tools and unit tests:
 libphosh_tool_sources = files(
   'app-auth-prompt.c',
   'activity.c',
@@ -210,14 +214,18 @@ libphosh_tool_sources = files(
   'overview.c',
   'password-entry.c',
   'osd-window.c',
-  'phosh-main.c',
   'plugin-loader.c',
   'power-menu.c',
   'power-menu-manager.c',
+  'quick-settings-box.c',
+  'quick-settings.c',
   'revealer.c',
   'status-icon.c',
+  'status-page.c',
+  'status-page-placeholder.c',
   'splash.c',
   'splash-manager.c',
+  'style-manager.c',
   'suspend-manager.c',
   'system-modal.c',
   'system-modal-dialog.c',
@@ -278,8 +286,7 @@ libphosh_headers = files(
   'session-presence.h',
   'session-manager.h',
   'shell.h',
-  'status-page.h',
-  'status-page-placeholder.h',
+  'style-manager.h',
   'system-prompt.h',
   'system-prompter.h',
   'thumbnail.h',
@@ -346,8 +353,6 @@ libphosh_sources = files(
   'session-presence.c',
   'session-manager.c',
   'shell.c',
-  'status-page.c',
-  'status-page-placeholder.c',
   'system-prompt.c',
   'system-prompter.c',
   'thumbnail.c',
@@ -477,7 +482,7 @@ phosh_plugins_dep = declare_dependency(
   sources: [generated_dbus_headers, wl_proto_headers],
 )
 
-if enable_introspection
+if enable_introspection or bindings_lib
   phosh_gir_sources = [ libphosh_sources,
                         libphosh_tool_sources,
                         libphosh_glib_generated_sources,
@@ -503,6 +508,8 @@ if enable_introspection
              extra_args : phosh_gir_extra_args,
            dependencies : phosh_static_lib_dep,
          fatal_warnings : true,
+                install : bindings_lib,
+        install_dir_gir : datadir / 'gir-1.0',
    )
 endif
 
