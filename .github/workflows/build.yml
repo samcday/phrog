@@ -69,6 +69,13 @@ jobs:
             -----END PGP PUBLIC KEY BLOCK-----
           EOF
 
+          # for phrog tests
+          sudo apt update
+          sudo apt-get install -y xvfb wf-recorder phoc
+          # TODO: why is this necessary?
+          sudo apt-get install -y libgmobile-dev
+
+          # Recent phosh needs gsettings-desktop-schemas > 43.0, Ubuntu currently shipping 42.x
           # Temporary(-ish?) hack: add Debian testing repo + GPG key
           cat <<EOF | sudo tee /etc/apt/sources.list.d/trixie.sources
           Types: deb
@@ -77,14 +84,6 @@ jobs:
           Components: main
           EOF
           sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0E98404D386FA1D9 6ED0E7B82643E131
-
-          # for phrog tests
-          sudo apt update
-          sudo apt-get install -y xvfb wf-recorder phoc
-          # TODO: why is this necessary?
-          sudo apt-get install -y libgmobile-dev
-
-          # Recent phosh needs gsettings-desktop-schemas > 43.0, Ubuntu currently shipping 42.x
           sudo apt-get upgrade -t testing -y gsettings-desktop-schemas-dev
 
           sudo apt-get build-dep -t trixie-nightly -y ./phosh/
