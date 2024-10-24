@@ -84,6 +84,7 @@ jobs:
           Components: main
           EOF
           sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0E98404D386FA1D9 6ED0E7B82643E131
+          sudo apt update
           sudo apt-get upgrade -t testing -y gsettings-desktop-schemas-dev
 
           sudo apt-get build-dep -t trixie-nightly -y ./phosh/
