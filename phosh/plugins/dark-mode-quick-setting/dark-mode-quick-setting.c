@@ -10,7 +10,6 @@
 #include "dark-mode-quick-setting.h"
 #include "plugin-shell.h"
 #include "quick-setting.h"
-#include "status-icon.h"
 
 #include <glib/gi18n.h>
 #include <gsettings-desktop-schemas/gdesktop-enums.h>

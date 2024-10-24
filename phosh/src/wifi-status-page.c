@@ -23,7 +23,7 @@
 struct _PhoshWifiStatusPage {
   PhoshStatusPage             parent_instance;
 
-  GtkButton                  *wifi_scan;
+  GtkSwitch                  *wifi_switch;
   GtkStack                   *stack;
   GtkListBox                 *networks;
   PhoshStatusPagePlaceholder *empty_state;
@@ -61,7 +61,7 @@ set_visible_page (PhoshWifiStatusPage *self, GParamSpec *pspec, PhoshWifiManager
   } else if (g_list_model_get_item (devices, 0) == NULL) {
     icon_name = "network-wireless-no-route-symbolic";
     title = _("No Wi-Fi Hotspots");
-    button_label = NULL;
+    button_label = _("Scan");
   } else {
     empty_state = FALSE;
   }
@@ -76,7 +76,8 @@ set_visible_page (PhoshWifiStatusPage *self, GParamSpec *pspec, PhoshWifiManager
     gtk_stack_set_visible_child_name (self->stack, "list_box");
   }
 
-  gtk_widget_set_visible (GTK_WIDGET (self->wifi_scan), !wifi_disabled && !hotspot_enabled);
+  gtk_widget_set_visible (GTK_WIDGET (self->wifi_switch), !wifi_absent && !hotspot_enabled);
+  gtk_switch_set_active (self->wifi_switch, !wifi_disabled);
 }
 
 static void
@@ -89,12 +90,16 @@ on_placeholder_clicked (PhoshWifiStatusPage *self, GtkWidget *widget)
     phosh_wifi_manager_set_enabled (self->wifi, TRUE);
   else if (hotspot_enabled)
     phosh_wifi_manager_set_hotspot_master (self->wifi, FALSE);
+  else
+    phosh_wifi_manager_request_scan (self->wifi);
 }
 
 static void
-on_wifi_scan_clicked (PhoshWifiStatusPage *self, GParamSpec *pspec, GtkButton *_button)
+on_switch_active_changed (PhoshWifiStatusPage *self, GParamSpec *pspec, GtkSwitch *_switch)
 {
-  phosh_wifi_manager_request_scan (self->wifi);
+  gboolean enabled = gtk_switch_get_active (self->wifi_switch);
+
+  phosh_wifi_manager_set_enabled (self->wifi, enabled);
 }
 
 static void
@@ -144,7 +149,7 @@ phosh_wifi_status_page_class_init (PhoshWifiStatusPageClass *klass)
   gtk_widget_class_set_template_from_resource (widget_class,
                                                "/sm/puri/phosh/ui/wifi-status-page.ui");
 
-  gtk_widget_class_bind_template_child (widget_class, PhoshWifiStatusPage, wifi_scan);
+  gtk_widget_class_bind_template_child (widget_class, PhoshWifiStatusPage, wifi_switch);
   gtk_widget_class_bind_template_child (widget_class, PhoshWifiStatusPage, stack);
   gtk_widget_class_bind_template_child (widget_class, PhoshWifiStatusPage, networks);
   gtk_widget_class_bind_template_child (widget_class, PhoshWifiStatusPage, empty_state);
@@ -152,7 +157,6 @@ phosh_wifi_status_page_class_init (PhoshWifiStatusPageClass *klass)
 
   gtk_widget_class_bind_template_callback (widget_class, on_network_activated_cb);
   gtk_widget_class_bind_template_callback (widget_class, on_placeholder_clicked);
-  gtk_widget_class_bind_template_callback (widget_class, on_wifi_scan_clicked);
 }
 
 static void
@@ -173,6 +177,11 @@ phosh_wifi_status_page_init (PhoshWifiStatusPage *self)
 
   model = G_LIST_MODEL (phosh_wifi_manager_get_networks (self->wifi));
 
+  g_signal_connect_object (self->wifi_switch,
+                           "notify::active",
+                           G_CALLBACK (on_switch_active_changed),
+                           self,
+                           G_CONNECT_SWAPPED);
   g_signal_connect_object (self->wifi,
                            "notify::present",
                            G_CALLBACK (set_visible_page),

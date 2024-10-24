@@ -73,51 +73,41 @@ phosh-top-panel .phosh-topbar-date {
   background: @phosh_borders_color;
 }
 
-phosh-quick-setting {
+#phosh_quick_settings flowboxchild > button {
   border-radius: 99px;
   border: 0;
+  padding: 8px 12px;
   font-weight: bold;
   font-size: 10pt;
+  /* use selection color to make quick settings items blue  */
   background-color: @phosh_button_bg_color;
 }
 
-phosh-quick-setting button:hover {
+#phosh_quick_settings flowboxchild > button:hover {
   background-color: shade(@phosh_button_bg_color, 1.14);
 }
 
-phosh-quick-setting:active button:hover {
+#phosh_quick_settings flowboxchild > button.phosh-qs-active:hover {
   background-color: shade(@theme_selected_bg_color, 1.14);
-  color: @theme_selected_fg_color;
+  color:  @theme_selected_fg_color;
 }
 
-phosh-quick-setting:active {
+#phosh_quick_settings flowboxchild > button.phosh-qs-active {
   background-color: @theme_selected_bg_color;
-  color: @theme_selected_fg_color;
+  color:  @theme_selected_fg_color;
 }
 
-phosh-quick-setting:disabled {
+#phosh_quick_settings flowboxchild > button:disabled {
   opacity: 0.5;
   background-color: @phosh_button_bg_color;
 }
 
-phosh-quick-setting button:focus {
-  box-shadow: inset 0 0 0 2px alpha(@theme_selected_fg_color, 0.2);
+#phosh_quick_settings flowboxchild:focus > button:not(:disabled) {
+  box-shadow: inset 0 0 0 2px alpha(@theme_selected_fg_color, .2);
   outline: none;
 }
 
-phosh-quick-setting button:first-child {
-  border-radius: 99px 0px 0px 99px;
-}
-
-phosh-quick-setting button:only-child {
-  border-radius: 99px;
-}
-
-phosh-quick-setting button:last-child:not(:only-child) {
-  border-radius: 0px 99px 99px 0px;
-}
-
-phosh-quick-setting button {
+#phosh_quick_settings flowboxchild {
   background: none;
   background-color: transparent;
   border: none;
@@ -125,10 +115,9 @@ phosh-quick-setting button {
   -gtk-icon-shadow: none;
   padding: 0;
   text-shadow: none;
-  padding: 8px 12px;
 }
 
-phosh-quick-setting button:focus {
+#phosh_quick_settings flowboxchild:focus {
   outline: none;
 }
 
@@ -1062,7 +1051,7 @@ button.suggested-action:focus {
 
 
 /* FIXME: an override to prevent double highlighting on some buttons */
-phosh-quick-setting button:focus,
+.phosh-quick-setting:hover,
 phosh-app-grid-button button:hover,
 phosh-keypad button:hover,
 phosh-media-player button:hover {
@@ -1104,23 +1093,4 @@ scale trough slider:hover {
 scale trough slider:active {
   border-color: shade(@phosh_fg_color, 0.9);
   background: shade(@phosh_fg_color, 0.9);
-}
-
-scale highlight {
-  background-color: @theme_selected_bg_color;
-}
-
-/* Switches */
-switch:not(:disabled):checked {
-  background-color: @theme_selected_bg_color;
-}
-
-/* Entries */
-entry:focus {
-  box-shadow: inset 0 0 0 1px @theme_selected_bg_color;
-}
-
-/* Progress bars */
-progressbar progress {
-  background-color: @theme_selected_bg_color;
 }

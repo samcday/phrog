@@ -53,7 +53,6 @@ quick_setting_plugins = [
   'dark-mode-quick-setting',
   'mobile-data-quick-setting',
   'night-light-quick-setting',
-  'pomodoro-quick-setting',
   'simple-custom-quick-setting',
   'wifi-hotspot-quick-setting',
 ]
