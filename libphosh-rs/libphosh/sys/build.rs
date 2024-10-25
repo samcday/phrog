@@ -70,13 +70,33 @@ fn main() {
                 .status().expect("meson install failed");
             assert!(status.success());
 
-            let build_dir = build_dir.display().to_string();
-
             // Set search path to private build.
-            println!("cargo:rustc-link-search=native={}/src", build_dir);
+            println!("cargo:rustc-link-search=native={}/src", build_dir.display());
+
+            // Write phosh gschema to home dir now. Sorta pollute-y, sure, but also very convenient.
+            let schema_path = PathBuf::from(std::env::var("HOME").unwrap()).join(".local/share/glib-2.0/schemas");
+            std::fs::create_dir_all(&schema_path).expect("failed to create schema dir");
+
+            let phosh_enums = build_dir.join("data/sm.puri.phosh.enums.xml");
+            let dest_path = schema_path.join(phosh_enums.file_name().unwrap());
+            std::fs::write(&dest_path, std::fs::read(phosh_enums).expect("failed to read phosh enums"))
+                .expect("failed to write phosh enums");
+            println!("cargo::rerun-if-changed={}", dest_path.display());
+
+            let phosh_gschema = build_dir.join("data/sm.puri.phosh.gschema.xml");
+            let dest_path = schema_path.join(phosh_gschema.file_name().unwrap());
+            std::fs::write(&dest_path, std::fs::read(phosh_gschema).expect("failed to read schema"))
+                .expect("failed to write phosh schema");
+            println!("cargo::rerun-if-changed={}", dest_path.display());
+
+            std::process::Command::new("glib-compile-schemas")
+                .arg(&schema_path)
+                .spawn()
+                .and_then(|mut v| v.wait())
+                .expect("failed to run glib-compile-schemas");
 
             system_deps::Library::from_internal_pkg_config(
-                    format!("{}/meson-private", build_dir),
+                    format!("{}/meson-private", build_dir.display()),
                     name,
                     version)
         })
