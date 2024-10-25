@@ -59,9 +59,11 @@ jobs:
 
           export XDG_RUNTIME_DIR=/tmp
 
-          # The build doesn't have anything installed, so fake a Phosh session file
+          # The build doesn't have anything installed, so fake a Phosh session
           mkdir /usr/share/wayland-sessions
           cp ./phosh/data/wayland-sessions/phosh.desktop /usr/share/wayland-sessions
+          touch /usr/bin/phosh-session
+          chmod +x /usr/bin/phosh-session
 
           # run tests
           mkdir -p test-recordings/
