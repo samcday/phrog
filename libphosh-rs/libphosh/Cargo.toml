@@ -15,7 +15,22 @@ keywords = ["phosh", "gnome"]
 name = "libphosh"
 
 [features]
+default = ["gtk_v3_20"]
+gtk_v2_4 = []
+gtk_v2_6 = ["gtk_v2_4"]
+gtk_v2_10 = ["gtk_v2_6"]
+gtk_v2_12 = ["gtk_v2_10"]
+gtk_v2_18 = ["gtk_v2_12"]
+gtk_v2_20 = ["gtk_v2_18"]
+gtk_v3 = ["gtk_v2_20"]
+gtk_v3_4 = ["gtk_v3"]
+gtk_v3_8 = ["gtk_v3_4"]
+gtk_v3_12 = ["gtk_v3_8"]
+gtk_v3_14 = ["gtk_v3_12"]
+gtk_v3_20 = ["gtk_v3_14"]
 static = ["ffi/static"]
+v3_12 = []
+v3_14 = []
 
 [package.metadata.docs.rs]
 all-features = true
@@ -25,13 +40,16 @@ rustdoc-args = ["--cfg", "docsrs"]
 [dependencies]
 libc = '0.2'
 
-[dependencies.glib]
+[dependencies.gdk]
 version = "0.18"
-features = [ "v2_66" ]
 
 [dependencies.gio]
 version = "0.18"
 features = [ "v2_70" ]
+
+[dependencies.glib]
+version = "0.18"
+features = [ "v2_66" ]
 
 [dependencies.gtk]
 version = "0.18"

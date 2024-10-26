@@ -11,6 +11,7 @@ macro_rules! skip_assert_initialized {
 }
 
 pub use auto::*;
+#[allow(unused_imports)]
 mod auto;
 pub mod subclass;
 

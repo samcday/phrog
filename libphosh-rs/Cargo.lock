@@ -429,6 +429,7 @@ dependencies = [
 name = "libphosh"
 version = "0.0.3"
 dependencies = [
+ "gdk",
  "gio",
  "glib",
  "gtk",
