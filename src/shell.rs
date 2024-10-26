@@ -7,6 +7,7 @@ glib::wrapper! {
 }
 
 impl Shell {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Object::builder().build()
     }
