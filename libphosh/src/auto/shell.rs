@@ -3,7 +3,7 @@
 // from ../gir-files
 // DO NOT EDIT
 
-use crate::{LockscreenManager};
+use crate::{LockscreenManager,ScreenshotManager};
 use glib::{prelude::*,signal::{connect_raw, SignalHandlerId},translate::*};
 use std::{boxed::Box as Box_};
 
@@ -276,11 +276,13 @@ pub trait ShellExt: IsA<Shell> + sealed::Sealed + 'static {
     //    unsafe { TODO: call ffi:phosh_shell_get_screen_saver_manager() }
     //}
 
-    //#[doc(alias = "phosh_shell_get_screenshot_manager")]
-    //#[doc(alias = "get_screenshot_manager")]
-    //fn screenshot_manager(&self) -> /*Ignored*/ScreenshotManager {
-    //    unsafe { TODO: call ffi:phosh_shell_get_screenshot_manager() }
-    //}
+    #[doc(alias = "phosh_shell_get_screenshot_manager")]
+    #[doc(alias = "get_screenshot_manager")]
+    fn screenshot_manager(&self) -> ScreenshotManager {
+        unsafe {
+            from_glib_none(ffi::phosh_shell_get_screenshot_manager(self.as_ref().to_glib_none().0))
+        }
+    }
 
     //#[doc(alias = "phosh_shell_get_session_manager")]
     //#[doc(alias = "get_session_manager")]
@@ -300,6 +302,12 @@ pub trait ShellExt: IsA<Shell> + sealed::Sealed + 'static {
     //#[doc(alias = "get_state")]
     //fn state(&self) -> /*Ignored*/ShellStateFlags {
     //    unsafe { TODO: call ffi:phosh_shell_get_state() }
+    //}
+
+    //#[doc(alias = "phosh_shell_get_style_manager")]
+    //#[doc(alias = "get_style_manager")]
+    //fn style_manager(&self) -> /*Ignored*/StyleManager {
+    //    unsafe { TODO: call ffi:phosh_shell_get_style_manager() }
     //}
 
     //#[doc(alias = "phosh_shell_get_toplevel_manager")]

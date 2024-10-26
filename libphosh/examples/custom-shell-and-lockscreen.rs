@@ -89,9 +89,8 @@ mod custom_lockscreen {
     }
 
     mod imp {
-        use gtk::glib::ObjectExt;
         use gtk::subclass::prelude::*;
-        use gtk::{glib, Button, Image, Label};
+        use gtk::{glib, Image};
         use gtk::prelude::WidgetExt;
         use libphosh::Lockscreen;
         use libphosh::prelude::LockscreenExt;

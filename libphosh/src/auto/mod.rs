@@ -15,11 +15,17 @@ pub use self::lockscreen_manager::LockscreenManager;
 mod quick_setting;
 pub use self::quick_setting::QuickSetting;
 
+mod screenshot_manager;
+pub use self::screenshot_manager::ScreenshotManager;
+
 mod shell;
 pub use self::shell::Shell;
 
 mod status_icon;
 pub use self::status_icon::StatusIcon;
+
+mod status_page;
+pub use self::status_page::StatusPage;
 
 mod top_panel;
 pub use self::top_panel::TopPanel;
@@ -35,6 +41,7 @@ pub(crate) mod traits {
     pub use super::quick_setting::QuickSettingExt;
     pub use super::shell::ShellExt;
     pub use super::status_icon::StatusIconExt;
+    pub use super::status_page::StatusPageExt;
     pub use super::wall_clock::WallClockExt;
 }
 pub(crate) mod builders {
@@ -44,5 +51,6 @@ pub(crate) mod builders {
     pub use super::quick_setting::QuickSettingBuilder;
     pub use super::shell::ShellBuilder;
     pub use super::status_icon::StatusIconBuilder;
+    pub use super::status_page::StatusPageBuilder;
     pub use super::top_panel::TopPanelBuilder;
 }

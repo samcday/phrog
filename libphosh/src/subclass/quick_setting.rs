@@ -1,5 +1,4 @@
-use glib::{Cast, Class, subclass::prelude::*};
-use glib::translate::ToGlibPtr;
+use glib::{Class, subclass::prelude::*};
 use gtk::subclass::prelude::ButtonImpl;
 use crate::QuickSetting;
 

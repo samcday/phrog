@@ -16,9 +16,10 @@ generate_builder = true
 trust_return_value_nullability = true
 
 external_libraries = [
+  "Gdk",
+  "Gio",
   "GLib",
   "GObject",
-  "Gio",
 ]
 
 generate = [
@@ -27,16 +28,19 @@ generate = [
   "Phosh.LockscreenManager",
   "Phosh.LockscreenPage",
   "Phosh.QuickSetting",
+  "Phosh.ScreenshotManager",
   "Phosh.StatusIcon",
+  "Phosh.StatusPage",
   "Phosh.TopPanel",
   "Phosh.WallClock",
 ]
 
 manual = [
-  "GLib.Error",
+  "Gdk.Rectangle",
   "Gio.AsyncReadyCallback",
   "Gio.AsyncResult",
   "Gio.Cancellable",
+  "GLib.Error",
   "Gtk.Bin",
   "Gtk.Button",
   "Gtk.Container",
@@ -200,6 +204,8 @@ ignore = [
     "Phosh.PowerMenu",
     "Phosh.PowerMenuManager",
     "Phosh.Proximity",
+    "Phosh.QuickSettings",
+    "Phosh.QuickSettingsBox",
     "Phosh.Revealer",
     "Phosh.RfkillDBusRfkillProxy",
     "Phosh.RfkillDBusRfkillSkeleton",
@@ -208,7 +214,6 @@ ignore = [
     "Phosh.RunCommandDialog",
     "Phosh.RunCommandManager",
     "Phosh.ScreenSaverManager",
-    "Phosh.ScreenshotManager",
     "Phosh.SensorProxyManager",
     "Phosh.SessionClientPrivateDBusClientPrivateProxy",
     "Phosh.SessionClientPrivateDBusClientPrivateSkeleton",
@@ -218,7 +223,6 @@ ignore = [
     "Phosh.SessionPresenceDBusPresenceSkeleton",
     "Phosh.Splash",
     "Phosh.SplashManager",
-    "Phosh.StatusPage",
     "Phosh.SuspendManager",
     "Phosh.SwipeAwayBin",
     "Phosh.SystemModal",

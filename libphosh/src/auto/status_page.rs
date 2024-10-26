@@ -3,75 +3,70 @@
 // from ../gir-files
 // DO NOT EDIT
 
-use crate::{StatusPage};
 use glib::{prelude::*,signal::{connect_raw, SignalHandlerId},translate::*};
 use std::{boxed::Box as Box_};
 
 glib::wrapper! {
-    #[doc(alias = "PhoshQuickSetting")]
-    pub struct QuickSetting(Object<ffi::PhoshQuickSetting, ffi::PhoshQuickSettingClass>) @extends gtk::Container, gtk::Widget;
+    #[doc(alias = "PhoshStatusPage")]
+    pub struct StatusPage(Object<ffi::PhoshStatusPage, ffi::PhoshStatusPageClass>) @extends gtk::Bin, gtk::Container, gtk::Widget;
 
     match fn {
-        type_ => || ffi::phosh_quick_setting_get_type(),
+        type_ => || ffi::phosh_status_page_get_type(),
     }
 }
 
-impl QuickSetting {
-        pub const NONE: Option<&'static QuickSetting> = None;
+impl StatusPage {
+        pub const NONE: Option<&'static StatusPage> = None;
     
 
-    #[doc(alias = "phosh_quick_setting_new")]
-    pub fn new(status_page: &impl IsA<StatusPage>) -> QuickSetting {
-        skip_assert_initialized!();
+    #[doc(alias = "phosh_status_page_new")]
+    pub fn new() -> StatusPage {
+        assert_initialized_main_thread!();
         unsafe {
-            gtk::Widget::from_glib_none(ffi::phosh_quick_setting_new(status_page.as_ref().to_glib_none().0)).unsafe_cast()
+            from_glib_none(ffi::phosh_status_page_new())
         }
     }
 
             // rustdoc-stripper-ignore-next
-            /// Creates a new builder-pattern struct instance to construct [`QuickSetting`] objects.
+            /// Creates a new builder-pattern struct instance to construct [`StatusPage`] objects.
             ///
-            /// This method returns an instance of [`QuickSettingBuilder`](crate::builders::QuickSettingBuilder) which can be used to create [`QuickSetting`] objects.
-            pub fn builder() -> QuickSettingBuilder {
-                QuickSettingBuilder::new()
+            /// This method returns an instance of [`StatusPageBuilder`](crate::builders::StatusPageBuilder) which can be used to create [`StatusPage`] objects.
+            pub fn builder() -> StatusPageBuilder {
+                StatusPageBuilder::new()
             }
         
 }
 
-impl Default for QuickSetting {
+impl Default for StatusPage {
                      fn default() -> Self {
-                         glib::object::Object::new::<Self>()
+                         Self::new()
                      }
                  }
 
 // rustdoc-stripper-ignore-next
-        /// A [builder-pattern] type to construct [`QuickSetting`] objects.
+        /// A [builder-pattern] type to construct [`StatusPage`] objects.
         ///
         /// [builder-pattern]: https://doc.rust-lang.org/1.0.0/style/ownership/builders.html
 #[must_use = "The builder must be built to be used"]
-pub struct QuickSettingBuilder {
-            builder: glib::object::ObjectBuilder<'static, QuickSetting>,
+pub struct StatusPageBuilder {
+            builder: glib::object::ObjectBuilder<'static, StatusPage>,
         }
 
-        impl QuickSettingBuilder {
+        impl StatusPageBuilder {
         fn new() -> Self {
             Self { builder: glib::object::Object::builder() }
         }
 
-                            pub fn active(self, active: bool) -> Self {
-                            Self { builder: self.builder.property("active", active), }
+                            pub fn footer(self, footer: &impl IsA<gtk::Widget>) -> Self {
+                            Self { builder: self.builder.property("footer", footer.clone().upcast()), }
                         }
 
-                            pub fn can_show_status(self, can_show_status: bool) -> Self {
-                            Self { builder: self.builder.property("can-show-status", can_show_status), }
+                            pub fn header(self, header: &impl IsA<gtk::Widget>) -> Self {
+                            Self { builder: self.builder.property("header", header.clone().upcast()), }
                         }
 
-                            pub fn showing_status(self, showing_status: bool) -> Self {
-                            Self { builder: self.builder.property("showing-status", showing_status), }
-                        }
-
-                            pub fn status_page(self, status_page: &impl IsA<StatusPage>) -> Self {
-                            Self { builder: self.builder.property("status-page", status_page.clone().upcast()), }
+                            pub fn title(self, title: impl Into<glib::GString>) -> Self {
+                            Self { builder: self.builder.property("title", title.into()), }
                         }
 
                             pub fn border_width(self, border_width: u32) -> Self {
@@ -274,181 +269,101 @@ pub struct QuickSettingBuilder {
                         }
 
     // rustdoc-stripper-ignore-next
-    /// Build the [`QuickSetting`].
+    /// Build the [`StatusPage`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
-    pub fn build(self) -> QuickSetting {
+    pub fn build(self) -> StatusPage {
     self.builder.build() }
 }
 
 mod sealed {
     pub trait Sealed {}
-    impl<T: super::IsA<super::QuickSetting>> Sealed for T {}
+    impl<T: super::IsA<super::StatusPage>> Sealed for T {}
 }
 
-pub trait QuickSettingExt: IsA<QuickSetting> + sealed::Sealed + 'static {
-    #[doc(alias = "phosh_quick_setting_get_active")]
-    #[doc(alias = "get_active")]
-    fn is_active(&self) -> bool {
+pub trait StatusPageExt: IsA<StatusPage> + sealed::Sealed + 'static {
+    #[doc(alias = "phosh_status_page_get_footer")]
+    #[doc(alias = "get_footer")]
+    fn footer(&self) -> gtk::Widget {
         unsafe {
-            from_glib(ffi::phosh_quick_setting_get_active(self.as_ref().to_glib_none().0))
+            from_glib_none(ffi::phosh_status_page_get_footer(self.as_ref().to_glib_none().0))
         }
     }
 
-    #[doc(alias = "phosh_quick_setting_get_can_show_status")]
-    #[doc(alias = "get_can_show_status")]
-    fn can_show_status(&self) -> bool {
+    #[doc(alias = "phosh_status_page_get_header")]
+    #[doc(alias = "get_header")]
+    fn header(&self) -> gtk::Widget {
         unsafe {
-            from_glib(ffi::phosh_quick_setting_get_can_show_status(self.as_ref().to_glib_none().0))
+            from_glib_none(ffi::phosh_status_page_get_header(self.as_ref().to_glib_none().0))
         }
     }
 
-    #[doc(alias = "phosh_quick_setting_get_showing_status")]
-    #[doc(alias = "get_showing_status")]
-    fn is_showing_status(&self) -> bool {
+    #[doc(alias = "phosh_status_page_get_title")]
+    #[doc(alias = "get_title")]
+    fn title(&self) -> glib::GString {
         unsafe {
-            from_glib(ffi::phosh_quick_setting_get_showing_status(self.as_ref().to_glib_none().0))
+            from_glib_none(ffi::phosh_status_page_get_title(self.as_ref().to_glib_none().0))
         }
     }
 
-    #[doc(alias = "phosh_quick_setting_get_status_page")]
-    #[doc(alias = "get_status_page")]
-    fn status_page(&self) -> StatusPage {
+    #[doc(alias = "phosh_status_page_set_footer")]
+    fn set_footer(&self, footer: &impl IsA<gtk::Widget>) {
         unsafe {
-            from_glib_none(ffi::phosh_quick_setting_get_status_page(self.as_ref().to_glib_none().0))
+            ffi::phosh_status_page_set_footer(self.as_ref().to_glib_none().0, footer.as_ref().to_glib_none().0);
         }
     }
 
-    #[doc(alias = "phosh_quick_setting_set_active")]
-    fn set_active(&self, active: bool) {
+    #[doc(alias = "phosh_status_page_set_header")]
+    fn set_header(&self, header: &impl IsA<gtk::Widget>) {
         unsafe {
-            ffi::phosh_quick_setting_set_active(self.as_ref().to_glib_none().0, active.into_glib());
+            ffi::phosh_status_page_set_header(self.as_ref().to_glib_none().0, header.as_ref().to_glib_none().0);
         }
     }
 
-    #[doc(alias = "phosh_quick_setting_set_can_show_status")]
-    fn set_can_show_status(&self, can_show_status: bool) {
+    #[doc(alias = "phosh_status_page_set_title")]
+    fn set_title(&self, title: &str) {
         unsafe {
-            ffi::phosh_quick_setting_set_can_show_status(self.as_ref().to_glib_none().0, can_show_status.into_glib());
+            ffi::phosh_status_page_set_title(self.as_ref().to_glib_none().0, title.to_glib_none().0);
         }
     }
 
-    #[doc(alias = "phosh_quick_setting_set_showing_status")]
-    fn set_showing_status(&self, showing_status: bool) {
-        unsafe {
-            ffi::phosh_quick_setting_set_showing_status(self.as_ref().to_glib_none().0, showing_status.into_glib());
-        }
-    }
-
-    #[doc(alias = "phosh_quick_setting_set_status_page")]
-    fn set_status_page(&self, status_page: &impl IsA<StatusPage>) {
-        unsafe {
-            ffi::phosh_quick_setting_set_status_page(self.as_ref().to_glib_none().0, status_page.as_ref().to_glib_none().0);
-        }
-    }
-
-    #[doc(alias = "clicked")]
-    fn connect_clicked<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn clicked_trampoline<P: IsA<QuickSetting>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshQuickSetting, f: glib::ffi::gpointer) {
+    #[doc(alias = "footer")]
+    fn connect_footer_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_footer_trampoline<P: IsA<StatusPage>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshStatusPage, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
             let f: &F = &*(f as *const F);
-            f(QuickSetting::from_glib_borrow(this).unsafe_cast_ref())
+            f(StatusPage::from_glib_borrow(this).unsafe_cast_ref())
         }
         unsafe {
             let f: Box_<F> = Box_::new(f);
-            connect_raw(self.as_ptr() as *mut _, b"clicked\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(clicked_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+            connect_raw(self.as_ptr() as *mut _, b"notify::footer\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_footer_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 
-    #[doc(alias = "hide-status")]
-    fn connect_hide_status<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn hide_status_trampoline<P: IsA<QuickSetting>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshQuickSetting, f: glib::ffi::gpointer) {
+    #[doc(alias = "header")]
+    fn connect_header_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_header_trampoline<P: IsA<StatusPage>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshStatusPage, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
             let f: &F = &*(f as *const F);
-            f(QuickSetting::from_glib_borrow(this).unsafe_cast_ref())
+            f(StatusPage::from_glib_borrow(this).unsafe_cast_ref())
         }
         unsafe {
             let f: Box_<F> = Box_::new(f);
-            connect_raw(self.as_ptr() as *mut _, b"hide-status\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(hide_status_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+            connect_raw(self.as_ptr() as *mut _, b"notify::header\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_header_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 
-    #[doc(alias = "long-pressed")]
-    fn connect_long_pressed<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn long_pressed_trampoline<P: IsA<QuickSetting>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshQuickSetting, f: glib::ffi::gpointer) {
+    #[doc(alias = "title")]
+    fn connect_title_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_title_trampoline<P: IsA<StatusPage>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshStatusPage, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
             let f: &F = &*(f as *const F);
-            f(QuickSetting::from_glib_borrow(this).unsafe_cast_ref())
+            f(StatusPage::from_glib_borrow(this).unsafe_cast_ref())
         }
         unsafe {
             let f: Box_<F> = Box_::new(f);
-            connect_raw(self.as_ptr() as *mut _, b"long-pressed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(long_pressed_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
-        }
-    }
-
-    #[doc(alias = "show-status")]
-    fn connect_show_status<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn show_status_trampoline<P: IsA<QuickSetting>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshQuickSetting, f: glib::ffi::gpointer) {
-            let f: &F = &*(f as *const F);
-            f(QuickSetting::from_glib_borrow(this).unsafe_cast_ref())
-        }
-        unsafe {
-            let f: Box_<F> = Box_::new(f);
-            connect_raw(self.as_ptr() as *mut _, b"show-status\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(show_status_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
-        }
-    }
-
-    #[doc(alias = "active")]
-    fn connect_active_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn notify_active_trampoline<P: IsA<QuickSetting>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshQuickSetting, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
-            let f: &F = &*(f as *const F);
-            f(QuickSetting::from_glib_borrow(this).unsafe_cast_ref())
-        }
-        unsafe {
-            let f: Box_<F> = Box_::new(f);
-            connect_raw(self.as_ptr() as *mut _, b"notify::active\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_active_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
-        }
-    }
-
-    #[doc(alias = "can-show-status")]
-    fn connect_can_show_status_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn notify_can_show_status_trampoline<P: IsA<QuickSetting>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshQuickSetting, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
-            let f: &F = &*(f as *const F);
-            f(QuickSetting::from_glib_borrow(this).unsafe_cast_ref())
-        }
-        unsafe {
-            let f: Box_<F> = Box_::new(f);
-            connect_raw(self.as_ptr() as *mut _, b"notify::can-show-status\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_can_show_status_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
-        }
-    }
-
-    #[doc(alias = "showing-status")]
-    fn connect_showing_status_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn notify_showing_status_trampoline<P: IsA<QuickSetting>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshQuickSetting, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
-            let f: &F = &*(f as *const F);
-            f(QuickSetting::from_glib_borrow(this).unsafe_cast_ref())
-        }
-        unsafe {
-            let f: Box_<F> = Box_::new(f);
-            connect_raw(self.as_ptr() as *mut _, b"notify::showing-status\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_showing_status_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
-        }
-    }
-
-    #[doc(alias = "status-page")]
-    fn connect_status_page_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
-        unsafe extern "C" fn notify_status_page_trampoline<P: IsA<QuickSetting>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshQuickSetting, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
-            let f: &F = &*(f as *const F);
-            f(QuickSetting::from_glib_borrow(this).unsafe_cast_ref())
-        }
-        unsafe {
-            let f: Box_<F> = Box_::new(f);
-            connect_raw(self.as_ptr() as *mut _, b"notify::status-page\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_status_page_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+            connect_raw(self.as_ptr() as *mut _, b"notify::title\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_title_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 }
 
-impl<O: IsA<QuickSetting>> QuickSettingExt for O {}
+impl<O: IsA<StatusPage>> StatusPageExt for O {}
