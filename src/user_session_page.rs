@@ -83,7 +83,6 @@ mod imp {
     use crate::dbus::accounts::AccountsProxy;
     use crate::user::User;
     use futures_util::StreamExt;
-    use zbus::zvariant::OwnedObjectPath;
 
     #[derive(CompositeTemplate, Default)]
     #[template(resource = "/mobi/phosh/phrog/lockscreen-user-session.ui")]

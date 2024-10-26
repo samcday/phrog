@@ -63,12 +63,12 @@ mod imp {
                 .build();
 
             self.obj()
-                .connect_active_notify(clone!(@weak self as this => move |qs| {
+                .connect_active_notify(clone!(@weak self as this => move |_| {
                     this.update();
                 }));
             self.update();
 
-            self.obj().connect_clicked(move |btn| {
+            self.obj().connect_clicked(move |_| {
                 settings
                     .set_boolean("shuffle-keypad", !settings.boolean("shuffle-keypad"))
                     .unwrap();

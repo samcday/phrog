@@ -1,3 +1,4 @@
+#![allow(non_snake_case)]
 pub mod accounts {
     //! # D-Bus interface proxy for: `org.freedesktop.Accounts`
     //!

@@ -3,6 +3,7 @@
 // from ../../gir-files (@ be988506d6fd)
 // DO NOT EDIT
 
+#[allow(unused_imports)]
 pub fn version() -> &'static str {
 {
         "1"

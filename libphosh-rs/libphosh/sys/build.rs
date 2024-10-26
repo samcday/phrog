@@ -1,4 +1,3 @@
-use std::fmt::format;
 use std::path::{Path, PathBuf};
 #[cfg(not(docsrs))]
 use std::process;
@@ -15,6 +14,8 @@ fn main() {
             std::env::set_var("SYSTEM_DEPS_LIBPHOSH_0_42_BUILD_INTERNAL", "always");
         }
     }
+
+    println!("libphosh build version: {}", build_version::version());
 
     let out_dir = std::env::var("OUT_DIR").unwrap();
 

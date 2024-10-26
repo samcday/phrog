@@ -13,20 +13,28 @@ impl Shell {
 }
 
 mod imp {
-    use std::cell::{Cell, OnceCell, RefCell};
-    use std::collections::HashSet;
+    use std::cell::{Cell, OnceCell};
     use crate::lockscreen::Lockscreen;
-    use gtk::glib::{GString, Properties, Type};
+    use gtk::glib::{Properties, Type};
     use gtk::prelude::StaticType;
     use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass};
     use gtk::{gdk, glib, CssProvider, StyleContext};
-    use gtk::gio::{IOExtensionPoint, Settings};
+    use gtk::gio::Settings;
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
-    use libphosh::ffi::PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET;
+
     use libphosh::prelude::ShellExt;
     use libphosh::subclass::shell::ShellImpl;
     use crate::APP_ID;
+
+    #[cfg(feature = "keypad-shuffle")]
+    use {
+        libphosh::ffi::PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET,
+        gtk::gio::IOExtensionPoint,
+        gtk::glib::GString,
+        std::cell::RefCell,
+        std::collections::HashSet,
+    };
 
     #[derive(Default, Properties)]
     #[properties(wrapper_type = super::Shell)]

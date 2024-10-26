@@ -1,11 +1,9 @@
-use std::future::Future;
 use crate::dbus::user::UserProxy;
 use futures_util::select;
 use gtk::gdk_pixbuf::Pixbuf;
 use gtk::gio::Cancellable;
 use gtk::glib::{clone, g_warning, spawn_future_local, Object};
 use gtk::prelude::FileExt;
-use gtk::subclass::prelude::ObjectSubclassIsExt;
 use gtk::{gio, glib};
 use zbus::export::futures_util::StreamExt;
 use zbus::zvariant::{ObjectPath, OwnedObjectPath};
@@ -126,7 +124,7 @@ mod imp {
                     let c = Cancellable::current();
                     match file.monitor(FileMonitorFlags::empty(), c.as_ref()) {
                         Ok(monitor) => user.set_icon_monitor(monitor.clone()),
-                        Err(err) => g_warning!("user", "error starting file monitor on {}", path),
+                        Err(err) => g_warning!("user", "error starting file monitor on {}: {}", path, err),
                     }
                 }
             });

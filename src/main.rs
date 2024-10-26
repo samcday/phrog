@@ -1,13 +1,16 @@
-use std::ffi::CString;
-use std::time::Duration;
 use clap::Parser;
 use gtk::glib::*;
 use gtk::Application;
-use gtk::prelude::{StyleContextExt, WidgetExt};
 use libphosh::prelude::*;
 use libphosh::WallClock;
 use nix::libc::{SIGTERM, SIGUSR1};
 use phrog::shell::Shell;
+
+#[cfg(feature = "static")]
+use {
+    std::ffi::CString,
+    gtk::prelude::{StyleContextExt, WidgetExt},
+};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -51,6 +54,7 @@ fn main() -> anyhow::Result<()> {
         gtk::main_quit();
     });
 
+    #[cfg(feature = "static")]
     let mut debug_mode = false;
     unix_signal_add(SIGUSR1, move || {
         // static only because libphosh isn't exporting phosh_log_set_log_domains (yet?)
