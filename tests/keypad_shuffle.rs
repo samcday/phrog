@@ -1,4 +1,3 @@
-#![cfg(feature="keypad-shuffle")]
 mod common;
 
 use gtk::glib;
