@@ -1,6 +1,5 @@
 use gtk::{glib, Widget};
-use std::time::{Duration, Instant, SystemTime};
-use gtk::glib::g_info;
+use std::time::{Duration, SystemTime};
 use gtk::prelude::*;
 use wayland_client::protocol::wl_pointer::ButtonState;
 use wayland_client::protocol::wl_registry;
@@ -17,11 +16,8 @@ struct State {
 
 pub struct VirtualPointer {
     ts: SystemTime,
-    state: State,
     event_queue: EventQueue<State>,
     ptr: ZwlrVirtualPointerV1,
-    width: u32,
-    height: u32,
     x: u32,
     y: u32,
 }
@@ -84,17 +80,14 @@ impl VirtualPointer {
         Self {
             ts,
             event_queue: conn.new_event_queue(),
-            state,
             ptr,
-            width,
-            height,
             x,
             y,
         }
     }
 
     pub async fn click_on(&mut self, widget: &impl IsA<Widget>) {
-        let (mut x, mut y) = widget.translate_coordinates(&widget.toplevel().unwrap(), 0, 0).unwrap();
+        let (mut x, y) = widget.translate_coordinates(&widget.toplevel().unwrap(), 0, 0).unwrap();
         x += widget.allocated_width() / 2;
         self.click_at(x as _, y as _).await;
     }

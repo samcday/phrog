@@ -1,4 +1,5 @@
 #![allow(non_snake_case)]
+#![allow(clippy::type_complexity)]
 pub mod accounts {
     //! # D-Bus interface proxy for: `org.freedesktop.Accounts`
     //!

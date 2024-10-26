@@ -5,5 +5,13 @@ FROM registry.gitlab.gnome.org/world/phosh/phosh/debian:v0.0.2024-05-08
 
 RUN export DEBIAN_FRONTEND=noninteractive \
    && apt-get -y update \
-   && apt-get -y install --no-install-recommends libk5crypto3 libkrb5-dev libgssapi-krb5-2 libgmobile-dev comerr-dev dh-cargo wf-recorder \
+   && apt-get -y install --no-install-recommends \
+    comerr-dev \
+    dh-cargo \
+    libgmobile-dev \
+    libgssapi-krb5-2 \
+    libk5crypto3 \
+    libkrb5-dev \
+    rust-clippy \
+    wf-recorder \
    && eatmydata apt-get clean

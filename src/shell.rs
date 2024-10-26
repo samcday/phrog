@@ -7,34 +7,31 @@ glib::wrapper! {
 }
 
 impl Shell {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Object::builder().build()
     }
 }
 
 mod imp {
-    use std::cell::{Cell, OnceCell};
+    use crate::keypad_shuffle::ShuffleKeypadQuickSetting;
     use crate::lockscreen::Lockscreen;
+    use crate::APP_ID;
+    use gtk::gio::IOExtensionPoint;
+    use gtk::gio::Settings;
+    use gtk::glib::GString;
     use gtk::glib::{Properties, Type};
     use gtk::prelude::StaticType;
-    use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass};
-    use gtk::{gdk, glib, CssProvider, StyleContext};
-    use gtk::gio::Settings;
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
-
+    use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass};
+    use gtk::{gdk, glib, CssProvider, StyleContext};
+    use libphosh::ffi::PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET;
     use libphosh::prelude::ShellExt;
     use libphosh::subclass::shell::ShellImpl;
-    use crate::APP_ID;
-
-    #[cfg(feature = "keypad-shuffle")]
-    use {
-        libphosh::ffi::PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET,
-        gtk::gio::IOExtensionPoint,
-        gtk::glib::GString,
-        std::cell::RefCell,
-        std::collections::HashSet,
-    };
+    use std::cell::RefCell;
+    use std::cell::{Cell, OnceCell};
+    use std::collections::HashSet;
 
     #[derive(Default, Properties)]
     #[properties(wrapper_type = super::Shell)]
@@ -42,9 +39,8 @@ mod imp {
         #[property(get, set)]
         fake_greetd: Cell<bool>,
 
-        #[cfg(feature = "keypad-shuffle")]
         #[property(get, set)]
-        keypad_shuffle_qs: RefCell<Option<crate::keypad_shuffle::ShuffleKeypadQuickSetting>>,
+        keypad_shuffle_qs: RefCell<Option<ShuffleKeypadQuickSetting>>,
 
         provider: Cell<CssProvider>,
 
@@ -56,23 +52,6 @@ mod imp {
         const NAME: &'static str = "PhrogShell";
         type Type = super::Shell;
         type ParentType = libphosh::Shell;
-    }
-
-    impl Shell {
-        #[cfg(feature = "keypad-shuffle")]
-        fn enable_keypad_shuffle(&self) {
-            IOExtensionPoint::implement(
-                std::str::from_utf8(PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET).unwrap(),
-                crate::keypad_shuffle::ShuffleKeypadQuickSetting::static_type(),
-                "keypad-shuffle",
-                10
-            ).expect("failed to implement plugin point");
-
-            let settings = Settings::new("sm.puri.phosh.plugins");
-            let mut qs: HashSet<GString> = HashSet::from_iter(settings.strv("quick-settings"));
-            qs.insert(GString::from("keypad-shuffle"));
-            settings.set_strv("quick-settings", qs.iter().collect::<Vec<&GString>>()).expect("failed to enable keypad-shuffle");
-        }
     }
 
     #[glib::derived_properties]
@@ -94,8 +73,17 @@ mod imp {
 
             self.provider.set(provider);
 
-            #[cfg(feature = "keypad-shuffle")]
-            self.enable_keypad_shuffle();
+            IOExtensionPoint::implement(
+                std::str::from_utf8(PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET).unwrap(),
+                ShuffleKeypadQuickSetting::static_type(),
+                "keypad-shuffle",
+                10,
+            ).expect("failed to implement plugin point");
+
+            let settings = Settings::new("sm.puri.phosh.plugins");
+            let mut qs: HashSet<GString> = HashSet::from_iter(settings.strv("quick-settings"));
+            qs.insert(GString::from("keypad-shuffle"));
+            settings.set_strv("quick-settings", qs.iter().collect::<Vec<&GString>>()).expect("failed to enable keypad-shuffle");
 
             self.obj().connect_ready(move |shell| {
                 let lockscreen = shell.lockscreen_manager().lockscreen()

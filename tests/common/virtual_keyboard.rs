@@ -10,7 +10,7 @@ use wayland_client::{delegate_noop, Connection, Dispatch, EventQueue, QueueHandl
 use wayland_protocols_misc::zwp_virtual_keyboard_v1::client::zwp_virtual_keyboard_manager_v1::ZwpVirtualKeyboardManagerV1;
 use wayland_protocols_misc::zwp_virtual_keyboard_v1::client::zwp_virtual_keyboard_v1::ZwpVirtualKeyboardV1;
 
-const KEYMAP_FILE: &'static str = "./phosh/tests/data/keymap.txt";
+const KEYMAP_FILE: &str = "./phosh/tests/data/keymap.txt";
 
 #[derive(Default)]
 struct State {
@@ -20,7 +20,6 @@ struct State {
 
 pub struct VirtualKeyboard {
     ts: SystemTime,
-    state: State,
     kb: ZwpVirtualKeyboardV1,
     event_queue: EventQueue<State>,
 }
@@ -76,7 +75,6 @@ impl VirtualKeyboard {
 
         Self {
             ts: SystemTime::now(),
-            state: Default::default(),
             event_queue,
             kb,
         }

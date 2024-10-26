@@ -5,7 +5,7 @@ pub mod virtual_pointer;
 use std::env::temp_dir;
 use std::os::unix::net::UnixListener;
 use std::path::PathBuf;
-use std::process::{Child, Stdio};
+use std::process::Stdio;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -15,11 +15,10 @@ use greetd_ipc::codec::SyncCodec;
 use gtk::{Button, Revealer};
 use gtk::glib::clone;
 use gtk::prelude::*;
-use libhandy::{Carousel, Deck};
+use libhandy::Carousel;
 use libphosh::Keypad;
 use phrog::lockscreen::Lockscreen;
 pub use virtual_pointer::VirtualPointer;
-use libhandy::prelude::*;
 use phrog::supervised_child::SupervisedChild;
 
 pub fn start_recording(name: &str) -> Option<SupervisedChild> {
@@ -95,6 +94,6 @@ pub fn get_lockscreen_bits(lockscreen: &mut Lockscreen) -> (Keypad, Button) {
     let keypad_revealer = keypad_page.children().get(2).unwrap().clone().downcast::<Revealer>().unwrap();
     let keypad = keypad_revealer.child().unwrap().downcast::<Keypad>().unwrap();
     let submit_box = keypad_page.children().get(3).unwrap().clone().downcast::<gtk::Box>().unwrap();
-    let submit_btn = submit_box.children().get(0).unwrap().clone().downcast::<Button>().unwrap();
+    let submit_btn = submit_box.children().first().unwrap().clone().downcast::<Button>().unwrap();
     (keypad, submit_btn)
 }

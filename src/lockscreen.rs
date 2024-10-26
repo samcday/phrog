@@ -190,8 +190,7 @@ mod imp {
             if self.greetd.borrow().is_none() {
                 self.greetd.set(Some(run_greetd()));
             }
-            let mut borrow = self.greetd.borrow_mut();
-            let (sender, receiver) = borrow.as_mut().unwrap();
+            let (sender, receiver) = self.greetd.clone().take().unwrap();
             sender
                 .send(req)
                 .await
