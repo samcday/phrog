@@ -65,7 +65,7 @@ fn main() -> anyhow::Result<()> {
                 g_warning!("🐸", "Ribbit ribbit!");
                 debug_mode = false;
                 let prev = CString::new(
-                    std::env::var("G_MESSAGES_DEBUG").unwrap_or(String::new())).unwrap();
+                    std::env::var("G_MESSAGES_DEBUG").unwrap_or_default()).unwrap();
                 unsafe { libphosh::ffi::phosh_log_set_log_domains(prev.as_ptr()); }
                 shell.top_panel().style_context().remove_class("debug");
             } else {

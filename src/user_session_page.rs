@@ -172,12 +172,12 @@ mod imp {
                 loop {
                     select! {
                         added = added_stream.next() => if let Some(added) = added {
-                            if let Some(path) = added.args().ok().and_then(|v| Some(v.user)) {
-                                users.append(&User::new(conn.clone(), path.into()));
+                            if let Some(path) = added.args().ok().map(|v| v.user) {
+                                users.append(&User::new(conn.clone(), path));
                             }
                         },
                         deleted = deleted_stream.next() => if let Some(deleted) = deleted {
-                            if let Some(path) = deleted.args().ok().and_then(|v| Some(v.user)) {
+                            if let Some(path) = deleted.args().ok().map(|v| v.user) {
                                 for (idx, user) in users.iter::<User>().flatten().enumerate() {
                                     if user.path() == path.as_str() {
                                         users.remove(idx as _);

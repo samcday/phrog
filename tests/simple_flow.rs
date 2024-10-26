@@ -7,14 +7,12 @@ use libphosh::prelude::WallClockExt;
 use libphosh::{LockscreenPage, WallClock};
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use greetd_ipc::codec::SyncCodec;
 use phrog::shell::Shell;
 use std::sync::Arc;
 use std::time::Duration;
 use gtk::gio::Settings;
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
-use gtk::traits::BinExt;
 use common::*;
 use wayland_client::Connection;
 use phrog::lockscreen::Lockscreen;

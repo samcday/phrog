@@ -1,5 +1,5 @@
 use std::path::{Path, PathBuf};
-use std::process::{Child, Stdio};
+use std::process::Stdio;
 use std::time::{Duration, Instant};
 use anyhow::Context;
 use zbus::zvariant::ObjectPath;

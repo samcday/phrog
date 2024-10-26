@@ -8,7 +8,6 @@ use libphosh::prelude::WallClockExt;
 use libphosh::WallClock;
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use greetd_ipc::codec::SyncCodec;
 use phrog::shell::Shell;
 use std::sync::Arc;
 use std::time::Duration;

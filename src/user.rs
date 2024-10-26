@@ -22,7 +22,7 @@ impl User {
         spawn_future_local(clone!(@weak obj => async move {
             let user_proxy = if let Ok(proxy) = UserProxy::builder(&conn)
                 .path(&path)
-                .expect(&format!("failed to construct UserProxy for {}", path))
+                .unwrap_or_else(|_| panic!("failed to construct UserProxy for {}", path))
                 .build()
                 .await
             {
