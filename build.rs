@@ -1,5 +1,4 @@
 use std::path::PathBuf;
-use std::process::Child;
 
 fn main() {
     glib_build_tools::compile_resources(
@@ -8,15 +7,14 @@ fn main() {
         "phrog.gresource",
     );
 
-    let schema_file = "mobi.phosh.phrog.gschema.xml";
-    let resources_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("resources");
     let schema_path = PathBuf::from(std::env::var("HOME").unwrap()).join(".local/share/glib-2.0/schemas");
     std::fs::create_dir_all(&schema_path).expect("failed to create schema dir");
 
-    std::fs::write(&schema_path.join(schema_file),
-                   std::fs::read(resources_dir.join(schema_file))
-                       .expect("failed to read schema file")
-    ).expect("failed to write schema file");
+    let phrog_gschema = PathBuf::from("resources/mobi.phosh.phrog.gschema.xml");
+    let dest_path = schema_path.join(phrog_gschema.file_name().unwrap());
+    std::fs::write(&dest_path, std::fs::read(phrog_gschema).expect("failed to read schema file"))
+        .expect("failed to write phrog schema file");
+    println!("cargo::rerun-if-changed={}", dest_path.display());
 
     std::process::Command::new("glib-compile-schemas")
         .arg(&schema_path)
