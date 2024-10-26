@@ -20,7 +20,7 @@ It is the spiritual successor of [phog][].
 
 The package has been [requested](https://gitlab.alpinelinux.org/alpine/aports/-/issues/16430) in Alpine, but has not yet landed in the Alpine package repositories.
 
-If you're using postmarketOS, you can install the latest build from the [in-flight merge request to aports](https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/71596):
+If you're using postmarketOS, you can install the latest build from the [in-flight merge request to aports](https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/74060):
 
 ```sh
 sudo apk add mrtest
