@@ -20,7 +20,6 @@ struct State {
 
 pub struct VirtualKeyboard {
     ts: SystemTime,
-    state: State,
     kb: ZwpVirtualKeyboardV1,
     event_queue: EventQueue<State>,
 }
@@ -76,7 +75,6 @@ impl VirtualKeyboard {
 
         Self {
             ts: SystemTime::now(),
-            state: Default::default(),
             event_queue,
             kb,
         }

@@ -16,11 +16,8 @@ struct State {
 
 pub struct VirtualPointer {
     ts: SystemTime,
-    state: State,
     event_queue: EventQueue<State>,
     ptr: ZwlrVirtualPointerV1,
-    width: u32,
-    height: u32,
     x: u32,
     y: u32,
 }
@@ -83,10 +80,7 @@ impl VirtualPointer {
         Self {
             ts,
             event_queue: conn.new_event_queue(),
-            state,
             ptr,
-            width,
-            height,
             x,
             y,
         }

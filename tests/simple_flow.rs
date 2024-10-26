@@ -1,4 +1,4 @@
-mod common;
+pub mod common;
 
 use gtk::glib;
 use gtk::glib::clone;
