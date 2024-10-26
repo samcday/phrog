@@ -1,23 +1,23 @@
-mod dbus;
-#[cfg(feature = "keypad-shuffle")]
 pub mod keypad_shuffle;
 pub mod lockscreen;
 pub mod nested_phoc;
-mod session_object;
-mod sessions;
 pub mod shell;
 pub mod supervised_child;
+
+mod dbus;
+mod session_object;
+mod sessions;
 mod user_session_page;
 mod user;
 
+use crate::nested_phoc::NestedPhoc;
 use anyhow::{anyhow, Context};
 use gtk::{gdk, gio};
 use wayland_client::protocol::wl_registry;
-use crate::nested_phoc::NestedPhoc;
 
 pub const APP_ID: &str = "mobi.phosh.phrog";
 
-struct DetectPhoc (bool);
+struct DetectPhoc(bool);
 
 impl wayland_client::Dispatch<wl_registry::WlRegistry, ()> for DetectPhoc {
     fn event(
@@ -72,7 +72,7 @@ pub fn init(phoc: Option<String>) -> anyhow::Result<Option<NestedPhoc>> {
         return Err(anyhow!("failed GDK init"));
     }
 
-    gtk::init().unwrap();
+    gtk::init()?;
     libhandy::init();
     Ok(nested_phoc)
 }
