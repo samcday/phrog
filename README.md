@@ -16,33 +16,23 @@ It is the spiritual successor of [phog][].
 
 ## Installation
 
-### Alpine/postmarketOS
+### Alpine/postmarketOS (edge)
 
-The package has been [requested](https://gitlab.alpinelinux.org/alpine/aports/-/issues/16430) in Alpine, but has not yet landed in the Alpine package repositories.
-
-If you're using postmarketOS, you can install the latest build from the [in-flight merge request to aports](https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/74060):
+`phrog` is available in the [Alpine edge testing package repository][alpine-pkg].
 
 ```sh
-sudo apk add mrtest
-mrtest add --alpine 71596
-```
-
-Otherwise, you must build the package yourself:
-
-```
-sudo apk add alpine-sdk
-abuild deps
-abuild -K
-sudo apk add ~/packages/dist/$(uname -m)/greetd-phrog-*.apk
+# If you haven't yet setup the testing repo on your device, see here:
+# https://wiki.alpinelinux.org/wiki/Repositories#Using_testing_repository
+apk add greetd-phrog@testing
 ```
 
 ### Debian
 
-Not yet available in official repositories, but [an MR is pending](https://salsa.debian.org/DebianOnMobile-team/phrog/-/merge_requests/1).
+Not yet available in official repositories, but [an MR is pending](debian-mr).
 
 ### Fedora
 
-Not yet available in official repositories, but [a COPR](https://copr.fedorainfracloud.org/coprs/samcday/phrog/) is maintained:
+Not yet available in official repositories, but [a COPR][copr] is maintained:
 
 ```
 sudo dnf copr enable samcday/phrog
@@ -102,3 +92,6 @@ cargo test --features=static
 [phog]: https://gitlab.com/mobian1/phog
 [Phosh]: https://gitlab.gnome.org/World/Phosh/phosh
 [greetd]: https://sr.ht/~kennylevinsen/greetd/
+[alpine-pkg]: https://pkgs.alpinelinux.org/packages?name=greetd-phrog&branch=edge&repo=&arch=&origin=&flagged=&maintainer=
+[copr]: https://copr.fedorainfracloud.org/coprs/samcday/phrog/
+[debian-mr]: https://salsa.debian.org/DebianOnMobile-team/phrog/-/merge_requests/1
