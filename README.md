@@ -7,7 +7,7 @@
 <br />
 
 A greeter that works on mobile devices and also other kinds of computers.
-
+ 
 🤓 `phrog` uses [Phosh][] to conduct a [greetd][] conversation.
 
 It is the spiritual successor of [phog][].
@@ -18,17 +18,15 @@ It is the spiritual successor of [phog][].
 
 ### Alpine/postmarketOS (edge)
 
-`phrog` is available in the [Alpine edge testing package repository][alpine-pkg].
+`phrog` is available in the [Alpine community package repository][alpine-pkg].
 
 ```sh
-# If you haven't yet setup the testing repo on your device, see here:
-# https://wiki.alpinelinux.org/wiki/Repositories#Using_testing_repository
-apk add greetd-phrog@testing
+apk add greetd-phrog
 ```
 
 ### Debian
 
-Not yet available in official repositories, but [an MR is pending](debian-mr).
+Not yet available in official repositories, but [an MR is pending][debian-mr].
 
 ### Fedora
 
