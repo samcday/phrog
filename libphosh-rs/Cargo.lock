@@ -427,7 +427,7 @@ dependencies = [
 
 [[package]]
 name = "libphosh"
-version = "0.0.3"
+version = "0.0.4"
 dependencies = [
  "gdk",
  "gio",
@@ -439,7 +439,7 @@ dependencies = [
 
 [[package]]
 name = "libphosh-sys"
-version = "0.0.3"
+version = "0.0.4"
 dependencies = [
  "gdk-pixbuf-sys",
  "gdk-sys",
@@ -450,7 +450,6 @@ dependencies = [
  "libc",
  "libhandy-sys",
  "pango-sys",
- "pkg-config",
  "shell-words",
  "system-deps",
  "tempfile",

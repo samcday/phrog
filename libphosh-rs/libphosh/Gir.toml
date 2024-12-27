@@ -23,7 +23,6 @@ external_libraries = [
 ]
 
 generate = [
-  "Phosh.Keypad",
   "Phosh.Lockscreen",
   "Phosh.LockscreenManager",
   "Phosh.LockscreenPage",
@@ -31,7 +30,6 @@ generate = [
   "Phosh.ScreenshotManager",
   "Phosh.StatusIcon",
   "Phosh.StatusPage",
-  "Phosh.TopPanel",
   "Phosh.WallClock",
 ]
 
@@ -44,7 +42,6 @@ manual = [
   "Gtk.Bin",
   "Gtk.Button",
   "Gtk.Container",
-  "Gtk.Grid",
   "Gtk.Widget",
   "Gtk.Window",
 ]
@@ -147,6 +144,7 @@ ignore = [
     "Phosh.IdleDBusObjectSkeleton",
     "Phosh.IdleManager",
     "Phosh.KeyboardEvents",
+    "Phosh.Keypad",
     "Phosh.LauncherEntryManager",
     "Phosh.LayoutManager",
     "Phosh.LocationInfo",
@@ -230,6 +228,7 @@ ignore = [
     "Phosh.SystemPrompt",
     "Phosh.Thumbnail",
     "Phosh.TimestampLabel",
+    "Phosh.TopPanel",
     "Phosh.Toplevel",
     "Phosh.ToplevelManager",
     "Phosh.ToplevelThumbnail",

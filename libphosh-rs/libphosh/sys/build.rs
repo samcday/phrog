@@ -11,7 +11,7 @@ fn main() {} // prevent linking libraries to avoid documentation failure
 fn main() {
     if let Ok(val) = std::env::var("CARGO_FEATURE_STATIC") {
         if val == "1" {
-            std::env::set_var("SYSTEM_DEPS_LIBPHOSH_0_42_BUILD_INTERNAL", "always");
+            std::env::set_var("SYSTEM_DEPS_LIBPHOSH_0_43_BUILD_INTERNAL", "always");
         }
     }
 
@@ -20,7 +20,7 @@ fn main() {
     let out_dir = std::env::var("OUT_DIR").unwrap();
 
     if let Err(s) = system_deps::Config::new()
-        .add_build_internal("libphosh-0.42", move |name, version| {
+        .add_build_internal("libphosh-0.43", move |name, version| {
             // We're going to build and statically link phosh.
             println!("cargo:rustc-link-lib=static={}", format!("phosh-{}", version));
 
