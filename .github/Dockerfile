@@ -1,17 +1,19 @@
 # This image is used as the build environment in Github Actions.
-# It's based on Phosh's CI image because we do a full (static) build of Phosh during the main CI run
 
-FROM registry.gitlab.gnome.org/world/phosh/phosh/debian:v0.0.2024-05-08
+FROM registry.gitlab.gnome.org/world/phosh/phosh/debian:v0.0.2024-11-04
+
+ARG PHOSH_TAG=v0.43.1
 
 RUN export DEBIAN_FRONTEND=noninteractive \
    && apt-get -y update \
    && apt-get -y install --no-install-recommends \
-    comerr-dev \
     dh-cargo \
-    libgmobile-dev \
-    libgssapi-krb5-2 \
-    libk5crypto3 \
-    libkrb5-dev \
     rust-clippy \
     wf-recorder \
+   && eatmydata git clone -b ${PHOSH_TAG} https://gitlab.gnome.org/World/Phosh/phosh.git \
+   && cd phosh \
+   && eatmydata apt-get -y build-dep . \
+   && eatmydata meson setup --prefix=/usr -Dbindings-lib=true _build . \
+   && eatmydata meson compile -C _build \
+   && eatmydata meson install -C _build \
    && eatmydata apt-get clean
