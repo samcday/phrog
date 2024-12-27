@@ -30,12 +30,6 @@ jobs:
           arch: ${{ matrix.arch }}
           branch: edge
           packages: alpine-sdk
-      # building and statically linking libphosh on qemu-user-emulated platforms is excruciatingly
-      # slow. Having one platform be statically linked to test that path is enough.
-      - name: disable statically linked libphosh
-        if: ${{ matrix.arch != 'x86_64' }}
-        run: |
-          sed -i -e 's/_static=1/_static=/' APKBUILD
       - name: setup
         env:
           RSA_PRIV: ${{ secrets.RSA_PRIVATE_KEY }}

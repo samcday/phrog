@@ -12,11 +12,10 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use greetd_ipc::{Request, Response};
 use greetd_ipc::AuthMessageType::Secret;
 use greetd_ipc::codec::SyncCodec;
-use gtk::{Button, Revealer};
+use gtk::{Button, Grid, Revealer};
 use gtk::glib::clone;
 use gtk::prelude::*;
 use libhandy::Carousel;
-use libphosh::Keypad;
 use phrog::lockscreen::Lockscreen;
 pub use virtual_pointer::VirtualPointer;
 use phrog::supervised_child::SupervisedChild;
@@ -83,7 +82,7 @@ pub fn fake_greetd(logged_in: &Arc<AtomicBool>) {
         }));
 }
 
-pub fn get_lockscreen_bits(lockscreen: &mut Lockscreen) -> (Keypad, Button) {
+pub fn get_lockscreen_bits(lockscreen: &mut Lockscreen) -> (Grid, Button) {
     // Here we do some yucky traversal of the UI structure in phosh/src/ui/lockscreen.ui in the
     // name of "art". We drill through to find the keypad, and then pick out the individual
     // digits + submit button to drive the UI interactions entirely via mouse.
@@ -92,7 +91,7 @@ pub fn get_lockscreen_bits(lockscreen: &mut Lockscreen) -> (Keypad, Button) {
 
     let keypad_page = carousel.children().get(2).unwrap().clone().downcast::<gtk::Box>().unwrap();
     let keypad_revealer = keypad_page.children().get(2).unwrap().clone().downcast::<Revealer>().unwrap();
-    let keypad = keypad_revealer.child().unwrap().downcast::<Keypad>().unwrap();
+    let keypad = keypad_revealer.child().unwrap().downcast::<Grid>().unwrap();
     let submit_box = keypad_page.children().get(3).unwrap().clone().downcast::<gtk::Box>().unwrap();
     let submit_btn = submit_box.children().first().unwrap().clone().downcast::<Button>().unwrap();
     (keypad, submit_btn)

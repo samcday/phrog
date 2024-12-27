@@ -1,5 +1,4 @@
 # Maintainer: Sam Day <me@samcday.com>
-_static=1
 pkgname=greetd-phrog
 pkgver=0.42.0_git
 _commit=main
@@ -19,41 +18,8 @@ depends="
 	libphosh"
 makedepends="
 	cargo
-	cargo-auditable"
-if [ -n "$_static" ]; then
-# keep in sync with phosh
-makedepends="$makedepends
-	callaudiod-dev
-	elogind-dev
-	evince-dev
-	evolution-data-server-dev
-	feedbackd-dev
-	gcr-dev
-	gettext-dev
-	glib-dev
-	gmobile-dev
-	gnome-bluetooth-dev
-	gnome-desktop-dev
-	gtk+3.0-dev
-	libadwaita-dev
-	libgudev-dev
-	libhandy1-dev
-	libsecret-dev
-	libunistring-dev
-	linux-pam-dev
-	meson
-	modemmanager-dev
-	networkmanager-dev
-	polkit-elogind-dev
-	pulseaudio-dev
-	py3-docutils
-	upower-dev
-	wayland-dev
-	wayland-protocols"
-else
-makedepends="$makedepends
+	cargo-auditable
 	libphosh-dev"
-fi
 checkdepends="xvfb-run"
 
 source="${url}/archive/$_commit/phrog-$_commit.tar.gz"
@@ -68,9 +34,7 @@ prepare() {
 }
 
 build() {
-    features=""
-    [ -n "$_static" ] && features="$features --features=static"
-	cargo auditable build $features --release --frozen
+	cargo auditable build --release --frozen
 }
 
 package() {
@@ -79,10 +43,8 @@ package() {
 }
 
 check() {
-    features=""
-    [ -n "$_static" ] && features="$features --features=static"
     export XDG_RUNTIME_DIR=/tmp
-	dbus-run-session xvfb-run -a phoc -E "cargo test $features --release --frozen"
+	dbus-run-session xvfb-run -a phoc -E "cargo test --release --frozen"
 }
 
 schemas() {

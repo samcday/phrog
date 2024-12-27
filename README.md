@@ -73,20 +73,6 @@ cargo run -- --fake
 cargo test
 ```
 
-You can also run with a statically linked libphosh from the vendored `./phosh/` subtree. This is useful if you want to work on a feature that also requires changes to upstream libphosh.
-
-```sh
-# Install the (many) Phosh build dependencies:
-# Fedora: sudo dnf4 build-dep --define 'with_static 1' ./phrog.spec
-# Debian (trixie): sudo apt-get build-dep -y ./phosh/
-# Alpine: abuild deps
-
-# Then it's mostly the same as before.
-# More features may be visible and more tests may run, since the local tree pulls ahead of upstream.
-cargo run --features=static -- --fake
-cargo test --features=static
-```
-
 [phog]: https://gitlab.com/mobian1/phog
 [Phosh]: https://gitlab.gnome.org/World/Phosh/phosh
 [greetd]: https://sr.ht/~kennylevinsen/greetd/

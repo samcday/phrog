@@ -26,7 +26,6 @@ mod imp {
     use gtk::subclass::prelude::*;
     use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass};
     use gtk::{gdk, glib, CssProvider, StyleContext};
-    use libphosh::ffi::PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET;
     use libphosh::prelude::ShellExt;
     use libphosh::subclass::shell::ShellImpl;
     use std::cell::RefCell;
@@ -74,7 +73,8 @@ mod imp {
             self.provider.set(provider);
 
             IOExtensionPoint::implement(
-                std::str::from_utf8(PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET).unwrap(),
+                // TODO: export this constant from the bindings and use it here
+                "phosh-quick-setting-widget",
                 ShuffleKeypadQuickSetting::static_type(),
                 "keypad-shuffle",
                 10,

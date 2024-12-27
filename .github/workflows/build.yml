@@ -49,10 +49,10 @@ jobs:
       - name: Build
         run: |
           set -uexo pipefail
-          cargo build --features=static --all-targets --verbose
+          cargo build --all-targets --verbose
       - name: Lint
         run: |
-          cargo clippy --features=static --all-targets --verbose
+          cargo clippy --all-targets --verbose
       - uses: actions/upload-artifact@v4
         with:
           name: x86-64-debug
@@ -63,14 +63,7 @@ jobs:
 
           export XDG_RUNTIME_DIR=/tmp
 
-          # The build doesn't have anything installed, so fake a Phosh session
-          mkdir /usr/share/wayland-sessions
-          cp ./phosh/data/wayland-sessions/phosh.desktop /usr/share/wayland-sessions
-          touch /usr/bin/phosh-session
-          chmod +x /usr/bin/phosh-session
-
           # run tests
-          mkdir -p test-recordings/
           export RECORD_TESTS=`pwd`/demo-video/recordings/
           export G_MESSAGES_DEBUG=all
           cat > phoc.ini <<HERE
@@ -78,7 +71,7 @@ jobs:
           mode = 720x1440
           scale = 2
           HERE
-          dbus-run-session xvfb-run -a -s -noreset phoc -C phoc.ini -S -E "cargo test --features=static --verbose -- --test-threads=1 --nocapture"
+          dbus-run-session xvfb-run -a -s -noreset phoc -C phoc.ini -S -E "cargo test --verbose -- --test-threads=1 --nocapture"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
