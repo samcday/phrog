@@ -1,9 +1,9 @@
 %global cargo_install_lib 0
-%global phosh_ver 0.42
+%global phosh_ver 0.43
 %bcond static 0
 
 Name:           phrog
-Version:        0.42.0
+Version:        0.43.0
 Release:        %autorelease
 Summary:        Greetd-compatible greeter for mobile phones
 License:        GPL-3.0-only

@@ -9,12 +9,22 @@ mod imp {
     use gtk::gio::Settings;
     use gtk::glib::clone;
     use gtk::glib::subclass::InitializingObject;
-    use gtk::prelude::*;
-    use gtk::subclass::prelude::*;
     use gtk::{glib, CompositeTemplate};
+    use gtk::subclass::bin::BinImpl;
+    use gtk::subclass::button::ButtonImpl;
+    use gtk::subclass::container::ContainerImpl;
+    use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass, TemplateChild, WidgetImpl};
     use libphosh::prelude::{QuickSettingExt, StatusIconExt};
     use libphosh::subclass::quick_setting::QuickSettingImpl;
     use crate::shell::Shell;
+    use gtk::subclass::widget::WidgetClassSubclassExt;
+    use gtk::subclass::prelude::ObjectSubclassExt;
+    use gtk::subclass::widget::CompositeTemplate;
+    use gtk::prelude::InitializingWidgetExt;
+    use gtk::subclass::prelude::ObjectImplExt;
+    use gtk::prelude::SettingsExt;
+    use gtk::prelude::SettingsExtManual;
+    use gtk::prelude::Cast;
 
     #[derive(CompositeTemplate, Default)]
     #[template(resource = "/mobi/phosh/phrog/shuffle-keypad-quick-setting.ui")]
