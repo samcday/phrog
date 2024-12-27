@@ -17,7 +17,7 @@ fn main() {
         let screenshot_manager = s.screenshot_manager();
 
         let take_screenshot = glib::clone!(@weak screenshot_manager as sm => move || {
-            sm.do_screenshot(None, Some("hello-world"), false);
+            sm.take_screenshot(None, Some("hello-world"), false, false);
         });
 
         glib::timeout_add_seconds_local_once(2, take_screenshot);

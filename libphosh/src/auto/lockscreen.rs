@@ -59,6 +59,10 @@ pub struct LockscreenBuilder {
                         //    Self { builder: self.builder.property("calls-manager", calls_manager), }
                         //}
 
+                            pub fn require_unlock(self, require_unlock: bool) -> Self {
+                            Self { builder: self.builder.property("require-unlock", require_unlock), }
+                        }
+
                             #[cfg(feature = "gtk_v2_4")]
     #[cfg_attr(docsrs, doc(cfg(feature = "gtk_v2_4")))]
     pub fn accept_focus(self, accept_focus: bool) -> Self {
@@ -479,6 +483,16 @@ pub trait LockscreenExt: IsA<Lockscreen> + sealed::Sealed + 'static {
     //    ObjectExt::property(self.as_ref(), "calls-manager")
     //}
 
+    #[doc(alias = "require-unlock")]
+    fn requires_unlock(&self) -> bool {
+        ObjectExt::property(self.as_ref(), "require-unlock")
+    }
+
+    #[doc(alias = "require-unlock")]
+    fn set_require_unlock(&self, require_unlock: bool) {
+        ObjectExt::set_property(self.as_ref(),"require-unlock", require_unlock)
+    }
+
     #[doc(alias = "lockscreen-unlock")]
     fn connect_lockscreen_unlock<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn lockscreen_unlock_trampoline<P: IsA<Lockscreen>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshLockscreen, f: glib::ffi::gpointer) {
@@ -515,6 +529,19 @@ pub trait LockscreenExt: IsA<Lockscreen> + sealed::Sealed + 'static {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"notify::page\0".as_ptr() as *const _,
                 Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_page_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+        }
+    }
+
+    #[doc(alias = "require-unlock")]
+    fn connect_require_unlock_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_require_unlock_trampoline<P: IsA<Lockscreen>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshLockscreen, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+            let f: &F = &*(f as *const F);
+            f(Lockscreen::from_glib_borrow(this).unsafe_cast_ref())
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"notify::require-unlock\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_require_unlock_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 }

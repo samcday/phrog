@@ -66,6 +66,14 @@ pub struct QuickSettingBuilder {
                             Self { builder: self.builder.property("can-show-status", can_show_status), }
                         }
 
+                            pub fn long_press_action_name(self, long_press_action_name: impl Into<glib::GString>) -> Self {
+                            Self { builder: self.builder.property("long-press-action-name", long_press_action_name.into()), }
+                        }
+
+                            pub fn long_press_action_target(self, long_press_action_target: impl Into<glib::GString>) -> Self {
+                            Self { builder: self.builder.property("long-press-action-target", long_press_action_target.into()), }
+                        }
+
                             pub fn showing_status(self, showing_status: bool) -> Self {
                             Self { builder: self.builder.property("showing-status", showing_status), }
                         }
@@ -302,6 +310,22 @@ pub trait QuickSettingExt: IsA<QuickSetting> + sealed::Sealed + 'static {
         }
     }
 
+    #[doc(alias = "phosh_quick_setting_get_long_press_action_name")]
+    #[doc(alias = "get_long_press_action_name")]
+    fn long_press_action_name(&self) -> glib::GString {
+        unsafe {
+            from_glib_none(ffi::phosh_quick_setting_get_long_press_action_name(self.as_ref().to_glib_none().0))
+        }
+    }
+
+    #[doc(alias = "phosh_quick_setting_get_long_press_action_target")]
+    #[doc(alias = "get_long_press_action_target")]
+    fn long_press_action_target(&self) -> glib::GString {
+        unsafe {
+            from_glib_none(ffi::phosh_quick_setting_get_long_press_action_target(self.as_ref().to_glib_none().0))
+        }
+    }
+
     #[doc(alias = "phosh_quick_setting_get_showing_status")]
     #[doc(alias = "get_showing_status")]
     fn is_showing_status(&self) -> bool {
@@ -329,6 +353,20 @@ pub trait QuickSettingExt: IsA<QuickSetting> + sealed::Sealed + 'static {
     fn set_can_show_status(&self, can_show_status: bool) {
         unsafe {
             ffi::phosh_quick_setting_set_can_show_status(self.as_ref().to_glib_none().0, can_show_status.into_glib());
+        }
+    }
+
+    #[doc(alias = "phosh_quick_setting_set_long_press_action_name")]
+    fn set_long_press_action_name(&self, action_name: &str) {
+        unsafe {
+            ffi::phosh_quick_setting_set_long_press_action_name(self.as_ref().to_glib_none().0, action_name.to_glib_none().0);
+        }
+    }
+
+    #[doc(alias = "phosh_quick_setting_set_long_press_action_target")]
+    fn set_long_press_action_target(&self, action_target: &str) {
+        unsafe {
+            ffi::phosh_quick_setting_set_long_press_action_target(self.as_ref().to_glib_none().0, action_target.to_glib_none().0);
         }
     }
 
@@ -421,6 +459,32 @@ pub trait QuickSettingExt: IsA<QuickSetting> + sealed::Sealed + 'static {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, b"notify::can-show-status\0".as_ptr() as *const _,
                 Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_can_show_status_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+        }
+    }
+
+    #[doc(alias = "long-press-action-name")]
+    fn connect_long_press_action_name_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_long_press_action_name_trampoline<P: IsA<QuickSetting>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshQuickSetting, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+            let f: &F = &*(f as *const F);
+            f(QuickSetting::from_glib_borrow(this).unsafe_cast_ref())
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"notify::long-press-action-name\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_long_press_action_name_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+        }
+    }
+
+    #[doc(alias = "long-press-action-target")]
+    fn connect_long_press_action_target_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_long_press_action_target_trampoline<P: IsA<QuickSetting>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshQuickSetting, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+            let f: &F = &*(f as *const F);
+            f(QuickSetting::from_glib_borrow(this).unsafe_cast_ref())
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"notify::long-press-action-target\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(notify_long_press_action_target_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 

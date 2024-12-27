@@ -14,7 +14,6 @@ external_libraries = [
    "Pango",
    "Handy",
 ]
-split_build_rs = true
 
 ignore = [
     "Phosh.Ambient",
@@ -82,6 +81,7 @@ ignore = [
     "Phosh.DBusSessionManagerSkeleton",
     "Phosh.DockedInfo",
     "Phosh.DockedManager",
+    "Phosh.DragSurface",
     "Phosh.EmergencyCallsManager",
     "Phosh.EmergencyCallsProxy",
     "Phosh.EmergencyCallsSkeleton",
@@ -113,6 +113,7 @@ ignore = [
     "Phosh.IdleDBusObjectSkeleton",
     "Phosh.IdleManager",
     "Phosh.KeyboardEvents",
+    "Phosh.Keypad",
     "Phosh.LauncherEntryManager",
     "Phosh.LayoutManager",
     "Phosh.LocationInfo",
@@ -195,6 +196,7 @@ ignore = [
     "Phosh.SystemPrompt",
     "Phosh.Thumbnail",
     "Phosh.TimestampLabel",
+    "Phosh.TopPanel",
     "Phosh.Toplevel",
     "Phosh.ToplevelManager",
     "Phosh.ToplevelThumbnail",
@@ -217,6 +219,7 @@ ignore = [
     "Phosh.ThumbnailClass",
     "Phosh.ManagerClass",
     "Phosh.NotificationClass",
+    "Phosh.DragSurfaceClass",
     # So we don't need to pull in gvc-mixer-control
     "Phosh.AudioDevicesClass",
     # This lack proper alignment as e.g. parents are missing	
@@ -230,6 +233,7 @@ ignore = [
     "Phosh.ModeManagerClass",
     "Phosh.MountNotificationClass",
     "Phosh.SuspendManagerClass",
+    "Phosh.TopPanelClass",
     "Phosh.ToplevelThumbnailClass",
     "Phosh.TorchManagerClass",
     # Ingore as we don't want to bother with libgnome-desktop

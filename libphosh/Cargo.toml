@@ -1,6 +1,6 @@
 [package]
 name = "libphosh"
-version = "0.0.3"
+version = "0.0.4"
 authors = ["Guido Günther <agx@sigxcpu.org>"]
 edition = "2021"
 readme = "../README.md"
@@ -28,7 +28,6 @@ gtk_v3_8 = ["gtk_v3_4"]
 gtk_v3_12 = ["gtk_v3_8"]
 gtk_v3_14 = ["gtk_v3_12"]
 gtk_v3_20 = ["gtk_v3_14"]
-static = ["ffi/static"]
 v3_12 = []
 v3_14 = []
 
@@ -58,4 +57,4 @@ features = ["v3_24"]
 [dependencies.ffi]
 package = "libphosh-sys"
 path = './sys'
-version = "0.0.3"
+version = "0.0.4"

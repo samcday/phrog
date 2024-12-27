@@ -16,5 +16,3 @@ mod auto;
 pub mod subclass;
 
 pub mod prelude;
-
-pub use ffi;

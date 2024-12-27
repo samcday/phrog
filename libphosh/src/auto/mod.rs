@@ -3,9 +3,6 @@
 // from ../gir-files
 // DO NOT EDIT
 
-mod keypad;
-pub use self::keypad::Keypad;
-
 mod lockscreen;
 pub use self::lockscreen::Lockscreen;
 
@@ -27,9 +24,6 @@ pub use self::status_icon::StatusIcon;
 mod status_page;
 pub use self::status_page::StatusPage;
 
-mod top_panel;
-pub use self::top_panel::TopPanel;
-
 mod wall_clock;
 pub use self::wall_clock::WallClock;
 
@@ -45,12 +39,10 @@ pub(crate) mod traits {
     pub use super::wall_clock::WallClockExt;
 }
 pub(crate) mod builders {
-    pub use super::keypad::KeypadBuilder;
     pub use super::lockscreen::LockscreenBuilder;
     pub use super::lockscreen_manager::LockscreenManagerBuilder;
     pub use super::quick_setting::QuickSettingBuilder;
     pub use super::shell::ShellBuilder;
     pub use super::status_icon::StatusIconBuilder;
     pub use super::status_page::StatusPageBuilder;
-    pub use super::top_panel::TopPanelBuilder;
 }

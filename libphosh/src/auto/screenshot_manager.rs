@@ -23,10 +23,10 @@ impl ScreenshotManager {
         }
     }
 
-    #[doc(alias = "phosh_screenshot_manager_do_screenshot")]
-    pub fn do_screenshot(&self, area: Option<&gdk::Rectangle>, filename: Option<&str>, include_cursor: bool) -> bool {
+    #[doc(alias = "phosh_screenshot_manager_take_screenshot")]
+    pub fn take_screenshot(&self, area: Option<&gdk::Rectangle>, filename: Option<&str>, copy_to_clipboard: bool, include_cursor: bool) -> bool {
         unsafe {
-            from_glib(ffi::phosh_screenshot_manager_do_screenshot(self.to_glib_none().0, area.to_glib_none().0, filename.to_glib_none().0, include_cursor.into_glib()))
+            from_glib(ffi::phosh_screenshot_manager_take_screenshot(self.to_glib_none().0, area.to_glib_none().0, filename.to_glib_none().0, copy_to_clipboard.into_glib(), include_cursor.into_glib()))
         }
     }
 }
