@@ -7,7 +7,7 @@
 <br />
 
 A greeter that works on mobile devices and also other kinds of computers.
-
+ 
 🤓 `phrog` uses [Phosh][] to conduct a [greetd][] conversation.
 
 It is the spiritual successor of [phog][].
@@ -18,17 +18,15 @@ It is the spiritual successor of [phog][].
 
 ### Alpine/postmarketOS (edge)
 
-`phrog` is available in the [Alpine edge testing package repository][alpine-pkg].
+`phrog` is available in the [Alpine community package repository][alpine-pkg].
 
 ```sh
-# If you haven't yet setup the testing repo on your device, see here:
-# https://wiki.alpinelinux.org/wiki/Repositories#Using_testing_repository
-apk add greetd-phrog@testing
+apk add greetd-phrog
 ```
 
 ### Debian
 
-Not yet available in official repositories, but [an MR is pending](debian-mr).
+Not yet available in official repositories, but [an MR is pending][debian-mr].
 
 ### Fedora
 
@@ -73,20 +71,6 @@ cargo run -- --fake
 
 # Run 🐸 tests
 cargo test
-```
-
-You can also run with a statically linked libphosh from the vendored `./phosh/` subtree. This is useful if you want to work on a feature that also requires changes to upstream libphosh.
-
-```sh
-# Install the (many) Phosh build dependencies:
-# Fedora: sudo dnf4 build-dep --define 'with_static 1' ./phrog.spec
-# Debian (trixie): sudo apt-get build-dep -y ./phosh/
-# Alpine: abuild deps
-
-# Then it's mostly the same as before.
-# More features may be visible and more tests may run, since the local tree pulls ahead of upstream.
-cargo run --features=static -- --fake
-cargo test --features=static
 ```
 
 [phog]: https://gitlab.com/mobian1/phog
