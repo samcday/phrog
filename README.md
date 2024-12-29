@@ -30,7 +30,7 @@ Not yet available in official repositories, but [an MR is pending][debian-mr].
 
 ### Fedora
 
-Not yet available in official repositories, but [a COPR][copr] is maintained:
+Not yet available in official repositories, but [a COPR][copr] is maintained (**for Fedora 41 and higher**):
 
 ```
 sudo dnf copr enable samcday/phrog
