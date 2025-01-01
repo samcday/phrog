@@ -20,8 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # Always build x64 in main + PRs, but only other architectures for tagged releases
-        arch: ${{ startsWith(github.ref, 'refs/tags/') && fromJSON('["x86_64", "aarch64"]') || fromJSON('["x86_64"]') }}
+        # aarch64 build is slooow - skip it in PR builds
+        arch: ${{ (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main') && fromJSON('["x86_64", "aarch64"]') || fromJSON('["x86_64"]') }}
     steps:
       - uses: actions/checkout@v4
       - uses: jirutka/setup-alpine@v1
