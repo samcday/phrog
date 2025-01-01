@@ -9,7 +9,9 @@ jobs:
   # Build PRs
   - job: copr_build
     trigger: pull_request
-    additional_repos: [copr://samcday/phrog-nightly]
+    additional_repos:
+      - copr://samcday/phosh-nightly
+      - copr://samcday/phrog-nightly
     targets:
       - fedora-41-aarch64
       - fedora-41-x86_64
