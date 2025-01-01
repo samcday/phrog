@@ -24,6 +24,8 @@ jobs:
     branch: main
     owner: samcday
     project: phrog-nightly
+    additional_repos:
+      - copr://samcday/phosh-nightly
 
   # Build tagged releases in samcday/phrog COPR
   - job: copr_build
