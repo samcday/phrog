@@ -39,6 +39,16 @@ jobs:
           echo "$RSA_PRIV" > ~/.abuild/key.rsa
           echo "$RSA_PUB" > ~/.abuild/key.rsa.pub
           cp ~/.abuild/key.rsa.pub /etc/apk/keys/key.rsa.pub
+
+          # Temporarily pull latest Phosh packages from fossdd's MR.
+          if [[ "${{ matrix.arch }}" == "x86_64" ]]; then
+            wget -O phosh.zip https://gitlab.alpinelinux.org/fossdd/aports/-/jobs/1670639/artifacts/download
+          else
+            wget -O phosh.zip https://gitlab.alpinelinux.org/fossdd/aports/-/jobs/1670631/artifacts/download
+          fi
+          unzip phosh.zip
+          apk add --allow-untrusted packages/community/${{ matrix.arch }}/*.apk
+
           abuild -F deps
         shell: alpine.sh --root {0}
       - name: build package
