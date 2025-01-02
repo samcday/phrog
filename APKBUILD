@@ -42,10 +42,11 @@ package() {
 	install -Dm755 target/release/phrog -t "$pkgdir"/usr/bin/
 }
 
-check() {
-    export XDG_RUNTIME_DIR=/tmp
-	dbus-run-session xvfb-run -a phoc -E "cargo test --release --frozen"
-}
+# Tests are currently broken without a patched phoc due to https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1161
+# check() {
+#     export XDG_RUNTIME_DIR=/tmp
+# 	dbus-run-session xvfb-run -a phoc -E "cargo test --release --frozen"
+# }
 
 schemas() {
     pkgdesc="Phrog schema files"
