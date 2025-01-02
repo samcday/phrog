@@ -27,7 +27,7 @@ fn main() -> anyhow::Result<()> {
 
     let _nested_phoc = phrog::init(if args.phoc {
         Some(String::from("phoc"))
-    } else { None });
+    } else { None })?;
 
     let _app = Application::builder().application_id(phrog::APP_ID).build();
 

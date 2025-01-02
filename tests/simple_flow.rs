@@ -20,7 +20,7 @@ use phrog::lockscreen::Lockscreen;
 #[test]
 fn test_simple_flow() {
     let tmp = tempfile::tempdir().unwrap();
-    let _nested_phoc = phrog::init(Some("phoc".into()));
+    let _nested_phoc = phrog::init(Some("phoc".into())).unwrap();
     let _system_dbus = dbus::system_dbus(tmp.path());
 
     let settings = Settings::new("sm.puri.phosh.lockscreen");
