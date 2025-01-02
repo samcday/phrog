@@ -16,42 +16,22 @@ It is the spiritual successor of [phog][].
 
 ## Installation
 
-### Alpine/postmarketOS (edge)
-
-`phrog` is available in the [Alpine community package repository][alpine-pkg].
-
-```sh
-apk add greetd-phrog
-```
-
-### Debian
-
-Not yet available in official repositories, but [an MR is pending][debian-mr].
-
-### Fedora
-
-Not yet available in official repositories, but [a COPR][copr] is maintained (**for Fedora 41 and higher**):
-
-```
-sudo dnf copr enable samcday/phrog
-sudo dnf install phrog
-```
-
-### Other
-
-You must build from source, see the Development section below.
+* Alpine (v3.21+): `apk add greetd-phrog`
+* Fedora ([COPR][]): `sudo dnf copr enable samcday/phrog && sudo dnf install phrog`
+* Other: you must build from source, see the Development section below.
 
 ## Running
 
-`phrog` is primarily intended to run via [greetd][] - your `/etc/greetd/config.toml` should
-look like this:
+`phrog` is a [greetd][] "greeter". To use it, make sure your `/etc/greetd/config.toml` looks like this:
 
 ```
 [default_session]
 command = "systemd-cat --identifier=phrog phrog"
 ```
 
-You can also run/test it directly with a faked session, run this from a terminal in your favourite (Wayland) desktop environment:
+Then run greetd however your distro prefers you to.
+
+You can also test it outside greetd, nested in your favourite Wayland desktop environment:
 
 ```
 phrog --fake
@@ -59,23 +39,22 @@ phrog --fake
 
 ## Development
 
-If your system has `libphosh` packaged and available:
+`libphosh` is required to build this project.
+
+* Alpine (v3.21+): `sudo apk add libphosh`
+* Fedora: `sudo dnf install libphosh-devel`
+* Debian: `sudo apt install libphosh-0.44-dev`
+
+If `libphosh` is not packaged for your distro, you need to build Phosh+libphosh manually. See the [Phosh][] README for more info.
+
+Once `libphosh` is installed, building and running 🐸 should be as simple as:
 
 ```sh
-# Install libphosh:
-# Fedora: sudo dnf install -y libphosh-devel
-# Alpine (edge): sudo apk add libphosh
-
-# Run 🐸 from source
 cargo run -- --fake
-
-# Run 🐸 tests
 cargo test
 ```
 
 [phog]: https://gitlab.com/mobian1/phog
 [Phosh]: https://gitlab.gnome.org/World/Phosh/phosh
 [greetd]: https://sr.ht/~kennylevinsen/greetd/
-[alpine-pkg]: https://pkgs.alpinelinux.org/packages?name=greetd-phrog&branch=edge&repo=&arch=&origin=&flagged=&maintainer=
-[copr]: https://copr.fedorainfracloud.org/coprs/samcday/phrog/
-[debian-mr]: https://salsa.debian.org/DebianOnMobile-team/phrog/-/merge_requests/1
+[COPR]: https://copr.fedorainfracloud.org/coprs/samcday/phrog/
