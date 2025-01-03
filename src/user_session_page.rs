@@ -1,9 +1,9 @@
 use crate::session_object::SessionObject;
-use gtk::{glib, ListBoxRow};
 use gtk::glib::{Cast, CastNone, Object};
 use gtk::prelude::*;
 use gtk::subclass::prelude::ObjectSubclassIsExt;
 use gtk::traits::ListBoxExt;
+use gtk::{glib, ListBoxRow};
 use libhandy::prelude::ActionRowExt;
 use libhandy::traits::ComboRowExt;
 use libhandy::ActionRow;
@@ -33,11 +33,25 @@ impl UserSessionPage {
                 }
             }
         }
-        self.imp().box_users.select_row(self.imp().box_users.children().first().and_then(|v| v.downcast_ref::<ListBoxRow>()));
+        self.imp().box_users.select_row(
+            self.imp()
+                .box_users
+                .children()
+                .first()
+                .and_then(|v| v.downcast_ref::<ListBoxRow>()),
+        );
     }
 
     pub fn select_session(&self, name: &str) {
-        for (idx, session) in self.imp().sessions.get().unwrap().iter::<SessionObject>().flatten().enumerate() {
+        for (idx, session) in self
+            .imp()
+            .sessions
+            .get()
+            .unwrap()
+            .iter::<SessionObject>()
+            .flatten()
+            .enumerate()
+        {
             if session.id() == name {
                 self.imp().row_sessions.set_selected_index(idx as _);
                 return;
@@ -65,12 +79,17 @@ impl UserSessionPage {
 }
 
 mod imp {
+    use crate::dbus::accounts::AccountsProxy;
     use crate::session_object::SessionObject;
     use crate::sessions;
+    use crate::shell::Shell;
+    use crate::user::User;
+    use futures_util::select;
+    use futures_util::StreamExt;
     use glib::subclass::InitializingObject;
     use gtk::gio::ListStore;
-    use gtk::glib::subclass::Signal;
     use gtk::glib::clone;
+    use gtk::glib::subclass::Signal;
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
     use gtk::{glib, CompositeTemplate, Image, ListBox};
@@ -78,11 +97,6 @@ mod imp {
     use libhandy::ActionRow;
     use std::cell::OnceCell;
     use std::sync::OnceLock;
-    use futures_util::select;
-    use crate::shell::Shell;
-    use crate::dbus::accounts::AccountsProxy;
-    use crate::user::User;
-    use futures_util::StreamExt;
 
     #[derive(CompositeTemplate, Default)]
     #[template(resource = "/mobi/phosh/phrog/lockscreen-user-session.ui")]
@@ -146,9 +160,7 @@ mod imp {
 
             self.box_users.bind_model(Some(&users), |v| {
                 let user = v.downcast_ref::<User>().unwrap();
-                let row = ActionRow::builder()
-                    .activatable(true)
-                    .build();
+                let row = ActionRow::builder().activatable(true).build();
                 user.bind_property("username", &row, "subtitle").build();
                 user.bind_property("name", &row, "title").build();
                 let image = Image::new();

@@ -78,15 +78,20 @@ mod imp {
                 ShuffleKeypadQuickSetting::static_type(),
                 "keypad-shuffle",
                 10,
-            ).expect("failed to implement plugin point");
+            )
+            .expect("failed to implement plugin point");
 
             let settings = Settings::new("sm.puri.phosh.plugins");
             let mut qs: HashSet<GString> = HashSet::from_iter(settings.strv("quick-settings"));
             qs.insert(GString::from("keypad-shuffle"));
-            settings.set_strv("quick-settings", qs.iter().collect::<Vec<&GString>>()).expect("failed to enable keypad-shuffle");
+            settings
+                .set_strv("quick-settings", qs.iter().collect::<Vec<&GString>>())
+                .expect("failed to enable keypad-shuffle");
 
             self.obj().connect_ready(move |shell| {
-                let lockscreen = shell.lockscreen_manager().lockscreen()
+                let lockscreen = shell
+                    .lockscreen_manager()
+                    .lockscreen()
                     .and_then(|v| v.downcast::<Lockscreen>().ok())
                     .expect("failed to get lockscreen");
                 let user_session_page = lockscreen.user_session_page();

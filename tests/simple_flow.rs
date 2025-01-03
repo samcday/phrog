@@ -3,61 +3,39 @@ pub mod common;
 use gtk::glib;
 use gtk::glib::clone;
 use libphosh::prelude::{LockscreenExt, ShellExt};
-use libphosh::prelude::WallClockExt;
-use libphosh::{LockscreenPage, WallClock};
-use std::sync::atomic::{AtomicBool, Ordering};
+use libphosh::LockscreenPage;
+use std::sync::atomic::Ordering;
 
-use phrog::shell::Shell;
-use std::sync::Arc;
-use std::time::Duration;
+use common::*;
 use gtk::gio::Settings;
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
-use common::*;
-use wayland_client::Connection;
 use phrog::lockscreen::Lockscreen;
+use std::time::Duration;
 
 #[test]
 fn test_simple_flow() {
-    let tmp = tempfile::tempdir().unwrap();
-    phrog::init().unwrap();
-    let _system_dbus = dbus::system_dbus(tmp.path());
+    let mut test = test_init();
 
-    let settings = Settings::new("sm.puri.phosh.lockscreen");
-    settings.set_boolean("shuffle-keypad", false).unwrap();
+    let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
+    phosh_settings.set_boolean("shuffle-keypad", false).unwrap();
 
-    let _conn = async_global_executor::block_on(async move {
-        dbus::run_accounts_fixture().await.unwrap()
-    });
+    let phrog_settings = Settings::new("mobi.phosh.phrog");
+    phrog_settings.set_string("last-user", "samcday").unwrap();
 
-    let logged_in = Arc::new(AtomicBool::new(false));
-    fake_greetd(&logged_in);
+    test.shell.set_locked(true);
 
-    let wall_clock = WallClock::new();
-    wall_clock.set_default();
-    let shell = Shell::new();
-    shell.set_default();
-    shell.set_locked(true);
-
-    let ready_called = Arc::new(AtomicBool::new(false));
-    let (ready_tx, ready_rx) = async_channel::bounded(1);
-    shell.connect_ready(clone!(@strong ready_called => move |shell| {
-        ready_called.store(true, Ordering::Relaxed);
-
-        let (_, _, width, height) = shell.usable_area();
-        let vp = VirtualPointer::new(Connection::connect_to_env().unwrap(), width as _, height as _);
-        ready_tx.send_blocking(vp).expect("notify ready failed");
-    }));
-
+    let ready_rx = test.ready_rx.clone();
+    let shell = test.shell.clone();
     glib::spawn_future_local(clone!(@weak shell => async move {
-        let mut vp = ready_rx.recv().await.unwrap();
+        let (mut vp, _) = ready_rx.recv().await.unwrap();
         glib::timeout_future(Duration::from_millis(2000)).await;
         // Move the mouse to first user row and click on it.
         let mut lockscreen = shell.lockscreen_manager().lockscreen().unwrap().downcast::<Lockscreen>().unwrap();
 
         let usp = lockscreen.imp().user_session_page.get().unwrap();
 
-        vp.click_on(usp.imp().box_users.selected_row().as_ref().unwrap()).await;
+        vp.click_on(usp.imp().box_users.row_at_index(0).as_ref().unwrap()).await;
 
         // wait for keypad page to slide in
         glib::timeout_future(Duration::from_millis(500)).await;
@@ -75,9 +53,8 @@ fn test_simple_flow() {
         glib::timeout_future(Duration::from_millis(50)).await;
     }));
 
-    let _recording = start_recording("simple-flow");
-    gtk::main();
+    test.start("simple-flow");
 
-    assert!(ready_called.load(Ordering::Relaxed));
-    assert!(logged_in.load(Ordering::Relaxed));
+    assert!(test.ready_called.load(Ordering::Relaxed));
+    assert!(test.logged_in.load(Ordering::Relaxed));
 }

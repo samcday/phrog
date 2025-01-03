@@ -14,9 +14,7 @@ glib::wrapper! {
 
 impl User {
     pub fn new(conn: zbus::Connection, path: ObjectPath) -> Self {
-        let obj: Self = Object::builder()
-            .property("path", path.as_str())
-            .build();
+        let obj: Self = Object::builder().property("path", path.as_str()).build();
 
         let path = OwnedObjectPath::from(path);
         spawn_future_local(clone!(@weak obj => async move {
@@ -124,7 +122,9 @@ mod imp {
                     let c = Cancellable::current();
                     match file.monitor(FileMonitorFlags::empty(), c.as_ref()) {
                         Ok(monitor) => user.set_icon_monitor(monitor.clone()),
-                        Err(err) => g_warning!("user", "error starting file monitor on {}: {}", path, err),
+                        Err(err) => {
+                            g_warning!("user", "error starting file monitor on {}: {}", path, err)
+                        }
                     }
                 }
             });

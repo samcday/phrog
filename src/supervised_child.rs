@@ -1,18 +1,21 @@
-use std::process::Child;
-use std::thread::sleep;
-use std::time::{Duration, Instant};
 use gtk::glib::{g_error, g_info, g_warning};
 use nix::sys::signal::SIGTERM;
 use nix::unistd::Pid;
+use std::process::Child;
+use std::thread::sleep;
+use std::time::{Duration, Instant};
 
-pub struct SupervisedChild{
+pub struct SupervisedChild {
     pub child: Child,
     name: String,
 }
 
 impl SupervisedChild {
     pub fn new(name: &str, child: Child) -> Self {
-        Self { child, name: name.to_string() }
+        Self {
+            child,
+            name: name.to_string(),
+        }
     }
 
     pub fn stop(&mut self) {
@@ -30,8 +33,8 @@ impl SupervisedChild {
                     sleep(Duration::from_secs(1));
                 }
                 g_warning!("phrog", "Process {} ignored SIGTERM. Killing...", label);
-            },
-            Err(err) => g_warning!("phrog", "Failed to SIGTERM process {}: {}", label, err)
+            }
+            Err(err) => g_warning!("phrog", "Failed to SIGTERM process {}: {}", label, err),
         }
 
         if let Err(err) = self.child.kill() {

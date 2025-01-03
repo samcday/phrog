@@ -73,7 +73,8 @@ pub mod user {
     use zbus::proxy;
     #[proxy(
         default_service = "org.freedesktop.Accounts",
-        interface = "org.freedesktop.Accounts.User")]
+        interface = "org.freedesktop.Accounts.User"
+    )]
     trait User {
         /// GetPasswordExpirationPolicy method
         fn get_password_expiration_policy(&self) -> zbus::Result<(i64, i64, i64, i64, i64, i64)>;

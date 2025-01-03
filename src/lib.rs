@@ -6,8 +6,8 @@ pub mod supervised_child;
 mod dbus;
 mod session_object;
 mod sessions;
-mod user_session_page;
 mod user;
+mod user_session_page;
 
 use anyhow::{anyhow, Context};
 use gtk::{gdk, gio};
@@ -49,7 +49,7 @@ pub fn init() -> anyhow::Result<()> {
     gio::resources_register_include!("phrog.gresource").context("failed to register resources.")?;
 
     if !is_phoc_detected().context("failed to detect Wayland compositor globals")? {
-        return Err(anyhow!("Phoc parent compositor not detected"))
+        return Err(anyhow!("Phoc parent compositor not detected"));
     }
 
     gdk::set_allowed_backends("wayland");
