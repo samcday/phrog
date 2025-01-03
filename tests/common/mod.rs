@@ -28,6 +28,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use tempfile::TempDir;
 pub use virtual_pointer::VirtualPointer;
 
+#[allow(dead_code)]
 pub struct Test {
     dbus_conn: zbus::Connection,
     pub logged_in: Arc<AtomicBool>,
@@ -69,9 +70,8 @@ pub fn test_init() -> Test {
     // use a more appropriate (moar froggy) accent color
     if_settings.set_string("accent-color", "green").unwrap();
 
-    let dbus_conn = async_global_executor::block_on(async move {
-        dbus::run_accounts_fixture().await.unwrap()
-    });
+    let dbus_conn =
+        async_global_executor::block_on(async move { dbus::run_accounts_fixture().await.unwrap() });
 
     let logged_in = Arc::new(AtomicBool::new(false));
     fake_greetd(&logged_in);
@@ -117,41 +117,41 @@ pub fn fake_greetd(logged_in: &Arc<AtomicBool>) {
     ));
     std::env::set_var("GREETD_SOCK", &path);
     std::thread::spawn(clone!(@strong logged_in => move || {
-            let listener = UnixListener::bind(&path).unwrap();
-            loop {
-                let (mut stream, _addr) = listener
-                    .accept()
-                    .expect("failed to accept greetd connection");
+        let listener = UnixListener::bind(&path).unwrap();
+        loop {
+            let (mut stream, _addr) = listener
+                .accept()
+                .expect("failed to accept greetd connection");
 
-                match Request::read_from(&mut stream).unwrap() {
-                    Request::CreateSession { .. } => Response::AuthMessage {
-                        auth_message_type: Secret,
-                        auth_message: "Password:".to_string(),
-                    }
-                    .write_to(&mut stream)
-                    .unwrap(),
-                    req => panic!("wrong request: {:?}", req),
+            match Request::read_from(&mut stream).unwrap() {
+                Request::CreateSession { .. } => Response::AuthMessage {
+                    auth_message_type: Secret,
+                    auth_message: "Password:".to_string(),
                 }
-
-                match Request::read_from(&mut stream).unwrap() {
-                    Request::PostAuthMessageResponse {
-                        response: Some(password),
-                    } => {
-                        assert_eq!(password, "0451");
-                        Response::Success.write_to(&mut stream).unwrap();
-                    }
-                    req => panic!("wrong request: {:?}", req),
-                }
-
-                match Request::read_from(&mut stream).unwrap() {
-                    Request::StartSession { .. } => {
-                        Response::Success.write_to(&mut stream).unwrap();
-                        logged_in.store(true, Ordering::Relaxed);
-                    }
-                    req => panic!("wrong request: {:?}", req),
-                }
+                .write_to(&mut stream)
+                .unwrap(),
+                req => panic!("wrong request: {:?}", req),
             }
-        }));
+
+            match Request::read_from(&mut stream).unwrap() {
+                Request::PostAuthMessageResponse {
+                    response: Some(password),
+                } => {
+                    assert_eq!(password, "0451");
+                    Response::Success.write_to(&mut stream).unwrap();
+                }
+                req => panic!("wrong request: {:?}", req),
+            }
+
+            match Request::read_from(&mut stream).unwrap() {
+                Request::StartSession { .. } => {
+                    Response::Success.write_to(&mut stream).unwrap();
+                    logged_in.store(true, Ordering::Relaxed);
+                }
+                req => panic!("wrong request: {:?}", req),
+            }
+        }
+    }));
 }
 
 pub fn get_lockscreen_bits(lockscreen: &mut Lockscreen) -> (Grid, Button) {
@@ -161,10 +161,34 @@ pub fn get_lockscreen_bits(lockscreen: &mut Lockscreen) -> (Grid, Button) {
     // This looks nice for the video recording.
     let carousel = lockscreen.child().unwrap().downcast::<Carousel>().unwrap();
 
-    let keypad_page = carousel.children().get(2).unwrap().clone().downcast::<gtk::Box>().unwrap();
-    let keypad_revealer = keypad_page.children().get(2).unwrap().clone().downcast::<Revealer>().unwrap();
+    let keypad_page = carousel
+        .children()
+        .get(2)
+        .unwrap()
+        .clone()
+        .downcast::<gtk::Box>()
+        .unwrap();
+    let keypad_revealer = keypad_page
+        .children()
+        .get(2)
+        .unwrap()
+        .clone()
+        .downcast::<Revealer>()
+        .unwrap();
     let keypad = keypad_revealer.child().unwrap().downcast::<Grid>().unwrap();
-    let submit_box = keypad_page.children().get(3).unwrap().clone().downcast::<gtk::Box>().unwrap();
-    let submit_btn = submit_box.children().first().unwrap().clone().downcast::<Button>().unwrap();
+    let submit_box = keypad_page
+        .children()
+        .get(3)
+        .unwrap()
+        .clone()
+        .downcast::<gtk::Box>()
+        .unwrap();
+    let submit_btn = submit_box
+        .children()
+        .first()
+        .unwrap()
+        .clone()
+        .downcast::<Button>()
+        .unwrap();
     (keypad, submit_btn)
 }

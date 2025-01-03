@@ -31,7 +31,9 @@ mod imp {
     use greetd_ipc::codec::SyncCodec;
     use greetd_ipc::{AuthMessageType, ErrorType, Request, Response};
     use gtk::gio::Settings;
-    use gtk::glib::{clone, closure_local, g_critical, g_warning, timeout_add_once, ObjectExt, Properties};
+    use gtk::glib::{
+        clone, closure_local, g_critical, g_warning, timeout_add_once, ObjectExt, Properties,
+    };
     use gtk::prelude::SettingsExtManual;
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
@@ -65,19 +67,30 @@ mod imp {
         let (greetd_resp_send, greetd_resp_recv) = async_channel::bounded(1);
 
         gio::spawn_blocking(move || {
-            let mut sock = std::env::var("GREETD_SOCK").ok().and_then(|path| UnixStream::connect(path).ok());
+            let mut sock = std::env::var("GREETD_SOCK")
+                .ok()
+                .and_then(|path| UnixStream::connect(path).ok());
             while let Ok(req) = greetd_req_recv.recv_blocking() {
                 let resp = if let Some(ref mut sock) = sock {
                     req.write_to(sock)
-                        .and_then(|_| { Response::read_from(sock) })
+                        .and_then(|_| Response::read_from(sock))
                         .unwrap_or_else(|err| Response::Error {
-                            error_type: ErrorType::Error, description: err.to_string() })
+                            error_type: ErrorType::Error,
+                            description: err.to_string(),
+                        })
                 } else {
-                    Response::Error {error_type: ErrorType::Error, description: "Greetd not connected".into()}
+                    Response::Error {
+                        error_type: ErrorType::Error,
+                        description: "Greetd not connected".into(),
+                    }
                 };
 
                 if let Err(err) = greetd_resp_send.send_blocking(resp) {
-                    g_critical!("greetd", "error sending greetd response on channel: {}", err);
+                    g_critical!(
+                        "greetd",
+                        "error sending greetd response on channel: {}",
+                        err
+                    );
                     continue;
                 }
             }
@@ -177,29 +190,26 @@ mod imp {
                     format!("GDMSESSION={}", session.id()),
                 ],
             })
-                .await
-                .context("start session")?;
+            .await
+            .context("start session")?;
 
             Ok(())
         }
 
         async fn greetd_req(&self, req: Request) -> anyhow::Result<Response> {
-            if libphosh::Shell::default().downcast::<Shell>().unwrap().fake_greetd() {
+            if libphosh::Shell::default()
+                .downcast::<Shell>()
+                .unwrap()
+                .fake_greetd()
+            {
                 return fake_greetd_interaction(req);
             }
             if self.greetd.borrow().is_none() {
                 self.greetd.set(Some(run_greetd()));
             }
             let (sender, receiver) = self.greetd.clone().take().unwrap();
-            sender
-                .send(req)
-                .await
-                .context("send greetd request")?;
-            match receiver
-                .recv()
-                .await
-                .context("receive greetd response")?
-            {
+            sender.send(req).await.context("send greetd request")?;
+            match receiver.recv().await.context("receive greetd response")? {
                 Response::Error {
                     error_type: ErrorType::Error,
                     description,
@@ -234,10 +244,9 @@ mod imp {
                     // AuthMessageType.
                     self.obj().set_sensitive(true);
                     match auth_message_type {
-                        AuthMessageType::Info | AuthMessageType::Error =>
-                            return Some(Request::PostAuthMessageResponse {
-                                response: None,
-                            }),
+                        AuthMessageType::Info | AuthMessageType::Error => {
+                            return Some(Request::PostAuthMessageResponse { response: None })
+                        }
                         _ => {}
                     }
                 }

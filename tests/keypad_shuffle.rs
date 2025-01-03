@@ -3,21 +3,15 @@ pub mod common;
 use gtk::glib;
 use gtk::glib::clone;
 use libphosh::prelude::ShellExt;
-use libphosh::prelude::WallClockExt;
-use libphosh::WallClock;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::Ordering;
 
-use phrog::shell::Shell;
-use std::sync::Arc;
-use std::time::Duration;
+use common::*;
 use gtk::gio::Settings;
 use gtk::prelude::*;
 use gtk::subclass::prelude::ObjectSubclassIsExt;
 use input_event_codes::*;
-use common::*;
-use wayland_client::Connection;
 use phrog::lockscreen::Lockscreen;
-use crate::common::virtual_keyboard::VirtualKeyboard;
+use std::time::Duration;
 
 #[test]
 fn keypad_shuffle() {

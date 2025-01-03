@@ -7,13 +7,17 @@ fn main() {
         "phrog.gresource",
     );
 
-    let schema_path = PathBuf::from(std::env::var("HOME").unwrap()).join(".local/share/glib-2.0/schemas");
+    let schema_path =
+        PathBuf::from(std::env::var("HOME").unwrap()).join(".local/share/glib-2.0/schemas");
     std::fs::create_dir_all(&schema_path).expect("failed to create schema dir");
 
     let phrog_gschema = PathBuf::from("resources/mobi.phosh.phrog.gschema.xml");
     let dest_path = schema_path.join(phrog_gschema.file_name().unwrap());
-    std::fs::write(&dest_path, std::fs::read(phrog_gschema).expect("failed to read schema file"))
-        .expect("failed to write phrog schema file");
+    std::fs::write(
+        &dest_path,
+        std::fs::read(phrog_gschema).expect("failed to read schema file"),
+    )
+    .expect("failed to write phrog schema file");
     println!("cargo::rerun-if-changed={}", dest_path.display());
 
     std::process::Command::new("glib-compile-schemas")

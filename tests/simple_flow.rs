@@ -6,12 +6,12 @@ use libphosh::prelude::{LockscreenExt, ShellExt};
 use libphosh::LockscreenPage;
 use std::sync::atomic::Ordering;
 
-use std::time::Duration;
+use common::*;
 use gtk::gio::Settings;
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
-use common::*;
 use phrog::lockscreen::Lockscreen;
+use std::time::Duration;
 
 #[test]
 fn test_simple_flow() {

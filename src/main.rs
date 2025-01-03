@@ -3,13 +3,16 @@ use gtk::glib::*;
 use gtk::Application;
 use libphosh::prelude::*;
 use libphosh::WallClock;
-use nix::libc::{SIGTERM};
+use nix::libc::SIGTERM;
 use phrog::shell::Shell;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
-    #[arg(short, long, default_value = "false",
+    #[arg(
+        short,
+        long,
+        default_value = "false",
         help = "Fake interactions with greetd (useful for local testing)"
     )]
     fake: bool,
@@ -27,9 +30,7 @@ fn main() -> anyhow::Result<()> {
     let wall_clock = WallClock::new();
     wall_clock.set_default();
 
-    let shell: Shell = Object::builder()
-        .property("fake-greetd", args.fake)
-        .build();
+    let shell: Shell = Object::builder().property("fake-greetd", args.fake).build();
     shell.set_default();
     shell.set_locked(true);
 
