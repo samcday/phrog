@@ -22,7 +22,7 @@ use crate::common::virtual_keyboard::VirtualKeyboard;
 #[test]
 fn keypad_shuffle() {
     let tmp = tempfile::tempdir().unwrap();
-    let _nested_phoc = phrog::init(Some("phoc".into())).unwrap();
+    phrog::init().unwrap();
     let _system_dbus = dbus::system_dbus(tmp.path());
 
     let _conn = async_global_executor::block_on(async move {
