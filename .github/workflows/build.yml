@@ -19,6 +19,7 @@ env:
 permissions:
   contents: write
   packages: write
+  pull-requests: write
 
 jobs:
   build-image:
@@ -101,15 +102,67 @@ jobs:
         run: |
           set -uexo pipefail
           docker run \
-            -v `pwd`/demo-video:/work -i ghcr.io/samcday/editly:latest \
+            -v `pwd`/demo-video:/work \
+            -i ghcr.io/samcday/editly:latest \
             bash -c 'cd /work; editly --json editly.json5; \
-            ffmpeg -i demo.mp4 -vcodec libwebp -filter:v fps=fps=60 -lossless 0 -loop 0 -preset default -an -vsync 0 -s 160:320 demo.webp'
+            ffmpeg -i demo.mp4 -vcodec libwebp -filter:v fps=fps=60 -lossless 0 -loop 0 -preset default -an -vsync 0 -s 160:320 demo.webp; \
+            for f in recordings/*.mp4; do \
+              ffmpeg -i $f -vcodec libwebp -filter:v fps=fps=60 -lossless 0 -loop 0 -preset default -an -vsync 0 -s 160:320 "${f%.mp4}.webp"; \
+            done \
+            '
       - uses: actions/upload-artifact@v4
         with:
           name: demo-video
           path: |
             demo-video/demo.mp4
             demo-video/demo.webp
+      - run: |
+          set -uexo pipefail
+          mkdir blob-upload/
+          cp demo-video/demo.webp demo-video/recordings/*.webp blob-upload/
+          
+          cat > comment.txt <<HERE
+          [The CI build recorded and generated some videos](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+          <details><summary>Demo video (shown on README and release notes)</summary>
+          <p>
+
+          <img width="180" height="360" src="https://samcday-phrog-videos.s3.eu-central-003.backblazeb2.com/${{ github.run_id }}/demo.webp">
+
+          </p>
+          </details>
+
+          HERE
+          for f in demo-video/recordings/*.webp; do
+            name="${f%.webp}"
+            name="${name#demo-video/recordings/}"
+            cat >> comment.txt <<HERE
+          <details><summary>${name}</summary>
+          <p>
+
+          <img width="180" height="360" src="https://samcday-phrog-videos.s3.eu-central-003.backblazeb2.com/${{ github.run_id }}/${name}.webp">
+
+          </p>
+          </details>
+
+          HERE
+          done
+      - uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --content-type=b2/x-auto
+        env:
+          AWS_S3_BUCKET: samcday-phrog-videos
+          AWS_ACCESS_KEY_ID: ${{ secrets.B2_APPLICATION_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.B2_APPLICATION_KEY }}
+          AWS_S3_ENDPOINT: https://s3.eu-central-003.backblazeb2.com
+          SOURCE_DIR: 'blob-upload'
+          DEST_DIR: ${{ github.run_id }}
+      - uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: ci-recordings
+          hide_and_recreate: true
+          hide_classify: OUTDATED
+          path: comment.txt
   release:
     needs: [build, demo]
     runs-on: ubuntu-24.04
