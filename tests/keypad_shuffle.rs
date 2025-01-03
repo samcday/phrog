@@ -21,38 +21,13 @@ use crate::common::virtual_keyboard::VirtualKeyboard;
 
 #[test]
 fn keypad_shuffle() {
-    std::env::set_var("GSETTINGS_BACKEND", "memory");
-    let tmp = tempfile::tempdir().unwrap();
-    phrog::init().unwrap();
-    let _system_dbus = dbus::system_dbus(tmp.path());
-
-    let _conn = async_global_executor::block_on(async move {
-        dbus::run_accounts_fixture().await.unwrap()
-    });
-
-    let logged_in = Arc::new(AtomicBool::new(false));
-    fake_greetd(&logged_in);
-
-    let wall_clock = WallClock::new();
-    wall_clock.set_default();
-    let shell = Shell::new();
-    shell.set_default();
-    shell.set_locked(true);
+    let mut test = test_init();
 
     let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
     phosh_settings.set_boolean("shuffle-keypad", false).unwrap();
 
-    let ready_called = Arc::new(AtomicBool::new(false));
-    let (ready_tx, ready_rx) = async_channel::bounded(1);
-    shell.connect_ready(clone!(@strong ready_called => move |shell| {
-        ready_called.store(true, Ordering::Relaxed);
-
-        let (_, _, width, height) = shell.usable_area();
-        let vp = VirtualPointer::new(Connection::connect_to_env().unwrap(), width as _, height as _);
-        let kb = VirtualKeyboard::new(Connection::connect_to_env().unwrap());
-        ready_tx.send_blocking((vp, kb)).expect("notify ready failed");
-    }));
-
+    let ready_rx = test.ready_rx.clone();
+    let shell = test.shell.clone();
     glib::spawn_future_local(clone!(@weak shell => async move {
         let (mut vp, kb) = ready_rx.recv().await.unwrap();
         glib::timeout_future(Duration::from_millis(1500)).await;
@@ -99,8 +74,7 @@ fn keypad_shuffle() {
         gtk::main_quit();
     }));
 
-    let _recording = start_recording("keypad-shuffle");
-    gtk::main();
+    test.start("keypad-shuffle");
 
-    assert!(ready_called.load(Ordering::Relaxed));
+    assert!(test.ready_called.load(Ordering::Relaxed));
 }

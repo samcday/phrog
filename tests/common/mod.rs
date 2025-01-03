@@ -2,36 +2,108 @@ pub mod dbus;
 pub mod virtual_keyboard;
 pub mod virtual_pointer;
 
+use crate::common::virtual_keyboard::VirtualKeyboard;
+use async_channel::Receiver;
+use greetd_ipc::codec::SyncCodec;
+use greetd_ipc::AuthMessageType::Secret;
+use greetd_ipc::{Request, Response};
+use gtk::gio::Settings;
+use gtk::glib::clone;
+use gtk::prelude::*;
+use gtk::{Button, Grid, Revealer};
+use libhandy::Carousel;
+use libphosh::prelude::ShellExt;
+use libphosh::prelude::WallClockExt;
+use libphosh::WallClock;
+use phrog::lockscreen::Lockscreen;
+use phrog::shell::Shell;
+use phrog::supervised_child::SupervisedChild;
 use std::env::temp_dir;
 use std::os::unix::net::UnixListener;
 use std::path::PathBuf;
 use std::process::Stdio;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
-use greetd_ipc::{Request, Response};
-use greetd_ipc::AuthMessageType::Secret;
-use greetd_ipc::codec::SyncCodec;
-use gtk::{Button, Grid, Revealer};
-use gtk::glib::clone;
-use gtk::prelude::*;
-use libhandy::Carousel;
-use phrog::lockscreen::Lockscreen;
+use tempfile::TempDir;
 pub use virtual_pointer::VirtualPointer;
-use phrog::supervised_child::SupervisedChild;
 
-pub fn start_recording(name: &str) -> Option<SupervisedChild> {
-    if let Ok(base_path) = std::env::var("RECORD_TESTS") {
-        if let Ok(child) = std::process::Command::new("wf-recorder")
-            .arg("-f")
-            .arg(PathBuf::from(base_path).join(format!("{}.mp4", name)))
-            .stdout(Stdio::null())
-            .stdin(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()
-        { Some(SupervisedChild::new("wf-recorder", child)) } else { None }
-    } else {
-        None
+pub struct Test {
+    dbus_conn: zbus::Connection,
+    pub logged_in: Arc<AtomicBool>,
+    pub ready_called: Arc<AtomicBool>,
+    pub ready_rx: Receiver<(VirtualPointer, VirtualKeyboard)>,
+    recording: Option<SupervisedChild>,
+    pub shell: Shell,
+    system_dbus: SupervisedChild,
+    tmp: TempDir,
+    wall_clock: WallClock,
+}
+
+impl Test {
+    pub fn start(&mut self, name: &str) {
+        if let Ok(base_path) = std::env::var("RECORD_TESTS") {
+            if let Ok(child) = std::process::Command::new("wf-recorder")
+                .arg("-f")
+                .arg(PathBuf::from(base_path).join(format!("{}.mp4", name)))
+                .stdout(Stdio::null())
+                .stdin(Stdio::null())
+                .stderr(Stdio::null())
+                .spawn()
+            {
+                self.recording = Some(SupervisedChild::new("wf-recorder", child));
+            }
+        }
+
+        gtk::main();
+    }
+}
+
+pub fn test_init() -> Test {
+    std::env::set_var("GSETTINGS_BACKEND", "memory");
+    let tmp = tempfile::tempdir().unwrap();
+    phrog::init().unwrap();
+    let system_dbus = dbus::system_dbus(tmp.path());
+
+    let if_settings = Settings::new("org.gnome.desktop.interface");
+    // use a more appropriate (moar froggy) accent color
+    if_settings.set_string("accent-color", "green").unwrap();
+
+    let dbus_conn = async_global_executor::block_on(async move {
+        dbus::run_accounts_fixture().await.unwrap()
+    });
+
+    let logged_in = Arc::new(AtomicBool::new(false));
+    fake_greetd(&logged_in);
+
+    let wall_clock = WallClock::new();
+    wall_clock.set_default();
+    let shell = Shell::new();
+    shell.set_default();
+    shell.set_locked(true);
+
+    let ready_called = Arc::new(AtomicBool::new(false));
+    let ready_called2 = ready_called.clone();
+    let (ready_tx, ready_rx) = async_channel::bounded(1);
+    shell.connect_ready(clone!(@strong ready_called2 => move |shell| {
+        ready_called2.store(true, Ordering::Relaxed);
+
+        let (_, _, width, height) = shell.usable_area();
+        let vp = VirtualPointer::new(wayland_client::Connection::connect_to_env().unwrap(), width as _, height as _);
+        let kb = VirtualKeyboard::new(wayland_client::Connection::connect_to_env().unwrap());
+        ready_tx.send_blocking((vp, kb)).expect("notify ready failed");
+    }));
+
+    Test {
+        dbus_conn,
+        logged_in,
+        ready_called,
+        ready_rx,
+        recording: None,
+        shell,
+        system_dbus,
+        tmp,
+        wall_clock,
     }
 }
 
