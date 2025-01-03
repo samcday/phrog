@@ -69,6 +69,4 @@ fn keypad_shuffle() {
     }));
 
     test.start("keypad-shuffle");
-
-    assert!(test.ready_called.load(Ordering::Relaxed));
 }

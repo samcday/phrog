@@ -55,6 +55,5 @@ fn test_simple_flow() {
 
     test.start("simple-flow");
 
-    assert!(test.ready_called.load(Ordering::Relaxed));
     assert!(test.logged_in.load(Ordering::Relaxed));
 }

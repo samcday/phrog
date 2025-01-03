@@ -57,6 +57,7 @@ impl Test {
         }
 
         gtk::main();
+        assert!(self.ready_called.load(Ordering::Relaxed));
     }
 }
 
