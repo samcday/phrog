@@ -23,8 +23,6 @@ fn test_simple_flow() {
     let phrog_settings = Settings::new("mobi.phosh.phrog");
     phrog_settings.set_string("last-user", "samcday").unwrap();
 
-    test.shell.set_locked(true);
-
     let ready_rx = test.ready_rx.clone();
     let shell = test.shell.clone();
     glib::spawn_future_local(clone!(@weak shell => async move {
