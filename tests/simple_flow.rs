@@ -51,7 +51,7 @@ fn test_simple_flow() {
 
     glib::spawn_future_local(clone!(@weak shell => async move {
         let mut vp = ready_rx.recv().await.unwrap();
-        glib::timeout_future(Duration::from_millis(500)).await;
+        glib::timeout_future(Duration::from_millis(2000)).await;
         // Move the mouse to first user row and click on it.
         let mut lockscreen = shell.lockscreen_manager().lockscreen().unwrap().downcast::<Lockscreen>().unwrap();
 

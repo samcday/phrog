@@ -53,7 +53,7 @@ fn keypad_shuffle() {
 
     glib::spawn_future_local(clone!(@weak shell => async move {
         let (mut vp, kb) = ready_rx.recv().await.unwrap();
-        glib::timeout_future(Duration::from_millis(500)).await;
+        glib::timeout_future(Duration::from_millis(1500)).await;
 
         kb.keypress(KEY_SPACE!()).await;
         glib::timeout_future(Duration::from_millis(1000)).await;
