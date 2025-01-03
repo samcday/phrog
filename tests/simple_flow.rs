@@ -30,6 +30,10 @@ fn test_simple_flow() {
     let phrog_settings = Settings::new("mobi.phosh.phrog");
     phrog_settings.set_string("last-user", "samcday").unwrap();
 
+    let if_settings = Settings::new("org.gnome.desktop.interface");
+    // use a more appropriate (moar froggy) accent color
+    if_settings.set_string("accent-color", "green").unwrap();
+
     let _conn = async_global_executor::block_on(async move {
         dbus::run_accounts_fixture().await.unwrap()
     });
