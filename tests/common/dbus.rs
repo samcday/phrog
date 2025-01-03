@@ -45,12 +45,33 @@ pub fn system_dbus(tmpdir: &Path) -> SupervisedChild {
 }
 
 struct AccountsFixture {}
-struct UserFixture {}
+struct UserFixture {
+    name: String,
+    username: String,
+    icon_file: String,
+}
 
 #[zbus::interface(name = "org.freedesktop.Accounts")]
 impl AccountsFixture {
     async fn list_cached_users(&self) -> Vec<ObjectPath> {
-        vec![ObjectPath::from_static_str_unchecked("/org/freedesktop/Accounts/1")]
+        vec![
+            ObjectPath::from_static_str_unchecked("/org/freedesktop/Accounts/phoshi"),
+            ObjectPath::from_static_str_unchecked("/org/freedesktop/Accounts/sam"),
+        ]
+    }
+}
+
+impl UserFixture {
+    fn new(name: &str, username: &str, icon_file: &str) -> Self {
+        Self {
+            name: name.into(),
+            username: username.into(),
+            icon_file: PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("tests/fixtures/")
+                .join(icon_file)
+                .display()
+                .to_string(),
+        }
     }
 }
 
@@ -58,15 +79,15 @@ impl AccountsFixture {
 impl UserFixture {
     #[zbus(property)]
     async fn real_name(&self) -> &str {
-        "Phoshi"
+        &self.name
     }
     #[zbus(property)]
     async fn user_name(&self) -> &str {
-        "phoshi"
+        &self.username
     }
     #[zbus(property)]
-    async fn icon_file(&self) -> String {
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/phoshi.png").display().to_string()
+    async fn icon_file(&self) -> &str {
+        &self.icon_file
     }
 }
 
@@ -78,7 +99,11 @@ pub async fn run_accounts_fixture() -> anyhow::Result<zbus::Connection> {
         .await.context("failed to serve org.freedesktop.Accounts")?;
     connection
         .object_server()
-        .at("/org/freedesktop/Accounts/1", UserFixture {})
+        .at("/org/freedesktop/Accounts/phoshi", UserFixture::new("Phoshi", "phoshi", "phoshi.png"))
+        .await.context("failed to serve org.freedesktop.Accounts.User")?;
+    connection
+        .object_server()
+        .at("/org/freedesktop/Accounts/sam", UserFixture::new("Sam", "samcday", "samcday.jpeg"))
         .await.context("failed to serve org.freedesktop.Accounts.User")?;
     connection
         .request_name("org.freedesktop.Accounts")

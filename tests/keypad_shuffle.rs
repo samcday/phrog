@@ -21,6 +21,7 @@ use crate::common::virtual_keyboard::VirtualKeyboard;
 
 #[test]
 fn keypad_shuffle() {
+    std::env::set_var("GSETTINGS_BACKEND", "memory");
     let tmp = tempfile::tempdir().unwrap();
     phrog::init().unwrap();
     let _system_dbus = dbus::system_dbus(tmp.path());
@@ -38,8 +39,9 @@ fn keypad_shuffle() {
     shell.set_default();
     shell.set_locked(true);
 
-    let settings = Settings::new("sm.puri.phosh.lockscreen");
-    settings.set_boolean("shuffle-keypad", false).unwrap();
+    let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
+    phosh_settings.set_boolean("shuffle-keypad", false).unwrap();
+
     let ready_called = Arc::new(AtomicBool::new(false));
     let (ready_tx, ready_rx) = async_channel::bounded(1);
     shell.connect_ready(clone!(@strong ready_called => move |shell| {
@@ -68,7 +70,7 @@ fn keypad_shuffle() {
         vp.click_on(&shell.keypad_shuffle_qs().unwrap().imp().info.clone()).await;
         glib::timeout_future(Duration::from_millis(500)).await;
 
-        assert!(settings.boolean("shuffle-keypad"));
+        assert!(phosh_settings.boolean("shuffle-keypad"));
 
         // close top panel
         kb.keypress(KEY_ESC!()).await;
@@ -86,7 +88,7 @@ fn keypad_shuffle() {
         vp.click_on(&shell.keypad_shuffle_qs().unwrap().imp().info.clone()).await;
         glib::timeout_future(Duration::from_millis(500)).await;
 
-        assert!(!settings.boolean("shuffle-keypad"));
+        assert!(!phosh_settings.boolean("shuffle-keypad"));
 
         kb.keypress(KEY_ESC!()).await;
         glib::timeout_future(Duration::from_millis(500)).await;

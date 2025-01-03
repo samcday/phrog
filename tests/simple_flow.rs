@@ -19,12 +19,16 @@ use phrog::lockscreen::Lockscreen;
 
 #[test]
 fn test_simple_flow() {
+    std::env::set_var("GSETTINGS_BACKEND", "memory");
     let tmp = tempfile::tempdir().unwrap();
     phrog::init().unwrap();
     let _system_dbus = dbus::system_dbus(tmp.path());
 
-    let settings = Settings::new("sm.puri.phosh.lockscreen");
-    settings.set_boolean("shuffle-keypad", false).unwrap();
+    let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
+    phosh_settings.set_boolean("shuffle-keypad", false).unwrap();
+
+    let phrog_settings = Settings::new("mobi.phosh.phrog");
+    phrog_settings.set_string("last-user", "samcday").unwrap();
 
     let _conn = async_global_executor::block_on(async move {
         dbus::run_accounts_fixture().await.unwrap()
@@ -57,7 +61,7 @@ fn test_simple_flow() {
 
         let usp = lockscreen.imp().user_session_page.get().unwrap();
 
-        vp.click_on(usp.imp().box_users.selected_row().as_ref().unwrap()).await;
+        vp.click_on(usp.imp().box_users.row_at_index(0).as_ref().unwrap()).await;
 
         // wait for keypad page to slide in
         glib::timeout_future(Duration::from_millis(500)).await;
