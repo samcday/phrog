@@ -34,7 +34,7 @@ Then run greetd however your distro prefers you to.
 You can also test it outside greetd, nested in your favourite Wayland desktop environment:
 
 ```
-phrog --fake
+phoc -S -E "phrog --fake"
 ```
 
 ## Development
@@ -50,8 +50,8 @@ If `libphosh` is not packaged for your distro, you need to build Phosh+libphosh 
 Once `libphosh` is installed, building and running 🐸 should be as simple as:
 
 ```sh
-cargo run -- --fake
-cargo test
+phoc -S -E "cargo run -- --fake"
+phoc -S -E "cargo test"
 ```
 
 [phog]: https://gitlab.com/mobian1/phog

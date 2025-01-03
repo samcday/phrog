@@ -1,6 +1,5 @@
 pub mod keypad_shuffle;
 pub mod lockscreen;
-pub mod nested_phoc;
 pub mod shell;
 pub mod supervised_child;
 
@@ -10,7 +9,6 @@ mod sessions;
 mod user_session_page;
 mod user;
 
-use crate::nested_phoc::NestedPhoc;
 use anyhow::{anyhow, Context};
 use gtk::{gdk, gio};
 use wayland_client::protocol::wl_registry;
@@ -47,32 +45,23 @@ fn is_phoc_detected() -> anyhow::Result<bool> {
     Ok(detect.0)
 }
 
-pub fn init(phoc: Option<String>) -> anyhow::Result<Option<NestedPhoc>> {
+pub fn init() -> anyhow::Result<()> {
     gio::resources_register_include!("phrog.gresource").context("failed to register resources.")?;
 
-    let mut nested_phoc = if let Some(phoc_binary) = phoc {
-        if !is_phoc_detected().context("failed to detect Wayland compositor globals")? {
-            Some(NestedPhoc::new(&phoc_binary))
-        } else { None }
-    } else { None };
+    if !is_phoc_detected().context("failed to detect Wayland compositor globals")? {
+        return Err(anyhow!("Phoc parent compositor not detected"))
+    }
 
     gdk::set_allowed_backends("wayland");
 
-    let display = if let Some(nested_phoc) = nested_phoc.as_mut() {
-        let display_name = nested_phoc.wait_for_startup();
-        std::env::set_var("WAYLAND_DISPLAY", &display_name);
-        gdk::init();
-        gdk::Display::open(&display_name)
-    } else {
-        gdk::init();
-        gdk::Display::default()
-    };
+    gdk::init();
 
+    let display = gdk::Display::default();
     if display.is_none() {
         return Err(anyhow!("failed GDK init"));
     }
 
     gtk::init()?;
     libhandy::init();
-    Ok(nested_phoc)
+    Ok(())
 }
