@@ -8,7 +8,7 @@ use greetd_ipc::codec::SyncCodec;
 use greetd_ipc::AuthMessageType::Secret;
 use greetd_ipc::{Request, Response};
 use gtk::gio::Settings;
-use gtk::glib::clone;
+use gtk::glib::{clone, timeout_add_once};
 use gtk::prelude::*;
 use gtk::{Button, Grid, Revealer};
 use libhandy::Carousel;
@@ -24,13 +24,14 @@ use std::path::PathBuf;
 use std::process::Stdio;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tempfile::TempDir;
 pub use virtual_pointer::VirtualPointer;
 
 #[allow(dead_code)]
 pub struct Test {
     dbus_conn: zbus::Connection,
+    pub if_settings: Settings,
     pub logged_in: Arc<AtomicBool>,
     pub ready_called: Arc<AtomicBool>,
     pub ready_rx: Receiver<(VirtualPointer, VirtualKeyboard)>,
@@ -97,6 +98,7 @@ pub fn test_init() -> Test {
 
     Test {
         dbus_conn,
+        if_settings,
         logged_in,
         ready_called,
         ready_rx,
@@ -192,4 +194,12 @@ pub fn get_lockscreen_bits(lockscreen: &mut Lockscreen) -> (Grid, Button) {
         .downcast::<Button>()
         .unwrap();
     (keypad, submit_btn)
+}
+
+pub fn fade_quit() {
+    libphosh::Shell::default().fade_out(0);
+    // Keep this timeout in sync with fadeout animation duration in phrog.css
+    timeout_add_once(Duration::from_millis(500), || {
+        gtk::main_quit();
+    });
 }

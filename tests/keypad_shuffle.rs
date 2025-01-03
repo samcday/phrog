@@ -3,8 +3,6 @@ pub mod common;
 use gtk::glib;
 use gtk::glib::clone;
 use libphosh::prelude::ShellExt;
-use std::sync::atomic::Ordering;
-
 use common::*;
 use gtk::gio::Settings;
 use gtk::prelude::*;
@@ -65,7 +63,7 @@ fn keypad_shuffle() {
         vp.click_on(&keypad.child_at(1, 1).unwrap()).await;
         glib::timeout_future(Duration::from_millis(500)).await;
 
-        gtk::main_quit();
+        fade_quit();
     }));
 
     test.start("keypad-shuffle");
