@@ -63,6 +63,7 @@ impl AccountsFixture {
     async fn list_cached_users(&self) -> Vec<ObjectPath> {
         vec![
             ObjectPath::from_static_str_unchecked("/org/freedesktop/Accounts/phoshi"),
+            ObjectPath::from_static_str_unchecked("/org/freedesktop/Accounts/agx"),
             ObjectPath::from_static_str_unchecked("/org/freedesktop/Accounts/sam"),
         ]
     }
@@ -107,6 +108,14 @@ pub async fn run_accounts_fixture() -> anyhow::Result<zbus::Connection> {
         .at("/org/freedesktop/Accounts", AccountsFixture {})
         .await
         .context("failed to serve org.freedesktop.Accounts")?;
+    connection
+        .object_server()
+        .at(
+            "/org/freedesktop/Accounts/agx",
+            UserFixture::new("Guido", "agx", "guido.png"),
+        )
+        .await
+        .context("failed to serve org.freedesktop.Accounts.User")?;
     connection
         .object_server()
         .at(
