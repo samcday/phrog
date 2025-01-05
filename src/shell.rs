@@ -16,7 +16,6 @@ impl Shell {
 mod imp {
     use crate::keypad_shuffle::ShuffleKeypadQuickSetting;
     use crate::lockscreen::Lockscreen;
-    use crate::APP_ID;
     use gtk::gio::IOExtensionPoint;
     use gtk::gio::Settings;
     use gtk::glib::GString;
@@ -26,7 +25,6 @@ mod imp {
     use gtk::subclass::prelude::*;
     use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass};
     use gtk::{gdk, glib, CssProvider, StyleContext};
-    use libphosh::prelude::ShellExt;
     use libphosh::subclass::shell::ShellImpl;
     use std::cell::RefCell;
     use std::cell::{Cell, OnceCell};
@@ -87,18 +85,6 @@ mod imp {
             settings
                 .set_strv("quick-settings", qs.iter().collect::<Vec<&GString>>())
                 .expect("failed to enable keypad-shuffle");
-
-            self.obj().connect_ready(move |shell| {
-                let lockscreen = shell
-                    .lockscreen_manager()
-                    .lockscreen()
-                    .and_then(|v| v.downcast::<Lockscreen>().ok())
-                    .expect("failed to get lockscreen");
-                let user_session_page = lockscreen.user_session_page();
-                let settings = Settings::new(APP_ID);
-                user_session_page.select_user(&settings.string("last-user"));
-                user_session_page.select_session(&settings.string("last-session"));
-            });
         }
     }
 
