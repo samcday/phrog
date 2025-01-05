@@ -8,10 +8,8 @@ use phrog::shell::Shell;
 
 static G_LOG_DOMAIN: &str = "phrog";
 
-static GLIB_LOGGER: GlibLogger = GlibLogger::new(
-    GlibLoggerFormat::Plain,
-    GlibLoggerDomain::CrateTarget,
-);
+static GLIB_LOGGER: GlibLogger =
+    GlibLogger::new(GlibLoggerFormat::Plain, GlibLoggerDomain::CrateTarget);
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -45,7 +43,6 @@ fn main() -> anyhow::Result<()> {
         .property("overview-visible", false)
         .build();
     shell.set_default();
-    shell.set_locked(true);
 
     shell.connect_ready(|_| {
         info!("Shell is ready");

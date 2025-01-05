@@ -9,5 +9,9 @@
             <default>""</default>
             <summary>The name of the last session that successfully launched</summary>
         </key>
+        <key name="first-run" type="s">
+            <default>""</default>
+            <summary>A path to a binary that should be executed when phrog starts up, before displaying the main login screen.</summary>
+        </key>
     </schema>
 </schemalist>
