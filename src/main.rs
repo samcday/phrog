@@ -40,7 +40,10 @@ fn main() -> anyhow::Result<()> {
     let wall_clock = WallClock::new();
     wall_clock.set_default();
 
-    let shell: Shell = Object::builder().property("fake-greetd", args.fake).build();
+    let shell: Shell = Object::builder()
+        .property("fake-greetd", args.fake)
+        .property("overview-visible", false)
+        .build();
     shell.set_default();
     shell.set_locked(true);
 
