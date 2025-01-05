@@ -9,7 +9,7 @@ ARG PHOSH_REF=v0.44.0
 # Official upstream can be used when phoc 0.45 is released
 #ARG PHOC_REMOTE=https://gitlab.gnome.org/World/Phosh/phoc.git
 ARG PHOC_REMOTE=https://gitlab.gnome.org/guidog/phoc.git
-ARG PHOC_REF=05f9cfbe4c4c0e74732d8817e1e2959053d40e6d
+ARG PHOC_REF=stack-order
 
 RUN export DEBIAN_FRONTEND=noninteractive \
    && apt-get -y update \
