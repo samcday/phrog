@@ -1,12 +1,15 @@
 use crate::dbus::user::UserProxy;
 use futures_util::select;
+use glib::warn;
 use gtk::gdk_pixbuf::Pixbuf;
 use gtk::gio::Cancellable;
-use gtk::glib::{clone, g_warning, spawn_future_local, Object};
+use gtk::glib::{clone, spawn_future_local, Object};
 use gtk::prelude::FileExt;
 use gtk::{gio, glib};
 use zbus::export::futures_util::StreamExt;
 use zbus::zvariant::{ObjectPath, OwnedObjectPath};
+
+static G_LOG_DOMAIN: &str = "phrog-user";
 
 glib::wrapper! {
     pub struct User(ObjectSubclass<imp::User>);
@@ -26,7 +29,7 @@ impl User {
             {
                 proxy
             } else {
-                g_warning!("user", "failed to construct UserProxy for {}", path);
+                warn!("failed to construct UserProxy for {}", path);
                 return;
             };
 
@@ -78,9 +81,11 @@ impl User {
 }
 
 mod imp {
+    use super::G_LOG_DOMAIN;
+    use glib::warn;
     use gtk::gdk_pixbuf::Pixbuf;
     use gtk::gio::{Cancellable, FileMonitorFlags};
-    use gtk::glib::{clone, g_warning, Properties};
+    use gtk::glib::{clone, Properties};
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
     use gtk::{gio, glib};
@@ -123,7 +128,7 @@ mod imp {
                     match file.monitor(FileMonitorFlags::empty(), c.as_ref()) {
                         Ok(monitor) => user.set_icon_monitor(monitor.clone()),
                         Err(err) => {
-                            g_warning!("user", "error starting file monitor on {}: {}", path, err)
+                            warn!("error starting file monitor on {}: {}", path, err)
                         }
                     }
                 }

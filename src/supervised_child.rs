@@ -1,9 +1,11 @@
-use gtk::glib::{g_error, g_info, g_warning};
+use glib::{error, info, warn};
 use nix::sys::signal::SIGTERM;
 use nix::unistd::Pid;
 use std::process::Child;
 use std::thread::sleep;
 use std::time::{Duration, Instant};
+
+static G_LOG_DOMAIN: &str = "phrog-supervised-child";
 
 pub struct SupervisedChild {
     pub child: Child,
@@ -21,7 +23,7 @@ impl SupervisedChild {
     pub fn stop(&mut self) {
         let pid = Pid::from_raw(self.child.id() as _);
         let label = format!("{} ({})", self.name, pid);
-        g_info!("phrog", "Stopping process {} with SIGTERM", label);
+        info!("Stopping process {} with SIGTERM", label);
         // First try to SIGTERM, allowing maximum of 5 seconds for graceful exit.
         match nix::sys::signal::kill(pid, SIGTERM) {
             Ok(_) => {
@@ -32,13 +34,13 @@ impl SupervisedChild {
                     }
                     sleep(Duration::from_secs(1));
                 }
-                g_warning!("phrog", "Process {} ignored SIGTERM. Killing...", label);
+                warn!("Process {} ignored SIGTERM. Killing...", label);
             }
-            Err(err) => g_warning!("phrog", "Failed to SIGTERM process {}: {}", label, err),
+            Err(err) => warn!("Failed to SIGTERM process {}: {}", label, err),
         }
 
         if let Err(err) = self.child.kill() {
-            g_error!("phrog", "Failed to kill process {}: {}", label, err);
+            error!("Failed to kill process {}: {}", label, err);
         }
     }
 }

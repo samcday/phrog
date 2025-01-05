@@ -1,9 +1,11 @@
 use crate::session_object::SessionObject;
+use glib::warn;
 use glob::glob;
 use gtk::gio::DesktopAppInfo;
-use gtk::glib::g_warning;
 use gtk::prelude::*;
 use std::collections::HashMap;
+
+static G_LOG_DOMAIN: &str = "phrog-sessions";
 
 pub fn sessions() -> Vec<SessionObject> {
     let mut sessions = HashMap::new();
@@ -19,7 +21,7 @@ pub fn sessions() -> Vec<SessionObject> {
 fn session_list(path: &str, session_type: &str, sessions: &mut HashMap<String, SessionObject>) {
     for f in match glob(path) {
         Err(e) => {
-            g_warning!("sessions", "couldn't check sessions in {}: {}", path, e);
+            warn!("couldn't check sessions in {}: {}", path, e);
             return;
         }
         Ok(iter) => iter,
@@ -34,7 +36,7 @@ fn session_list(path: &str, session_type: &str, sessions: &mut HashMap<String, S
         let info = if let Some(info) = DesktopAppInfo::from_filename(&f) {
             info
         } else {
-            g_warning!("session", "Unable to parse session file {:?}", f);
+            warn!("Unable to parse session file {:?}", f);
             continue;
         };
         sessions.insert(

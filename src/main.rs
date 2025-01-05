@@ -6,6 +6,13 @@ use libphosh::WallClock;
 use nix::libc::SIGTERM;
 use phrog::shell::Shell;
 
+static G_LOG_DOMAIN: &str = "phrog";
+
+static GLIB_LOGGER: GlibLogger = GlibLogger::new(
+    GlibLoggerFormat::Plain,
+    GlibLoggerDomain::CrateTarget,
+);
+
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
@@ -19,6 +26,9 @@ struct Args {
 }
 
 fn main() -> anyhow::Result<()> {
+    log::set_logger(&GLIB_LOGGER).unwrap();
+    log::set_max_level(log::LevelFilter::Debug);
+
     let args = Args::parse();
 
     // TODO: check XDG_RUNTIME_DIR here? Angry if not set? Default?
@@ -35,7 +45,7 @@ fn main() -> anyhow::Result<()> {
     shell.set_locked(true);
 
     shell.connect_ready(|_| {
-        println!("Shell is ready");
+        info!("Shell is ready");
     });
 
     unix_signal_add_local_once(SIGTERM, || {
