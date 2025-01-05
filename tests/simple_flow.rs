@@ -21,7 +21,7 @@ fn test_simple_flow() {
     phosh_settings.set_boolean("shuffle-keypad", false).unwrap();
 
     let phrog_settings = Settings::new("mobi.phosh.phrog");
-    phrog_settings.set_string("last-user", "samcday").unwrap();
+    phrog_settings.set_string("last-user", "agx").unwrap();
 
     let ready_rx = test.ready_rx.clone();
     let shell = test.shell.clone();
