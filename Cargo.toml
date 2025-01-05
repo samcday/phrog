@@ -15,8 +15,11 @@ zbus = { version = "4", default-features = false, features = ["blocking", "async
 nix = { version = "0.27", features = ["signal"] }
 async-global-executor = "2.4.1"
 futures-util = "0.3.30"
+log = "0.4.22"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies.glib]
+version = "0.18"
+features = ["log_macros"]
 
 [dependencies.gtk]
 version = "0.18"
