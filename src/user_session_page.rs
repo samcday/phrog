@@ -60,10 +60,12 @@ mod imp {
     use gtk::{glib, CompositeTemplate, Image, ListBox, ListBoxRow};
     use libhandy::prelude::*;
     use libhandy::ActionRow;
-    use std::cell::OnceCell;
+    use std::cell::{Cell, OnceCell};
     use std::sync::OnceLock;
+    use glib::Properties;
 
-    #[derive(CompositeTemplate, Default)]
+    #[derive(CompositeTemplate, Default, Properties)]
+    #[properties(wrapper_type = super::UserSessionPage)]
     #[template(resource = "/mobi/phosh/phrog/lockscreen-user-session.ui")]
     pub struct UserSessionPage {
         #[template_child]
@@ -74,6 +76,9 @@ mod imp {
 
         users: OnceCell<ListStore>,
         pub sessions: OnceCell<ListStore>,
+
+        #[property(get, set)]
+        ready: Cell<bool>,
     }
 
     #[glib::object_subclass]
@@ -92,6 +97,7 @@ mod imp {
         }
     }
 
+    #[glib::derived_properties]
     impl ObjectImpl for UserSessionPage {
         fn constructed(&self) {
             self.parent_constructed();
@@ -180,6 +186,8 @@ mod imp {
                         .and_then(|v| v.downcast_ref::<ListBoxRow>()),
                 );
 
+                this.obj().set_ready(true);
+
                 let mut added_stream = accounts_proxy.receive_user_added().await.unwrap();
                 let mut deleted_stream = accounts_proxy.receive_user_deleted().await.unwrap();
 
@@ -207,7 +215,11 @@ mod imp {
 
         fn signals() -> &'static [Signal] {
             static SIGNALS: OnceLock<Vec<Signal>> = OnceLock::new();
-            SIGNALS.get_or_init(|| vec![Signal::builder("login").build()])
+            SIGNALS.get_or_init(|| {
+                vec![
+                    Signal::builder("login").build(),
+                ]
+            })
         }
     }
 
