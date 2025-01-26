@@ -5,11 +5,8 @@ FROM registry.gitlab.gnome.org/world/phosh/phosh/debian:v0.0.2024-11-04
 ARG PHOSH_REMOTE=https://gitlab.gnome.org/World/Phosh/phosh.git
 ARG PHOSH_REF=v0.44.0
 
-# Workaround for https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1161
-# Official upstream can be used when phoc 0.45 is released
-#ARG PHOC_REMOTE=https://gitlab.gnome.org/World/Phosh/phoc.git
-ARG PHOC_REMOTE=https://gitlab.gnome.org/guidog/phoc.git
-ARG PHOC_REF=stack-order
+ARG PHOC_REMOTE=https://gitlab.gnome.org/World/Phosh/phoc.git
+ARG PHOC_REF=v0.44.1
 
 RUN export DEBIAN_FRONTEND=noninteractive \
    && apt-get -y update \
