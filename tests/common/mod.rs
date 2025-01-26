@@ -62,7 +62,11 @@ impl Test {
     }
 }
 
-pub fn test_init() -> Test {
+pub struct TestOptions {
+    pub num_users: Option<u32>,
+}
+
+pub fn test_init(options: Option<TestOptions>) -> Test {
     std::env::set_var("GSETTINGS_BACKEND", "memory");
     let tmp = tempfile::tempdir().unwrap();
     phrog::init().unwrap();
@@ -72,8 +76,11 @@ pub fn test_init() -> Test {
     // use a more appropriate (moar froggy) accent color
     if_settings.set_string("accent-color", "green").unwrap();
 
-    let dbus_conn =
-        async_global_executor::block_on(async move { dbus::run_accounts_fixture().await.unwrap() });
+    let dbus_conn = async_global_executor::block_on(async move {
+        dbus::run_accounts_fixture(options.and_then(|opts| opts.num_users))
+            .await
+            .unwrap()
+    });
 
     let logged_in = Arc::new(AtomicBool::new(false));
     fake_greetd(&logged_in);

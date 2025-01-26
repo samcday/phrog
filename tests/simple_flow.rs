@@ -15,7 +15,7 @@ use std::time::Duration;
 
 #[test]
 fn test_simple_flow() {
-    let mut test = test_init();
+    let mut test = test_init(None);
 
     let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
     phosh_settings.set_boolean("shuffle-keypad", false).unwrap();
