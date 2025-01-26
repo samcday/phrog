@@ -29,7 +29,9 @@ It is the spiritual successor of [phog][].
 command = "systemd-cat --identifier=phrog phrog"
 ```
 
-Then run greetd however your distro prefers you to.
+Then run greetd however your distro prefers you to, see the
+[example-config](./example-config) directory for an example greetd config and
+startup script that launches greetd in a way suitable for mobile use.
 
 You can also test it outside greetd, nested in your favourite Wayland desktop environment:
 
