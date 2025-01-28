@@ -90,8 +90,11 @@ pub fn test_init() -> Test {
     shell.connect_ready(clone!(@strong ready_called2 => move |shell| {
         ready_called2.store(true, Ordering::Relaxed);
 
-        let (_, _, width, height) = shell.usable_area();
-        let vp = VirtualPointer::new(wayland_client::Connection::connect_to_env().unwrap(), width as _, height as _);
+        let display = gtk::gdk::Display::default().unwrap();
+        let monitor = display.monitor(0).unwrap();
+        let screen_geom = monitor.geometry();
+        let vp = VirtualPointer::new(wayland_client::Connection::connect_to_env().unwrap(),
+            screen_geom.width() as u32, screen_geom.height() as u32);
         let kb = VirtualKeyboard::new(wayland_client::Connection::connect_to_env().unwrap());
         ready_tx.send_blocking((vp, kb)).expect("notify ready failed");
     }));

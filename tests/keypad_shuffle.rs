@@ -1,6 +1,6 @@
 pub mod common;
 
-use gtk::glib;
+use gtk::{gdk, glib};
 use gtk::glib::clone;
 use libphosh::prelude::ShellExt;
 use common::*;
@@ -50,7 +50,10 @@ fn keypad_shuffle() {
 
         glib::timeout_future(Duration::from_millis(1000)).await;
 
-        vp.click_at((shell.usable_area().2 / 2) as _, 0).await;
+        let display = gtk::gdk::Display::default().unwrap();
+        let monitor = display.monitor(0).unwrap();
+        let screen_geom = monitor.geometry();
+        vp.click_at((screen_geom.width() / 2) as _, 0).await;
         glib::timeout_future(Duration::from_millis(500)).await;
         vp.click_on(&shell.keypad_shuffle_qs().unwrap().imp().info.clone()).await;
         glib::timeout_future(Duration::from_millis(500)).await;
