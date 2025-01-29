@@ -4,7 +4,7 @@ use glib::warn;
 use gtk::gdk_pixbuf::Pixbuf;
 use gtk::gio::Cancellable;
 use gtk::glib::{clone, spawn_future_local, Object};
-use gtk::prelude::FileExt;
+use gtk::prelude::{FileExt, ObjectExt};
 use gtk::{gio, glib};
 use zbus::export::futures_util::StreamExt;
 use zbus::zvariant::{ObjectPath, OwnedObjectPath};
@@ -42,6 +42,8 @@ impl User {
             if let Ok(v) = user_proxy.icon_file().await {
                 obj.set_icon_file(v);
             }
+
+            obj.emit_by_name::<()>("loaded", &[]);
 
             let mut name_stream = user_proxy.receive_real_name_changed().await.fuse();
             let mut username_stream = user_proxy.receive_user_name_changed().await.fuse();
@@ -85,11 +87,13 @@ mod imp {
     use glib::warn;
     use gtk::gdk_pixbuf::Pixbuf;
     use gtk::gio::{Cancellable, FileMonitorFlags};
+    use gtk::glib::subclass::Signal;
     use gtk::glib::{clone, Properties};
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
     use gtk::{gio, glib};
     use std::cell::RefCell;
+    use std::sync::OnceLock;
 
     #[derive(Properties, Default)]
     #[properties(wrapper_type = super::User)]
@@ -140,6 +144,11 @@ mod imp {
                     }));
                 }
             });
+        }
+
+        fn signals() -> &'static [Signal] {
+            static SIGNALS: OnceLock<Vec<Signal>> = OnceLock::new();
+            SIGNALS.get_or_init(|| vec![Signal::builder("loaded").build()])
         }
     }
 }

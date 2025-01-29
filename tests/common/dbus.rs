@@ -51,7 +51,9 @@ pub fn system_dbus(tmpdir: &Path) -> SupervisedChild {
     SupervisedChild::new("dbus-daemon", child)
 }
 
-struct AccountsFixture {}
+struct AccountsFixture {
+    num_users: Option<u32>,
+}
 struct UserFixture {
     name: String,
     username: String,
@@ -61,11 +63,15 @@ struct UserFixture {
 #[zbus::interface(name = "org.freedesktop.Accounts")]
 impl AccountsFixture {
     async fn list_cached_users(&self) -> Vec<ObjectPath> {
-        vec![
+        let mut users = vec![
             ObjectPath::from_static_str_unchecked("/org/freedesktop/Accounts/phoshi"),
             ObjectPath::from_static_str_unchecked("/org/freedesktop/Accounts/agx"),
             ObjectPath::from_static_str_unchecked("/org/freedesktop/Accounts/sam"),
-        ]
+        ];
+        if let Some(num_users) = self.num_users {
+            users.truncate(num_users as _);
+        }
+        users
     }
 }
 
@@ -99,13 +105,13 @@ impl UserFixture {
     }
 }
 
-pub async fn run_accounts_fixture() -> anyhow::Result<zbus::Connection> {
+pub async fn run_accounts_fixture(num_users: Option<u32>) -> anyhow::Result<zbus::Connection> {
     let connection = zbus::Connection::system()
         .await
         .context("failed to connect to system bus")?;
     connection
         .object_server()
-        .at("/org/freedesktop/Accounts", AccountsFixture {})
+        .at("/org/freedesktop/Accounts", AccountsFixture { num_users })
         .await
         .context("failed to serve org.freedesktop.Accounts")?;
     connection
