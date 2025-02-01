@@ -25,6 +25,7 @@ use std::process::Stdio;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use glib::g_critical;
 use tempfile::TempDir;
 pub use virtual_pointer::VirtualPointer;
 
@@ -57,7 +58,16 @@ impl Test {
             }
         }
 
+        let timed_out = Arc::new(AtomicBool::new(false));
+        timeout_add_once(Duration::from_secs(60), clone!(@strong timed_out => move || {
+            timed_out.store(true, Ordering::SeqCst);
+            g_critical!("phrog", "Test timed out!");
+            gtk::main_quit();
+        }));
+
         gtk::main();
+
+        assert!(!timed_out.load(Ordering::SeqCst));
         assert!(self.ready_called.load(Ordering::Relaxed));
     }
 }
