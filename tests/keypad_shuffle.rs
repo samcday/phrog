@@ -20,7 +20,7 @@ fn keypad_shuffle() {
 
     let ready_rx = test.ready_rx.clone();
     let shell = test.shell.clone();
-    glib::spawn_future_local(clone!(@weak shell => async move {
+    test.start("keypad-shuffle", glib::spawn_future_local(clone!(@weak shell => async move {
         let (mut vp, kb) = ready_rx.recv().await.unwrap();
         glib::timeout_future(Duration::from_millis(1500)).await;
 
@@ -64,7 +64,5 @@ fn keypad_shuffle() {
         glib::timeout_future(Duration::from_millis(500)).await;
 
         fade_quit();
-    }));
-
-    test.start("keypad-shuffle");
+    })));
 }

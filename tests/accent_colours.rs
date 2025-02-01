@@ -18,7 +18,7 @@ fn test_accent_colours() {
 
     let ready_rx = test.ready_rx.clone();
     let if_settings = test.if_settings.clone();
-    glib::spawn_future_local(async move {
+    test.start("accent-colours", glib::spawn_future_local(async move {
         let (_, _) = ready_rx.recv().await.unwrap();
         glib::timeout_future(Duration::from_millis(1500)).await;
 
@@ -28,7 +28,5 @@ fn test_accent_colours() {
         }
 
         fade_quit();
-    });
-
-    test.start("accent-colours");
+    }));
 }

@@ -7,6 +7,7 @@ use gtk::traits::ListBoxExt;
 use libhandy::prelude::ActionRowExt;
 use libhandy::traits::ComboRowExt;
 use libhandy::ActionRow;
+use crate::shell::Shell;
 
 glib::wrapper! {
     pub struct UserSessionPage(ObjectSubclass<imp::UserSessionPage>)
@@ -25,9 +26,9 @@ impl UserSessionPage {
     }
 
     pub fn session(&self) -> SessionObject {
+        let shell = libphosh::Shell::default().downcast::<Shell>().unwrap();
         let session_idx = self.imp().row_sessions.selected_index() as u32;
-        let sessions = self.imp().sessions.get().unwrap();
-        sessions
+        shell.sessions().unwrap()
             .item(session_idx)
             .clone()
             .and_downcast::<SessionObject>()
@@ -48,7 +49,7 @@ mod imp {
     use crate::session_object::SessionObject;
     use crate::shell::Shell;
     use crate::user::User;
-    use crate::{sessions, APP_ID};
+    use crate::APP_ID;
     use futures_util::select;
     use futures_util::StreamExt;
     use glib::subclass::InitializingObject;
@@ -75,7 +76,6 @@ mod imp {
         pub row_sessions: TemplateChild<libhandy::ComboRow>,
 
         users: OnceCell<ListStore>,
-        pub sessions: OnceCell<ListStore>,
 
         #[property(get, set)]
         ready: Cell<bool>,
@@ -111,27 +111,15 @@ mod imp {
                     this.obj().emit_by_name::<()>("login", &[]);
                 }));
 
-            self.sessions
-                .set(ListStore::new::<SessionObject>())
-                .unwrap();
-
-            let session_list = sessions::sessions();
-            self.sessions
-                .get()
-                .unwrap()
-                .extend_from_slice(&session_list);
-
             self.row_sessions.bind_name_model(
-                Some(self.sessions.get().unwrap()),
+                Some(shell.sessions().as_ref().unwrap()),
                 Some(Box::new(|v| {
                     v.downcast_ref::<SessionObject>().unwrap().name()
                 })),
             );
             let last_session = settings.string("last-session");
-            for (idx, session) in self
-                .sessions
-                .get()
-                .unwrap()
+            for (idx, session) in shell.sessions()
+                .as_ref().unwrap()
                 .iter::<SessionObject>()
                 .flatten()
                 .enumerate()

@@ -11,17 +11,21 @@ use gtk::gio::Settings;
 use gtk::prelude::*;
 use phrog::lockscreen::Lockscreen;
 use std::time::Duration;
+use phrog::session_object::SessionObject;
 
 #[test]
 fn test_trivial_flow() {
-    let mut test = test_init(Some(TestOptions { num_users: Some(1) }));
+    let mut test = test_init(Some(TestOptions {
+        num_users: Some(1),
+        sessions: Some(vec![SessionObject::new("phosh", "Phosh", "", "", "")]),
+    }));
 
     let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
     phosh_settings.set_boolean("shuffle-keypad", false).unwrap();
 
     let ready_rx = test.ready_rx.clone();
     let shell = test.shell.clone();
-    glib::spawn_future_local(clone!(@weak shell => async move {
+    test.start("trivial-flow", glib::spawn_future_local(clone!(@weak shell => async move {
         let (mut vp, _) = ready_rx.recv().await.unwrap();
         glib::timeout_future(Duration::from_millis(2000)).await;
 
@@ -39,9 +43,7 @@ fn test_trivial_flow() {
 
         vp.click_on(&submit_btn).await;
         glib::timeout_future(Duration::from_millis(50)).await;
-    }));
-
-    test.start("trivial-flow");
+    })));
 
     assert!(test.logged_in.load(Ordering::Relaxed));
 }
