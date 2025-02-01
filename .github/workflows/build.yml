@@ -3,9 +3,10 @@ name: build
 on:
   push:
     branches: [main]
-    tags: ['*']
   pull_request:
     branches: [main]
+  release:
+    types: [published]
   workflow_dispatch: {}
 
 concurrency:
@@ -166,7 +167,7 @@ jobs:
   release:
     needs: [build, demo]
     runs-on: ubuntu-24.04
-    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    if: github.event_name == 'release'
     steps:
       - uses: actions/download-artifact@v4
         with:
