@@ -16,7 +16,7 @@ impl Shell {
 mod imp {
     use crate::keypad_shuffle::ShuffleKeypadQuickSetting;
     use crate::lockscreen::Lockscreen;
-    use gtk::gio::IOExtensionPoint;
+    use gtk::gio::{IOExtensionPoint, ListStore};
     use gtk::gio::Settings;
     use gtk::glib::GString;
     use gtk::glib::{Properties, Type};
@@ -29,6 +29,8 @@ mod imp {
     use std::cell::RefCell;
     use std::cell::{Cell, OnceCell};
     use std::collections::HashSet;
+    use crate::session_object::SessionObject;
+    use crate::sessions;
 
     #[derive(Default, Properties)]
     #[properties(wrapper_type = super::Shell)]
@@ -39,8 +41,10 @@ mod imp {
         #[property(get, set)]
         keypad_shuffle_qs: RefCell<Option<ShuffleKeypadQuickSetting>>,
 
-        provider: Cell<CssProvider>,
+        #[property(get, set)]
+        pub sessions: RefCell<Option<ListStore>>,
 
+        provider: Cell<CssProvider>,
         pub dbus_connection: OnceCell<zbus::Connection>,
     }
 
@@ -58,6 +62,12 @@ mod imp {
             self.dbus_connection.set(system_dbus).unwrap();
 
             self.parent_constructed();
+
+            if self.obj().sessions().is_none() {
+                let sessions_store = ListStore::new::<SessionObject>();
+                sessions_store.extend_from_slice(&sessions::sessions());
+                self.obj().set_sessions(sessions_store);
+            }
 
             let provider = CssProvider::new();
             provider.load_from_resource("/mobi/phosh/phrog/phrog.css");

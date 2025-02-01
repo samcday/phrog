@@ -121,8 +121,9 @@ mod imp {
 
             self.user_session_page.get().unwrap().connect_ready_notify(
                 clone!(@weak-allow-none self as this => move |usp| {
+                    let shell = libphosh::Shell::default().downcast::<Shell>().unwrap();
                     let user_count = usp.imp().box_users.children().len();
-                    let session_count = usp.imp().sessions.get().unwrap().n_items();
+                    let session_count = shell.sessions().map_or(0, |s| s.n_items());
                     // If there's only one user and one session, set the default + active page to the keypad.
                     if session_count == 1 && user_count == 1 {
                         let this = if let Some(this) = this { this } else {
