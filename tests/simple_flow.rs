@@ -25,7 +25,7 @@ fn test_simple_flow() {
 
     let ready_rx = test.ready_rx.clone();
     let shell = test.shell.clone();
-    glib::spawn_future_local(clone!(@weak shell => async move {
+    test.start("simple-flow", glib::spawn_future_local(clone!(@weak shell => async move {
         let (mut vp, _) = ready_rx.recv().await.unwrap();
         glib::timeout_future(Duration::from_millis(2000)).await;
         // Move the mouse to first user row and click on it.
@@ -49,9 +49,7 @@ fn test_simple_flow() {
 
         vp.click_on(&submit_btn).await;
         glib::timeout_future(Duration::from_millis(50)).await;
-    }));
-
-    test.start("simple-flow");
+    })));
 
     assert!(test.logged_in.load(Ordering::Relaxed));
 }

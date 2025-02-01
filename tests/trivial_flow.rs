@@ -21,7 +21,7 @@ fn test_trivial_flow() {
 
     let ready_rx = test.ready_rx.clone();
     let shell = test.shell.clone();
-    glib::spawn_future_local(clone!(@weak shell => async move {
+    test.start("trivial-flow", glib::spawn_future_local(clone!(@weak shell => async move {
         let (mut vp, _) = ready_rx.recv().await.unwrap();
         glib::timeout_future(Duration::from_millis(2000)).await;
 
@@ -39,9 +39,7 @@ fn test_trivial_flow() {
 
         vp.click_on(&submit_btn).await;
         glib::timeout_future(Duration::from_millis(50)).await;
-    }));
-
-    test.start("trivial-flow");
+    })));
 
     assert!(test.logged_in.load(Ordering::Relaxed));
 }

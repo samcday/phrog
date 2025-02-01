@@ -25,7 +25,7 @@ use std::process::Stdio;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use glib::g_critical;
+use glib::{g_critical, spawn_future_local, JoinHandle};
 use tempfile::TempDir;
 pub use virtual_pointer::VirtualPointer;
 
@@ -44,7 +44,7 @@ pub struct Test {
 }
 
 impl Test {
-    pub fn start(&mut self, name: &str) {
+    pub fn start(&mut self, name: &str, jh: JoinHandle<()>) {
         if let Ok(base_path) = std::env::var("RECORD_TESTS") {
             if let Ok(child) = std::process::Command::new("wf-recorder")
                 .arg("-f")
@@ -65,9 +65,19 @@ impl Test {
             gtk::main_quit();
         }));
 
+        let failed = Arc::new(AtomicBool::new(false));
+        spawn_future_local(clone!(@strong failed => async move {
+            if jh.await.is_err() {
+                g_critical!("phrog", "Test failed!");
+                gtk::main_quit();
+                failed.store(true, Ordering::SeqCst);
+            }
+        }));
+
         gtk::main();
 
         assert!(!timed_out.load(Ordering::SeqCst));
+        assert!(!failed.load(Ordering::SeqCst));
         assert!(self.ready_called.load(Ordering::Relaxed));
     }
 }
