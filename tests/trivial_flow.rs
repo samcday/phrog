@@ -11,10 +11,14 @@ use gtk::gio::Settings;
 use gtk::prelude::*;
 use phrog::lockscreen::Lockscreen;
 use std::time::Duration;
+use phrog::session_object::SessionObject;
 
 #[test]
 fn test_trivial_flow() {
-    let mut test = test_init(Some(TestOptions { num_users: Some(1) }));
+    let mut test = test_init(Some(TestOptions {
+        num_users: Some(1),
+        sessions: Some(vec![SessionObject::new("phosh", "Phosh", "", "", "")]),
+    }));
 
     let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
     phosh_settings.set_boolean("shuffle-keypad", false).unwrap();
