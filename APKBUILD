@@ -1,15 +1,12 @@
 # Maintainer: Sam Day <me@samcday.com>
 pkgname=greetd-phrog
 pkgver=0.43.0_git
-_commit=main
 pkgrel=0
 pkgdesc="Mobile device greeter"
-url="https://github.com/samcday/phrog"
-# riscv64: blocked by greetd
+url=https://github.com/samcday/phrog
 # s390x: blocked by greetd & phosh
-# ppc64le: blocked by phosh
 # armhf: blocked by phosh
-arch="all !s390x !riscv64 !armhf !ppc64le"
+arch="all !s390x !armhf"
 license="GPL-3.0-only"
 depends="
 	phosh
@@ -22,14 +19,17 @@ makedepends="
 	libphosh-dev"
 checkdepends="xvfb-run"
 
-source="${url}/archive/$_commit/phrog-$_commit.tar.gz"
+_gitrev=main
+source="https://github.com/samcday/phrog/archive/$_gitrev/phrog-$_gitrev.tar.gz"
 subpackages="$pkgname-schemas::noarch"
-builddir="$srcdir/phrog-$_commit"
-options="net" # cargo fetch
+builddir="$srcdir/phrog-$_gitrev"
+# net: cargo fetch
+options="net"
 
 export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix=$builddir=/build/"
 
 prepare() {
+	default_prepare
 	cargo fetch --target="$CTARGET" --locked
 }
 
@@ -42,14 +42,16 @@ package() {
 	install -Dm755 target/release/phrog -t "$pkgdir"/usr/bin/
 }
 
-# Tests are currently broken without a patched phoc due to https://gitlab.gnome.org/World/Phosh/phosh/-/issues/1161
-# check() {
-#     export XDG_RUNTIME_DIR=/tmp
-# 	dbus-run-session xvfb-run -a phoc -E "cargo test --release --frozen"
-# }
+check() {
+	export XDG_RUNTIME_DIR=/tmp
+	# TODO: trivial_flow test is failing in Alpine (and elsewhere):
+	# https://github.com/samcday/phrog/issues/89
+	rm tests/trivial_flow.rs
+	dbus-run-session xvfb-run -a phoc -E "cargo test --frozen"
+}
 
 schemas() {
-    pkgdesc="Phrog schema files"
-    depends=""
-    amove usr/share/glib-2.0/schemas
+	pkgdesc="Phrog schema files"
+	depends=""
+	amove usr/share/glib-2.0/schemas
 }

@@ -3,9 +3,10 @@ name: build
 on:
   push:
     branches: [main]
-    tags: ['*']
   pull_request:
     branches: [main]
+  release:
+    types: [published]
   workflow_dispatch: {}
 
 concurrency:
@@ -116,6 +117,14 @@ jobs:
           path: |
             demo-video/demo.mp4
             demo-video/demo.webp
+      - name: upload demo artifacts to release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'release'
+        with:
+          name: ${{ github.event.release.name }}
+          files: |
+            demo-video/demo.mp4
+            demo-video/demo.webp
       - run: |
           set -uexo pipefail
           mkdir blob-upload/
@@ -158,23 +167,9 @@ jobs:
           SOURCE_DIR: 'blob-upload'
           DEST_DIR: ${{ github.run_id }}
       - uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
         with:
           header: ci-recordings
           hide_and_recreate: true
           hide_classify: OUTDATED
           path: comment.txt
-  release:
-    needs: [build, demo]
-    runs-on: ubuntu-24.04
-    if: ${{ startsWith(github.ref, 'refs/tags/') }}
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: demo-video
-          path: demo-video
-      - name: upload release artifacts
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            demo-video/demo.mp4
-            demo-video/demo.webp

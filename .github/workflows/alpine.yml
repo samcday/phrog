@@ -3,10 +3,9 @@ name: alpine
 on:
   push:
     branches: [main]
-    tags: ['*']
-  pull_request:
-    branches: [main]
   workflow_dispatch: {}
+  release:
+    types: [published]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,14 +16,16 @@ permissions:
 
 jobs:
   alpine:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04${{ matrix.arch == 'aarch64' && '-arm' || '' }}
     strategy:
       matrix:
-        # aarch64 build is slooow - skip it in PR builds
-        arch: ${{ (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main') && fromJSON('["x86_64", "aarch64"]') || fromJSON('["x86_64"]') }}
+        arch:
+          - x86_64
+          - aarch64
     steps:
       - uses: actions/checkout@v4
-      - uses: jirutka/setup-alpine@v1
+      # Using fork (aarch64 branch from bgilbert/setup-alpine) until jirutka/setup-alpine#11 is resolved
+      - uses: samcday/setup-alpine@main
         id: alpine
         with:
           arch: ${{ matrix.arch }}
@@ -41,15 +42,34 @@ jobs:
           cp ~/.abuild/key.rsa.pub /etc/apk/keys/key.rsa.pub
           abuild -F deps
         shell: alpine.sh --root {0}
+      - name: update sha
+        if: github.event_name != 'release'
+        run: |
+          sed -i -e "s/^_gitrev=main$/_gitrev=$GITHUB_SHA/" APKBUILD
+      - name: release prep
+        if: github.event_name == 'release'
+        run: |
+          # Remove _git suffix to indicate the stable release.
+          # Assumes that the base (unsuffixed) pkgver was already updated to the new version in release commit.
+          sed -i -e 's/^\(pkgver=.*\)_git$/\1/' APKBUILD
+          # Delete _gitrev= var and rewrite usages to pkgver
+          sed -i -e '/^_gitrev=/d' -e 's/_gitrev/pkgver/g' APKBUILD
       - name: build package
         run: |
           export PACKAGER_PRIVKEY=$HOME/.abuild/key.rsa
-          sed -i -e "s/_commit=main/_commit=$GITHUB_SHA/" APKBUILD
           abuild -F checksum
           abuild -F -P /packages
           chmod -R 777 /packages
+          cp APKBUILD /packages/phrog/${{ matrix.arch }}
         shell: alpine.sh --root {0}
       - uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.arch }}
           path: ${{ steps.alpine.outputs.root-path }}/packages/phrog/${{ matrix.arch }}/
+      - name: upload demo artifacts to release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'release'
+        with:
+          name: ${{ github.event.release.name }}
+          files: |
+            ${{ steps.alpine.outputs.root-path }}/packages/phrog/${{ matrix.arch }}/*.apk
