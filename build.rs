@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
 fn main() {
+
     glib_build_tools::compile_resources(
         &["resources"],
         "resources/phrog.gresources.xml",
@@ -13,12 +14,8 @@ fn main() {
 
     let phrog_gschema = PathBuf::from("resources/mobi.phosh.phrog.gschema.xml");
     let dest_path = schema_path.join(phrog_gschema.file_name().unwrap());
-    std::fs::write(
-        &dest_path,
-        std::fs::read(phrog_gschema).expect("failed to read schema file"),
-    )
-    .expect("failed to write phrog schema file");
-    println!("cargo::rerun-if-changed={}", dest_path.display());
+    std::fs::copy(&phrog_gschema, dest_path).expect("failed to copy phrog schema file");
+    println!("cargo::rerun-if-changed={}", phrog_gschema.display());
 
     std::process::Command::new("glib-compile-schemas")
         .arg(&schema_path)
