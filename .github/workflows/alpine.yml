@@ -66,3 +66,10 @@ jobs:
         with:
           name: packages-${{ matrix.arch }}
           path: ${{ steps.alpine.outputs.root-path }}/packages/phrog/${{ matrix.arch }}/
+      - name: upload demo artifacts to release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'release'
+        with:
+          name: ${{ github.event.release.name }}
+          files: |
+            ${{ steps.alpine.outputs.root-path }}/packages/phrog/${{ matrix.arch }}/*.apk
