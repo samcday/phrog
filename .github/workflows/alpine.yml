@@ -42,13 +42,25 @@ jobs:
           cp ~/.abuild/key.rsa.pub /etc/apk/keys/key.rsa.pub
           abuild -F deps
         shell: alpine.sh --root {0}
+      - name: update sha
+        if: github.event_name != 'release'
+        run: |
+          sed -i -e "s/^_gitrev=main$/_gitrev=$GITHUB_SHA/" APKBUILD
+      - name: release prep
+        if: github.event_name == 'release'
+        run: |
+          # Remove _git suffix to indicate the stable release.
+          # Assumes that the base (unsuffixed) pkgver was already updated to the new version in release commit.
+          sed -i -e 's/^\(pkgver=.*\)_git$/\1/' APKBUILD
+          # Delete _gitrev= var and rewrite usages to pkgver
+          sed -i -e '/^_gitrev=/d' -e 's/_gitrev/pkgver/g' APKBUILD
       - name: build package
         run: |
           export PACKAGER_PRIVKEY=$HOME/.abuild/key.rsa
-          sed -i -e "s/_commit=main/_commit=$GITHUB_SHA/" APKBUILD
           abuild -F checksum
           abuild -F -P /packages
           chmod -R 777 /packages
+          cp APKBUILD /packages/phrog/${{ matrix.arch }}
         shell: alpine.sh --root {0}
       - uses: actions/upload-artifact@v4
         with:
