@@ -159,6 +159,7 @@ jobs:
           SOURCE_DIR: 'blob-upload'
           DEST_DIR: ${{ github.run_id }}
       - uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
         with:
           header: ci-recordings
           hide_and_recreate: true
