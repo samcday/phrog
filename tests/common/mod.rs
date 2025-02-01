@@ -7,7 +7,7 @@ use async_channel::Receiver;
 use greetd_ipc::codec::SyncCodec;
 use greetd_ipc::AuthMessageType::Secret;
 use greetd_ipc::{Request, Response};
-use gtk::gio::Settings;
+use gtk::gio::{ListStore, Settings};
 use gtk::glib::{clone, timeout_add_once};
 use gtk::prelude::*;
 use gtk::{Button, Grid, Revealer};
@@ -25,8 +25,9 @@ use std::process::Stdio;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use glib::{g_critical, spawn_future_local, JoinHandle};
+use glib::{g_critical, spawn_future_local, JoinHandle, Object};
 use tempfile::TempDir;
+use phrog::session_object::SessionObject;
 pub use virtual_pointer::VirtualPointer;
 
 #[allow(dead_code)]
@@ -84,6 +85,7 @@ impl Test {
 
 pub struct TestOptions {
     pub num_users: Option<u32>,
+    pub sessions: Option<Vec<SessionObject>>,
 }
 
 pub fn test_init(options: Option<TestOptions>) -> Test {
@@ -96,8 +98,9 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
     // use a more appropriate (moar froggy) accent color
     if_settings.set_string("accent-color", "green").unwrap();
 
+    let num_users = options.as_ref().and_then(|opts| opts.num_users);
     let dbus_conn = async_global_executor::block_on(async move {
-        dbus::run_accounts_fixture(options.and_then(|opts| opts.num_users))
+        dbus::run_accounts_fixture(num_users)
             .await
             .unwrap()
     });
@@ -105,9 +108,17 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
     let logged_in = Arc::new(AtomicBool::new(false));
     fake_greetd(&logged_in);
 
+    let mut shell_builder = Object::builder();
+
+    if let Some(sessions) = options.and_then(|opts| opts.sessions.clone()) {
+        let sessions_store = ListStore::new::<SessionObject>();
+        sessions_store.extend_from_slice(&sessions);
+        shell_builder = shell_builder.property("sessions", sessions_store);
+    }
+
     let wall_clock = WallClock::new();
     wall_clock.set_default();
-    let shell = Shell::new();
+    let shell: Shell = shell_builder.build();
     shell.set_default();
     shell.set_locked(true);
 

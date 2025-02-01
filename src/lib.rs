@@ -4,7 +4,7 @@ pub mod shell;
 pub mod supervised_child;
 
 mod dbus;
-mod session_object;
+pub mod session_object;
 mod sessions;
 mod user;
 mod user_session_page;
