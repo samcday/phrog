@@ -36,6 +36,8 @@ fn test_simple_flow() {
         // last-session should be empty and thus the selection should default to Phosh.
         assert_eq!(usp.session().id(), "phosh");
 
+        assert_eq!(usp.username(), Some("agx".to_string()));
+
         // Move the mouse to first user row and click on it.
         vp.click_on(usp.imp().box_users.row_at_index(0).as_ref().unwrap()).await;
 
