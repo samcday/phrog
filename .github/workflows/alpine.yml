@@ -60,6 +60,10 @@ jobs:
           abuild -F checksum
           abuild -F -P /packages
           chmod -R 777 /packages
+
+          for f in /packages/phrog/${{ matrix.arch }}/*.apk; do
+            mv $f ${f%.apk}-${{ matrix.arch }}.apk
+          done
         shell: alpine.sh --root {0}
       - uses: actions/upload-artifact@v4
         if: github.event_name == 'release' && matrix.arch == 'x86_64'
