@@ -66,7 +66,7 @@ jobs:
           done
         shell: alpine.sh --root {0}
       - uses: actions/upload-artifact@v4
-        if: github.event_name == 'release' && matrix.arch == 'x86_64'
+        if: matrix.arch == 'x86_64'
         with:
           name: APKBUILD
           path: ${{ steps.alpine.outputs.root-path }}/APKBUILD
@@ -74,10 +74,17 @@ jobs:
         with:
           name: packages-${{ matrix.arch }}
           path: ${{ steps.alpine.outputs.root-path }}/packages/phrog/${{ matrix.arch }}/*.apk
-      - name: upload demo artifacts to release
+      - name: upload .apk artifacts to release
         uses: softprops/action-gh-release@v2
         if: github.event_name == 'release'
         with:
           name: ${{ github.event.release.name }}
           files: |
             ${{ steps.alpine.outputs.root-path }}/packages/phrog/${{ matrix.arch }}/*.apk
+      - name: upload APKBUILD artifact to release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'release' && matrix.arch == 'x86_64'
+        with:
+          name: ${{ github.event.release.name }}
+          files: |
+            ${{ steps.alpine.outputs.root-path }}/APKBUILD
