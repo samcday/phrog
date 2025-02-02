@@ -38,7 +38,7 @@ build() {
 }
 
 package() {
-	install -Dm755 resources/mobi.phosh.phrog.gschema.xml -t "$pkgdir"/usr/share/glib-2.0/schemas/
+	install -Dm644 data/mobi.phosh.phrog.gschema.xml -t "$pkgdir"/usr/share/glib-2.0/schemas/
 	install -Dm755 target/release/phrog -t "$pkgdir"/usr/bin/
 }
 
