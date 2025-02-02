@@ -59,8 +59,8 @@ jobs:
           export PACKAGER_PRIVKEY=$HOME/.abuild/key.rsa
           abuild -F checksum
           abuild -F -P /packages
+          mv APKBUILD /packages
           chmod -R 777 /packages
-
           for f in /packages/phrog/${{ matrix.arch }}/*.apk; do
             mv $f ${f%.apk}-${{ matrix.arch }}.apk
           done
@@ -69,7 +69,7 @@ jobs:
         if: matrix.arch == 'x86_64'
         with:
           name: APKBUILD
-          path: ${{ steps.alpine.outputs.root-path }}/APKBUILD
+          path: ${{ steps.alpine.outputs.root-path }}/packages/APKBUILD
       - uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.arch }}
@@ -87,4 +87,4 @@ jobs:
         with:
           name: ${{ github.event.release.name }}
           files: |
-            ${{ steps.alpine.outputs.root-path }}/APKBUILD
+            ${{ steps.alpine.outputs.root-path }}/packages/APKBUILD
