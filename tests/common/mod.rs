@@ -83,9 +83,12 @@ impl Test {
     }
 }
 
+#[derive(Default)]
 pub struct TestOptions {
     pub num_users: Option<u32>,
     pub sessions: Option<Vec<SessionObject>>,
+    pub last_user: Option<String>,
+    pub last_session: Option<String>,
 }
 
 pub fn test_init(options: Option<TestOptions>) -> Test {
@@ -93,6 +96,12 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
     let tmp = tempfile::tempdir().unwrap();
     phrog::init().unwrap();
     let system_dbus = dbus::system_dbus(tmp.path());
+
+    if let Some(ref options) = options {
+        let phrog_settings = Settings::new("mobi.phosh.phrog");
+        phrog_settings.set_string("last-user", &options.last_user.clone().unwrap_or(String::new())).unwrap();
+        phrog_settings.set_string("last-session", &options.last_session.clone().unwrap_or(String::new())).unwrap();
+    }
 
     let if_settings = Settings::new("org.gnome.desktop.interface");
     // use a more appropriate (moar froggy) accent color
@@ -110,11 +119,12 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
 
     let mut shell_builder = Object::builder();
 
-    if let Some(sessions) = options.and_then(|opts| opts.sessions.clone()) {
-        let sessions_store = ListStore::new::<SessionObject>();
-        sessions_store.extend_from_slice(&sessions);
-        shell_builder = shell_builder.property("sessions", sessions_store);
-    }
+    let sessions_store = ListStore::new::<SessionObject>();
+    sessions_store.extend_from_slice(&options.and_then(|opts| opts.sessions.clone()).unwrap_or(vec![
+        SessionObject::new("gnome", "GNOME", "", "", ""),
+        SessionObject::new("phosh", "Phosh", "", "", ""),
+    ]));
+    shell_builder = shell_builder.property("sessions", sessions_store);
 
     let wall_clock = WallClock::new();
     wall_clock.set_default();
