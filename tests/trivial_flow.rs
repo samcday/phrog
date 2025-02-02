@@ -18,6 +18,7 @@ fn test_trivial_flow() {
     let mut test = test_init(Some(TestOptions {
         num_users: Some(1),
         sessions: Some(vec![SessionObject::new("phosh", "Phosh", "", "", "")]),
+        ..Default::default()
     }));
 
     let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");

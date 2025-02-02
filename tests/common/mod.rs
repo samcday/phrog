@@ -83,9 +83,12 @@ impl Test {
     }
 }
 
+#[derive(Default)]
 pub struct TestOptions {
     pub num_users: Option<u32>,
     pub sessions: Option<Vec<SessionObject>>,
+    pub last_user: Option<String>,
+    pub last_session: Option<String>,
 }
 
 pub fn test_init(options: Option<TestOptions>) -> Test {
@@ -93,6 +96,12 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
     let tmp = tempfile::tempdir().unwrap();
     phrog::init().unwrap();
     let system_dbus = dbus::system_dbus(tmp.path());
+
+    if let Some(ref options) = options {
+        let phrog_settings = Settings::new("mobi.phosh.phrog");
+        phrog_settings.set_string("last-user", &options.last_user.clone().unwrap_or(String::new())).unwrap();
+        phrog_settings.set_string("last-session", &options.last_session.clone().unwrap_or(String::new())).unwrap();
+    }
 
     let if_settings = Settings::new("org.gnome.desktop.interface");
     // use a more appropriate (moar froggy) accent color

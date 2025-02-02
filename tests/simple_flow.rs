@@ -15,13 +15,13 @@ use std::time::Duration;
 
 #[test]
 fn test_simple_flow() {
-    let mut test = test_init(None);
+    let mut test = test_init(Some(TestOptions {
+        last_user: Some("agx".into()),
+        ..Default::default()
+    }));
 
     let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
     phosh_settings.set_boolean("shuffle-keypad", false).unwrap();
-
-    let phrog_settings = Settings::new("mobi.phosh.phrog");
-    phrog_settings.set_string("last-user", "agx").unwrap();
 
     let ready_rx = test.ready_rx.clone();
     let shell = test.shell.clone();
