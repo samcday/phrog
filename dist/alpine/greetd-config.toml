@@ -1,0 +1,10 @@
+# This is a greetd config.toml preconfigured to run phrog.
+# You can use it by adding the following line to /etc/conf.d/greetd:
+# cfgfile="/etc/phrog/greetd-config.toml"
+
+[terminal]
+vt = 7
+
+[default_session]
+command = "sh -c 'dbus-run-session /usr/libexec/phrog-greetd-session 2>&1 | logger -t phrog'"
+user = "greetd"

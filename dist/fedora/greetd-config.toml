@@ -1,0 +1,10 @@
+# This is a greetd config.toml preconfigured to run phrog.
+# It's intended to be used with phrog.service
+# But you can also use it directly by running greetd --config=/etc/phrog/greetd-config.toml
+
+[terminal]
+vt = 1
+
+[default_session]
+command = "systemd-cat --identifier=phrog /usr/libexec/phrog-greetd-session"
+user = "greetd"

@@ -37,8 +37,15 @@ Provides:       greetd-%{name} = %{version}
 %{cargo_license} > LICENSE.dependencies
 
 %install
-install -d %{buildroot}%{_datadir}/glib-2.0/schemas/
-%{__install} -Dpm 0644 data/mobi.phosh.phrog.gschema.xml %{buildroot}%{_datadir}/glib-2.0/schemas/
+%{__install} -Dpm 0644 data/mobi.phosh.phrog.gschema.xml -t %{buildroot}%{_datadir}/glib-2.0/schemas/
+%{__install} -Dpm 0644 data/phrog.session -t %{buildroot}%{_datadir}/gnome-session/sessions/
+%{__install} -Dpm 0644 data/mobi.phosh.Phrog.desktop -t %{buildroot}%{_datadir}/applications/
+%{__install} -Dpm 0644 dist/fedora/greetd-config.toml -t %{buildroot}%{_sysconfdir}/phrog/
+%{__install} -Dpm 0644 dist/fedora/phrog.service -t %{buildroot}%{_unitdir}/
+%{__install} -Dpm 0644 data/systemd-session.conf -T %{buildroot}%{_userunitdir}/gnome-session@phrog.target.d/session.conf
+%{__install} -Dpm 0755 data/phrog-greetd-session -t %{buildroot}%{_libexecdir}/
+%{__install} -d %{buildroot}%{_datadir}/phrog/autostart
+%{__install} -d %{buildroot}%{_sysconfdir}/phrog/autostart
 %cargo_install
 
 %if %{with check}
@@ -49,8 +56,18 @@ install -d %{buildroot}%{_datadir}/glib-2.0/schemas/
 %files
 %license LICENSE
 %doc README.md
-%{_datadir}/glib-2.0/schemas/*
 %{_bindir}/phrog
+%{_datadir}/applications/mobi.phosh.Phrog.desktop
+%{_datadir}/glib-2.0/schemas/mobi.phosh.phrog.gschema.xml
+%{_datadir}/gnome-session/sessions/phrog.session
+%{_datadir}/phrog
+%{_datadir}/phrog/autostart
+%{_libexecdir}/phrog-greetd-session
+%{_sysconfdir}/phrog
+%{_sysconfdir}/phrog/autostart
+%config(noreplace) %{_sysconfdir}/phrog/greetd-config.toml
+%{_unitdir}/phrog.service
+%{_userunitdir}/gnome-session@phrog.target.d/session.conf
 
 %changelog
 %autochangelog
