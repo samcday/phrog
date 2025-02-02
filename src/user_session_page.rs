@@ -117,7 +117,13 @@ mod imp {
                     v.downcast_ref::<SessionObject>().unwrap().name()
                 })),
             );
-            let last_session = settings.string("last-session");
+            let mut last_session = settings.string("last-session");
+
+            if last_session.is_empty() {
+                // No preference for a session exists, so let's default to Phosh.
+                last_session = GString::from("phosh");
+            }
+
             for (idx, session) in shell.sessions()
                 .as_ref().unwrap()
                 .iter::<SessionObject>()
