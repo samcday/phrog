@@ -63,7 +63,7 @@ mod imp {
     use libhandy::ActionRow;
     use std::cell::{Cell, OnceCell};
     use std::sync::OnceLock;
-    use glib::Properties;
+    use glib::{GString, Properties};
 
     #[derive(CompositeTemplate, Default, Properties)]
     #[properties(wrapper_type = super::UserSessionPage)]
