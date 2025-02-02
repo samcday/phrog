@@ -119,11 +119,12 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
 
     let mut shell_builder = Object::builder();
 
-    if let Some(sessions) = options.and_then(|opts| opts.sessions.clone()) {
-        let sessions_store = ListStore::new::<SessionObject>();
-        sessions_store.extend_from_slice(&sessions);
-        shell_builder = shell_builder.property("sessions", sessions_store);
-    }
+    let sessions_store = ListStore::new::<SessionObject>();
+    sessions_store.extend_from_slice(&options.and_then(|opts| opts.sessions.clone()).unwrap_or(vec![
+        SessionObject::new("gnome", "GNOME", "", "", ""),
+        SessionObject::new("phosh", "Phosh", "", "", ""),
+    ]));
+    shell_builder = shell_builder.property("sessions", sessions_store);
 
     let wall_clock = WallClock::new();
     wall_clock.set_default();
