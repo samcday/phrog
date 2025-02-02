@@ -60,12 +60,16 @@ jobs:
           abuild -F checksum
           abuild -F -P /packages
           chmod -R 777 /packages
-          cp APKBUILD /packages/phrog/${{ matrix.arch }}
         shell: alpine.sh --root {0}
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'release' && matrix.arch == 'x86_64'
+        with:
+          name: APKBUILD
+          path: ${{ steps.alpine.outputs.root-path }}/APKBUILD
       - uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.arch }}
-          path: ${{ steps.alpine.outputs.root-path }}/packages/phrog/${{ matrix.arch }}/
+          path: ${{ steps.alpine.outputs.root-path }}/packages/phrog/${{ matrix.arch }}/*.apk
       - name: upload demo artifacts to release
         uses: softprops/action-gh-release@v2
         if: github.event_name == 'release'
