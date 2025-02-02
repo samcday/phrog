@@ -28,11 +28,15 @@ fn test_simple_flow() {
     test.start("simple-flow", glib::spawn_future_local(clone!(@weak shell => async move {
         let (mut vp, _) = ready_rx.recv().await.unwrap();
         glib::timeout_future(Duration::from_millis(2000)).await;
-        // Move the mouse to first user row and click on it.
-        let mut lockscreen = shell.lockscreen_manager().lockscreen().unwrap().downcast::<Lockscreen>().unwrap();
 
+        let mut lockscreen = shell.lockscreen_manager().lockscreen().unwrap().downcast::<Lockscreen>().unwrap();
         let usp = lockscreen.imp().user_session_page.get().unwrap();
 
+        // test_init mocked sessions such that GNOME should be the first option in the list, but
+        // last-session should be empty and thus the selection should default to Phosh.
+        assert_eq!(usp.session().id(), "phosh");
+
+        // Move the mouse to first user row and click on it.
         vp.click_on(usp.imp().box_users.row_at_index(0).as_ref().unwrap()).await;
 
         // wait for keypad page to slide in
