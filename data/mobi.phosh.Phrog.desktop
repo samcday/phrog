@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Phrog
+Comment=Greeter shell for greetd
+Type=Application
+Exec=phrog
+NoDisplay=true

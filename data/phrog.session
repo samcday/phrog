@@ -1,0 +1,4 @@
+[GNOME Session]
+Name=phrog
+# Keep this in sync with systemd/user/gnome-session@phrog.target.d/session.conf
+RequiredComponents=mobi.phosh.Phrog;org.gnome.SettingsDaemon.MediaKeys;org.gnome.SettingsDaemon.Power;sm.puri.OSK0;

@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# This simple wrapper script is intended to be used directly by greetd to
+# start up the phrog greeter session.
+# Your distribution packaging should have already set something up for you,
+# but if you're doing this manually you can make use of this script by
+# adding something like this to your config.toml:
+# [default_session]
+# command = "/usr/libexec/phrog-greetd-session"
+
+PHOC_INI="/usr/share/phrog/phoc.ini"
+if [ -f /etc/phrog/phoc.ini ]; then
+  PHOC_INI=/etc/phrog/phoc.ini
+fi
+
+# Need to set XDG_CURRENT_DESKTOP now, otherwise gnome-session defaults it to
+# "GNOME", which is a problem because default desktop files for Squeekboard and
+# phosh-osk-stub specify "OnlyShowIn=Phosh;"
+export XDG_CURRENT_DESKTOP=Phosh:GNOME
+
+export GNOME_SESSION_AUTOSTART_DIR=/usr/share/phrog/autostart:/etc/phrog/autostart
+
+exec phoc -S -C "${PHOC_INI}" -E 'gnome-session --session=phrog'

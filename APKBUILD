@@ -38,8 +38,14 @@ build() {
 }
 
 package() {
-	install -Dm755 resources/mobi.phosh.phrog.gschema.xml -t "$pkgdir"/usr/share/glib-2.0/schemas/
+	install -Dm644 data/mobi.phosh.phrog.gschema.xml -t "$pkgdir"/usr/share/glib-2.0/schemas/
+	install -Dm644 data/phrog.session -t "$pkgdir"/usr/share/gnome-session/sessions/
+	install -Dm644 data/mobi.phosh.Phrog.desktop -t "$pkgdir"/usr/share/applications/
+	install -Dm644 dist/alpine/greetd-config.toml -t "$pkgdir"/etc/phrog/
+	install -d "$pkgdir"/usr/share/phrog/autostart
+	install -d "$pkgdir"/etc/phrog/autostart
 	install -Dm755 target/release/phrog -t "$pkgdir"/usr/bin/
+	install -Dm755 data/phrog-greetd-session -t "$pkgdir"/usr/libexec/
 }
 
 check() {
