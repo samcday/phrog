@@ -2,7 +2,7 @@
 %global phosh_ver 0.44
 
 Name:           phrog
-Version:        0.44.0
+Version:        0.44.1
 Release:        %autorelease
 Summary:        Greetd-compatible greeter for mobile phones
 License:        GPL-3.0-only
