@@ -6,5 +6,5 @@
 vt = 1
 
 [default_session]
-command = "systemd-cat --identifier=phrog /usr/libexec/phrog-greetd-session"
+command = "/usr/libexec/phrog-greetd-session"
 user = "greetd"

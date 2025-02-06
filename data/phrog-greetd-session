@@ -1,4 +1,6 @@
 #!/bin/sh
+# process substitution is supported by BusyBox ash
+# shellcheck disable=SC3001
 
 # This simple wrapper script is intended to be used directly by greetd to
 # start up the phrog greeter session.
@@ -20,5 +22,13 @@ PHOC_INI=/etc/phrog/phoc.ini
 export XDG_CURRENT_DESKTOP=Phosh:GNOME
 
 export GNOME_SESSION_AUTOSTART_DIR=/usr/share/phrog/autostart:/etc/phrog/autostart
+
+# greetd swallows all output from the greeters it spawns. We don't want that.
+# Redirect all output to journald or syslog.
+if command -v systemd-cat >/dev/null 2>&1; then
+  exec > >(systemd-cat --identifier=phrog) 2>&1
+elif command -v logger >/dev/null 2>&1; then
+  exec > >(logger -s -t phrog) 2>&1
+fi
 
 exec phoc -S -C "${PHOC_INI}" -E 'gnome-session --session=phrog'
