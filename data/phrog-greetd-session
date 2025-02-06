@@ -8,10 +8,11 @@
 # [default_session]
 # command = "/usr/libexec/phrog-greetd-session"
 
-PHOC_INI="/usr/share/phrog/phoc.ini"
-if [ -f /etc/phrog/phoc.ini ]; then
-  PHOC_INI=/etc/phrog/phoc.ini
-fi
+# We prefer phoc.ini from phrog, falling back to Phosh otherwise
+PHOC_INI=/etc/phrog/phoc.ini
+[ ! -f $PHOC_INI ] && PHOC_INI=/usr/share/phrog/phoc.ini
+[ ! -f $PHOC_INI ] && PHOC_INI=/etc/phosh/phoc.ini
+[ ! -f $PHOC_INI ] && PHOC_INI=/usr/share/phosh/phoc.ini
 
 # Need to set XDG_CURRENT_DESKTOP now, otherwise gnome-session defaults it to
 # "GNOME", which is a problem because default desktop files for Squeekboard and
