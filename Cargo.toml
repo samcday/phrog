@@ -35,7 +35,7 @@ glib-build-tools = "0"
 [dev-dependencies]
 input-event-codes = "6.2.0"
 wayland-client = "0.31"
-wayland-protocols = { version = "0.31", features = ["client"] }
-wayland-protocols-misc = { version = "0.3.1", features = ["client"] }
-wayland-protocols-wlr = { version = "0.2", features = ["client"] }
+wayland-protocols = { version = "0.32", features = ["client"] }
+wayland-protocols-misc = { version = "0.3", features = ["client"] }
+wayland-protocols-wlr = { version = "0.3", features = ["client"] }
 tempfile = "3"
