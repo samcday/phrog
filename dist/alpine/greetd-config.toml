@@ -6,5 +6,5 @@
 vt = 7
 
 [default_session]
-command = "dbus-run-session /usr/libexec/phrog-greetd-session"
+command = "/usr/libexec/phrog-greetd-session"
 user = "greetd"
