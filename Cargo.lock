@@ -1064,9 +1064,9 @@ dependencies = [
 
 [[package]]
 name = "libphosh"
-version = "0.0.5"
+version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "74e31a3ccaba362abf6bc2b461e569226cb2f37b161b44f7101b218f0232c955"
+checksum = "43a9fc0e0f3cadc21d2440b61acf24042b89e50879e858814bba381c653ddb33"
 dependencies = [
  "gdk",
  "gio 0.18.4",
@@ -1078,9 +1078,9 @@ dependencies = [
 
 [[package]]
 name = "libphosh-sys"
-version = "0.0.5"
+version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2839ca41063b7e44107cb27101eb48268ad035b20b7719d55cd5cae3f7f4dfa4"
+checksum = "38c25c00ea3180e94245ce3550ab29cee352ae767f740ef57ed7f954bec9288e"
 dependencies = [
  "gdk-pixbuf-sys",
  "gdk-sys",
