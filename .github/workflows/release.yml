@@ -1,5 +1,4 @@
-name: release
-
+name: Create release from tag
 on:
   push:
     tags: ['*']
@@ -18,3 +17,4 @@ jobs:
         with:
           body_path: body.md
           generate_release_notes: true
+          token: ${{ secrets.RELEASE_GITHUB_TOKEN }}

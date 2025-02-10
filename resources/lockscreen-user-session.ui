@@ -24,6 +24,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="expand">True</property>
+                                <style>
+                                    <class name="users"/>
+                                </style>
                             </object>
                             <packing>
                                 <property name="expand">True</property>
@@ -42,6 +45,9 @@
                                         <property name="can_focus">True</property>
                                         <property name="expand">True</property>
                                         <property name="title" translatable="yes">Session</property>
+                                        <style>
+                                            <class name="sessions"/>
+                                        </style>
                                     </object>
                                 </child>
                             </object>

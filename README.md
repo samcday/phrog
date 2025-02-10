@@ -1,93 +1,79 @@
 ## 🐸 (phrog)
 
-<img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/0.10.0/demo.webp">
+<img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/0.44.1/demo.webp">
 
 <br />
 <br />
 <br />
 
 A greeter that works on mobile devices and also other kinds of computers.
-
+ 
 🤓 `phrog` uses [Phosh][] to conduct a [greetd][] conversation.
 
 It is the spiritual successor of [phog][].
 
 <br clear="right"/>
 
-## Installation
+## Usage
+
+### Alpine/postmarketOS
+
+```
+sudo apk add greetd-phrog
+
+# Configure greetd to run phrog:
+cat <<HERE | sudo tee -a /etc/conf.d/greetd
+cfgfile="/etc/phrog/greetd-config.toml"
+HERE
+
+rc-update add greetd
+```
 
 ### Fedora
 
 ```
+# Phrog is not yet available in Fedora's repos
 sudo dnf copr enable samcday/phrog
-# If you want to test the latest and/or greatest
-# sudo dnf copr enable samcday/phrog-nightly
 sudo dnf install phrog
-```
 
-### Alpine
-
-The package has been [requested](https://gitlab.alpinelinux.org/alpine/aports/-/issues/16430) in Alpine.
-
-For now, you must build it yourself:
-
-```
-sudo apk add alpine-sdk
-abuild deps
-abuild -K
-sudo apk add ~/packages/dist/$(uname -m)/greetd-phrog-*.apk
+sudo systemctl enable phrog
 ```
 
 ### Other
 
-You must build from source, see the Development section below.
+Want to use phrog on another distro? [Please get in touch.](#getting-help)
 
-## Running
-
-`phrog` is primarily intended to run via [greetd][] - your `/etc/greetd/config.toml` should
-look like this:
-
-```
-[default_session]
-command = "systemd-cat --identifier=phrog phrog"
-```
-
-You can also run/test it directly with a faked session, run this from a terminal in your favourite (Wayland) desktop environment:
-
-```
-phrog --fake
-```
+If you want to run it manually, you'll need to build from source (see below), and then take a look at the existing packaging to understand how to wire up the necessary bits to spawn a functional greeter session under greetd.
 
 ## Development
 
-If your system has `libphosh` packaged and available:
+`libphosh` is required to build this project.
+
+* Alpine (v3.21+): `sudo apk add libphosh`
+* Fedora: `sudo dnf install libphosh-devel`
+* Debian: `sudo apt install libphosh-0.44-dev`
+
+If `libphosh` is not packaged for your distro, you need to build Phosh+libphosh manually. See the [Phosh][] README for more info.
+
+Once `libphosh` is installed, building and running 🐸 should be as simple as:
 
 ```sh
-# Install libphosh:
-# Fedora: sudo dnf install -y libphosh-devel
-# Alpine (edge): sudo apk add libphosh
+# To run phrog without greetd, pass --fake
+# You can "login" to any user with the password "0" 
+phoc -S -E "cargo run -- --fake"
 
-# Run 🐸 from source
-cargo run -- --fake
-
-# Run 🐸 tests
-cargo test
+phoc -S -E "cargo test"
 ```
 
-You can also run with a statically linked libphosh from the vendored `./phosh/` subtree. This is useful if you want to work on a feature that also requires changes to upstream libphosh.
+## Getting help
 
-```sh
-# Install the (many) Phosh build dependencies:
-# Fedora: sudo dnf4 build-dep --define 'with_static 1' ./phrog.spec
-# Debian (trixie): sudo apt-get build-dep -y ./phosh/
-# Alpine: abuild deps
+Found a bug or want to request a feature? [Please file an issue!][issues]
 
-# Then it's mostly the same as before.
-# More features may be visible and more tests may run, since the local tree pulls ahead of upstream.
-cargo run --features=static -- --fake
-cargo test --features=static
-```
+You can also come chat in Matrix: [#phosh:talk.puri.sm][Matrix]
 
 [phog]: https://gitlab.com/mobian1/phog
 [Phosh]: https://gitlab.gnome.org/World/Phosh/phosh
 [greetd]: https://sr.ht/~kennylevinsen/greetd/
+[COPR]: https://copr.fedorainfracloud.org/coprs/samcday/phrog/
+[issues]: https://github.com/samcday/phrog/issues
+[Matrix]: https://matrix.to/#/#phosh:talk.puri.sm

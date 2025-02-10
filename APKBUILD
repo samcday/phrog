@@ -1,16 +1,12 @@
 # Maintainer: Sam Day <me@samcday.com>
-_static=1
 pkgname=greetd-phrog
-pkgver=0.10.0_git
-_commit=main
+pkgver=0.44.1_git
 pkgrel=0
 pkgdesc="Mobile device greeter"
-url="https://github.com/samcday/phrog"
-# riscv64: blocked by greetd
+url=https://github.com/samcday/phrog
 # s390x: blocked by greetd & phosh
-# ppc64le: blocked by phosh
 # armhf: blocked by phosh
-arch="all !s390x !riscv64 !armhf !ppc64le"
+arch="all !s390x !armhf"
 license="GPL-3.0-only"
 depends="
 	phosh
@@ -19,72 +15,46 @@ depends="
 	libphosh"
 makedepends="
 	cargo
-	cargo-auditable"
-if [ -n "$_static" ]; then
-makedepends="$makedepends
-	callaudiod-dev
-	elogind-dev
-	evince-dev
-	evolution-data-server-dev
-	feedbackd-dev
-	gcr-dev
-	gettext-dev
-	glib-dev
-	gmobile-dev
-	gnome-bluetooth-dev
-	gnome-desktop-dev
-	gtk+3.0-dev
-	libadwaita-dev
-	libgudev-dev
-	libhandy1-dev
-	libsecret-dev
-	libunistring-dev
-	linux-pam-dev
-	meson
-	networkmanager-dev
-	polkit-elogind-dev
-	pulseaudio-dev
-	py3-docutils
-	upower-dev
-	wayland-dev
-	wayland-protocols"
-else
-makedepends="$makedepends
+	cargo-auditable
 	libphosh-dev"
-fi
 checkdepends="xvfb-run"
 
-source="${url}/archive/$_commit/phrog-$_commit.tar.gz"
+_gitrev=main
+source="https://github.com/samcday/phrog/archive/$_gitrev/phrog-$_gitrev.tar.gz"
 subpackages="$pkgname-schemas::noarch"
-builddir="$srcdir/phrog-$_commit"
-options="net" # cargo fetch
+builddir="$srcdir/phrog-$_gitrev"
+# net: cargo fetch
+options="net"
 
 export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix=$builddir=/build/"
 
 prepare() {
+	default_prepare
 	cargo fetch --target="$CTARGET" --locked
 }
 
 build() {
-    features=""
-    [ -n "$_static" ] && features="$features --features=static"
-	cargo auditable build $features --release --frozen
+	cargo auditable build --release --frozen
 }
 
 package() {
-	install -Dm755 resources/mobi.phosh.phrog.gschema.xml -t "$pkgdir"/usr/share/glib-2.0/schemas/
+	install -Dm644 data/mobi.phosh.phrog.gschema.xml -t "$pkgdir"/usr/share/glib-2.0/schemas/
+	install -Dm644 data/phrog.session -t "$pkgdir"/usr/share/gnome-session/sessions/
+	install -Dm644 data/mobi.phosh.Phrog.desktop -t "$pkgdir"/usr/share/applications/
+	install -Dm644 dist/alpine/greetd-config.toml -t "$pkgdir"/etc/phrog/
+	install -d "$pkgdir"/usr/share/phrog/autostart
+	install -d "$pkgdir"/etc/phrog/autostart
 	install -Dm755 target/release/phrog -t "$pkgdir"/usr/bin/
+	install -Dm755 data/phrog-greetd-session -t "$pkgdir"/usr/libexec/
 }
 
 check() {
-    features=""
-    [ -n "$_static" ] && features="$features --features=static"
-    export XDG_RUNTIME_DIR=/tmp
-	dbus-run-session xvfb-run -a phoc -E "cargo test $features --release --frozen"
+	export XDG_RUNTIME_DIR=/tmp
+	dbus-run-session xvfb-run -a phoc -E "cargo test --frozen"
 }
 
 schemas() {
-    pkgdesc="Phrog schema files"
-    depends=""
-    amove usr/share/glib-2.0/schemas
+	pkgdesc="Phrog schema files"
+	depends=""
+	amove usr/share/glib-2.0/schemas
 }

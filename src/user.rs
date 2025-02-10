@@ -1,14 +1,15 @@
-use std::future::Future;
 use crate::dbus::user::UserProxy;
 use futures_util::select;
+use glib::warn;
 use gtk::gdk_pixbuf::Pixbuf;
 use gtk::gio::Cancellable;
-use gtk::glib::{clone, g_warning, spawn_future_local, Object};
-use gtk::prelude::FileExt;
-use gtk::subclass::prelude::ObjectSubclassIsExt;
+use gtk::glib::{clone, spawn_future_local, Object};
+use gtk::prelude::{FileExt, ObjectExt};
 use gtk::{gio, glib};
 use zbus::export::futures_util::StreamExt;
 use zbus::zvariant::{ObjectPath, OwnedObjectPath};
+
+static G_LOG_DOMAIN: &str = "phrog-user";
 
 glib::wrapper! {
     pub struct User(ObjectSubclass<imp::User>);
@@ -16,21 +17,19 @@ glib::wrapper! {
 
 impl User {
     pub fn new(conn: zbus::Connection, path: ObjectPath) -> Self {
-        let obj: Self = Object::builder()
-            .property("path", path.as_str())
-            .build();
+        let obj: Self = Object::builder().property("path", path.as_str()).build();
 
         let path = OwnedObjectPath::from(path);
         spawn_future_local(clone!(@weak obj => async move {
             let user_proxy = if let Ok(proxy) = UserProxy::builder(&conn)
                 .path(&path)
-                .expect(&format!("failed to construct UserProxy for {}", path))
+                .unwrap_or_else(|_| panic!("failed to construct UserProxy for {}", path))
                 .build()
                 .await
             {
                 proxy
             } else {
-                g_warning!("user", "failed to construct UserProxy for {}", path);
+                warn!("failed to construct UserProxy for {}", path);
                 return;
             };
 
@@ -43,6 +42,8 @@ impl User {
             if let Ok(v) = user_proxy.icon_file().await {
                 obj.set_icon_file(v);
             }
+
+            obj.emit_by_name::<()>("loaded", &[]);
 
             let mut name_stream = user_proxy.receive_real_name_changed().await.fuse();
             let mut username_stream = user_proxy.receive_user_name_changed().await.fuse();
@@ -82,13 +83,17 @@ impl User {
 }
 
 mod imp {
+    use super::G_LOG_DOMAIN;
+    use glib::warn;
     use gtk::gdk_pixbuf::Pixbuf;
     use gtk::gio::{Cancellable, FileMonitorFlags};
-    use gtk::glib::{clone, g_warning, Properties};
+    use gtk::glib::subclass::Signal;
+    use gtk::glib::{clone, Properties};
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
     use gtk::{gio, glib};
     use std::cell::RefCell;
+    use std::sync::OnceLock;
 
     #[derive(Properties, Default)]
     #[properties(wrapper_type = super::User)]
@@ -126,7 +131,9 @@ mod imp {
                     let c = Cancellable::current();
                     match file.monitor(FileMonitorFlags::empty(), c.as_ref()) {
                         Ok(monitor) => user.set_icon_monitor(monitor.clone()),
-                        Err(err) => g_warning!("user", "error starting file monitor on {}", path),
+                        Err(err) => {
+                            warn!("error starting file monitor on {}: {}", path, err)
+                        }
                     }
                 }
             });
@@ -137,6 +144,11 @@ mod imp {
                     }));
                 }
             });
+        }
+
+        fn signals() -> &'static [Signal] {
+            static SIGNALS: OnceLock<Vec<Signal>> = OnceLock::new();
+            SIGNALS.get_or_init(|| vec![Signal::builder("loaded").build()])
         }
     }
 }

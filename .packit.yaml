@@ -8,11 +8,12 @@ downstream_package_name: phrog
 jobs:
   # Build PRs
   - job: copr_build
+    manual_trigger: true
     trigger: pull_request
-    additional_repos: [copr://samcday/phrog-nightly]
+    additional_repos:
+      - copr://samcday/phosh-nightly
+      - copr://samcday/phrog-nightly
     targets:
-      - fedora-40-aarch64
-      - fedora-40-x86_64
       - fedora-41-aarch64
       - fedora-41-x86_64
       - fedora-rawhide-aarch64
@@ -24,6 +25,8 @@ jobs:
     branch: main
     owner: samcday
     project: phrog-nightly
+    additional_repos:
+      - copr://samcday/phosh-nightly
 
   # Build tagged releases in samcday/phrog COPR
   - job: copr_build

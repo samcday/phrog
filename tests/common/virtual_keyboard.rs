@@ -1,8 +1,8 @@
+use gtk::glib;
 use std::fs::File;
 use std::os::fd::AsFd;
 use std::os::unix::fs::MetadataExt;
 use std::time::{Duration, SystemTime};
-use gtk::glib;
 use wayland_client::protocol::wl_keyboard::KeymapFormat::XkbV1;
 use wayland_client::protocol::wl_registry;
 use wayland_client::protocol::wl_seat::WlSeat;
@@ -10,7 +10,7 @@ use wayland_client::{delegate_noop, Connection, Dispatch, EventQueue, QueueHandl
 use wayland_protocols_misc::zwp_virtual_keyboard_v1::client::zwp_virtual_keyboard_manager_v1::ZwpVirtualKeyboardManagerV1;
 use wayland_protocols_misc::zwp_virtual_keyboard_v1::client::zwp_virtual_keyboard_v1::ZwpVirtualKeyboardV1;
 
-const KEYMAP_FILE: &'static str = "./phosh/tests/data/keymap.txt";
+const KEYMAP_FILE: &str = "./tests/data/keymap.txt";
 
 #[derive(Default)]
 struct State {
@@ -20,7 +20,6 @@ struct State {
 
 pub struct VirtualKeyboard {
     ts: SystemTime,
-    state: State,
     kb: ZwpVirtualKeyboardV1,
     event_queue: EventQueue<State>,
 }
@@ -76,15 +75,13 @@ impl VirtualKeyboard {
 
         Self {
             ts: SystemTime::now(),
-            state: Default::default(),
             event_queue,
             kb,
         }
     }
 
     pub fn modifiers(&self, mods: u32) {
-        self.kb
-            .modifiers(mods, 0, 0, 0);
+        self.kb.modifiers(mods, 0, 0, 0);
         self.event_queue.flush().unwrap();
     }
 
