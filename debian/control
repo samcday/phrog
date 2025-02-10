@@ -23,11 +23,19 @@ Build-Depends:
  librust-zbus-4+async-io-dev (>= 4.3.1~~),
  librust-zbus-4+blocking-dev (>= 4.3.1~~),
 # Dependencies needed only for tests
+ at-spi2-core <!nocheck>,
+ dbus-x11 <!nocheck>,
+ gnome-settings-daemon <!nocheck>,
  librust-input-event-codes-6-dev (>= 6.2.0~~) <!nocheck>,
  librust-wayland-protocols-0.32+client-dev <!nocheck>,
  librust-wayland-protocols-misc-0.3+client-dev (>= 0.3.1~~) <!nocheck>,
  librust-wayland-protocols-wlr-0.3+client-dev <!nocheck>,
  librust-tempfile-3-dev <!nocheck>,
+ phoc <!nocheck>,
+# phosh is needed until the gschema is shipped with the lib package
+ phosh <!nocheck>,
+ xauth <!nocheck>,
+ xvfb <!nocheck>,
 Standards-Version: 4.7.0
 Homepage: https://github.com/samcday/phrog/
 Vcs-Browser: https://salsa.debian.org/DebianOnMobile-team/phrog

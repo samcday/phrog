@@ -19,7 +19,6 @@ export INSTALL_DIR=$(CURDIR)/debian/phrog
 # during build and delete it afterwards
 override_dh_auto_build:
 	HOME=$(CURDIR)/debian/tmp_home $(CARGO) build
-	rm -rf $(CURDIR)/debian/tmp_home
 
 override_dh_auto_install:
 	install -D -m0755 target/$(DEB_HOST_RUST_TYPE)/debug/phrog \
@@ -27,13 +26,19 @@ override_dh_auto_install:
 	install -D -m0644 resources/mobi.phosh.phrog.gschema.xml \
 		$(INSTALL_DIR)/usr/share/glib-2.0/schemas/mobi.phosh.phrog.gschema.xml
 
-# Disable tests for now as they rely on downstream libphosh-rs features
 override_dh_auto_test:
+ifeq ($(filter nocheck,$(DEB_BUILD_OPTIONS)),)
+	mkdir -p $(CURDIR)/debian/tmp_home $(CURDIR)/debian/tmp_run
+	LC_ALL=C.UTF-8 XDG_RUNTIME_DIR=$(CURDIR)/debian/tmp_run \
+		HOME=$(CURDIR)/debian/tmp_home dbus-run-session xvfb-run -a \
+			phoc -C $(CURDIR)/debian/config/phoc.ini -E "$(CARGO) test"
+endif
 
 execute_after_dh_auto_clean:
 	$(CARGO) clean
 	rm -rf $(CARGO_HOME)
 	rm -rf $(CARGO_REGISTRY)
+	rm -rf $(CURDIR)/debian/tmp_home $(CURDIR)/debian/tmp_run
 
 execute_before_dh_auto_configure:
 	$(CARGO) prepare-debian $(CARGO_REGISTRY) --link-from-system
