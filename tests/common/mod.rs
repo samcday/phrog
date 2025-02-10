@@ -105,6 +105,9 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
         phrog_settings.set_string("first-run", &options.first_run.clone().unwrap_or(String::new())).unwrap();
     }
 
+    let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
+    phosh_settings.set_boolean("shuffle-keypad", false).unwrap();
+
     let if_settings = Settings::new("org.gnome.desktop.interface");
     // use a more appropriate (moar froggy) accent color
     if_settings.set_string("accent-color", "green").unwrap();
