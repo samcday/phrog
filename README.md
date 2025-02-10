@@ -52,7 +52,6 @@ If you want to run it manually, you'll need to build from source (see below), an
 
 * Alpine (v3.21+): `sudo apk add libphosh`
 * Fedora: `sudo dnf install libphosh-devel`
-* Debian: `sudo apt install libphosh-0.44-dev`
 
 If `libphosh` is not packaged for your distro, you need to build Phosh+libphosh manually. See the [Phosh][] README for more info.
 
