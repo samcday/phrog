@@ -7,7 +7,6 @@ use libphosh::LockscreenPage;
 use std::sync::atomic::Ordering;
 
 use common::*;
-use gtk::gio::Settings;
 use gtk::prelude::*;
 use phrog::lockscreen::Lockscreen;
 use std::time::Duration;
@@ -20,9 +19,6 @@ fn test_trivial_flow() {
         sessions: Some(vec![SessionObject::new("phosh", "Phosh", "", "", "")]),
         ..Default::default()
     }));
-
-    let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
-    phosh_settings.set_boolean("shuffle-keypad", false).unwrap();
 
     let ready_rx = test.ready_rx.clone();
     let shell = test.shell.clone();

@@ -15,9 +15,6 @@ use std::time::Duration;
 fn keypad_shuffle() {
     let mut test = test_init(None);
 
-    let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
-    phosh_settings.set_boolean("shuffle-keypad", false).unwrap();
-
     let ready_rx = test.ready_rx.clone();
     let shell = test.shell.clone();
     test.start("keypad-shuffle", glib::spawn_future_local(clone!(@weak shell => async move {
@@ -37,6 +34,7 @@ fn keypad_shuffle() {
         vp.click_on(&shell.keypad_shuffle_qs().unwrap().imp().info.clone()).await;
         glib::timeout_future(Duration::from_millis(500)).await;
 
+        let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
         assert!(phosh_settings.boolean("shuffle-keypad"));
 
         // close top panel

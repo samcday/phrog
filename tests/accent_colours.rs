@@ -4,7 +4,6 @@ use gtk::glib;
 use libphosh::prelude::ShellExt;
 
 use common::*;
-use gtk::gio::Settings;
 use gtk::prelude::*;
 use std::time::Duration;
 
@@ -12,8 +11,6 @@ use std::time::Duration;
 fn test_accent_colours() {
     let mut test = test_init(None);
 
-    let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
-    phosh_settings.set_boolean("shuffle-keypad", false).unwrap();
     test.shell.set_locked(true);
 
     let ready_rx = test.ready_rx.clone();

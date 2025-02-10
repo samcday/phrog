@@ -1,6 +1,8 @@
 use glib::Object;
 use gtk::glib;
 
+static G_LOG_DOMAIN: &str = "phrog";
+
 glib::wrapper! {
     pub struct Shell(ObjectSubclass<imp::Shell>)
         @extends libphosh::Shell;
@@ -14,10 +16,14 @@ impl Shell {
 }
 
 mod imp {
+    use super::G_LOG_DOMAIN;
     use crate::keypad_shuffle::ShuffleKeypadQuickSetting;
     use crate::lockscreen::Lockscreen;
-    use gtk::gio::{IOExtensionPoint, ListStore};
+    use crate::session_object::SessionObject;
+    use crate::sessions;
+    use glib::{clone, spawn_future_local, warn};
     use gtk::gio::Settings;
+    use gtk::gio::{spawn_blocking, IOExtensionPoint, ListStore};
     use gtk::glib::GString;
     use gtk::glib::{Properties, Type};
     use gtk::prelude::StaticType;
@@ -29,8 +35,8 @@ mod imp {
     use std::cell::RefCell;
     use std::cell::{Cell, OnceCell};
     use std::collections::HashSet;
-    use crate::session_object::SessionObject;
-    use crate::sessions;
+    use std::process::Command;
+    use libphosh::prelude::ShellExt;
 
     #[derive(Default, Properties)]
     #[properties(wrapper_type = super::Shell)]
@@ -95,6 +101,26 @@ mod imp {
             settings
                 .set_strv("quick-settings", qs.iter().collect::<Vec<&GString>>())
                 .expect("failed to enable keypad-shuffle");
+
+            let settings = Settings::new(crate::APP_ID);
+
+            let shell = self.to_owned();
+            glib::idle_add_local_once(move || {
+                let first_run = settings.string("first-run");
+                if !first_run.is_empty() {
+                    spawn_future_local(clone!(@weak shell as this => async move {
+                        if let Err(err) = spawn_blocking(|| {
+                                Command::new(first_run).spawn().and_then(|mut child| child.wait())
+                            }).await
+                        {
+                            warn!("Failed to execute first-run app: {:?}", err);
+                        }
+                        this.obj().set_locked(true);
+                    }));
+                } else {
+                    shell.obj().set_locked(true);
+                }
+            });
         }
     }
 
