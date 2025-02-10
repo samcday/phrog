@@ -52,31 +52,6 @@ fn main() -> anyhow::Result<()> {
         gtk::main_quit();
     });
 
-    // TODO: upstream changes to expose phosh_log_set_log_domains
-    // #[cfg(feature = "static")]
-    // let mut debug_mode = false;
-    // unix_signal_add(SIGUSR1, move || {
-    //     // static only because libphosh isn't exporting phosh_log_set_log_domains (yet?)
-    //     #[cfg(feature = "static")]
-    //     {
-    //         let shell = libphosh::Shell::default().downcast::<Shell>().unwrap();
-    //         if debug_mode {
-    //             g_warning!("🐸", "Ribbit ribbit!");
-    //             debug_mode = false;
-    //             let prev = CString::new(
-    //                 std::env::var("G_MESSAGES_DEBUG").unwrap_or_default()).unwrap();
-    //             unsafe { libphosh::ffi::phosh_log_set_log_domains(prev.as_ptr()); }
-    //             shell.top_panel().style_context().remove_class("debug");
-    //         } else {
-    //             g_warning!("🐸", "Ribbit!");
-    //             debug_mode = true;
-    //             unsafe { libphosh::ffi::phosh_log_set_log_domains(c"all".as_ptr()); }
-    //             shell.top_panel().style_context().add_class("debug");
-    //         }
-    //     }
-    //     ControlFlow::Continue
-    // });
-
     gtk::main();
 
     Ok(())
