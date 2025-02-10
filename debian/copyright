@@ -2,19 +2,17 @@ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: phrog
 Upstream-Contact: Sam Day <me@samcday.com>
 Source: https://github.com/samcday/phrog/
-Files-Excluded: demo-video
-                libphosh-rs
-                phosh
 
 Files: *
-Copyright: 2024 Sam Day <me@samcday.com>
+Copyright: 2024-2025 Sam Day <me@samcday.com>
 License: GPL-3
 
 Files: debian/*
-Copyright: 2024 Arnaud Ferraris <aferraris@debian.org>
+Copyright: 2024-2025 Arnaud Ferraris <aferraris@debian.org>
 License: GPL-3
 
-Files: tests/fixtures/phoshi.png
+Files: tests/fixtures/guido.png
+       tests/fixtures/phoshi.png
 Copyright: 2022 Guido Günther <agx@sigxcpu.org>
 License: CC-BY-SA-4.0
 
