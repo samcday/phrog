@@ -32,7 +32,8 @@ rc-update add greetd
 ### Fedora
 
 ```
-# Phrog is not yet available in Fedora's repos
+# Phrog is not available in Fedora's repos
+# But an unofficial COPR is provided:
 sudo dnf copr enable samcday/phrog
 sudo dnf install phrog
 
