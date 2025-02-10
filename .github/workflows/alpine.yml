@@ -3,10 +3,9 @@ name: alpine
 on:
   push:
     branches: [main]
-    tags: ['*']
-  pull_request:
-    branches: [main]
   workflow_dispatch: {}
+  release:
+    types: [published]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,25 +16,21 @@ permissions:
 
 jobs:
   alpine:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04${{ matrix.arch == 'aarch64' && '-arm' || '' }}
     strategy:
       matrix:
-        # Always build x64 in main + PRs, but only other architectures for tagged releases
-        arch: ${{ startsWith(github.ref, 'refs/tags/') && fromJSON('["x86_64", "aarch64"]') || fromJSON('["x86_64"]') }}
+        arch:
+          - x86_64
+          - aarch64
     steps:
       - uses: actions/checkout@v4
-      - uses: jirutka/setup-alpine@v1
+      # Using fork (aarch64 branch from bgilbert/setup-alpine) until jirutka/setup-alpine#11 is resolved
+      - uses: samcday/setup-alpine@main
         id: alpine
         with:
           arch: ${{ matrix.arch }}
           branch: edge
           packages: alpine-sdk
-      # building and statically linking libphosh on qemu-user-emulated platforms is excruciatingly
-      # slow. Having one platform be statically linked to test that path is enough.
-      - name: disable statically linked libphosh
-        if: ${{ matrix.arch != 'x86_64' }}
-        run: |
-          sed -i -e 's/_static=1/_static=/' APKBUILD
       - name: setup
         env:
           RSA_PRIV: ${{ secrets.RSA_PRIVATE_KEY }}
@@ -47,15 +42,49 @@ jobs:
           cp ~/.abuild/key.rsa.pub /etc/apk/keys/key.rsa.pub
           abuild -F deps
         shell: alpine.sh --root {0}
+      - name: update sha
+        if: github.event_name != 'release'
+        run: |
+          sed -i -e "s/^_gitrev=main$/_gitrev=$GITHUB_SHA/" APKBUILD
+      - name: release prep
+        if: github.event_name == 'release'
+        run: |
+          # Remove _git suffix to indicate the stable release.
+          # Assumes that the base (unsuffixed) pkgver was already updated to the new version in release commit.
+          sed -i -e 's/^\(pkgver=.*\)_git$/\1/' APKBUILD
+          # Delete _gitrev= var and rewrite usages to pkgver
+          sed -i -e '/^_gitrev=/d' -e 's/_gitrev/pkgver/g' APKBUILD
       - name: build package
         run: |
           export PACKAGER_PRIVKEY=$HOME/.abuild/key.rsa
-          sed -i -e "s/_commit=main/_commit=$GITHUB_SHA/" APKBUILD
           abuild -F checksum
           abuild -F -P /packages
+          mv APKBUILD /packages
           chmod -R 777 /packages
+          for f in /packages/phrog/${{ matrix.arch }}/*.apk; do
+            mv $f ${f%.apk}-${{ matrix.arch }}.apk
+          done
         shell: alpine.sh --root {0}
+      - uses: actions/upload-artifact@v4
+        if: matrix.arch == 'x86_64'
+        with:
+          name: APKBUILD
+          path: ${{ steps.alpine.outputs.root-path }}/packages/APKBUILD
       - uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.arch }}
-          path: ${{ steps.alpine.outputs.root-path }}/packages/phrog/${{ matrix.arch }}/
+          path: ${{ steps.alpine.outputs.root-path }}/packages/phrog/${{ matrix.arch }}/*.apk
+      - name: upload .apk artifacts to release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'release'
+        with:
+          name: ${{ github.event.release.name }}
+          files: |
+            ${{ steps.alpine.outputs.root-path }}/packages/phrog/${{ matrix.arch }}/*.apk
+      - name: upload APKBUILD artifact to release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'release' && matrix.arch == 'x86_64'
+        with:
+          name: ${{ github.event.release.name }}
+          files: |
+            ${{ steps.alpine.outputs.root-path }}/packages/APKBUILD

@@ -18,8 +18,16 @@ phrog-user-session-page list {
     background-color: transparent;
 }
 
-phrog-user-session-page row:not(:selected):not(:focus) {
-    background-color: @phosh_button_bg_color;
+phrog-user-session-page .users row:not(:selected) {
+    background-color: @phosh_action_bg_color;
+}
+
+phrog-user-session-page .users row:selected {
+    background-color: @theme_selected_bg_color;
+}
+
+phrog-user-session-page .sessions {
+    background-color: @phosh_action_bg_color;
 }
 
 phrog-user-session-page row:first-child {

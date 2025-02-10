@@ -3,81 +3,69 @@ name: build
 on:
   push:
     branches: [main]
-    tags: ['*']
   pull_request:
     branches: [main]
+  release:
+    types: [published]
   workflow_dispatch: {}
-
-env:
-  CARGO_TERM_COLOR: always
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-Dwarnings"
+
 permissions:
   contents: write
+  packages: write
+  pull-requests: write
 
 jobs:
-  build:
+  build-image:
     runs-on: ubuntu-24.04
+    outputs:
+      hash: ${{ steps.hash.outputs.value }}
     steps:
       - uses: actions/checkout@v4
-      # selecting a toolchain either by action or manual `rustup` calls should happen
-      # before the plugin, as the cache uses the current rustc version as its cache key
-      - run: rustup toolchain install stable --profile minimal
-      - uses: Swatinem/rust-cache@v2
-        with: {}
-      - name: apt-get deps
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: get CI image hash
+        id: hash
         run: |
           set -uexo pipefail
-          export DEBIAN_FRONTEND=noninteractive
-          cat <<EOF | sudo tee /etc/apt/sources.list.d/phosh-nightly.sources
-          Types: deb
-          URIs: http://deb.phosh.mobi/nightly/
-          Suites: trixie-nightly
-          Components: main
-          Signed-By:
-            -----BEGIN PGP PUBLIC KEY BLOCK-----
-            
-            mQINBGXoHOYBEAC/893ifemxPCa3l+46Vtpjiew4Eu+c3kXEj6sEOQZS8+ZvJ93O
-            So3cEe7tqPM8AjqPjO6GsBjqr86swk5bbZ70GIqo1H2p9JdBaiQWqTDXxXRDvel5
-            0SaxbUQvLm880pjS/gcsBezRv8vb9dxDsPMzap6GuJnF5QqagfOX8B1aQKCywJNo
-            QoFc3RL7c3j2hLRpI4kdfcjo2j3GtjKb+ojWja9dng/gsMlrHYEqS+aWg+eVFnLM
-            XkwJXS/4AQjooH9qC+swtVNYYzt7wQdCm1mNFfrXDHSLse0ugyESqZ8AN5d9bUlB
-            fAae7xv/lV3QfozSolFODvXlBjNaCDYb1r8Rag01eM83b1Wv/R23enFO18p/UW9k
-            +/wk+kOqUfEd+0NBkXdRQiCrvwxHs51IqMFH5aAhM9lHmaHYmdPjETdeYPeKlA22
-            CYLCkApEazGNPZGt6Kv7XeBwiI+6DScbHxr+j9S/j9+7BuMs6MItE4J9EtavkFtr
-            aw/ijGsifCKJWpkD28uZ3h83qi8diUwRde0zrX4SJAUi/T2UXPywep1z6bQ70Vaf
-            YrciSOndw5zWiTYMUDl6q7iZR6vloiZMoGf7psLx1y0Vg4Sq8DPldXAMpaNPh8+Z
-            UhqD94pBGg+iVaYII8MeWHaqtHc0ewQAKAq121rulOuZgaRbl/5LuQp8rQARAQAB
-            tD1QaG9zaCBEZWJpYW4gUGFja2FnZXMgKEFyY2hpdmUgU2lnbmluZyBLZXkpIDxk
-            ZWJzQHBob3NoLm1vYmk+iQJUBBMBCgA+AhsDBQsJCAcDBRUKCQgLBRYCAwEAAh4B
-            AheAFiEEeHJPmfZ/wlY1lpbHLf0ViOUfQ7IFAmXoV34FCQlmPBgACgkQLf0ViOUf
-            Q7JWNxAApMQeEKSto6LGZkdqoKXCZgaXg//2UeAnkhK9+Z1hZ2Do7RYhoOW994yi
-            FqtZ92WVMqzbK0EqfEnFX8yVzM1cXo3PgouCDCgTy060YmH0OV2XxThr8fJ4uZfW
-            vib9HE+W4o/dgoMSy3BlPtpB1y/gevgJGoHAtQbV6Ex4bRL89i8pOQJYPYRx5Xj0
-            4SADUWWjOnY9AZbykUlMuRFSOMBWITn8yqUCYPpw8bGbtFignfvK1iRcW5LIkrtY
-            XsOlQCK5+ttNAMUkCeI93LGYhSZUqbpt87tdkbCP5qfV7o7Vkv8iObKw8fxKh2o1
-            oijY8S6ZqEl/CZjDtKcdvsQrEvY3Z1KX0xUNn01PFrHGzRiTn7eieXF4O3PCM2zJ
-            1TGva0gliKUgdN4y8W6Ul1H74T3rhZWpNO10rotfnvyX6AP/bLlkdMdSpL85mcqt
-            PfSROQGcKOU6WmF1G2MvwzBY6sjP3IN95qqnaBKa1IJGBPFt5IsY8eoqdNuNkeRT
-            W3OFcBQas+1RQdDzOZ7svJIX9fNBubebtnB20mRYIwESkhQMO2VpjyrBPzUP+bum
-            kg/7Lx/Gr+OdH2SzNfeTr+28foyKExf2wdhbICErm+eRq1Bh4dFe6ljN/YBUVdEq
-            MHjCZ4GQaiw5Uq+5sQTUWYkFeb/j3NeRadmSTshinPgTISGNYBo=
-            =lIij
-            -----END PGP PUBLIC KEY BLOCK-----
-          EOF
-          # for phrog tests
-          sudo apt update
-          sudo apt-get install -y xvfb wf-recorder phoc
-          # TODO: why is this necessary?
-          sudo apt-get install -y libgmobile-dev
-          sudo apt-get build-dep -t trixie-nightly -y ./phosh/
+          echo "value=${{ hashFiles('.github/Dockerfile') }}" >> $GITHUB_OUTPUT
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .github/
+          file: .github/Dockerfile
+          push: true
+          tags: ghcr.io/samcday/phrog-ci:${{ steps.hash.outputs.value }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+  build:
+    needs: build-image
+    runs-on: ubuntu-24.04
+    container: ghcr.io/samcday/phrog-ci:${{ needs.build-image.outputs.hash }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
       - name: Build
         run: |
           set -uexo pipefail
-          cargo build --features=static --all-targets --verbose
+          cargo build --all-targets --verbose
+      - name: Lint
+        run: |
+          cargo clippy --all-targets --verbose
       - uses: actions/upload-artifact@v4
         with:
           name: x86-64-debug
@@ -86,8 +74,9 @@ jobs:
         run: |
           set -uexo pipefail
 
+          export XDG_RUNTIME_DIR=/tmp
+
           # run tests
-          mkdir -p test-recordings/
           export RECORD_TESTS=`pwd`/demo-video/recordings/
           export G_MESSAGES_DEBUG=all
           cat > phoc.ini <<HERE
@@ -95,32 +84,92 @@ jobs:
           mode = 720x1440
           scale = 2
           HERE
-          dbus-run-session xvfb-run -a -s -noreset phoc -C phoc.ini -S -E "cargo test --features=static --verbose -- --test-threads=1 --nocapture"
+          dbus-run-session xvfb-run -a -s -noreset phoc -C phoc.ini -S -E "cargo test --verbose -- --test-threads=1 --nocapture"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-recordings
           path: demo-video/recordings
-      - name: demo.mp4
+  demo:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: test-recordings
+          path: demo-video/recordings
+      - name: Generate demo.mp4 with editly
         run: |
           set -uexo pipefail
           docker run \
-            -v `pwd`/demo-video:/work -i ghcr.io/samcday/editly:latest \
+            -v `pwd`/demo-video:/work \
+            -i ghcr.io/samcday/editly:latest \
             bash -c 'cd /work; editly --json editly.json5; \
-            ffmpeg -i demo.mp4 -vcodec libwebp -filter:v fps=fps=60 -lossless 0 -loop 0 -preset default -an -vsync 0 -s 160:320 demo.webp'
+            ffmpeg -i demo.mp4 -vcodec libwebp -filter:v fps=fps=60 -lossless 0 -loop 0 -preset default -an -vsync 0 -s 160:320 demo.webp; \
+            for f in recordings/*.mp4; do \
+              ffmpeg -i $f -vcodec libwebp -filter:v fps=fps=60 -lossless 0 -loop 0 -preset default -an -vsync 0 -s 160:320 "${f%.mp4}.webp"; \
+            done \
+            '
       - uses: actions/upload-artifact@v4
         with:
-          name: demo.mp4
-          path: demo-video/demo.mp4
-      - name: prepare release artifacts
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
-        run: |
-          cp target/debug/phrog phrog-x86_64
-      - name: upload release artifacts
+          name: demo-video
+          path: |
+            demo-video/demo.mp4
+            demo-video/demo.webp
+      - name: upload demo artifacts to release
         uses: softprops/action-gh-release@v2
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        if: github.event_name == 'release'
         with:
+          name: ${{ github.event.release.name }}
           files: |
             demo-video/demo.mp4
             demo-video/demo.webp
-            phrog-x86_64
+      - run: |
+          set -uexo pipefail
+          mkdir blob-upload/
+          cp demo-video/demo.webp demo-video/recordings/*.webp blob-upload/
+          
+          cat > comment.txt <<HERE
+          [The CI build recorded and generated some videos](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+          <details><summary>Demo video (shown on README and release notes)</summary>
+          <p>
+
+          <img width="180" height="360" src="https://samcday-phrog-videos.s3.eu-central-003.backblazeb2.com/${{ github.run_id }}/demo.webp">
+
+          </p>
+          </details>
+
+          HERE
+          for f in demo-video/recordings/*.webp; do
+            name="${f%.webp}"
+            name="${name#demo-video/recordings/}"
+            cat >> comment.txt <<HERE
+          <details><summary>${name}</summary>
+          <p>
+
+          <img width="180" height="360" src="https://samcday-phrog-videos.s3.eu-central-003.backblazeb2.com/${{ github.run_id }}/${name}.webp">
+
+          </p>
+          </details>
+
+          HERE
+          done
+      - uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --content-type=b2/x-auto
+        env:
+          AWS_S3_BUCKET: samcday-phrog-videos
+          AWS_ACCESS_KEY_ID: ${{ secrets.B2_APPLICATION_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.B2_APPLICATION_KEY }}
+          AWS_S3_ENDPOINT: https://s3.eu-central-003.backblazeb2.com
+          SOURCE_DIR: 'blob-upload'
+          DEST_DIR: ${{ github.run_id }}
+      - uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          header: ci-recordings
+          hide_and_recreate: true
+          hide_classify: OUTDATED
+          path: comment.txt

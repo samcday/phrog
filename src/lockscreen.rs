@@ -4,6 +4,8 @@ use greetd_ipc::ErrorType::AuthError;
 use greetd_ipc::{Request, Response};
 use gtk::glib;
 
+static G_LOG_DOMAIN: &str = "phrog-lockscreen";
+
 glib::wrapper! {
     pub struct Lockscreen(ObjectSubclass<imp::Lockscreen>)
         @extends libphosh::Lockscreen, gtk::Widget, gtk::Window, gtk::Bin;
@@ -22,16 +24,18 @@ impl Default for Lockscreen {
 }
 
 mod imp {
+    use super::G_LOG_DOMAIN;
     use crate::lockscreen::fake_greetd_interaction;
     use crate::shell::Shell;
     use crate::user_session_page::UserSessionPage;
     use crate::APP_ID;
     use anyhow::{anyhow, Context};
     use async_channel::{Receiver, Sender};
+    use glib::{error, warn};
     use greetd_ipc::codec::SyncCodec;
     use greetd_ipc::{AuthMessageType, ErrorType, Request, Response};
     use gtk::gio::Settings;
-    use gtk::glib::{clone, closure_local, g_critical, g_warning, timeout_add_once, ObjectExt, Properties};
+    use gtk::glib::{clone, closure_local, timeout_add_once, ObjectExt, Properties};
     use gtk::prelude::SettingsExtManual;
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
@@ -65,19 +69,26 @@ mod imp {
         let (greetd_resp_send, greetd_resp_recv) = async_channel::bounded(1);
 
         gio::spawn_blocking(move || {
-            let mut sock = std::env::var("GREETD_SOCK").ok().and_then(|path| UnixStream::connect(path).ok());
+            let mut sock = std::env::var("GREETD_SOCK")
+                .ok()
+                .and_then(|path| UnixStream::connect(path).ok());
             while let Ok(req) = greetd_req_recv.recv_blocking() {
                 let resp = if let Some(ref mut sock) = sock {
                     req.write_to(sock)
-                        .and_then(|_| { Response::read_from(sock) })
+                        .and_then(|_| Response::read_from(sock))
                         .unwrap_or_else(|err| Response::Error {
-                            error_type: ErrorType::Error, description: err.to_string() })
+                            error_type: ErrorType::Error,
+                            description: err.to_string(),
+                        })
                 } else {
-                    Response::Error {error_type: ErrorType::Error, description: "Greetd not connected".into()}
+                    Response::Error {
+                        error_type: ErrorType::Error,
+                        description: "Greetd not connected".into(),
+                    }
                 };
 
                 if let Err(err) = greetd_resp_send.send_blocking(resp) {
-                    g_critical!("greetd", "error sending greetd response on channel: {}", err);
+                    error!("error sending greetd response on channel: {}", err);
                     continue;
                 }
             }
@@ -108,6 +119,22 @@ mod imp {
                     }));
                 }));
 
+            self.user_session_page.get().unwrap().connect_ready_notify(
+                clone!(@weak-allow-none self as this => move |usp| {
+                    let shell = libphosh::Shell::default().downcast::<Shell>().unwrap();
+                    let user_count = usp.imp().box_users.children().len();
+                    let session_count = shell.sessions().map_or(0, |s| s.n_items());
+                    // If there's only one user and one session, set the default + active page to the keypad.
+                    if session_count == 1 && user_count == 1 {
+                        let this = if let Some(this) = this { this } else {
+                            return;
+                        };
+                        this.obj().set_page(LockscreenPage::Unlock);
+                        this.obj().set_default_page(LockscreenPage::Unlock);
+                    }
+                }),
+            );
+
             self.user_session_page.get().unwrap().connect_closure(
                 "login",
                 false,
@@ -133,7 +160,7 @@ mod imp {
             }
 
             if let Err(err) = self.greetd_req(Request::CancelSession).await {
-                g_warning!("greetd", "greetd CancelSession failed: {}", err);
+                warn!("greetd CancelSession failed: {}", err);
             }
             self.session.replace(None);
         }
@@ -147,7 +174,7 @@ mod imp {
 
             self.session.replace(user.clone());
             let username = user.unwrap();
-            g_warning!("greetd", "creating greetd session for user {}", username);
+            warn!("creating greetd session for user {}", username);
             self.obj().set_sensitive(false);
             let mut req = Some(Request::CreateSession { username });
             while let Some(next_req) = req.take() {
@@ -162,11 +189,11 @@ mod imp {
             if let Err(err) =
                 settings.set("last-user", self.session.clone().take().unwrap_or_default())
             {
-                g_warning!("lockscreen", "setting last-user failed {}", err);
+                warn!("setting last-user failed {}", err);
             }
 
             if let Err(err) = settings.set("last-session", session.id()) {
-                g_warning!("lockscreen", "setting last-session failed {}", err);
+                warn!("setting last-session failed {}", err);
             }
             self.greetd_req(Request::StartSession {
                 cmd: vec![session.command()],
@@ -177,30 +204,26 @@ mod imp {
                     format!("GDMSESSION={}", session.id()),
                 ],
             })
-                .await
-                .context("start session")?;
+            .await
+            .context("start session")?;
 
             Ok(())
         }
 
         async fn greetd_req(&self, req: Request) -> anyhow::Result<Response> {
-            if libphosh::Shell::default().downcast::<Shell>().unwrap().fake_greetd() {
+            if libphosh::Shell::default()
+                .downcast::<Shell>()
+                .unwrap()
+                .fake_greetd()
+            {
                 return fake_greetd_interaction(req);
             }
             if self.greetd.borrow().is_none() {
                 self.greetd.set(Some(run_greetd()));
             }
-            let mut borrow = self.greetd.borrow_mut();
-            let (sender, receiver) = borrow.as_mut().unwrap();
-            sender
-                .send(req)
-                .await
-                .context("send greetd request")?;
-            match receiver
-                .recv()
-                .await
-                .context("receive greetd response")?
-            {
+            let (sender, receiver) = self.greetd.clone().take().unwrap();
+            sender.send(req).await.context("send greetd request")?;
+            match receiver.recv().await.context("receive greetd response")? {
                 Response::Error {
                     error_type: ErrorType::Error,
                     description,
@@ -213,8 +236,9 @@ mod imp {
             let resp = self.greetd_req(req).await;
 
             if let Err(err) = resp {
-                g_critical!("greetd", "failed to send greetd request: {:?}", err);
+                error!("failed to send greetd request: {:?}", err);
                 self.obj().set_unlock_status("Greetd error, check logs");
+                self.obj().set_sensitive(true);
                 return None;
             }
 
@@ -223,21 +247,18 @@ mod imp {
                     auth_message_type,
                     auth_message,
                 } => {
-                    g_warning!(
-                        "greetd",
+                    warn!(
                         "got greetd auth message ({:?}) {}",
-                        auth_message_type,
-                        auth_message
+                        auth_message_type, auth_message
                     );
                     self.obj().set_unlock_status(&auth_message);
                     // TODO: it would be nice to override the GtkEntry input-purpose depending on
                     // AuthMessageType.
                     self.obj().set_sensitive(true);
                     match auth_message_type {
-                        AuthMessageType::Info | AuthMessageType::Error =>
-                            return Some(Request::PostAuthMessageResponse {
-                                response: None,
-                            }),
+                        AuthMessageType::Info | AuthMessageType::Error => {
+                            return Some(Request::PostAuthMessageResponse { response: None })
+                        }
                         _ => {}
                     }
                 }
@@ -254,7 +275,7 @@ mod imp {
                     error_type: ErrorType::AuthError,
                     description,
                 } => {
-                    g_warning!("greetd", "auth error '{}'", description);
+                    warn!("auth error '{}'", description);
                     self.obj().shake_pin_entry();
                     self.cancel_session().await;
                     glib::timeout_future_seconds(1).await;
@@ -262,7 +283,7 @@ mod imp {
                         username: self.user_session_page.get()?.username()?,
                     });
                 }
-                v => g_critical!("greetd", "unexpected response to start session: {:?}", v),
+                v => error!("unexpected response to start session: {:?}", v),
             }
             None
         }

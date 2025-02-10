@@ -1,5 +1,5 @@
 use crate::session_object::SessionObject;
-use gtk::{glib, ListBoxRow};
+use gtk::glib;
 use gtk::glib::{Cast, CastNone, Object};
 use gtk::prelude::*;
 use gtk::subclass::prelude::ObjectSubclassIsExt;
@@ -7,6 +7,7 @@ use gtk::traits::ListBoxExt;
 use libhandy::prelude::ActionRowExt;
 use libhandy::traits::ComboRowExt;
 use libhandy::ActionRow;
+use crate::shell::Shell;
 
 glib::wrapper! {
     pub struct UserSessionPage(ObjectSubclass<imp::UserSessionPage>)
@@ -24,31 +25,10 @@ impl UserSessionPage {
         Object::builder().build()
     }
 
-    pub fn select_user(&self, username: &str) {
-        for w in self.imp().box_users.children() {
-            if let Ok(row) = w.downcast::<ActionRow>() {
-                if row.subtitle().filter(|v| v == username).is_some() {
-                    self.imp().box_users.select_row(Some(&row));
-                    return;
-                }
-            }
-        }
-        self.imp().box_users.select_row(self.imp().box_users.children().first().and_then(|v| v.downcast_ref::<ListBoxRow>()));
-    }
-
-    pub fn select_session(&self, name: &str) {
-        for (idx, session) in self.imp().sessions.get().unwrap().iter::<SessionObject>().flatten().enumerate() {
-            if session.id() == name {
-                self.imp().row_sessions.set_selected_index(idx as _);
-                return;
-            }
-        }
-    }
-
     pub fn session(&self) -> SessionObject {
+        let shell = libphosh::Shell::default().downcast::<Shell>().unwrap();
         let session_idx = self.imp().row_sessions.selected_index() as u32;
-        let sessions = self.imp().sessions.get().unwrap();
-        sessions
+        shell.sessions().unwrap()
             .item(session_idx)
             .clone()
             .and_downcast::<SessionObject>()
@@ -65,27 +45,28 @@ impl UserSessionPage {
 }
 
 mod imp {
+    use crate::dbus::accounts::AccountsProxy;
     use crate::session_object::SessionObject;
-    use crate::sessions;
+    use crate::shell::Shell;
+    use crate::user::User;
+    use crate::APP_ID;
+    use futures_util::select;
+    use futures_util::StreamExt;
     use glib::subclass::InitializingObject;
-    use gtk::gio::ListStore;
+    use gtk::gio::{ListStore, Settings};
     use gtk::glib::subclass::Signal;
-    use gtk::glib::clone;
+    use gtk::glib::{clone, closure_local};
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
-    use gtk::{glib, CompositeTemplate, Image, ListBox};
+    use gtk::{glib, CompositeTemplate, Image, ListBox, ListBoxRow};
     use libhandy::prelude::*;
     use libhandy::ActionRow;
-    use std::cell::OnceCell;
+    use std::cell::{Cell, OnceCell};
     use std::sync::OnceLock;
-    use futures_util::select;
-    use crate::shell::Shell;
-    use crate::dbus::accounts::AccountsProxy;
-    use crate::user::User;
-    use futures_util::StreamExt;
-    use zbus::zvariant::OwnedObjectPath;
+    use glib::{GString, Properties};
 
-    #[derive(CompositeTemplate, Default)]
+    #[derive(CompositeTemplate, Default, Properties)]
+    #[properties(wrapper_type = super::UserSessionPage)]
     #[template(resource = "/mobi/phosh/phrog/lockscreen-user-session.ui")]
     pub struct UserSessionPage {
         #[template_child]
@@ -95,7 +76,9 @@ mod imp {
         pub row_sessions: TemplateChild<libhandy::ComboRow>,
 
         users: OnceCell<ListStore>,
-        pub sessions: OnceCell<ListStore>,
+
+        #[property(get, set)]
+        ready: Cell<bool>,
     }
 
     #[glib::object_subclass]
@@ -114,10 +97,12 @@ mod imp {
         }
     }
 
+    #[glib::derived_properties]
     impl ObjectImpl for UserSessionPage {
         fn constructed(&self) {
             self.parent_constructed();
 
+            let settings = Settings::new(APP_ID);
             let shell = libphosh::Shell::default().downcast::<Shell>().unwrap();
             let conn = shell.imp().dbus_connection.clone().into_inner().unwrap();
 
@@ -126,46 +111,76 @@ mod imp {
                     this.obj().emit_by_name::<()>("login", &[]);
                 }));
 
-            self.sessions
-                .set(ListStore::new::<SessionObject>())
-                .unwrap();
-
-            let session_list = sessions::sessions();
-            self.sessions
-                .get()
-                .unwrap()
-                .extend_from_slice(&session_list);
-
             self.row_sessions.bind_name_model(
-                Some(self.sessions.get().unwrap()),
+                Some(shell.sessions().as_ref().unwrap()),
                 Some(Box::new(|v| {
                     v.downcast_ref::<SessionObject>().unwrap().name()
                 })),
             );
+            let mut last_session = settings.string("last-session");
+
+            if last_session.is_empty() {
+                // No preference for a session exists, so let's default to Phosh.
+                last_session = GString::from("phosh");
+            }
+
+            for (idx, session) in shell.sessions()
+                .as_ref().unwrap()
+                .iter::<SessionObject>()
+                .flatten()
+                .enumerate()
+            {
+                if session.id() == last_session {
+                    self.row_sessions.set_selected_index(idx as _);
+                    break;
+                }
+            }
 
             let users = ListStore::new::<User>();
+            let last_user = settings.string("last-user");
 
-            self.box_users.bind_model(Some(&users), |v| {
+            self.box_users.bind_model(Some(&users), clone!(@weak self as this, @strong last_user => @default-panic, move |v| {
                 let user = v.downcast_ref::<User>().unwrap();
-                let row = ActionRow::builder()
-                    .activatable(true)
-                    .build();
+                let row = ActionRow::builder().activatable(true).build();
                 user.bind_property("username", &row, "subtitle").build();
                 user.bind_property("name", &row, "title").build();
                 let image = Image::new();
                 row.add_prefix(&image);
                 image.show();
                 user.bind_property("icon-pixbuf", &image, "pixbuf").build();
+
+                user.connect_closure("loaded", false, closure_local!(@strong this, @strong last_user, @strong row => move |obj: glib::Object| {
+                    if let Ok(user) = obj.downcast::<User>() {
+                        if user.username() == last_user {
+                            this.box_users.select_row(Some(&row));
+                        }
+                    }
+                }));
+
                 row.upcast()
-            });
+            }));
 
             self.users.set(users.clone()).unwrap();
-            glib::spawn_future_local(clone!(@weak self as this => async move {
+            glib::spawn_future_local(clone!(@weak self as this, @strong last_user => async move {
                 let accounts_proxy = AccountsProxy::new(&conn).await.unwrap();
 
                 for path in accounts_proxy.list_cached_users().await.unwrap() {
                     users.append(&User::new(conn.clone(), path.into()));
                 }
+
+                // The initial user list has been populated. Select the first item in the list to
+                // ensure something is selected.
+                // This will be overridden by the "loaded" signal handler, if the appropriate user
+                // matching the last-user setting was discovered.
+                this.box_users.select_row(
+                    this
+                        .box_users
+                        .children()
+                        .first()
+                        .and_then(|v| v.downcast_ref::<ListBoxRow>()),
+                );
+
+                this.obj().set_ready(true);
 
                 let mut added_stream = accounts_proxy.receive_user_added().await.unwrap();
                 let mut deleted_stream = accounts_proxy.receive_user_deleted().await.unwrap();
@@ -173,12 +188,12 @@ mod imp {
                 loop {
                     select! {
                         added = added_stream.next() => if let Some(added) = added {
-                            if let Some(path) = added.args().ok().and_then(|v| Some(v.user)) {
-                                users.append(&User::new(conn.clone(), path.into()));
+                            if let Some(path) = added.args().ok().map(|v| v.user) {
+                                users.append(&User::new(conn.clone(), path));
                             }
                         },
                         deleted = deleted_stream.next() => if let Some(deleted) = deleted {
-                            if let Some(path) = deleted.args().ok().and_then(|v| Some(v.user)) {
+                            if let Some(path) = deleted.args().ok().map(|v| v.user) {
                                 for (idx, user) in users.iter::<User>().flatten().enumerate() {
                                     if user.path() == path.as_str() {
                                         users.remove(idx as _);
@@ -194,7 +209,11 @@ mod imp {
 
         fn signals() -> &'static [Signal] {
             static SIGNALS: OnceLock<Vec<Signal>> = OnceLock::new();
-            SIGNALS.get_or_init(|| vec![Signal::builder("login").build()])
+            SIGNALS.get_or_init(|| {
+                vec![
+                    Signal::builder("login").build(),
+                ]
+            })
         }
     }
 

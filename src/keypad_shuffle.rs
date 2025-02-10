@@ -6,15 +6,18 @@ glib::wrapper! {
 }
 
 mod imp {
+    use crate::shell::Shell;
     use gtk::gio::Settings;
     use gtk::glib::clone;
     use gtk::glib::subclass::InitializingObject;
-    use gtk::prelude::*;
+    use gtk::prelude::Cast;
+    use gtk::prelude::InitializingWidgetExt;
+    use gtk::prelude::SettingsExt;
+    use gtk::prelude::SettingsExtManual;
     use gtk::subclass::prelude::*;
     use gtk::{glib, CompositeTemplate};
     use libphosh::prelude::{QuickSettingExt, StatusIconExt};
     use libphosh::subclass::quick_setting::QuickSettingImpl;
-    use crate::shell::Shell;
 
     #[derive(CompositeTemplate, Default)]
     #[template(resource = "/mobi/phosh/phrog/shuffle-keypad-quick-setting.ui")]
@@ -55,7 +58,10 @@ mod imp {
     impl ObjectImpl for ShuffleKeypadQuickSetting {
         fn constructed(&self) {
             self.parent_constructed();
-            libphosh::Shell::default().downcast::<Shell>().unwrap().set_keypad_shuffle_qs(self.obj().clone());
+            libphosh::Shell::default()
+                .downcast::<Shell>()
+                .unwrap()
+                .set_keypad_shuffle_qs(self.obj().clone());
 
             let settings = Settings::new("sm.puri.phosh.lockscreen");
             settings
@@ -63,12 +69,12 @@ mod imp {
                 .build();
 
             self.obj()
-                .connect_active_notify(clone!(@weak self as this => move |qs| {
+                .connect_active_notify(clone!(@weak self as this => move |_| {
                     this.update();
                 }));
             self.update();
 
-            self.obj().connect_clicked(move |btn| {
+            self.obj().connect_clicked(move |_| {
                 settings
                     .set_boolean("shuffle-keypad", !settings.boolean("shuffle-keypad"))
                     .unwrap();

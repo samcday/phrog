@@ -1,0 +1,41 @@
+#!/bin/sh
+# process substitution is supported by BusyBox ash
+# shellcheck disable=SC3001
+
+# This simple wrapper script is intended to be used directly by greetd to
+# start up the phrog greeter session.
+# Your distribution packaging should have already set something up for you,
+# but if you're doing this manually you can make use of this script by
+# adding something like this to your config.toml:
+# [default_session]
+# command = "/usr/libexec/phrog-greetd-session"
+
+# We prefer phoc.ini from phrog, falling back to Phosh otherwise
+PHOC_INI=/etc/phrog/phoc.ini
+[ ! -f $PHOC_INI ] && PHOC_INI=/usr/share/phrog/phoc.ini
+[ ! -f $PHOC_INI ] && PHOC_INI=/etc/phosh/phoc.ini
+[ ! -f $PHOC_INI ] && PHOC_INI=/usr/share/phosh/phoc.ini
+
+# Need to set XDG_CURRENT_DESKTOP now, otherwise gnome-session defaults it to
+# "GNOME", which is a problem because default desktop files for Squeekboard and
+# phosh-osk-stub specify "OnlyShowIn=Phosh;"
+export XDG_CURRENT_DESKTOP=Phosh:GNOME
+
+export GNOME_SESSION_AUTOSTART_DIR=/usr/share/phrog/autostart:/etc/phrog/autostart
+
+# greetd swallows all output from the greeters it spawns. We don't want that.
+# Redirect all output to journald or syslog.
+if command -v systemd-cat >/dev/null 2>&1; then
+  exec > >(systemd-cat --identifier=phrog) 2>&1
+elif command -v logger >/dev/null 2>&1; then
+  exec > >(logger -s -t phrog) 2>&1
+fi
+
+# phoc needs a dbus session bus present or it fails to initialize. Since a
+# healthy greeter session needs one anyway, let's ensure it's started now.
+dbus_command=""
+if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+  dbus_command=dbus-run-session
+fi
+
+exec $dbus_command phoc -S -C "${PHOC_INI}" -E 'gnome-session --session=phrog'
