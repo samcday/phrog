@@ -135,7 +135,6 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
     wall_clock.set_default();
     let shell: Shell = shell_builder.build();
     shell.set_default();
-    shell.set_locked(true);
 
     let ready_called = Arc::new(AtomicBool::new(false));
     let ready_called2 = ready_called.clone();
