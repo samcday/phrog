@@ -3,5 +3,5 @@ vt = 7
 
 # The default session, also known as the greeter.
 [default_session]
-command = "systemd-cat --identifier=phrog /usr/bin/phrog"
+command = "/usr/libexec/phrog-greetd-session"
 user = "_greetd"

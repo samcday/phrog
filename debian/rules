@@ -22,9 +22,9 @@ override_dh_auto_build:
 
 override_dh_auto_install:
 	install -D -m0755 target/$(DEB_HOST_RUST_TYPE)/debug/phrog \
-		$(INSTALL_DIR)/usr/libexec/phrog
-	install -D -m0644 resources/mobi.phosh.phrog.gschema.xml \
-		$(INSTALL_DIR)/usr/share/glib-2.0/schemas/mobi.phosh.phrog.gschema.xml
+		$(INSTALL_DIR)/usr/bin/phrog
+	install -D -m0755 data/phrog-greetd-session \
+		$(INSTALL_DIR)/usr/libexec/phrog-greetd-session
 
 override_dh_auto_test:
 ifeq ($(filter nocheck,$(DEB_BUILD_OPTIONS)),)
