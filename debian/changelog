@@ -1,3 +1,9 @@
+phrog (0.44.1-1) UNRELEASED; urgency=medium
+
+  * New upstream version
+
+ -- Arnaud Ferraris <aferraris@debian.org>  Mon, 10 Feb 2025 14:52:48 +0100
+
 phrog (0.10.0+ds1-1) unstable; urgency=medium
 
   * Initial Debian packaging (Closes: #1082766)
