@@ -1,18 +1,17 @@
 From: Arnaud Ferraris <aferraris@debian.org>
-Date: Sat, 12 Oct 2024 22:35:09 +0200
+Date: Mon, 10 Feb 2025 15:28:02 +0100
 Subject: src: fix build
 
 ---
  src/lockscreen.rs        | 1 -
- src/shell.rs             | 2 +-
- src/user_session_page.rs | 4 +---
- 3 files changed, 2 insertions(+), 5 deletions(-)
+ src/user_session_page.rs | 3 +--
+ 2 files changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/src/lockscreen.rs b/src/lockscreen.rs
-index 32a529a..df2350a 100644
+index ea99693..25550f3 100644
 --- a/src/lockscreen.rs
 +++ b/src/lockscreen.rs
-@@ -35,7 +35,6 @@ mod imp {
+@@ -39,7 +39,6 @@ mod imp {
      use gtk::prelude::SettingsExtManual;
      use gtk::prelude::*;
      use gtk::subclass::prelude::*;
@@ -20,31 +19,18 @@ index 32a529a..df2350a 100644
      use gtk::{gio, glib};
      use libphosh::prelude::*;
      use libphosh::subclass::lockscreen::LockscreenImpl;
-diff --git a/src/shell.rs b/src/shell.rs
-index a11a94d..91509de 100644
---- a/src/shell.rs
-+++ b/src/shell.rs
-@@ -23,7 +23,7 @@ mod imp {
-     use gtk::gio::{IOExtensionPoint, Settings};
-     use gtk::prelude::*;
-     use gtk::subclass::prelude::*;
--    use libphosh::ffi::PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET;
-+    use phosh_sys::PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET;
-     use libphosh::prelude::ShellExt;
-     use libphosh::subclass::shell::ShellImpl;
-     use crate::APP_ID;
 diff --git a/src/user_session_page.rs b/src/user_session_page.rs
-index a150c02..d060899 100644
+index e440376..4f8b527 100644
 --- a/src/user_session_page.rs
 +++ b/src/user_session_page.rs
-@@ -3,9 +3,7 @@ use gtk::{glib, ListBoxRow};
+@@ -3,9 +3,8 @@ use gtk::glib;
  use gtk::glib::{Cast, CastNone, Object};
  use gtk::prelude::*;
  use gtk::subclass::prelude::ObjectSubclassIsExt;
 -use gtk::traits::ListBoxExt;
--use libhandy::prelude::ActionRowExt;
+ use libhandy::prelude::ActionRowExt;
 -use libhandy::traits::ComboRowExt;
-+use libhandy::prelude::{ActionRowExt, ComboRowExt};
++use libhandy::prelude::ComboRowExt;
  use libhandy::ActionRow;
+ use crate::shell::Shell;
  
- glib::wrapper! {

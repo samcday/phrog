@@ -1,81 +1,39 @@
 From: Arnaud Ferraris <aferraris@debian.org>
-Date: Sat, 12 Oct 2024 22:34:57 +0200
+Date: Mon, 10 Feb 2025 15:27:29 +0100
 Subject: Cargo.toml: relax dependencies
 
-Ensure we can use the versions of crates packaged in Debian. Moreover,
-this change replaces `tempdir` with `tempfile`, the former being absent
-from Debian due to being deprecated and replaced with the latter.
+Ensure we can use the versions of crates packaged in Debian.
+
+Forwarded: not-needed
 ---
- Cargo.toml              | 19 ++++++++++---------
- tests/keypad_shuffle.rs |  2 +-
- tests/simple_flow.rs    |  2 +-
- 3 files changed, 12 insertions(+), 11 deletions(-)
+ Cargo.toml | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/Cargo.toml b/Cargo.toml
-index c7a1922..78b6a70 100644
+index b627703..bf90b5d 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
-@@ -8,11 +8,12 @@ glob = "0.3.1"
+@@ -8,11 +8,11 @@ glob = "0.3.1"
  greetd_ipc = { version = "0.10.0", features = ["sync-codec"] }
  async-channel = "2.2.1"
  anyhow = "1.0.82"
--libphosh = { path = "libphosh-rs/libphosh" }
-+libphosh = "0.0.3"
-+libphosh-sys = "0.0.3"
+-libphosh = "0.0.5"
++libphosh = "0.0.6"
  clap = { version = "4.5.4", features = ["derive"] }
--wayland-client = "0.31.3"
--zbus = { version = "=4.3.1", default-features = false, features = ["blocking", "async-io"] }
--nix = { version = "0.29.0", features = ["signal"] }
-+wayland-client = "0.31"
-+zbus = { version = "4.3", default-features = false, features = ["blocking", "async-io"] }
+ wayland-client = "0.31"
+ zbus = { version = "4", default-features = false, features = ["blocking", "async-io"] }
+-nix = { version = "0.27", features = ["signal"] }
 +nix = { version = "0.29", features = ["signal"] }
  async-global-executor = "2.4.1"
  futures-util = "0.3.30"
- 
-@@ -27,15 +28,15 @@ version = "0.11"
- features = ["v1_6"]
- 
- [build-dependencies]
--glib-build-tools = "0.18.0"
-+glib-build-tools = "0.20"
- 
+ log = "0.4.22"
+@@ -35,7 +35,7 @@ glib-build-tools = "0"
  [dev-dependencies]
  input-event-codes = "6.2.0"
--wayland-client = "0.31.3"
--wayland-protocols = { version = "0.32.1", features = ["client"] }
-+wayland-client = "0.31"
-+wayland-protocols = { version = "0.31", features = ["client"] }
+ wayland-client = "0.31"
+-wayland-protocols = { version = "0.31", features = ["client"] }
++wayland-protocols = { version = "0.32", features = ["client"] }
  wayland-protocols-misc = { version = "0.3.1", features = ["client"] }
--wayland-protocols-wlr = { version = "0.3.1", features = ["client"] }
--tempdir = "0.3.7"
-+wayland-protocols-wlr = { version = "0.2", features = ["client"] }
-+tempfile = "3"
- 
- [features]
- keypad-shuffle = []
-diff --git a/tests/keypad_shuffle.rs b/tests/keypad_shuffle.rs
-index 26a238e..4da68fd 100644
---- a/tests/keypad_shuffle.rs
-+++ b/tests/keypad_shuffle.rs
-@@ -23,7 +23,7 @@ use crate::common::virtual_keyboard::VirtualKeyboard;
- 
- #[test]
- fn keypad_shuffle() {
--    let tmp = tempdir::TempDir::new("phrog-test-system-dbus").unwrap();
-+    let tmp = tempfile::tempdir("phrog-test-system-dbus").unwrap();
-     let _nested_phoc = phrog::init(Some("phoc".into()));
-     let _system_dbus = dbus::system_dbus(tmp.path());
- 
-diff --git a/tests/simple_flow.rs b/tests/simple_flow.rs
-index 81b666a..e73aadc 100644
---- a/tests/simple_flow.rs
-+++ b/tests/simple_flow.rs
-@@ -21,7 +21,7 @@ use phrog::lockscreen::Lockscreen;
- 
- #[test]
- fn test_simple_flow() {
--    let tmp = tempdir::TempDir::new("phrog-test-system-dbus").unwrap();
-+    let tmp = tempfile::tempdir("phrog-test-system-dbus").unwrap();
-     let _nested_phoc = phrog::init(Some("phoc".into()));
-     let _system_dbus = dbus::system_dbus(tmp.path());
- 
+-wayland-protocols-wlr = { version = "0.2", features = ["client"] }
++wayland-protocols-wlr = { version = "0.3", features = ["client"] }
+ tempfile = "3"
