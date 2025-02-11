@@ -32,7 +32,7 @@ pub use virtual_pointer::VirtualPointer;
 
 #[allow(dead_code)]
 pub struct Test {
-    session_dbus_conn: zbus::Connection,
+    pub session_dbus_conn: zbus::Connection,
     system_dbus_conn: zbus::Connection,
     pub if_settings: Settings,
     pub logged_in: Arc<AtomicBool>,
