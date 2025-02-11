@@ -1,8 +1,32 @@
-phrog (0.44.1-1) UNRELEASED; urgency=medium
+phrog (0.44.1-1) unstable; urgency=medium
 
   * New upstream version
+  * d/patches: update for new upstream release
+  * d/control: update build dependencies for current Debian packages.
+    Also add some more packages needed only for running tests, now that we
+    can re-enable them.
+  * d/rules: re-enable build tests.
+    Those were previously relying on downstream libphosh-rs features, which
+    have now been upstreamed. We can therefore re-enable those, adding the
+    corresponding build-dependencies.
+  * debian: install new files provided by phrog.
+    Upstream now provides a wrapper script making use of `systemd-cat` so we
+    can both drop our own wrapper and make our `greetd` config a bit
+    simpler.
+    Also install the new files found under `data/` such as the `.desktop`
+    file and session configurations.
+  * debian: acknowledge repacking is no longer needed.
+    Upstream no longer ships the problematics files nor do they vendor
+    `libphosh-rs` anymore. While at it, update `d/copyright` for the new
+    release.
+  * d/patches: require bash for wrapper script.
+    It isn't POSIX-compliant, potentially leading to runtime problems if the
+    default shell doesn't implement the corresponding bashisms.
+  * debian: reload systemd on installation/removal.
+    Otherwise the systemd config, especially for `greetd.service`, might be
+    out-of-sync.
 
- -- Arnaud Ferraris <aferraris@debian.org>  Mon, 10 Feb 2025 14:52:48 +0100
+ -- Arnaud Ferraris <aferraris@debian.org>  Tue, 11 Feb 2025 11:58:40 +0100
 
 phrog (0.10.0+ds1-1) unstable; urgency=medium
 
