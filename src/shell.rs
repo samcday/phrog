@@ -5,7 +5,7 @@ static G_LOG_DOMAIN: &str = "phrog";
 
 glib::wrapper! {
     pub struct Shell(ObjectSubclass<imp::Shell>)
-        @extends libphosh::Shell;
+        @extends libphosh::Shell, gtk::gio::ActionGroup;
 }
 
 impl Shell {
