@@ -89,6 +89,7 @@ pub struct TestOptions {
     pub sessions: Option<Vec<SessionObject>>,
     pub last_user: Option<String>,
     pub last_session: Option<String>,
+    pub first_run: Option<String>,
 }
 
 pub fn test_init(options: Option<TestOptions>) -> Test {
@@ -101,7 +102,11 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
         let phrog_settings = Settings::new("mobi.phosh.phrog");
         phrog_settings.set_string("last-user", &options.last_user.clone().unwrap_or(String::new())).unwrap();
         phrog_settings.set_string("last-session", &options.last_session.clone().unwrap_or(String::new())).unwrap();
+        phrog_settings.set_string("first-run", &options.first_run.clone().unwrap_or(String::new())).unwrap();
     }
+
+    let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
+    phosh_settings.set_boolean("shuffle-keypad", false).unwrap();
 
     let if_settings = Settings::new("org.gnome.desktop.interface");
     // use a more appropriate (moar froggy) accent color
@@ -130,7 +135,6 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
     wall_clock.set_default();
     let shell: Shell = shell_builder.build();
     shell.set_default();
-    shell.set_locked(true);
 
     let ready_called = Arc::new(AtomicBool::new(false));
     let ready_called2 = ready_called.clone();
