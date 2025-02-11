@@ -284,6 +284,14 @@ pub fn get_lockscreen_bits(lockscreen: &mut Lockscreen) -> (Grid, Button) {
     (keypad, submit_btn)
 }
 
+pub fn keypad_digit(grid: &gtk::Grid, digit: i32) -> gtk::Widget {
+    if digit == 0 {
+        return grid.child_at(1, 3).unwrap();
+    }
+    let digit = digit - 1;
+    grid.child_at(digit % 3, digit / 3).unwrap()
+}
+
 pub fn fade_quit() {
     libphosh::Shell::default().fade_out(0);
     // Keep this timeout in sync with fadeout animation duration in phrog.css
