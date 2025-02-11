@@ -16,6 +16,8 @@ BuildRequires:  cargo-rpm-macros >= 24
 BuildRequires:	dbus-daemon
 # for xvfb-run in %check
 BuildRequires:  xorg-x11-server-Xvfb
+# first-run test uses foot
+BuildRequires:  foot
 
 Requires:       squeekboard
 Requires:       gnome-session
