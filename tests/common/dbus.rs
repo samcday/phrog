@@ -26,13 +26,15 @@ pub fn dbus_daemon(kind: &str, tmpdir: &Path) -> SupervisedChild {
       </policy>
     </busconfig>
     "#,
-            kind,
-            dbus_path
+            kind, dbus_path
         ),
     )
     .expect("failed to write dbus config");
 
-    std::env::set_var(format!("DBUS_{}_BUS_ADDRESS", kind.to_uppercase()), dbus_path);
+    std::env::set_var(
+        format!("DBUS_{}_BUS_ADDRESS", kind.to_uppercase()),
+        dbus_path,
+    );
     let child = std::process::Command::new("dbus-daemon")
         .arg(format!("--config-file={}", config_path.to_str().unwrap()))
         .stdout(Stdio::null())
@@ -106,7 +108,10 @@ impl UserFixture {
     }
 }
 
-pub async fn run_accounts_fixture(connection: zbus::Connection, num_users: Option<u32>) -> anyhow::Result<()> {
+pub async fn run_accounts_fixture(
+    connection: zbus::Connection,
+    num_users: Option<u32>,
+) -> anyhow::Result<()> {
     connection
         .object_server()
         .at("/org/freedesktop/Accounts", AccountsFixture { num_users })
