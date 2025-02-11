@@ -3,6 +3,7 @@ pub mod virtual_keyboard;
 pub mod virtual_pointer;
 
 use crate::common::virtual_keyboard::VirtualKeyboard;
+use anyhow::Context;
 use async_channel::Receiver;
 use greetd_ipc::codec::SyncCodec;
 use greetd_ipc::AuthMessageType::Secret;
@@ -32,7 +33,8 @@ pub use virtual_pointer::VirtualPointer;
 
 #[allow(dead_code)]
 pub struct Test {
-    dbus_conn: zbus::Connection,
+    session_dbus_conn: zbus::Connection,
+    system_dbus_conn: zbus::Connection,
     pub if_settings: Settings,
     pub logged_in: Arc<AtomicBool>,
     pub ready_called: Arc<AtomicBool>,
@@ -40,6 +42,7 @@ pub struct Test {
     recording: Option<SupervisedChild>,
     pub shell: Shell,
     system_dbus: SupervisedChild,
+    session_dbus: SupervisedChild,
     tmp: TempDir,
     wall_clock: WallClock,
 }
@@ -95,8 +98,10 @@ pub struct TestOptions {
 pub fn test_init(options: Option<TestOptions>) -> Test {
     std::env::set_var("GSETTINGS_BACKEND", "memory");
     let tmp = tempfile::tempdir().unwrap();
+    let system_dbus = dbus::dbus_daemon("system", tmp.path());
+    let session_dbus = dbus::dbus_daemon("session", tmp.path());
+
     phrog::init().unwrap();
-    let system_dbus = dbus::system_dbus(tmp.path());
 
     if let Some(ref options) = options {
         let phrog_settings = Settings::new("mobi.phosh.phrog");
@@ -113,10 +118,20 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
     if_settings.set_string("accent-color", "green").unwrap();
 
     let num_users = options.as_ref().and_then(|opts| opts.num_users);
-    let dbus_conn = async_global_executor::block_on(async move {
-        dbus::run_accounts_fixture(num_users)
+    let (system_dbus_conn, session_dbus_conn) = async_global_executor::block_on(async move {
+        let system = zbus::Connection::system()
             .await
-            .unwrap()
+            .expect("failed to connect to system bus");
+
+        dbus::run_accounts_fixture(system.clone(), num_users)
+            .await
+            .unwrap();
+
+        let session = zbus::Connection::session()
+            .await
+            .expect("failed to connect to session bus");
+
+        (system, session)
     });
 
     let logged_in = Arc::new(AtomicBool::new(false));
@@ -149,7 +164,8 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
     }));
 
     Test {
-        dbus_conn,
+        system_dbus_conn,
+        session_dbus_conn,
         if_settings,
         logged_in,
         ready_called,
@@ -157,6 +173,7 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
         recording: None,
         shell,
         system_dbus,
+        session_dbus,
         tmp,
         wall_clock,
     }
