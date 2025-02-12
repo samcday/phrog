@@ -16,6 +16,7 @@ depends="
 makedepends="
 	cargo
 	cargo-auditable
+	foot
 	libphosh-dev"
 checkdepends="xvfb-run"
 
