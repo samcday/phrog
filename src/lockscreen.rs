@@ -100,51 +100,53 @@ mod imp {
     #[glib::derived_properties]
     impl ObjectImpl for Lockscreen {
         fn constructed(&self) {
-            self.user_session_page.set(UserSessionPage::new()).unwrap();
+            let self_obj = self.obj();
+            let usp = UserSessionPage::new();
 
-            self.obj()
-                .add_extra_page(self.user_session_page.get().unwrap());
-            self.obj().set_default_page(LockscreenPage::Extra);
+            // Insert the UserSessionPage widget into the "extra page" of Phosh.Lockscreen.
+            // This sits in-between the Info and Unlock (keypad) pages.
+            // We default to this page (which means inactivity bounces user back to it).
+            self_obj.add_extra_page(&usp);
+            self_obj.set_default_page(LockscreenPage::Extra);
 
-            self.obj()
-                .connect_page_notify(clone!(@weak self as this => move |ls| {
-                    glib::spawn_future_local(clone!(@weak ls => async move {
-                        // Page is lockscreen, begin greetd conversation.
-                        if ls.page() == LockscreenPage::Unlock {
-                            this.create_session().await;
-                        } else {
-                            // No longer on unlock, cancel session.
-                            this.cancel_session().await;
-                        }
-                    }));
-                }));
-
-            self.user_session_page.get().unwrap().connect_ready_notify(
-                clone!(@weak-allow-none self as this => move |usp| {
-                    let shell = libphosh::Shell::default().downcast::<Shell>().unwrap();
-                    let user_count = usp.imp().box_users.children().len();
-                    let session_count = shell.sessions().map_or(0, |s| s.n_items());
-                    // If there's only one user and one session, set the default + active page to the keypad.
-                    if session_count == 1 && user_count == 1 {
-                        let this = if let Some(this) = this { this } else {
-                            return;
-                        };
-                        this.obj().set_page(LockscreenPage::Unlock);
-                        this.obj().set_default_page(LockscreenPage::Unlock);
+            // Add a signal handler for when Phosh.Lockscreen active page changes.
+            // We hook up greetd session initiation/cancellation to this.
+            self_obj.connect_page_notify(clone!(@weak self as this => move |ls| {
+                glib::spawn_future_local(clone!(@weak ls => async move {
+                    // Page is lockscreen, begin greetd conversation.
+                    if ls.page() == LockscreenPage::Unlock {
+                        this.create_session().await;
+                    } else {
+                        // No longer on unlock, cancel session.
+                        this.cancel_session().await;
                     }
-                }),
-            );
+                }));
+            }));
 
-            self.user_session_page.get().unwrap().connect_closure(
+            // Add a handler for the UserSessionPage notifying of readiness, which happens when
+            // all user+sessions on the system have been loaded. At this point we can decide if
+            // the "trivial flow" is suitable (jump straight to keypad if there's only one user and
+            // session choice available).
+            usp.connect_ready_notify(clone!(@weak self_obj => move |usp| {
+                let shell = Shell::default();
+                let user_count = usp.imp().box_users.children().len();
+                let session_count = shell.sessions().map_or(0, |s| s.n_items());
+                // If there's only one user and one session, set the default + active page to the keypad.
+                if session_count == 1 && user_count == 1 {
+                    self_obj.set_page(LockscreenPage::Unlock);
+                    self_obj.set_default_page(LockscreenPage::Unlock);
+                }
+            }));
+
+            usp.connect_closure(
                 "login",
                 false,
-                closure_local!(@weak-allow-none self as this => move |_: UserSessionPage| {
-                        let this = if let Some(this) = this { this } else {
-                            return;
-                        };
-                        this.obj().set_page(LockscreenPage::Unlock);
+                closure_local!(@watch self_obj => move |_: UserSessionPage| {
+                    self_obj.set_page(LockscreenPage::Unlock);
                 }),
             );
+
+            self.user_session_page.set(usp).unwrap();
 
             self.parent_constructed();
         }
