@@ -26,14 +26,14 @@ Build-Depends:
  at-spi2-core <!nocheck>,
  dbus-x11 <!nocheck>,
  gnome-settings-daemon <!nocheck>,
+ gnome-shell-common <!nocheck>,
  librust-input-event-codes-6-dev (>= 6.2.0~~) <!nocheck>,
  librust-wayland-protocols-0.32+client-dev <!nocheck>,
  librust-wayland-protocols-misc-0.3+client-dev (>= 0.3.1~~) <!nocheck>,
  librust-wayland-protocols-wlr-0.3+client-dev <!nocheck>,
  librust-tempfile-3-dev <!nocheck>,
  phoc <!nocheck>,
-# phosh is needed until the gschema is shipped with the lib package
- phosh <!nocheck>,
+ phosh-common <!nocheck>,
  xauth <!nocheck>,
  xvfb <!nocheck>,
 Standards-Version: 4.7.0
@@ -47,14 +47,19 @@ Architecture: any
 Depends:
  ${misc:Depends},
  ${shlibs:Depends},
+ at-spi2-core,
  fonts-lato,
+ gnome-settings-daemon,
  gnome-shell-common,
  greetd,
  librsvg2-common,
  phoc,
- polkitd,
+ phosh-common,
  phosh-osk-stub |squeekboard,
+ polkitd,
 Conflicts: phog
+Provides: phog
+Replaces: phog
 Description: Greetd-compatible greeter for mobile phones
  Phrog is a graphical greeter speaking the `greetd` protocol and aimed at mobile
  devices like smart phones and tablets using touch based inputs and small
