@@ -44,10 +44,10 @@ fn test_simple_flow() {
 
         let (keypad, submit_btn) = get_lockscreen_bits(&mut lockscreen);
 
-        vp.click_on(&keypad.child_at(1, 3).unwrap()).await; // 0
-        vp.click_on(&keypad.child_at(0, 1).unwrap()).await; // 4
-        vp.click_on(&keypad.child_at(1, 1).unwrap()).await; // 5
-        vp.click_on(&keypad.child_at(0, 0).unwrap()).await; // 1
+        vp.click_on(&keypad_digit(&keypad, 0)).await;
+        vp.click_on(&keypad_digit(&keypad, 4)).await;
+        vp.click_on(&keypad_digit(&keypad, 5)).await;
+        vp.click_on(&keypad_digit(&keypad, 1)).await;
 
         vp.click_on(&submit_btn).await;
         glib::timeout_future(Duration::from_millis(50)).await;

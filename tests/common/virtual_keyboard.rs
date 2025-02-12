@@ -6,7 +6,7 @@ use std::time::{Duration, SystemTime};
 use wayland_client::protocol::wl_keyboard::KeymapFormat::XkbV1;
 use wayland_client::protocol::wl_registry;
 use wayland_client::protocol::wl_seat::WlSeat;
-use wayland_client::{delegate_noop, Connection, Dispatch, EventQueue, QueueHandle};
+use wayland_client::{Connection, Dispatch, EventQueue, QueueHandle, delegate_noop};
 use wayland_protocols_misc::zwp_virtual_keyboard_v1::client::zwp_virtual_keyboard_manager_v1::ZwpVirtualKeyboardManagerV1;
 use wayland_protocols_misc::zwp_virtual_keyboard_v1::client::zwp_virtual_keyboard_v1::ZwpVirtualKeyboardV1;
 
@@ -86,10 +86,15 @@ impl VirtualKeyboard {
     }
 
     pub async fn keypress(&self, keycode: u32) {
+        self.keypress_duration(keycode, Duration::from_millis(25))
+            .await;
+    }
+
+    pub async fn keypress_duration(&self, keycode: u32, duration: Duration) {
         self.kb
             .key(self.ts.elapsed().unwrap().as_millis() as _, keycode, 1);
         self.event_queue.flush().unwrap();
-        glib::timeout_future(Duration::from_millis(25)).await;
+        glib::timeout_future(duration).await;
         self.kb
             .key(self.ts.elapsed().unwrap().as_millis() as _, keycode, 0);
         self.event_queue.flush().unwrap();

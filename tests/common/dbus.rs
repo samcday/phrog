@@ -5,9 +5,9 @@ use std::process::Stdio;
 use std::time::{Duration, Instant};
 use zbus::zvariant::ObjectPath;
 
-pub fn system_dbus(tmpdir: &Path) -> SupervisedChild {
-    let config_path = tmpdir.join("system-dbus.xml");
-    let sock_path = tmpdir.join("system.sock");
+pub fn dbus_daemon(kind: &str, tmpdir: &Path) -> SupervisedChild {
+    let config_path = tmpdir.join(format!("{}-dbus.xml", kind));
+    let sock_path = tmpdir.join(format!("{}.sock", kind));
     let dbus_path = format!("unix:path={}", sock_path.display());
     std::fs::write(
         &config_path,
@@ -16,7 +16,7 @@ pub fn system_dbus(tmpdir: &Path) -> SupervisedChild {
     <!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-Bus Bus Configuration 1.0//EN"
      "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
     <busconfig>
-      <type>system</type>
+      <type>{}</type>
       <keep_umask/>
       <listen>{}</listen>
       <policy context="default">
@@ -26,12 +26,15 @@ pub fn system_dbus(tmpdir: &Path) -> SupervisedChild {
       </policy>
     </busconfig>
     "#,
-            dbus_path
+            kind, dbus_path
         ),
     )
-    .expect("failed to write system dbus config");
+    .expect("failed to write dbus config");
 
-    std::env::set_var("DBUS_SYSTEM_BUS_ADDRESS", dbus_path);
+    std::env::set_var(
+        format!("DBUS_{}_BUS_ADDRESS", kind.to_uppercase()),
+        dbus_path,
+    );
     let child = std::process::Command::new("dbus-daemon")
         .arg(format!("--config-file={}", config_path.to_str().unwrap()))
         .stdout(Stdio::null())
@@ -105,10 +108,10 @@ impl UserFixture {
     }
 }
 
-pub async fn run_accounts_fixture(num_users: Option<u32>) -> anyhow::Result<zbus::Connection> {
-    let connection = zbus::Connection::system()
-        .await
-        .context("failed to connect to system bus")?;
+pub async fn run_accounts_fixture(
+    connection: zbus::Connection,
+    num_users: Option<u32>,
+) -> anyhow::Result<()> {
     connection
         .object_server()
         .at("/org/freedesktop/Accounts", AccountsFixture { num_users })
@@ -142,5 +145,5 @@ pub async fn run_accounts_fixture(num_users: Option<u32>) -> anyhow::Result<zbus
         .request_name("org.freedesktop.Accounts")
         .await
         .context("failed to request name")?;
-    Ok(connection)
+    Ok(())
 }

@@ -4,35 +4,36 @@ pub mod virtual_pointer;
 
 use crate::common::virtual_keyboard::VirtualKeyboard;
 use async_channel::Receiver;
-use greetd_ipc::codec::SyncCodec;
+use glib::{JoinHandle, Object, g_critical, spawn_future_local};
 use greetd_ipc::AuthMessageType::Secret;
+use greetd_ipc::codec::SyncCodec;
 use greetd_ipc::{Request, Response};
 use gtk::gio::{ListStore, Settings};
 use gtk::glib::{clone, timeout_add_once};
 use gtk::prelude::*;
 use gtk::{Button, Grid, Revealer};
 use libhandy::Carousel;
+use libphosh::WallClock;
 use libphosh::prelude::ShellExt;
 use libphosh::prelude::WallClockExt;
-use libphosh::WallClock;
 use phrog::lockscreen::Lockscreen;
+use phrog::session_object::SessionObject;
 use phrog::shell::Shell;
 use phrog::supervised_child::SupervisedChild;
 use std::env::temp_dir;
 use std::os::unix::net::UnixListener;
 use std::path::PathBuf;
 use std::process::Stdio;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use glib::{g_critical, spawn_future_local, JoinHandle, Object};
 use tempfile::TempDir;
-use phrog::session_object::SessionObject;
 pub use virtual_pointer::VirtualPointer;
 
 #[allow(dead_code)]
 pub struct Test {
-    dbus_conn: zbus::Connection,
+    pub session_dbus_conn: zbus::Connection,
+    system_dbus_conn: zbus::Connection,
     pub if_settings: Settings,
     pub logged_in: Arc<AtomicBool>,
     pub ready_called: Arc<AtomicBool>,
@@ -40,6 +41,7 @@ pub struct Test {
     recording: Option<SupervisedChild>,
     pub shell: Shell,
     system_dbus: SupervisedChild,
+    session_dbus: SupervisedChild,
     tmp: TempDir,
     wall_clock: WallClock,
 }
@@ -60,11 +62,14 @@ impl Test {
         }
 
         let timed_out = Arc::new(AtomicBool::new(false));
-        timeout_add_once(Duration::from_secs(60), clone!(@strong timed_out => move || {
-            timed_out.store(true, Ordering::SeqCst);
-            g_critical!("phrog", "Test timed out!");
-            gtk::main_quit();
-        }));
+        timeout_add_once(
+            Duration::from_secs(60),
+            clone!(@strong timed_out => move || {
+                timed_out.store(true, Ordering::SeqCst);
+                g_critical!("phrog", "Test timed out!");
+                gtk::main_quit();
+            }),
+        );
 
         let failed = Arc::new(AtomicBool::new(false));
         spawn_future_local(clone!(@strong failed => async move {
@@ -95,14 +100,31 @@ pub struct TestOptions {
 pub fn test_init(options: Option<TestOptions>) -> Test {
     std::env::set_var("GSETTINGS_BACKEND", "memory");
     let tmp = tempfile::tempdir().unwrap();
+    let system_dbus = dbus::dbus_daemon("system", tmp.path());
+    let session_dbus = dbus::dbus_daemon("session", tmp.path());
+
     phrog::init().unwrap();
-    let system_dbus = dbus::system_dbus(tmp.path());
 
     if let Some(ref options) = options {
         let phrog_settings = Settings::new("mobi.phosh.phrog");
-        phrog_settings.set_string("last-user", &options.last_user.clone().unwrap_or(String::new())).unwrap();
-        phrog_settings.set_string("last-session", &options.last_session.clone().unwrap_or(String::new())).unwrap();
-        phrog_settings.set_string("first-run", &options.first_run.clone().unwrap_or(String::new())).unwrap();
+        phrog_settings
+            .set_string(
+                "last-user",
+                &options.last_user.clone().unwrap_or(String::new()),
+            )
+            .unwrap();
+        phrog_settings
+            .set_string(
+                "last-session",
+                &options.last_session.clone().unwrap_or(String::new()),
+            )
+            .unwrap();
+        phrog_settings
+            .set_string(
+                "first-run",
+                &options.first_run.clone().unwrap_or(String::new()),
+            )
+            .unwrap();
     }
 
     let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
@@ -113,10 +135,20 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
     if_settings.set_string("accent-color", "green").unwrap();
 
     let num_users = options.as_ref().and_then(|opts| opts.num_users);
-    let dbus_conn = async_global_executor::block_on(async move {
-        dbus::run_accounts_fixture(num_users)
+    let (system_dbus_conn, session_dbus_conn) = async_global_executor::block_on(async move {
+        let system = zbus::Connection::system()
             .await
-            .unwrap()
+            .expect("failed to connect to system bus");
+
+        dbus::run_accounts_fixture(system.clone(), num_users)
+            .await
+            .unwrap();
+
+        let session = zbus::Connection::session()
+            .await
+            .expect("failed to connect to session bus");
+
+        (system, session)
     });
 
     let logged_in = Arc::new(AtomicBool::new(false));
@@ -125,10 +157,12 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
     let mut shell_builder = Object::builder();
 
     let sessions_store = ListStore::new::<SessionObject>();
-    sessions_store.extend_from_slice(&options.and_then(|opts| opts.sessions.clone()).unwrap_or(vec![
-        SessionObject::new("gnome", "GNOME", "", "", ""),
-        SessionObject::new("phosh", "Phosh", "", "", ""),
-    ]));
+    sessions_store.extend_from_slice(&options.and_then(|opts| opts.sessions.clone()).unwrap_or(
+        vec![
+            SessionObject::new("gnome", "GNOME", "", "", ""),
+            SessionObject::new("phosh", "Phosh", "", "", ""),
+        ],
+    ));
     shell_builder = shell_builder.property("sessions", sessions_store);
 
     let wall_clock = WallClock::new();
@@ -149,7 +183,8 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
     }));
 
     Test {
-        dbus_conn,
+        system_dbus_conn,
+        session_dbus_conn,
         if_settings,
         logged_in,
         ready_called,
@@ -157,6 +192,7 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
         recording: None,
         shell,
         system_dbus,
+        session_dbus,
         tmp,
         wall_clock,
     }
@@ -246,6 +282,14 @@ pub fn get_lockscreen_bits(lockscreen: &mut Lockscreen) -> (Grid, Button) {
         .downcast::<Button>()
         .unwrap();
     (keypad, submit_btn)
+}
+
+pub fn keypad_digit(grid: &gtk::Grid, digit: i32) -> gtk::Widget {
+    if digit == 0 {
+        return grid.child_at(1, 3).unwrap();
+    }
+    let digit = digit - 1;
+    grid.child_at(digit % 3, digit / 3).unwrap()
 }
 
 pub fn fade_quit() {
