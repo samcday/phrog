@@ -103,6 +103,10 @@ mod imp {
             let self_obj = self.obj();
             let usp = UserSessionPage::new();
 
+            // Default unlock status in PhoshLockscreen is "Enter Passcode", which doesn't make
+            // sense in our case.
+            self_obj.set_unlock_status("");
+
             // Insert the UserSessionPage widget into the "extra page" of Phosh.Lockscreen.
             // This sits in-between the Info and Unlock (keypad) pages.
             // We default to this page (which means inactivity bounces user back to it).
