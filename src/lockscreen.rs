@@ -217,11 +217,7 @@ mod imp {
         }
 
         async fn greetd_req(&self, req: Request) -> anyhow::Result<Response> {
-            if libphosh::Shell::default()
-                .downcast::<Shell>()
-                .unwrap()
-                .fake_greetd()
-            {
+            if Shell::default().fake_greetd() {
                 return fake_greetd_interaction(req);
             }
             if self.greetd.borrow().is_none() {
@@ -271,7 +267,7 @@ mod imp {
                 Response::Success => {
                     self.obj().set_unlock_status("Success. Logging in...");
                     self.start_session().await.unwrap();
-                    libphosh::Shell::default().fade_out(0);
+                    Shell::default().fade_out(0);
                     // Keep this timeout in sync with fadeout animation duration in phrog.css
                     timeout_add_once(Duration::from_millis(500), || {
                         gtk::main_quit();
