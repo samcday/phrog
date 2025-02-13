@@ -1,6 +1,4 @@
-#!/bin/sh
-# process substitution is supported by BusyBox ash
-# shellcheck disable=SC3001
+#!/bin/bash
 
 # This simple wrapper script is intended to be used directly by greetd to
 # start up the phrog greeter session.
