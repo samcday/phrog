@@ -1,4 +1,4 @@
-use glib::Object;
+use glib::{Cast, Object};
 use gtk::glib;
 
 static G_LOG_DOMAIN: &str = "phrog";
@@ -12,6 +12,12 @@ impl Shell {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Object::builder().build()
+    }
+}
+
+impl Default for Shell {
+    fn default() -> Self {
+        libphosh::Shell::default().downcast::<Shell>().unwrap()
     }
 }
 

@@ -26,7 +26,7 @@ impl UserSessionPage {
     }
 
     pub fn session(&self) -> SessionObject {
-        let shell = libphosh::Shell::default().downcast::<Shell>().unwrap();
+        let shell = Shell::default();
         let session_idx = self.imp().row_sessions.selected_index() as u32;
         shell.sessions().unwrap()
             .item(session_idx)
@@ -103,7 +103,7 @@ mod imp {
             self.parent_constructed();
 
             let settings = Settings::new(APP_ID);
-            let shell = libphosh::Shell::default().downcast::<Shell>().unwrap();
+            let shell = Shell::default();
             let conn = shell.imp().dbus_connection.clone().into_inner().unwrap();
 
             self.box_users
