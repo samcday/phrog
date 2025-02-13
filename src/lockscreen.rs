@@ -39,7 +39,6 @@ mod imp {
     use gtk::prelude::SettingsExtManual;
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
-    use gtk::traits::WidgetExt;
     use gtk::{gio, glib};
     use libphosh::prelude::*;
     use libphosh::subclass::lockscreen::LockscreenImpl;
