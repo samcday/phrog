@@ -3,9 +3,7 @@ use gtk::glib;
 use gtk::glib::{Cast, CastNone, Object};
 use gtk::prelude::*;
 use gtk::subclass::prelude::ObjectSubclassIsExt;
-use gtk::traits::ListBoxExt;
-use libhandy::prelude::ActionRowExt;
-use libhandy::traits::ComboRowExt;
+use libhandy::prelude::{ActionRowExt, ComboRowExt};
 use libhandy::ActionRow;
 use crate::shell::Shell;
 
