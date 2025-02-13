@@ -1,0 +1,20 @@
+From: Arnaud Ferraris <arnaud.ferraris@collabora.com>
+Date: Tue, 11 Feb 2025 11:58:06 +0100
+Subject: phrog-greetd-session: use bash shebang
+
+This script uses bashisms, so let's ensure it doesn't run using an
+incompatible shell.
+---
+ data/phrog-greetd-session | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/data/phrog-greetd-session b/data/phrog-greetd-session
+index d70a089..c0a4504 100644
+--- a/data/phrog-greetd-session
++++ b/data/phrog-greetd-session
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ # process substitution is supported by BusyBox ash
+ # shellcheck disable=SC3001
+ 

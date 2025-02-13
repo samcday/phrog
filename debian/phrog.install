@@ -1,0 +1,10 @@
+# Upstream files
+data/mobi.phosh.phrog.gschema.xml usr/share/glib-2.0/schemas
+data/phrog.session usr/share/gnome-session/sessions
+data/mobi.phosh.Phrog.desktop usr/share/applications
+data/systemd-session.conf usr/lib/systemd/user/gnome-session@phrog.target.d
+
+# Debian-specific config
+debian/config/greetd/phrog.toml etc/greetd
+debian/config/phoc.ini usr/share/phrog
+debian/config/systemd/phrog.conf usr/lib/systemd/system/greetd.service.d

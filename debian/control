@@ -1,0 +1,64 @@
+Source: phrog
+Section: x11
+Priority: optional
+Maintainer: DebianOnMobile Maintainers <debian-on-mobile-maintainers@alioth-lists.debian.net>
+Uploaders: Arnaud Ferraris <aferraris@debian.org>
+Build-Depends:
+ debhelper-compat (= 13),
+ dh-cargo,
+ librust-anyhow-1-dev (>= 1.0.82~~),
+ librust-async-channel-2-dev (>= 2.2.1~~),
+ librust-async-global-executor-2-dev (>= 2.4.1~~),
+ librust-clap-4-dev (>= 4.5.4~~),
+ librust-futures-util-0.3-dev (>= 0.3.30~~),
+ librust-glib-0.18+log-macros-dev,
+ librust-glib-build-tools-dev,
+ librust-glob-0.3-dev (>= 0.3.1~~),
+ librust-greetd-ipc-0.10+sync-codec-dev,
+ librust-gtk-0.18+v3-24-dev,
+ librust-libhandy-0.11+v1-6-dev,
+ librust-libphosh-0.0.6-dev,
+ librust-nix-0.29+signal-dev,
+ librust-wayland-client-0.31-dev,
+ librust-zbus-4+async-io-dev (>= 4.3.1~~),
+ librust-zbus-4+blocking-dev (>= 4.3.1~~),
+# Dependencies needed only for tests
+ at-spi2-core <!nocheck>,
+ dbus-x11 <!nocheck>,
+ gnome-settings-daemon <!nocheck>,
+ librust-input-event-codes-6-dev (>= 6.2.0~~) <!nocheck>,
+ librust-wayland-protocols-0.32+client-dev <!nocheck>,
+ librust-wayland-protocols-misc-0.3+client-dev (>= 0.3.1~~) <!nocheck>,
+ librust-wayland-protocols-wlr-0.3+client-dev <!nocheck>,
+ librust-tempfile-3-dev <!nocheck>,
+ phoc <!nocheck>,
+# phosh is needed until the gschema is shipped with the lib package
+ phosh <!nocheck>,
+ xauth <!nocheck>,
+ xvfb <!nocheck>,
+Standards-Version: 4.7.0
+Homepage: https://github.com/samcday/phrog/
+Vcs-Browser: https://salsa.debian.org/DebianOnMobile-team/phrog
+Vcs-Git: https://salsa.debian.org/DebianOnMobile-team/phrog.git
+Rules-Requires-Root: no
+
+Package: phrog
+Architecture: any
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+ fonts-lato,
+ gnome-shell-common,
+ greetd,
+ librsvg2-common,
+ phoc,
+ polkitd,
+ phosh-osk-stub |squeekboard,
+Conflicts: phog
+Description: Greetd-compatible greeter for mobile phones
+ Phrog is a graphical greeter speaking the `greetd` protocol and aimed at mobile
+ devices like smart phones and tablets using touch based inputs and small
+ screens.
+ .
+ It was initially designed for the Phosh Mobile Environment based on GNOME/GTK
+ but can spawn any graphical session.
