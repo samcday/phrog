@@ -31,7 +31,7 @@ mod imp {
     use crate::APP_ID;
     use anyhow::{anyhow, Context};
     use async_channel::{Receiver, Sender};
-    use glib::{error, warn};
+    use glib::{error, info, warn};
     use greetd_ipc::codec::SyncCodec;
     use greetd_ipc::{AuthMessageType, ErrorType, Request, Response};
     use gtk::gio::Settings;
@@ -125,6 +125,13 @@ mod imp {
                         // No longer on unlock, cancel session.
                         this.obj().set_default_page(LockscreenPage::Extra);
                         this.cancel_session().await;
+                        this.session.replace(None);
+                        // Make absolutely sure that lockscreen is sensitive again.
+                        // This should already be taken care of elsewhere, but if we somehow hit
+                        // an edge case in the convoluted dance with greetd, we really don't want
+                        // the user to end up with a lockscreen that cannot be interacted with, as
+                        // that deadlocks the whole UI, basically.
+                        this.obj().set_sensitive(true);
                     }
                 }));
             }));
@@ -169,7 +176,6 @@ mod imp {
             if let Err(err) = self.greetd_req(Request::CancelSession).await {
                 warn!("greetd CancelSession failed: {}", err);
             }
-            self.session.replace(None);
         }
 
         async fn create_session(&self) {
@@ -181,7 +187,7 @@ mod imp {
 
             self.session.replace(user.clone());
             let username = user.unwrap();
-            warn!("creating greetd session for user {}", username);
+            info!("creating greetd session for user {}", username);
             self.obj().set_sensitive(false);
             let mut req = Some(Request::CreateSession { username });
             while let Some(next_req) = req.take() {
@@ -240,7 +246,7 @@ mod imp {
 
             if let Err(err) = resp {
                 error!("failed to send greetd request: {:?}", err);
-                self.obj().set_unlock_status("Greetd error, check logs");
+                self.obj().set_unlock_status("Error, please try again");
                 self.obj().set_sensitive(true);
                 return None;
             }
@@ -250,19 +256,25 @@ mod imp {
                     auth_message_type,
                     auth_message,
                 } => {
-                    warn!(
-                        "got greetd auth message ({:?}) {}",
-                        auth_message_type, auth_message
-                    );
                     self.obj().set_unlock_status(&auth_message);
-                    // TODO: it would be nice to override the GtkEntry input-purpose depending on
-                    // AuthMessageType.
-                    self.obj().set_sensitive(true);
+                    if let AuthMessageType::Error = auth_message_type {
+                        self.obj().shake_pin_entry();
+                    }
                     match auth_message_type {
                         AuthMessageType::Info | AuthMessageType::Error => {
+                            // An info message or error has been displayed in the unlock status.
+                            // If it was an error, we've also started shaking the pin entry.
+                            // Wait here a second to give the user a chance to notice the message.
+                            glib::timeout_future_seconds(1).await;
+                            self.obj().set_sensitive(true);
+
+                            // Next we dismiss the message and move on to the next auth question.
                             return Some(Request::PostAuthMessageResponse { response: None })
                         }
-                        _ => {}
+                        _ => {
+                            // TODO: set GtkEntry input-purpose depending on AuthMessageType.
+                            self.obj().set_sensitive(true);
+                        }
                     }
                 }
                 Response::Success => {
@@ -278,10 +290,19 @@ mod imp {
                     error_type: ErrorType::AuthError,
                     description,
                 } => {
-                    warn!("auth error '{}'", description);
+                    warn!("auth error: '{}'", description);
+                    self.obj().set_unlock_status("Login failed, please try again");
                     self.obj().shake_pin_entry();
+                    // Greetd IPC dox seem to suggest that this isn't necessary, but then agreety
+                    // does this, and if we don't we get a "session is already being configured"
+                    // error. So.
                     self.cancel_session().await;
+                    // We hold here for a second, so that the login failure message has a chance
+                    // to marinate in users' gray meat. Otherwise, the caller driving this
+                    // interaction will fire off the CreateSession immediately, which will then
+                    // result in a new AuthMessage that overwrites the unlock status.
                     glib::timeout_future_seconds(1).await;
+
                     return Some(Request::CreateSession {
                         username: self.user_session_page.get()?.username()?,
                     });
@@ -322,7 +343,7 @@ fn fake_greetd_interaction(req: Request) -> anyhow::Result<Response> {
             if response.is_none() || response.unwrap() != "0" {
                 anyhow::Ok(Response::Error {
                     error_type: AuthError,
-                    description: String::from("0"),
+                    description: String::from("Incorrect password (hint: it's '0')"),
                 })
             } else {
                 anyhow::Ok(Response::Success)
