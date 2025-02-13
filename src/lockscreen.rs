@@ -119,9 +119,11 @@ mod imp {
                 glib::spawn_future_local(clone!(@weak ls => async move {
                     // Page is lockscreen, begin greetd conversation.
                     if ls.page() == LockscreenPage::Unlock {
+                        this.obj().set_default_page(LockscreenPage::Unlock);
                         this.create_session().await;
                     } else {
                         // No longer on unlock, cancel session.
+                        this.obj().set_default_page(LockscreenPage::Extra);
                         this.cancel_session().await;
                     }
                 }));
@@ -138,7 +140,6 @@ mod imp {
                 // If there's only one user and one session, set the default + active page to the keypad.
                 if session_count == 1 && user_count == 1 {
                     self_obj.set_page(LockscreenPage::Unlock);
-                    self_obj.set_default_page(LockscreenPage::Unlock);
                 }
             }));
 
