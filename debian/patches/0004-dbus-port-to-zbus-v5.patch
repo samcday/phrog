@@ -1,0 +1,48 @@
+From: Arnaud Ferraris <arnaud.ferraris@collabora.com>
+Date: Fri, 14 Feb 2025 10:26:45 +0100
+Subject: dbus: port to zbus v5
+
+This is quite straightforward, only requiring to explicitly mark the
+proxies as `pub`.
+
+Forwarded: https://github.com/samcday/phrog/pull/106
+---
+ Cargo.toml  | 2 +-
+ src/dbus.rs | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index bf90b5d..1a3cedb 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -11,7 +11,7 @@ anyhow = "1.0.82"
+ libphosh = "0.0.6"
+ clap = { version = "4.5.4", features = ["derive"] }
+ wayland-client = "0.31"
+-zbus = { version = "4", default-features = false, features = ["blocking", "async-io"] }
++zbus = { version = "5", default-features = false, features = ["blocking", "async-io"] }
+ nix = { version = "0.29", features = ["signal"] }
+ async-global-executor = "2.4.1"
+ futures-util = "0.3.30"
+diff --git a/src/dbus.rs b/src/dbus.rs
+index cdfbb44..7cc6ee6 100644
+--- a/src/dbus.rs
++++ b/src/dbus.rs
+@@ -10,7 +10,7 @@ pub mod accounts {
+         default_service = "org.freedesktop.Accounts",
+         default_path = "/org/freedesktop/Accounts"
+     )]
+-    trait Accounts {
++    pub trait Accounts {
+         /// CacheUser method
+         fn cache_user(&self, name: &str) -> zbus::Result<zbus::zvariant::OwnedObjectPath>;
+ 
+@@ -75,7 +75,7 @@ pub mod user {
+         default_service = "org.freedesktop.Accounts",
+         interface = "org.freedesktop.Accounts.User"
+     )]
+-    trait User {
++    pub trait User {
+         /// GetPasswordExpirationPolicy method
+         fn get_password_expiration_policy(&self) -> zbus::Result<(i64, i64, i64, i64, i64, i64)>;
+ 

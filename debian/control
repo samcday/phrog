@@ -20,8 +20,8 @@ Build-Depends:
  librust-libphosh-0.0.6-dev,
  librust-nix-0.29+signal-dev,
  librust-wayland-client-0.31-dev,
- librust-zbus-4+async-io-dev (>= 4.3.1~~),
- librust-zbus-4+blocking-dev (>= 4.3.1~~),
+ librust-zbus-5+async-io-dev (>= 4.3.1~~),
+ librust-zbus-5+blocking-dev (>= 4.3.1~~),
 # Dependencies needed only for tests
  at-spi2-core <!nocheck>,
  dbus-x11 <!nocheck>,
