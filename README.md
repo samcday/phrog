@@ -29,6 +29,15 @@ HERE
 rc-update add greetd
 ```
 
+### Debian
+
+Currently only in [sid][debian-sid-phrog], but you can also get it from the [Phosh nightly repo][phosh-nightly].
+
+```
+sudo apt install phrog
+sudo systemctl enable greetd
+```
+
 ### Fedora
 
 ```
@@ -48,14 +57,15 @@ If you want to run it manually, you'll need to build from source (see below), an
 
 ## Development
 
-`libphosh` is required to build this project.
+`libphosh` 0.45 is required to build this project.
 
 * Alpine (v3.21+): `sudo apk add libphosh`
+* Debian (trixie): `sudo apt install libphosh-0.45-dev`
 * Fedora: `sudo dnf install libphosh-devel`
 
 If `libphosh` is not packaged for your distro, you need to build Phosh+libphosh manually. See the [Phosh][] README for more info.
 
-Once `libphosh` is installed, building and running 🐸 should be as simple as:
+Once `libphosh` is installed, building and running 🐸 should be quite simple:
 
 ```sh
 # To run phrog without greetd, pass --fake
@@ -77,3 +87,5 @@ You can also come chat in Matrix: [#phosh:talk.puri.sm][Matrix]
 [COPR]: https://copr.fedorainfracloud.org/coprs/samcday/phrog/
 [issues]: https://github.com/samcday/phrog/issues
 [Matrix]: https://matrix.to/#/#phosh:talk.puri.sm
+[debian-sid-phrog]: https://packages.debian.org/sid/phrog
+[phosh-nightly]: https://phosh.mobi/posts/phosh-nightly/
