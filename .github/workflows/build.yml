@@ -42,7 +42,16 @@ jobs:
       run:
         shell: bash
     steps:
+      - if: |
+          github.event.pull_request.author_association != 'COLLABORATOR'
+          && github.event.pull_request.author_association != 'OWNER'
+          && !contains(github.event.pull_request.labels.*.name, 'ci-ok')
+        run: |
+          echo This PR has not yet been marked as safe with a ci-ok label
+          exit 1
       - uses: actions/checkout@v4
+        with:
+          ref: ${{  github.event.pull_request.head.sha }}
       - name: Build
         run: |
           set -uexo pipefail
