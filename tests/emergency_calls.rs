@@ -13,6 +13,7 @@ use glib::clone;
 use libphosh::LockscreenPage;
 use libphosh::prelude::{LockscreenExt, ShellExt};
 use serde::{Deserialize, Serialize};
+use zbus::object_server::SignalEmitter;
 use zbus::zvariant::{OwnedValue, Type, Value};
 
 #[derive(Deserialize, Serialize, Type, Value, PartialEq, Debug)]
@@ -30,7 +31,7 @@ struct EmergencyCallsFixture {
 #[zbus::interface(name = "org.gnome.Calls.EmergencyCalls")]
 impl EmergencyCallsFixture {
     #[zbus(signal)]
-    async fn emergency_numbers_changed(signal_ctxt: &zbus::SignalContext<'_>) -> zbus::Result<()>;
+    async fn emergency_numbers_changed(signal_emitter: &SignalEmitter<'_>, message: &str) -> zbus::Result<()>;
 
     async fn get_emergency_contacts(&self) -> Vec<EmergencyContact> {
         // Not used currently, maybe we expand test later to check this.
