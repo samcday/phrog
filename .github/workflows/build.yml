@@ -44,6 +44,7 @@ jobs:
         shell: bash
     steps:
       - if: |
+          github.event_name == 'pull_request_target' &&
           github.event.pull_request.author_association != 'COLLABORATOR'
           && github.event.pull_request.author_association != 'OWNER'
           && !contains(github.event.pull_request.labels.*.name, 'ci-ok')
