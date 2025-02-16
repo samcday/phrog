@@ -1,3 +1,18 @@
+phrog (0.44.1-2) unstable; urgency=medium
+
+  * debian: add salsa-ci.yml
+  * debian: port to zbus v5 (Closes: #1095912)
+  * d/control: fix (build-)dependencies.
+    The binary package must depend on `phosh-common` as it won't work
+    otherwise when used on systemd where Phosh isn't installed (e.g.
+    Plasma Mobile images). As a matter of fact, this is true for all test
+    dependencies, so add `at-spi2-core` and `gnome-settings-daemon` to the
+    list as well.
+    Finally, add `Provides:` and `Replaces:` on `phog` so we can RM the
+    latter.
+
+ -- Arnaud Ferraris <aferraris@debian.org>  Sun, 16 Feb 2025 02:24:27 +0100
+
 phrog (0.44.1-1) unstable; urgency=medium
 
   * New upstream version
