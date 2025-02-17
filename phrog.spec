@@ -2,7 +2,7 @@
 %global cargo_install_lib 0
 
 Name:           phrog
-Version:        0.44.1
+Version:        0.45.0
 Release:        %autorelease
 Summary:        Mobile-friendly greeter for greetd
 License:        GPL-3.0-only
