@@ -259,21 +259,27 @@ mod imp {
                     self.obj().set_unlock_status(&auth_message);
                     if let AuthMessageType::Error = auth_message_type {
                         self.obj().shake_pin_entry();
+                        // Lockscreen will be made sensitive at the end of PIN shake.
+
+                        // We can only communicate status via the unlock status label.
+                        // As soon as we PostAuthMessageResponse below, that will move to the next
+                        // auth attempt and likely a new auth message that will overwrite this one.
+                        // So we wait here a second before dismissing the message, to ensure the
+                        // user has a chance to notice the message.
+                        glib::timeout_future_seconds(1).await;
+                    } else {
+                        self.obj().set_sensitive(true);
                     }
                     match auth_message_type {
                         AuthMessageType::Info | AuthMessageType::Error => {
-                            // An info message or error has been displayed in the unlock status.
-                            // If it was an error, we've also started shaking the pin entry.
-                            // Wait here a second to give the user a chance to notice the message.
-                            glib::timeout_future_seconds(1).await;
-                            self.obj().set_sensitive(true);
-
-                            // Next we dismiss the message and move on to the next auth question.
+                            // Dismiss the message and move on to the next auth question.
+                            // TODO: This might mean that some info messages are swallowed.
+                            // Currently, we only care about fprintd's Info message, which blocks
+                            // on the response until fingerprint reader is deactivated.
                             return Some(Request::PostAuthMessageResponse { response: None })
                         }
                         _ => {
                             // TODO: set GtkEntry input-purpose depending on AuthMessageType.
-                            self.obj().set_sensitive(true);
                         }
                     }
                 }
