@@ -1,17 +1,18 @@
 # This image is used as the build environment in Github Actions.
 
-FROM registry.gitlab.gnome.org/world/phosh/phosh/debian:v0.0.2024-11-04
+FROM registry.gitlab.gnome.org/world/phosh/phosh/debian:v0.0.2025-02-07
 
 ARG PHOSH_REMOTE=https://gitlab.gnome.org/World/Phosh/phosh.git
-ARG PHOSH_REF=v0.44.0
+ARG PHOSH_REF=v0.45_rc1
 
 ARG PHOC_REMOTE=https://gitlab.gnome.org/World/Phosh/phoc.git
-ARG PHOC_REF=v0.44.1
+ARG PHOC_REF=v0.45_rc1
 
 RUN export DEBIAN_FRONTEND=noninteractive \
    && apt-get -y update \
    && apt-get -y install --no-install-recommends \
     dh-cargo \
+    foot \
     rust-clippy \
     wf-recorder \
    && eatmydata git clone ${PHOC_REMOTE} \

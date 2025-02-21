@@ -10,7 +10,6 @@ mod imp {
     use gtk::gio::Settings;
     use gtk::glib::clone;
     use gtk::glib::subclass::InitializingObject;
-    use gtk::prelude::Cast;
     use gtk::prelude::InitializingWidgetExt;
     use gtk::prelude::SettingsExt;
     use gtk::prelude::SettingsExtManual;
@@ -58,10 +57,7 @@ mod imp {
     impl ObjectImpl for ShuffleKeypadQuickSetting {
         fn constructed(&self) {
             self.parent_constructed();
-            libphosh::Shell::default()
-                .downcast::<Shell>()
-                .unwrap()
-                .set_keypad_shuffle_qs(self.obj().clone());
+            Shell::default().set_keypad_shuffle_qs(self.obj().clone());
 
             let settings = Settings::new("sm.puri.phosh.lockscreen");
             settings

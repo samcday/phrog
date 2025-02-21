@@ -10,7 +10,7 @@ pub mod accounts {
         default_service = "org.freedesktop.Accounts",
         default_path = "/org/freedesktop/Accounts"
     )]
-    trait Accounts {
+    pub trait Accounts {
         /// CacheUser method
         fn cache_user(&self, name: &str) -> zbus::Result<zbus::zvariant::OwnedObjectPath>;
 
@@ -75,7 +75,7 @@ pub mod user {
         default_service = "org.freedesktop.Accounts",
         interface = "org.freedesktop.Accounts.User"
     )]
-    trait User {
+    pub trait User {
         /// GetPasswordExpirationPolicy method
         fn get_password_expiration_policy(&self) -> zbus::Result<(i64, i64, i64, i64, i64, i64)>;
 

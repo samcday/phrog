@@ -7,7 +7,6 @@ use libphosh::LockscreenPage;
 use std::sync::atomic::Ordering;
 
 use common::*;
-use gtk::gio::Settings;
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
 use phrog::lockscreen::Lockscreen;
@@ -19,9 +18,6 @@ fn test_simple_flow() {
         last_user: Some("agx".into()),
         ..Default::default()
     }));
-
-    let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
-    phosh_settings.set_boolean("shuffle-keypad", false).unwrap();
 
     let ready_rx = test.ready_rx.clone();
     let shell = test.shell.clone();
@@ -48,10 +44,10 @@ fn test_simple_flow() {
 
         let (keypad, submit_btn) = get_lockscreen_bits(&mut lockscreen);
 
-        vp.click_on(&keypad.child_at(1, 3).unwrap()).await; // 0
-        vp.click_on(&keypad.child_at(0, 1).unwrap()).await; // 4
-        vp.click_on(&keypad.child_at(1, 1).unwrap()).await; // 5
-        vp.click_on(&keypad.child_at(0, 0).unwrap()).await; // 1
+        vp.click_on(&keypad_digit(&keypad, 0)).await;
+        vp.click_on(&keypad_digit(&keypad, 4)).await;
+        vp.click_on(&keypad_digit(&keypad, 5)).await;
+        vp.click_on(&keypad_digit(&keypad, 1)).await;
 
         vp.click_on(&submit_btn).await;
         glib::timeout_future(Duration::from_millis(50)).await;

@@ -31,7 +31,7 @@ mod imp {
     use crate::APP_ID;
     use anyhow::{anyhow, Context};
     use async_channel::{Receiver, Sender};
-    use glib::{error, warn};
+    use glib::{error, info, warn};
     use greetd_ipc::codec::SyncCodec;
     use greetd_ipc::{AuthMessageType, ErrorType, Request, Response};
     use gtk::gio::Settings;
@@ -39,7 +39,6 @@ mod imp {
     use gtk::prelude::SettingsExtManual;
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
-    use gtk::traits::WidgetExt;
     use gtk::{gio, glib};
     use libphosh::prelude::*;
     use libphosh::subclass::lockscreen::LockscreenImpl;
@@ -100,51 +99,65 @@ mod imp {
     #[glib::derived_properties]
     impl ObjectImpl for Lockscreen {
         fn constructed(&self) {
-            self.user_session_page.set(UserSessionPage::new()).unwrap();
+            let self_obj = self.obj();
+            let usp = UserSessionPage::new();
 
-            self.obj()
-                .add_extra_page(self.user_session_page.get().unwrap());
-            self.obj().set_default_page(LockscreenPage::Extra);
+            // Default unlock status in PhoshLockscreen is "Enter Passcode", which doesn't make
+            // sense in our case.
+            self_obj.set_unlock_status("");
 
-            self.obj()
-                .connect_page_notify(clone!(@weak self as this => move |ls| {
-                    glib::spawn_future_local(clone!(@weak ls => async move {
-                        // Page is lockscreen, begin greetd conversation.
-                        if ls.page() == LockscreenPage::Unlock {
-                            this.create_session().await;
-                        } else {
-                            // No longer on unlock, cancel session.
-                            this.cancel_session().await;
-                        }
-                    }));
-                }));
+            // Insert the UserSessionPage widget into the "extra page" of Phosh.Lockscreen.
+            // This sits in-between the Info and Unlock (keypad) pages.
+            // We default to this page (which means inactivity bounces user back to it).
+            self_obj.add_extra_page(&usp);
+            self_obj.set_default_page(LockscreenPage::Extra);
 
-            self.user_session_page.get().unwrap().connect_ready_notify(
-                clone!(@weak-allow-none self as this => move |usp| {
-                    let shell = libphosh::Shell::default().downcast::<Shell>().unwrap();
-                    let user_count = usp.imp().box_users.children().len();
-                    let session_count = shell.sessions().map_or(0, |s| s.n_items());
-                    // If there's only one user and one session, set the default + active page to the keypad.
-                    if session_count == 1 && user_count == 1 {
-                        let this = if let Some(this) = this { this } else {
-                            return;
-                        };
-                        this.obj().set_page(LockscreenPage::Unlock);
+            // Add a signal handler for when Phosh.Lockscreen active page changes.
+            // We hook up greetd session initiation/cancellation to this.
+            self_obj.connect_page_notify(clone!(@weak self as this => move |ls| {
+                glib::spawn_future_local(clone!(@weak ls => async move {
+                    // Page is lockscreen, begin greetd conversation.
+                    if ls.page() == LockscreenPage::Unlock {
                         this.obj().set_default_page(LockscreenPage::Unlock);
+                        this.create_session().await;
+                    } else {
+                        // No longer on unlock, cancel session.
+                        this.obj().set_default_page(LockscreenPage::Extra);
+                        this.cancel_session().await;
+                        this.session.replace(None);
+                        // Make absolutely sure that lockscreen is sensitive again.
+                        // This should already be taken care of elsewhere, but if we somehow hit
+                        // an edge case in the convoluted dance with greetd, we really don't want
+                        // the user to end up with a lockscreen that cannot be interacted with, as
+                        // that deadlocks the whole UI, basically.
+                        this.obj().set_sensitive(true);
                     }
-                }),
-            );
+                }));
+            }));
 
-            self.user_session_page.get().unwrap().connect_closure(
+            // Add a handler for the UserSessionPage notifying of readiness, which happens when
+            // all user+sessions on the system have been loaded. At this point we can decide if
+            // the "trivial flow" is suitable (jump straight to keypad if there's only one user and
+            // session choice available).
+            usp.connect_ready_notify(clone!(@weak self_obj => move |usp| {
+                let shell = Shell::default();
+                let user_count = usp.imp().box_users.children().len();
+                let session_count = shell.sessions().map_or(0, |s| s.n_items());
+                // If there's only one user and one session, set the default + active page to the keypad.
+                if session_count == 1 && user_count == 1 {
+                    self_obj.set_page(LockscreenPage::Unlock);
+                }
+            }));
+
+            usp.connect_closure(
                 "login",
                 false,
-                closure_local!(@weak-allow-none self as this => move |_: UserSessionPage| {
-                        let this = if let Some(this) = this { this } else {
-                            return;
-                        };
-                        this.obj().set_page(LockscreenPage::Unlock);
+                closure_local!(@watch self_obj => move |_: UserSessionPage| {
+                    self_obj.set_page(LockscreenPage::Unlock);
                 }),
             );
+
+            self.user_session_page.set(usp).unwrap();
 
             self.parent_constructed();
         }
@@ -162,7 +175,6 @@ mod imp {
             if let Err(err) = self.greetd_req(Request::CancelSession).await {
                 warn!("greetd CancelSession failed: {}", err);
             }
-            self.session.replace(None);
         }
 
         async fn create_session(&self) {
@@ -174,7 +186,8 @@ mod imp {
 
             self.session.replace(user.clone());
             let username = user.unwrap();
-            warn!("creating greetd session for user {}", username);
+            info!("creating greetd session for user {}", username);
+            self.obj().set_unlock_status("Please wait...");
             self.obj().set_sensitive(false);
             let mut req = Some(Request::CreateSession { username });
             while let Some(next_req) = req.take() {
@@ -211,11 +224,7 @@ mod imp {
         }
 
         async fn greetd_req(&self, req: Request) -> anyhow::Result<Response> {
-            if libphosh::Shell::default()
-                .downcast::<Shell>()
-                .unwrap()
-                .fake_greetd()
-            {
+            if Shell::default().fake_greetd() {
                 return fake_greetd_interaction(req);
             }
             if self.greetd.borrow().is_none() {
@@ -237,7 +246,7 @@ mod imp {
 
             if let Err(err) = resp {
                 error!("failed to send greetd request: {:?}", err);
-                self.obj().set_unlock_status("Greetd error, check logs");
+                self.obj().set_unlock_status("Error, please try again");
                 self.obj().set_sensitive(true);
                 return None;
             }
@@ -247,25 +256,37 @@ mod imp {
                     auth_message_type,
                     auth_message,
                 } => {
-                    warn!(
-                        "got greetd auth message ({:?}) {}",
-                        auth_message_type, auth_message
-                    );
                     self.obj().set_unlock_status(&auth_message);
-                    // TODO: it would be nice to override the GtkEntry input-purpose depending on
-                    // AuthMessageType.
-                    self.obj().set_sensitive(true);
+                    if let AuthMessageType::Error = auth_message_type {
+                        self.obj().shake_pin_entry();
+                        // Lockscreen will be made sensitive at the end of PIN shake.
+
+                        // We can only communicate status via the unlock status label.
+                        // As soon as we PostAuthMessageResponse below, that will move to the next
+                        // auth attempt and likely a new auth message that will overwrite this one.
+                        // So we wait here a second before dismissing the message, to ensure the
+                        // user has a chance to notice the message.
+                        glib::timeout_future_seconds(1).await;
+                    } else {
+                        self.obj().set_sensitive(true);
+                    }
                     match auth_message_type {
                         AuthMessageType::Info | AuthMessageType::Error => {
+                            // Dismiss the message and move on to the next auth question.
+                            // TODO: This might mean that some info messages are swallowed.
+                            // Currently, we only care about fprintd's Info message, which blocks
+                            // on the response until fingerprint reader is deactivated.
                             return Some(Request::PostAuthMessageResponse { response: None })
                         }
-                        _ => {}
+                        _ => {
+                            // TODO: set GtkEntry input-purpose depending on AuthMessageType.
+                        }
                     }
                 }
                 Response::Success => {
                     self.obj().set_unlock_status("Success. Logging in...");
                     self.start_session().await.unwrap();
-                    libphosh::Shell::default().fade_out(0);
+                    Shell::default().fade_out(0);
                     // Keep this timeout in sync with fadeout animation duration in phrog.css
                     timeout_add_once(Duration::from_millis(500), || {
                         gtk::main_quit();
@@ -275,10 +296,19 @@ mod imp {
                     error_type: ErrorType::AuthError,
                     description,
                 } => {
-                    warn!("auth error '{}'", description);
+                    warn!("auth error: '{}'", description);
+                    self.obj().set_unlock_status("Login failed, please try again");
                     self.obj().shake_pin_entry();
+                    // Greetd IPC dox seem to suggest that this isn't necessary, but then agreety
+                    // does this, and if we don't we get a "session is already being configured"
+                    // error. So.
                     self.cancel_session().await;
+                    // We hold here for a second, so that the login failure message has a chance
+                    // to marinate in users' gray meat. Otherwise, the caller driving this
+                    // interaction will fire off the CreateSession immediately, which will then
+                    // result in a new AuthMessage that overwrites the unlock status.
                     glib::timeout_future_seconds(1).await;
+
                     return Some(Request::CreateSession {
                         username: self.user_session_page.get()?.username()?,
                     });
@@ -296,6 +326,7 @@ mod imp {
     impl LockscreenImpl for Lockscreen {
         fn unlock_submit(&self) {
             glib::spawn_future_local(clone!(@weak self as this => async move {
+                this.obj().set_unlock_status("Please wait...");
                 this.obj().set_sensitive(false);
                 let mut req = Some(Request::PostAuthMessageResponse {
                     response: Some(this.obj().pin_entry().to_string())
@@ -319,7 +350,7 @@ fn fake_greetd_interaction(req: Request) -> anyhow::Result<Response> {
             if response.is_none() || response.unwrap() != "0" {
                 anyhow::Ok(Response::Error {
                     error_type: AuthError,
-                    description: String::from("0"),
+                    description: String::from("Incorrect password (hint: it's '0')"),
                 })
             } else {
                 anyhow::Ok(Response::Success)

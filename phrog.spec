@@ -1,32 +1,38 @@
+%bcond_without check
 %global cargo_install_lib 0
-%global phosh_ver 0.44
 
 Name:           phrog
-Version:        0.44.1
+Version:        0.45.0
 Release:        %autorelease
-Summary:        Greetd-compatible greeter for mobile phones
+Summary:        Mobile-friendly greeter for greetd
 License:        GPL-3.0-only
 URL:            https://github.com/samcday/phrog
 Source:         %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
+ExcludeArch:    %{ix86}
+
 BuildRequires:  cargo-rpm-macros >= 24
-BuildRequires:  pkgconfig(libphosh-%{phosh_ver})
+# for dbus-run-session in %check
+BuildRequires:	dbus-daemon
+# for xvfb-run in %check
+BuildRequires:  xorg-x11-server-Xvfb
+# first-run test uses foot
+BuildRequires:  foot
 
-Requires:       greetd >= 0.6
-Requires:       libphosh >= %{phosh_ver}
-
-# for dbus-launch
-Requires:       dbus-x11
-
-Provides:       greetd-greeter = 0.6
-Provides:       greetd-%{name} = %{version}
+Requires:       squeekboard
+Requires:       gnome-session
+Requires:       greetd
+Requires:       phoc
 
 %description
-%{summary}.
+Phrog uses Phosh and greetd to provide a graphical login manager.
 
 %prep
 %autosetup -p1
 %cargo_prep
+# tests need a writable XDG_RUNTIME_DIR
+mkdir -p /tmp/runtime-dir
+chmod 0700 /tmp/runtime-dir
 
 %generate_buildrequires
 %cargo_generate_buildrequires
@@ -50,7 +56,14 @@ Provides:       greetd-%{name} = %{version}
 
 %if %{with check}
 %check
+export G_MESSAGES_DEBUG=all
+export XDG_RUNTIME_DIR=/tmp/runtime-dir
+cat > test.sh <<HERE
+#!/bin/bash
 %cargo_test
+HERE
+chmod +x test.sh
+dbus-run-session xvfb-run -a -s -noreset phoc -S -E ./test.sh
 %endif
 
 %files

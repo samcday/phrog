@@ -1,10 +1,10 @@
 # Maintainer: Sam Day <me@samcday.com>
 pkgname=greetd-phrog
-pkgver=0.44.1_git
+pkgver=0.45.0_git
 pkgrel=0
 pkgdesc="Mobile device greeter"
 url=https://github.com/samcday/phrog
-# s390x: blocked by greetd & phosh
+# s390x: blocked by greetd
 # armhf: blocked by phosh
 arch="all !s390x !armhf"
 license="GPL-3.0-only"
@@ -16,6 +16,7 @@ depends="
 makedepends="
 	cargo
 	cargo-auditable
+	foot
 	libphosh-dev"
 checkdepends="xvfb-run"
 
