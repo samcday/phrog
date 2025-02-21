@@ -1,4 +1,0 @@
-0001-Cargo.toml-relax-dependencies.patch
-0002-src-fix-build.patch
-0003-phrog-greetd-session-use-bash-shebang.patch
-0004-dbus-port-to-zbus-v5.patch
