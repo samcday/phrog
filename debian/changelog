@@ -1,8 +1,12 @@
-phrog (0.45.0-1) UNRELEASED; urgency=medium
+phrog (0.45.0-1) unstable; urgency=medium
 
   * New upstream version
+  * debian: drop patches.
+    They're all upstream by now :)
+  * d/control: add new build-time test dependencies.
+    A new upstream test relies on `foot` to be present on the system.
 
- -- Arnaud Ferraris <aferraris@debian.org>  Fri, 21 Feb 2025 11:51:09 +0100
+ -- Arnaud Ferraris <aferraris@debian.org>  Fri, 21 Feb 2025 12:18:30 +0100
 
 phrog (0.44.1-2) unstable; urgency=medium
 
