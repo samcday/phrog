@@ -1,0 +1,75 @@
+Source: phrog
+Section: x11
+Priority: optional
+Maintainer: DebianOnMobile Maintainers <debian-on-mobile-maintainers@alioth-lists.debian.net>
+Uploaders: Arnaud Ferraris <aferraris@debian.org>
+Build-Depends:
+ cargo,
+ debhelper-compat (= 13),
+ libphosh-0.45-dev | libphosh-dev,
+# Dependencies cargo culted from phosh
+ gsettings-desktop-schemas-dev (>= 47),
+ libadwaita-1-dev,
+ libappstream-dev,
+ libcallaudio-dev,
+ libevince-dev,
+ libgirepository1.0-dev,
+ libjson-glib-dev,
+ libsecret-1-dev,
+ libsystemd-dev,
+ libfeedback-dev (>= 0.4.0),
+ libfribidi-dev,
+ libgcr-3-dev,
+ libgmobile-dev,
+ libgnome-bluetooth-3.0-dev,
+ libgnome-desktop-3-dev,
+ libgtk-3-dev,
+ libgtk-4-dev,
+ libgudev-1.0-dev,
+ libhandy-1-dev (>= 1.1.90),
+ libmm-glib-dev,
+ libnm-dev,
+ libpam0g-dev,
+ libpolkit-agent-1-dev,
+ libpulse-dev,
+ libsoup-3.0-dev,
+ libupower-glib-dev,
+ libwayland-dev,
+ libxml2-utils,
+ linux-libc-dev (>= 5.12) [arm64],
+# Dependencies needed only for tests
+ at-spi2-core <!nocheck>,
+ dbus-x11 <!nocheck>,
+ foot <!nocheck>,
+ gnome-settings-daemon <!nocheck>,
+ phoc <!nocheck>,
+# phosh is needed until the gschema is shipped with the lib package
+ phosh <!nocheck>,
+ xauth <!nocheck>,
+ xvfb <!nocheck>,
+Standards-Version: 4.7.0
+Homepage: https://github.com/samcday/phrog/
+Vcs-Browser: https://salsa.debian.org/DebianOnMobile-team/phrog
+Vcs-Git: https://salsa.debian.org/DebianOnMobile-team/phrog.git
+Rules-Requires-Root: no
+
+Package: phrog
+Architecture: any
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+ fonts-lato,
+ gnome-shell-common,
+ greetd,
+ librsvg2-common,
+ phoc,
+ polkitd,
+ phosh-osk-stub |squeekboard,
+Conflicts: phog
+Description: Greetd-compatible greeter for mobile phones
+ Phrog is a graphical greeter speaking the `greetd` protocol and aimed at mobile
+ devices like smart phones and tablets using touch based inputs and small
+ screens.
+ .
+ It was initially designed for the Phosh Mobile Environment based on GNOME/GTK
+ but can spawn any graphical session.

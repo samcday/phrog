@@ -3,8 +3,9 @@ name: build
 on:
   push:
     branches: [main]
-  pull_request:
+  pull_request_target:
     branches: [main]
+    types: [labeled, opened, reopened, synchronize]
   release:
     types: [published]
   workflow_dispatch: {}
@@ -23,42 +24,36 @@ permissions:
   pull-requests: write
 
 jobs:
-  build-image:
+  image-hash:
     runs-on: ubuntu-24.04
     outputs:
       hash: ${{ steps.hash.outputs.value }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
       - name: get CI image hash
         id: hash
         run: |
           set -uexo pipefail
           echo "value=${{ hashFiles('.github/Dockerfile') }}" >> $GITHUB_OUTPUT
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: .github/
-          file: .github/Dockerfile
-          push: true
-          tags: ghcr.io/samcday/phrog-ci:${{ steps.hash.outputs.value }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
   build:
-    needs: build-image
+    needs: image-hash
     runs-on: ubuntu-24.04
-    container: ghcr.io/samcday/phrog-ci:${{ needs.build-image.outputs.hash }}
+    container: ghcr.io/samcday/phrog-ci:${{ needs.image-hash.outputs.hash }}
     defaults:
       run:
         shell: bash
     steps:
+      - if: |
+          github.event_name == 'pull_request_target' &&
+          github.event.pull_request.author_association != 'COLLABORATOR'
+          && github.event.pull_request.author_association != 'OWNER'
+          && !contains(github.event.pull_request.labels.*.name, 'ci-ok')
+        run: |
+          echo This PR has not yet been marked as safe with a ci-ok label
+          exit 1
       - uses: actions/checkout@v4
+        with:
+          ref: ${{  github.event.pull_request.head.sha }}
       - name: Build
         run: |
           set -uexo pipefail
@@ -167,7 +162,7 @@ jobs:
           SOURCE_DIR: 'blob-upload'
           DEST_DIR: ${{ github.run_id }}
       - uses: marocchino/sticky-pull-request-comment@v2
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request_target'
         with:
           header: ci-recordings
           hide_and_recreate: true
