@@ -1,3 +1,9 @@
+phrog (0.45.0-1) UNRELEASED; urgency=medium
+
+  * New upstream version
+
+ -- Arnaud Ferraris <aferraris@debian.org>  Fri, 21 Feb 2025 11:51:09 +0100
+
 phrog (0.44.1-2) unstable; urgency=medium
 
   * debian: add salsa-ci.yml
