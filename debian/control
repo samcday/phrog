@@ -25,6 +25,7 @@ Build-Depends:
 # Dependencies needed only for tests
  at-spi2-core <!nocheck>,
  dbus-x11 <!nocheck>,
+ foot <!nocheck>,
  gnome-settings-daemon <!nocheck>,
  gnome-shell-common <!nocheck>,
  librust-input-event-codes-6-dev (>= 6.2.0~~) <!nocheck>,
