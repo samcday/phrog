@@ -1,3 +1,15 @@
+phrog (0.45.0-2) unstable; urgency=medium
+
+  * debian: maintscripts: only invoke systemd if running.
+    There are cases (e.g. image generation) where we install the packages
+    without having `systemd` running. In those cases, calling
+    `deb-systemd-invoke` returns an error, and so does the corresponding
+    maintscript.
+    Fix this by only calling `deb-systemd-invoke` when we know `systemd` is
+    actually running.
+
+ -- Arnaud Ferraris <aferraris@debian.org>  Sat, 22 Feb 2025 10:20:30 +0100
+
 phrog (0.45.0-1) unstable; urgency=medium
 
   * New upstream version
