@@ -27,11 +27,14 @@ override_dh_auto_install:
 		$(INSTALL_DIR)/usr/libexec/phrog-greetd-session
 
 override_dh_auto_test:
+# Don't run tests on 32 bits systems as we might run out of memory
+ifneq ($(DEB_HOST_ARCH_BITS),32)
 ifeq ($(filter nocheck,$(DEB_BUILD_OPTIONS)),)
 	mkdir -p $(CURDIR)/debian/tmp_home $(CURDIR)/debian/tmp_run
 	LC_ALL=C.UTF-8 XDG_RUNTIME_DIR=$(CURDIR)/debian/tmp_run \
 		HOME=$(CURDIR)/debian/tmp_home dbus-run-session xvfb-run -a \
 			phoc -C $(CURDIR)/debian/config/phoc.ini -E "$(CARGO) test"
+endif
 endif
 
 execute_after_dh_auto_clean:
