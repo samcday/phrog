@@ -1,3 +1,9 @@
+phrog (0.45.0-1) unstable; urgency=medium
+
+ * See https://github.com/samcday/phrog/releases/tag/0.45.0
+
+ -- Sam Day <me@samcday.com>  Sun, 02 Mar 2025 15:52:06 +0100
+
 phrog (0.44.1-1) unstable; urgency=medium
 
   * New upstream version
