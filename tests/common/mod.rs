@@ -127,9 +127,6 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
             .unwrap();
     }
 
-    let phosh_settings = Settings::new("sm.puri.phosh.lockscreen");
-    phosh_settings.set_boolean("shuffle-keypad", false).unwrap();
-
     let if_settings = Settings::new("org.gnome.desktop.interface");
     // use a more appropriate (moar froggy) accent color
     if_settings.set_string("accent-color", "green").unwrap();
