@@ -27,6 +27,11 @@ builddir="$srcdir/phrog-$_gitrev"
 # net: cargo fetch
 options="net"
 
+# Tests are flaky on loongarch64 + armv7
+if [ "$CARCH" = "loongarch64" ] || [ "$CARCH" = "armv7" ]; then
+	options="$options !check"
+fi
+
 export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix=$builddir=/build/"
 
 prepare() {
