@@ -1,3 +1,9 @@
+phrog (0.46.0-1) UNRELEASED; urgency=medium
+
+  * New upstream version
+
+ -- Arnaud Ferraris <aferraris@debian.org>  Mon, 24 Mar 2025 00:07:43 +0100
+
 phrog (0.45.0-3) unstable; urgency=medium
 
   * d/rules: fix build on armel
