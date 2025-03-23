@@ -1,4 +1,3 @@
-pub mod keypad_shuffle;
 pub mod lockscreen;
 pub mod shell;
 pub mod supervised_child;

@@ -1,12 +1,12 @@
 use crate::dbus::user::UserProxy;
+use futures_util::StreamExt;
 use futures_util::select;
 use glib::warn;
 use gtk::gdk_pixbuf::Pixbuf;
 use gtk::gio::Cancellable;
-use gtk::glib::{clone, spawn_future_local, Object};
+use gtk::glib::{Object, clone, spawn_future_local};
 use gtk::prelude::{FileExt, ObjectExt};
 use gtk::{gio, glib};
-use zbus::export::futures_util::StreamExt;
 use zbus::zvariant::{ObjectPath, OwnedObjectPath};
 
 static G_LOG_DOMAIN: &str = "phrog-user";
@@ -88,7 +88,7 @@ mod imp {
     use gtk::gdk_pixbuf::Pixbuf;
     use gtk::gio::{Cancellable, FileMonitorFlags};
     use gtk::glib::subclass::Signal;
-    use gtk::glib::{clone, Properties};
+    use gtk::glib::{Properties, clone};
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
     use gtk::{gio, glib};
