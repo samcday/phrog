@@ -37,7 +37,7 @@ Build-Depends:
  phosh-common <!nocheck>,
  xauth <!nocheck>,
  xvfb <!nocheck>,
-Standards-Version: 4.7.0
+Standards-Version: 4.7.2
 Homepage: https://github.com/samcday/phrog/
 Vcs-Browser: https://salsa.debian.org/DebianOnMobile-team/phrog
 Vcs-Git: https://salsa.debian.org/DebianOnMobile-team/phrog.git
