@@ -55,7 +55,7 @@ package() {
 }
 
 check() {
-	export XDG_RUNTIME_DIR=/tmp
+	export XDG_RUNTIME_DIR="$builddir"
 	dbus-run-session xvfb-run -a phoc -E "cargo test --frozen"
 }
 
