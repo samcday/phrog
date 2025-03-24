@@ -1,4 +1,6 @@
-%bcond_without check
+# Tests are disabled until rust-wayland-protocols-misc is available
+# https://bugzilla.redhat.com/show_bug.cgi?id=2344240
+%bcond check 0
 %global cargo_install_lib 0
 
 Name:           phrog
