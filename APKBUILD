@@ -1,6 +1,6 @@
 # Maintainer: Sam Day <me@samcday.com>
 pkgname=greetd-phrog
-pkgver=0.45.0_git
+pkgver=0.46.0_git
 pkgrel=0
 pkgdesc="Mobile device greeter"
 url=https://github.com/samcday/phrog
@@ -27,6 +27,11 @@ builddir="$srcdir/phrog-$_gitrev"
 # net: cargo fetch
 options="net"
 
+# Tests are flaky on loongarch64 + armv7
+if [ "$CARCH" = "loongarch64" ] || [ "$CARCH" = "armv7" ]; then
+	options="$options !check"
+fi
+
 export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix=$builddir=/build/"
 
 prepare() {
@@ -50,7 +55,7 @@ package() {
 }
 
 check() {
-	export XDG_RUNTIME_DIR=/tmp
+	export XDG_RUNTIME_DIR="$builddir"
 	dbus-run-session xvfb-run -a phoc -E "cargo test --frozen"
 }
 
