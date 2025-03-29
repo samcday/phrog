@@ -1,3 +1,10 @@
+phrog (0.46.0-2) unstable; urgency=medium
+
+  * d/control: add missing runtime dependencies.
+    Without those, `phrog` cannot run on non-Phosh systems. (Closes: #1099910)
+
+ -- Arnaud Ferraris <aferraris@debian.org>  Sat, 29 Mar 2025 10:35:26 +0100
+
 phrog (0.46.0-1) unstable; urgency=medium
 
   * New upstream version
