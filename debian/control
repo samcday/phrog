@@ -48,8 +48,11 @@ Architecture: any
 Depends:
  ${misc:Depends},
  ${shlibs:Depends},
+ accountsservice,
  at-spi2-core,
  fonts-lato,
+ gnome-session-bin,
+ gnome-session-common,
  gnome-settings-daemon,
  gnome-shell-common,
  greetd,
