@@ -19,10 +19,11 @@ BuildRequires:  xorg-x11-server-Xvfb
 # first-run test uses foot
 BuildRequires:  foot
 
-Requires:       squeekboard
+Requires:       accountsservice
 Requires:       gnome-session
 Requires:       greetd
 Requires:       phoc
+Requires:       phosh-osk = 1.0
 
 %description
 Phrog uses Phosh and greetd to provide a graphical login manager.
