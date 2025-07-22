@@ -47,6 +47,8 @@ mod imp {
     use std::os::unix::net::UnixStream;
     use std::time::Duration;
 
+    const QUIT_DELAY: u64 = 500;
+
     #[derive(Default, Properties)]
     #[properties(wrapper_type = super::Lockscreen)]
     pub struct Lockscreen {
@@ -288,7 +290,7 @@ mod imp {
                     self.start_session().await.unwrap();
                     Shell::default().fade_out(0);
                     // Keep this timeout in sync with fadeout animation duration in phrog.css
-                    timeout_add_once(Duration::from_millis(500), || {
+                    timeout_add_once(Duration::from_millis(QUIT_DELAY), || {
                         gtk::main_quit();
                     });
                 }
