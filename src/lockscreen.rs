@@ -31,7 +31,7 @@ mod imp {
     use crate::APP_ID;
     use anyhow::{anyhow, Context};
     use async_channel::{Receiver, Sender};
-    use glib::{error, info, warn};
+    use glib::{error, g_message, info, warn};
     use greetd_ipc::codec::SyncCodec;
     use greetd_ipc::{AuthMessageType, ErrorType, Request, Response};
     use gtk::gio::Settings;
@@ -288,6 +288,7 @@ mod imp {
                 Response::Success => {
                     self.obj().set_unlock_status("Success. Logging in...");
                     self.start_session().await.unwrap();
+                    g_message!("phrog", "launched session, exiting in {}ms", QUIT_DELAY);
                     Shell::default().fade_out(0);
                     // Keep this timeout in sync with fadeout animation duration in phrog.css
                     timeout_add_once(Duration::from_millis(QUIT_DELAY), || {
