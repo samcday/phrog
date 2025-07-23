@@ -4,8 +4,8 @@ set -e
 
 if [ "$1" = "configure" ]; then
     # Ensure our config fragments are taken into account
-    deb-systemd-invoke --system daemon-reload
-    deb-systemd-invoke --user daemon-reload
+    systemctl --system daemon-reload >/dev/null || true
+    systemctl --user daemon-reload >/dev/null || true
 fi
 
 #DEBHELPER#
