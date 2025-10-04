@@ -1,0 +1,10 @@
+[Unit]
+Description=Phrog Greeter
+DefaultDependencies=no
+
+Requisite=gnome-session-initialized.target
+PartOf=gnome-session-initialized.target
+Before=gnome-session-initialized.target
+
+Requires=mobi.phosh.Phrog.service
+After=mobi.phosh.Phrog.service
