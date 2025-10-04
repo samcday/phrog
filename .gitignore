@@ -1,3 +1,9 @@
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/files
+debian/phrog/
+debian/phrog.substvars
+debian/tmp_home/
 target/
 *.tar.gz
 *.src.rpm
