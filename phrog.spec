@@ -82,6 +82,8 @@ dbus-run-session xvfb-run -a -s -noreset phoc -S -E ./test.sh
 %config(noreplace) %{_sysconfdir}/phrog/greetd-config.toml
 %{_unitdir}/phrog.service
 %{_userunitdir}/gnome-session@phrog.target.d/session.conf
+%{_userunitdir}/mobi.phosh.Phrog.service
+%{_userunitdir}/mobi.phosh.Phrog.target
 
 %changelog
 %autochangelog
