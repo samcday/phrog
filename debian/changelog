@@ -1,3 +1,11 @@
+phrog (0.46.0-3) unstable; urgency=medium
+
+  * Cherry-pick commits from upstream issue tracker
+  * Install systemd units. This way we can run with gnome-session 49
+  * d/control: Bump librust-phosh dependency
+
+ -- Guido Günther <agx@sigxcpu.org>  Sun, 05 Oct 2025 18:32:11 +0200
+
 phrog (0.46.0-2) unstable; urgency=medium
 
   * d/control: add missing runtime dependencies.
