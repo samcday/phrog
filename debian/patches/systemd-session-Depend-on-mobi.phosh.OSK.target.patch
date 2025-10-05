@@ -1,0 +1,26 @@
+From: =?utf-8?q?Guido_G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Wed, 1 Oct 2025 22:49:52 +0200
+Subject: systemd-session: Depend on mobi.phosh.OSK.target
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+This keeps OSK startup working with gnome-session >= 49 which
+removed the `RequiredComponents` key. We can keep that around
+in our session file for a bit longer so we can work with older
+gnome-session as well.
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ data/systemd-session.conf | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/data/systemd-session.conf b/data/systemd-session.conf
+index 662abf1..fdaa6e5 100644
+--- a/data/systemd-session.conf
++++ b/data/systemd-session.conf
+@@ -2,3 +2,4 @@
+ # Keep this in sync with phrog.session
+ Wants=org.gnome.SettingsDaemon.MediaKeys.target
+ Wants=org.gnome.SettingsDaemon.Power.target
++Wants=mobi.phosh.OSK.target

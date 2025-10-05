@@ -1,0 +1,95 @@
+From: =?utf-8?q?Guido_G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sat, 4 Oct 2025 14:44:02 +0200
+Subject: systemd: Start phrog
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+Since RequiredComponents is no longer handled by gnome-session
+we need to start phrog via systemd. The unit files match what
+phosh does.
+
+This allows phrog to start with gnome-session >= 49.
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ data/mobi.phosh.Phrog.service | 27 +++++++++++++++++++++++++++
+ data/mobi.phosh.Phrog.target  | 10 ++++++++++
+ data/systemd-session.conf     |  2 ++
+ phrog.spec                    |  2 ++
+ 4 files changed, 41 insertions(+)
+ create mode 100644 data/mobi.phosh.Phrog.service
+ create mode 100644 data/mobi.phosh.Phrog.target
+
+diff --git a/data/mobi.phosh.Phrog.service b/data/mobi.phosh.Phrog.service
+new file mode 100644
+index 0000000..501c951
+--- /dev/null
++++ b/data/mobi.phosh.Phrog.service
+@@ -0,0 +1,27 @@
++# This is a systemd user unit intended to be started with gnome-session.
++
++[Unit]
++Description=Phrog, a greeter for mobile phones
++Documentation=https://github.com/samcday/phrog
++
++After=gnome-session-manager.target
++
++Requisite=gnome-session-initialized.target
++PartOf=gnome-session-initialized.target
++Before=gnome-session-initialized.target
++
++StartLimitIntervalSec=15s
++StartLimitBurst=3
++
++OnFailure=gnome-session-shutdown.target
++OnFailureJobMode=replace-irreversibly
++CollectMode=inactive-or-failed
++RefuseManualStart=on
++RefuseManualStop=on
++
++[Service]
++Type=simple
++ExecStart=phrog
++Restart=on-failure
++Slice=session.slice
++OOMScoreAdjust=-1000
+diff --git a/data/mobi.phosh.Phrog.target b/data/mobi.phosh.Phrog.target
+new file mode 100644
+index 0000000..c5ff4f8
+--- /dev/null
++++ b/data/mobi.phosh.Phrog.target
+@@ -0,0 +1,10 @@
++[Unit]
++Description=Phrosh Greeter
++DefaultDependencies=no
++
++Requisite=gnome-session-initialized.target
++PartOf=gnome-session-initialized.target
++Before=gnome-session-initialized.target
++
++Requires=mobi.phosh.Phrog.service
++After=mobi.phosh.Phrog.service
+diff --git a/data/systemd-session.conf b/data/systemd-session.conf
+index fdaa6e5..6c93a1b 100644
+--- a/data/systemd-session.conf
++++ b/data/systemd-session.conf
+@@ -3,3 +3,5 @@
+ Wants=org.gnome.SettingsDaemon.MediaKeys.target
+ Wants=org.gnome.SettingsDaemon.Power.target
+ Wants=mobi.phosh.OSK.target
++
++Requires=mobi.phosh.Phrog.target
+diff --git a/phrog.spec b/phrog.spec
+index fa618d9..c043d08 100644
+--- a/phrog.spec
++++ b/phrog.spec
+@@ -81,6 +81,8 @@ dbus-run-session xvfb-run -a -s -noreset phoc -S -E ./test.sh
+ %config(noreplace) %{_sysconfdir}/phrog/greetd-config.toml
+ %{_unitdir}/phrog.service
+ %{_userunitdir}/gnome-session@phrog.target.d/session.conf
++%{_userunitdir}/mobi.phosh.Phrog.service
++%{_userunitdir}/mobi.phosh.Phrog.target
+ 
+ %changelog
+ %autochangelog
