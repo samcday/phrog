@@ -1,3 +1,12 @@
+phrog (0.46.0-4) unstable; urgency=medium
+
+  * debian: build with rust-nix 0.30 (Closes: #1116545)
+  * d/control: build-depend on dbus-daemon instead of dbus-x11
+    (Closes: #1117101)
+  * d/watch: convert to version 5
+
+ -- Arnaud Ferraris <aferraris@debian.org>  Fri, 24 Oct 2025 16:30:54 +0200
+
 phrog (0.46.0-3) unstable; urgency=medium
 
   * Cherry-pick commits from upstream issue tracker
