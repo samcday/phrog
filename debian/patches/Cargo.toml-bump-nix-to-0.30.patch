@@ -1,0 +1,22 @@
+From: Arnaud Ferraris <arnaud.ferraris@collabora.com>
+Date: Fri, 24 Oct 2025 16:01:43 +0200
+Subject: Cargo.toml: bump nix to 0.30
+
+This is the version currently in Debian.
+---
+ Cargo.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index df70023..e17b8b8 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -12,7 +12,7 @@ libphosh = "0.0.7"
+ clap = { version = "4.5.4", features = ["derive"] }
+ wayland-client = "0.31"
+ zbus = { version = "5", default-features = false, features = ["blocking", "async-io"] }
+-nix = { version = "0.29", features = ["signal"] }
++nix = { version = "0.30", features = ["signal"] }
+ async-global-executor = "2.4.1"
+ futures-util = "0.3.30"
+ log = "0.4.22"

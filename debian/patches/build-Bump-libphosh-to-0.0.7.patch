@@ -13,7 +13,7 @@ Signed-off-by: Guido Günther <agx@sigxcpu.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Cargo.toml b/Cargo.toml
-index 093df21..feb5af6 100644
+index d963e09..df70023 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -8,7 +8,7 @@ glob = "0.3.1"
