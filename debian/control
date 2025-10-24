@@ -24,7 +24,7 @@ Build-Depends:
  librust-zbus-5+blocking-dev (>= 4.3.1~~),
 # Dependencies needed only for tests
  at-spi2-core <!nocheck>,
- dbus-x11 <!nocheck>,
+ dbus-daemon <!nocheck>,
  foot <!nocheck>,
  gnome-settings-daemon <!nocheck>,
  gnome-shell-common <!nocheck>,
