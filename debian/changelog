@@ -1,3 +1,10 @@
+phrog (0.46.0-5) unstable; urgency=medium
+
+  * Require stevia. phosh-osk-stub is long gone and users can still install
+    squeekboard but we want the default OSK installed at all times.
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 07 Nov 2025 20:05:11 +0100
+
 phrog (0.46.0-4) unstable; urgency=medium
 
   * debian: build with rust-nix 0.30 (Closes: #1116545)
