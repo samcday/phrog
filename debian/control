@@ -58,7 +58,7 @@ Depends:
  librsvg2-common,
  phoc,
  phosh-common,
- phosh-osk-stub |squeekboard,
+ phosh-osk-stevia,
  polkitd,
 Conflicts: phog
 Provides: phog
