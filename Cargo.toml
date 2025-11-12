@@ -2,6 +2,7 @@
 name = "phrog"
 version = "0.50.0"
 edition = "2021"
+license = "GPL-3.0-only"
 
 [dependencies]
 glob = "0.3.1"
