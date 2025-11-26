@@ -3,14 +3,19 @@
 FROM registry.gitlab.gnome.org/world/phosh/phosh/debian:v0.0.2025-11-06
 
 ARG PHOSH_REMOTE=https://gitlab.gnome.org/World/Phosh/phosh.git
-ARG PHOSH_REF=v0.45_rc1
+ARG PHOSH_REF=v0.51.0
 
 ARG PHOC_REMOTE=https://gitlab.gnome.org/World/Phosh/phoc.git
-ARG PHOC_REF=v0.45_rc1
+ARG PHOC_REF=v0.51.0
+
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH
 
 RUN export DEBIAN_FRONTEND=noninteractive \
    && apt-get -y update \
    && apt-get -y install --no-install-recommends \
+    curl \
     dh-cargo \
     foot \
     rust-clippy \
@@ -27,6 +32,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
    && cd phosh \
    && git checkout ${PHOSH_REF} \
    && eatmydata apt-get --no-install-recommends -y build-dep . \
+   && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+      | sh -s -- -y --no-modify-path --profile minimal --default-toolchain 1.85.0 \
+   && chmod -R a+rX /usr/local/rustup /usr/local/cargo \
    && eatmydata meson setup --prefix=/usr -Dbindings-lib=true _build . \
    && eatmydata meson compile -C _build \
    && eatmydata meson install -C _build \
