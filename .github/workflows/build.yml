@@ -88,6 +88,7 @@ jobs:
           name: test-recordings
           path: demo-video/recordings
   demo:
+    if: github.event_name != 'pull_request_target' || contains(github.event.pull_request.labels.*.name, 'demo')
     needs: build
     runs-on: ubuntu-24.04
     steps:
