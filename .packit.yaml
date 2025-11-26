@@ -10,6 +10,7 @@ jobs:
   - job: copr_build
     manual_trigger: true
     trigger: pull_request
+    enable_net: true
     additional_repos:
       - copr://samcday/phosh-nightly
       - copr://samcday/phrog-nightly
@@ -22,6 +23,7 @@ jobs:
   # Build main commits in samcday/phrog-nightly COPR
   - job: copr_build
     trigger: commit
+    enable_net: true
     branch: main
     owner: samcday
     project: phrog-nightly
@@ -31,5 +33,6 @@ jobs:
   # Build tagged releases in samcday/phrog COPR
   - job: copr_build
     trigger: release
+    enable_net: true
     owner: samcday
     project: phrog

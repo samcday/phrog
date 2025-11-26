@@ -1,5 +1,9 @@
 %bcond_without check
+%bcond_without vendor
 %global cargo_install_lib 0
+%if %{with vendor}
+%global _cargo_generate_buildrequires 0
+%endif
 
 Name:           phrog
 Version:        0.50.0
@@ -19,6 +23,17 @@ BuildRequires:  xorg-x11-server-Xvfb
 # first-run test uses foot
 BuildRequires:  foot
 
+%if %{with vendor}
+BuildRequires:  pkgconfig(atk)
+BuildRequires:  pkgconfig(cairo)
+BuildRequires:  pkgconfig(cairo-gobject)
+BuildRequires:  pkgconfig(gdk-3.0)
+BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
+BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(libhandy-1)
+BuildRequires:  pkgconfig(libphosh-0.45)
+%endif
+
 Requires:       accountsservice
 Requires:       gnome-session
 Requires:       greetd
@@ -30,20 +45,29 @@ Phrog uses Phosh and greetd to provide a graphical login manager.
 
 %prep
 %autosetup -p1
-%cargo_prep
+
 # tests need a writable XDG_RUNTIME_DIR
 mkdir -p /tmp/runtime-dir
 chmod 0700 /tmp/runtime-dir
 
+%if %{with vendor}
+%{__cargo} vendor --locked --versioned-dirs vendor
+%cargo_prep -v vendor
+%else
+%cargo_prep
 %generate_buildrequires
 %cargo_generate_buildrequires
+%endif
 
 %build
 %cargo_build
+%cargo_vendor_manifest
 %{cargo_license_summary}
 %{cargo_license} > LICENSE.dependencies
 
 %install
+%{__install} -Dpm 0644 data/mobi.phosh.Phrog.service -t %{buildroot}%{_userunitdir}/
+%{__install} -Dpm 0644 data/mobi.phosh.Phrog.target -t %{buildroot}%{_userunitdir}/
 %{__install} -Dpm 0644 data/mobi.phosh.phrog.gschema.xml -t %{buildroot}%{_datadir}/glib-2.0/schemas/
 %{__install} -Dpm 0644 data/phrog.session -t %{buildroot}%{_datadir}/gnome-session/sessions/
 %{__install} -Dpm 0644 data/mobi.phosh.Phrog.desktop -t %{buildroot}%{_datadir}/applications/
