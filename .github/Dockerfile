@@ -34,6 +34,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
    && eatmydata apt-get --no-install-recommends -y build-dep . \
    && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
       | sh -s -- -y --no-modify-path --profile minimal --default-toolchain 1.85.0 \
+   && rustup component add clippy rustfmt --toolchain 1.85.0 \
    && chmod -R a+rX /usr/local/rustup /usr/local/cargo \
    && eatmydata meson setup --prefix=/usr -Dbindings-lib=true _build . \
    && eatmydata meson compile -C _build \
