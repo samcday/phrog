@@ -1,6 +1,6 @@
 # This image is used as the build environment in Github Actions.
 
-FROM registry.gitlab.gnome.org/world/phosh/phosh/debian:v0.0.2025-02-07
+FROM registry.gitlab.gnome.org/world/phosh/phosh/debian:v0.0.2025-11-06
 
 ARG PHOSH_REMOTE=https://gitlab.gnome.org/World/Phosh/phosh.git
 ARG PHOSH_REF=v0.45_rc1
