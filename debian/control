@@ -64,7 +64,7 @@ Depends:
  librsvg2-common,
  phoc,
  polkitd,
- phosh-osk-stub |squeekboard,
+ phosh-osk-stevia,
 Conflicts: phog
 Description: Greetd-compatible greeter for mobile phones
  Phrog is a graphical greeter speaking the `greetd` protocol and aimed at mobile
