@@ -79,7 +79,7 @@ phoc -S -E "cargo test"
 
 Found a bug or want to request a feature? [Please file an issue!][issues]
 
-You can also come chat in Matrix: [#phosh:talk.puri.sm][Matrix]
+You can also come chat in Matrix: [#phosh:phosh.mobi][Matrix]
 
 [phog]: https://gitlab.com/mobian1/phog
 [Phosh]: https://gitlab.gnome.org/World/Phosh/phosh

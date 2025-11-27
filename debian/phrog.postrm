@@ -3,9 +3,11 @@
 set -e
 
 if [ "$1" = "remove" ] || [ "$1" = "purge" ]; then
-    # Ensure our config fragments are no longer taken into account
-    deb-systemd-invoke --system daemon-reload
-    deb-systemd-invoke --user daemon-reload
+    if [ -d /run/systemd/system ]; then
+        # Ensure our config fragments are no longer taken into account
+        deb-systemd-invoke --system daemon-reload
+        deb-systemd-invoke --user daemon-reload
+    fi
 fi
 
 #DEBHELPER#

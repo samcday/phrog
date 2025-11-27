@@ -1,0 +1,27 @@
+# This is a systemd user unit intended to be started with gnome-session.
+
+[Unit]
+Description=Phrog, a greeter for mobile phones
+Documentation=https://github.com/samcday/phrog
+
+After=gnome-session-manager.target
+
+Requisite=gnome-session-initialized.target
+PartOf=gnome-session-initialized.target
+Before=gnome-session-initialized.target
+
+StartLimitIntervalSec=15s
+StartLimitBurst=3
+
+OnFailure=gnome-session-shutdown.target
+OnFailureJobMode=replace-irreversibly
+CollectMode=inactive-or-failed
+RefuseManualStart=on
+RefuseManualStop=on
+
+[Service]
+Type=simple
+ExecStart=phrog
+Restart=on-failure
+Slice=session.slice
+OOMScoreAdjust=-1000

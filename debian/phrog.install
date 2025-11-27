@@ -2,6 +2,8 @@
 data/mobi.phosh.phrog.gschema.xml usr/share/glib-2.0/schemas
 data/phrog.session usr/share/gnome-session/sessions
 data/mobi.phosh.Phrog.desktop usr/share/applications
+data/mobi.phosh.Phrog.service /usr/lib/systemd/user/
+data/mobi.phosh.Phrog.target /usr/lib/systemd/user/
 data/systemd-session.conf usr/lib/systemd/user/gnome-session@phrog.target.d
 
 # Debian-specific config
