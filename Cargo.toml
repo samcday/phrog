@@ -17,6 +17,7 @@ nix = { version = "0.30", features = ["signal"] }
 async-global-executor = "3.0.0"
 futures-util = "0.3.30"
 log = "0.4.22"
+lazy_static = "^1.4"
 
 [dependencies.glib]
 version = "0.18"
