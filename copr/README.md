@@ -1,0 +1,25 @@
+Build order:
+
+ * rust-glib-sys0.18
+ * rust-gobject-sys0.18
+ * rust-gio-sys0.18
+ * rust-glib-macros0.18
+ * rust-glib0.18
+ * rust-pango-sys0.18
+ * rust-gdk-pixbuf-sys0.18
+ * rust-cairo-sys-rs0.18
+ * rust-gdk-sys
+ * rust-atk-sys
+ * rust-gtk-sys
+ * rust-libhandy-sys
+ * rust-gio0.18
+ * rust-gdk-pixbuf0.18
+ * rust-pango0.18
+ * rust-atk
+ * rust-cairo-rs0.18
+ * rust-gtk3-macros
+ * rust-gdk
+ * rust-gtk
+ * rust-libhandy
+ * rust-libphosh-sys
+ * rust-libphosh

@@ -1,0 +1,9 @@
+[package]
+summary = "Rust bindings for the ATK library"
+description = "Rust bindings for the ATK library."
+
+[features]
+hide = [
+    "v2_50",
+]
+

@@ -1,0 +1,20 @@
+[package]
+cargo-toml-patch-comments = ["drop unused, benchmark-only criterion dev-dependency"]
+
+[tests]
+skip = [
+    "collections::strv::test::test_into_strv",
+    "structured_log",
+]
+skip-exact = true
+comments = [
+    "skip a test that only works when run in-tree",
+]
+
+[scripts]
+prep.post = [
+    "# drop compiletests that don't compile due to missing dependencies",
+    "rm tests/regex_compiletest.rs",
+    "rm -r tests/regex_compiletest/",
+]
+

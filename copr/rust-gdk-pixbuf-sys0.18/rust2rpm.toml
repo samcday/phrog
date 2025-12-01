@@ -1,0 +1,10 @@
+[tests]
+run = ["none"]
+comments = ["tests are broken: https://github.com/gtk-rs/gtk-rs-core/issues/64"]
+
+[requires]
+build = ["pkgconfig(gdk-pixbuf-2.0) >= 2.36.8"]
+lib = ["pkgconfig(gdk-pixbuf-2.0) >= 2.36.8"]
+features.v2_40 = ["pkgconfig(gdk-pixbuf-2.0) >= 2.40"]
+features.v2_42 = ["pkgconfig(gdk-pixbuf-2.0) >= 2.42"]
+

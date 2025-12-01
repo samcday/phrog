@@ -1,0 +1,19 @@
+[package]
+summary = "FFI bindings to libgdk-3"
+description = "FFI bindings to libgdk-3."
+
+[requires]
+build = [
+    "pkgconfig(gdk-3.0) >= 3.22",
+]
+lib = [
+    "pkgconfig(gdk-3.0) >= 3.22",
+]
+features.v3_24 = [
+    "pkgconfig(gdk-3.0) >= 3.24",
+]
+
+[tests]
+run = "none"
+comments = ["tests are broken: https://github.com/gtk-rs/gtk-rs-core/issues/64"]
+

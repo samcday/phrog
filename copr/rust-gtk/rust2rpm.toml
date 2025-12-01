@@ -1,0 +1,8 @@
+[package]
+summary = "Rust bindings for the GTK+ 3 library"
+description = "Rust bindings for the GTK+ 3 library."
+
+[tests]
+run = "none"
+comments = ["tests require a running display server"]
+

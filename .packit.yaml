@@ -10,20 +10,20 @@ jobs:
   - job: copr_build
     manual_trigger: true
     trigger: pull_request
-    enable_net: true
     additional_repos:
       - copr://samcday/phosh-nightly
       - copr://samcday/phrog-nightly
     targets:
-      - fedora-41-aarch64
-      - fedora-41-x86_64
-      - fedora-rawhide-aarch64
-      - fedora-rawhide-x86_64
+      fedora-41-aarch64: &opts
+        without_opts:
+          - vendor
+      fedora-41-x86_64: *opts
+      fedora-rawhide-aarch64: *opts
+      fedora-rawhide-x86_64: *opts
 
   # Build main commits in samcday/phrog-nightly COPR
   - job: copr_build
     trigger: commit
-    enable_net: true
     branch: main
     owner: samcday
     project: phrog-nightly

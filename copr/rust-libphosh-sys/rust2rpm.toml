@@ -1,0 +1,3 @@
+[requires]
+build = ["pkgconfig(libphosh-0.45)"]
+lib = ["pkgconfig(libphosh-0.45)"]

@@ -1,0 +1,34 @@
+[package]
+summary = "FFI bindings to libgtk-3"
+description = "FFI bindings to libgtk-3."
+
+[requires]
+build = [
+    "pkgconfig(gtk+-3.0) >= 3.22",
+]
+lib = [
+    "pkgconfig(gtk+-3.0) >= 3.22",
+]
+features.v3_24 = [
+    "pkgconfig(gtk+-3.0) >= 3.24",
+]
+features.v3_24_1 = [
+    "pkgconfig(gtk+-3.0) >= 3.24.1",
+]
+features.v3_24_11 = [
+    "pkgconfig(gtk+-3.0) >= 3.24.11",
+]
+features.v3_24_30 = [
+    "pkgconfig(gtk+-3.0) >= 3.24.30",
+]
+features.v3_24_8 = [
+    "pkgconfig(gtk+-3.0) >= 3.24.8",
+]
+features.v3_24_9 = [
+    "pkgconfig(gtk+-3.0) >= 3.24.9",
+]
+
+[tests]
+run = "none"
+comments = ["tests are broken: https://github.com/gtk-rs/gtk-rs-core/issues/64"]
+

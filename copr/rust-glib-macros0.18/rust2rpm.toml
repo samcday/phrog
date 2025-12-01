@@ -1,0 +1,4 @@
+[tests]
+run = ["none"]
+comments = ["resolve circular dependency with glib"]
+

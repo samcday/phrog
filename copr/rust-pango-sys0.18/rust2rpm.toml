@@ -1,0 +1,14 @@
+[tests]
+run = ["none"]
+comments = ["tests are broken: https://github.com/gtk-rs/gtk-rs-core/issues/64"]
+
+[requires]
+build = ["pkgconfig(pango) >= 1.40"]
+lib =["pkgconfig(pango) >= 1.40"]
+features.v1_42 = ["pkgconfig(pango) >= 1.42"]
+features.v1_44 = ["pkgconfig(pango) >= 1.44"]
+features.v1_46 = ["pkgconfig(pango) >= 1.46"]
+features.v1_48 = ["pkgconfig(pango) >= 1.48"]
+features.v1_50 = ["pkgconfig(pango) >= 1.50"]
+features.v1_52 = ["pkgconfig(pango) >= 1.51"]
+
