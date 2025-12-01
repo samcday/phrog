@@ -1,0 +1,17 @@
+[tests]
+run = ["none"]
+comments = ["tests are broken: https://github.com/gtk-rs/gtk-rs-core/issues/64"]
+
+[requires]
+build = ["pkgconfig(gobject-2.0) >= 2.56"]
+lib = ["pkgconfig(gobject-2.0) >= 2.56"]
+features.v2_58 = ["pkgconfig(gobject-2.0) >= 2.58"]
+features.v2_62 = ["pkgconfig(gobject-2.0) >= 2.62"]
+features.v2_66 = ["pkgconfig(gobject-2.0) >= 2.66"]
+features.v2_68 = ["pkgconfig(gobject-2.0) >= 2.68"]
+features.v2_70 = ["pkgconfig(gobject-2.0) >= 2.70"]
+features.v2_72 = ["pkgconfig(gobject-2.0) >= 2.72"]
+features.v2_74 = ["pkgconfig(gobject-2.0) >= 2.74"]
+features.v2_76 = ["pkgconfig(gobject-2.0) >= 2.76"]
+features.v2_78 = ["pkgconfig(gobject-2.0) >= 2.77"]
+

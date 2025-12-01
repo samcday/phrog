@@ -1,0 +1,17 @@
+[tests]
+run = ["none"]
+comments = ["tests are broken: https://github.com/gtk-rs/gtk-rs-core/issues/64"]
+
+[features]
+hide = ["win32-surface"]
+
+[requires]
+build = ["pkgconfig(cairo) >= 1.14"]
+lib = ["pkgconfig(cairo) >= 1.14"]
+features.v1_16 = ["pkgconfig(cairo) >= 1.16"]
+features.v1_18 = ["pkgconfig(cairo) >= 1.17"]
+features.use_glib = [
+    "((pkgconfig(cairo-gobject) >= 1.16 if crate(cairo-sys-rs/v1_16)) and pkgconfig(cairo-gobject) >= 1.14)",
+    "((pkgconfig(cairo-gobject) >= 1.17 if crate(cairo-sys-rs/v1_18)) and pkgconfig(cairo-gobject) >= 1.14)",
+]
+

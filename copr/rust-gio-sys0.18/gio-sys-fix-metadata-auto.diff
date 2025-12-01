@@ -1,0 +1,12 @@
+--- gio-sys-0.18.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ gio-sys-0.18.1/Cargo.toml	2024-03-27T21:15:54.289501+00:00
+@@ -113,9 +113,3 @@
+ v2_76 = ["v2_74"]
+ v2_78 = ["v2_76"]
+ 
+-[target."cfg(windows)".dependencies.winapi]
+-version = "0.3.9"
+-features = [
+-    "ws2def",
+-    "winsock2",
+-]

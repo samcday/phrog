@@ -1,0 +1,26 @@
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Thu Jul 09 2020 Josh Stone <jistone@redhat.com> - 0.9.0-1
+- Update to 0.9.0
+
+* Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
+* Wed Jan 15 2020 Josh Stone <jistone@redhat.com> - 0.8.0-1
+- Update to 0.8.0
+
+* Tue Dec 10 2019 Josh Stone <jistone@redhat.com> - 0.7.0-1
+- Update to 0.7.0
+
+* Fri Jul 26 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
+* Sun Apr 28 15:33:54 CEST 2019 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 0.6.0-1
+- Initial package

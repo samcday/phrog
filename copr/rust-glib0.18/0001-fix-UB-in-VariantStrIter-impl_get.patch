@@ -1,0 +1,32 @@
+From 7667e5f8347df7579655bfcf99e65c2987b6fa08 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Wed, 3 Apr 2024 19:46:42 +0200
+Subject: [PATCH] fix UB in VariantStrIter::impl_get
+
+---
+ src/variant_iter.rs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/variant_iter.rs b/src/variant_iter.rs
+index b406172..e0997f6 100644
+--- a/src/variant_iter.rs
++++ b/src/variant_iter.rs
+@@ -117,13 +117,13 @@ impl<'a> VariantStrIter<'a> {
+ 
+     fn impl_get(&self, i: usize) -> &'a str {
+         unsafe {
+-            let p: *mut libc::c_char = std::ptr::null_mut();
++            let mut p: *mut libc::c_char = std::ptr::null_mut();
+             let s = b"&s\0";
+             ffi::g_variant_get_child(
+                 self.variant.to_glib_none().0,
+                 i,
+                 s as *const u8 as *const _,
+-                &p,
++                &mut p,
+                 std::ptr::null::<i8>(),
+             );
+             let p = std::ffi::CStr::from_ptr(p);
+-- 
+2.44.0
+

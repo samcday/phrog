@@ -1,0 +1,12 @@
+[tests]
+run = ["none"]
+comments = ["tests are broken: https://github.com/gtk-rs/gtk-rs-core/issues/64"]
+
+[requires]
+build = ["pkgconfig(libhandy-1) >= 1"]
+lib = ["pkgconfig(libhandy-1) >= 1"]
+features.v1_0 = ["pkgconfig(libhandy-1) >= 1"]
+features.v1_2 = ["pkgconfig(libhandy-1) >= 1.2"]
+features.v1_4 = ["pkgconfig(libhandy-1) >= 1.4"]
+features.v1_6 = ["pkgconfig(libhandy-1) >= 1.6"]
+

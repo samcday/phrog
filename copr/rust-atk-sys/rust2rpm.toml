@@ -1,0 +1,38 @@
+[package]
+summary = "FFI bindings to libatk-1"
+description = "FFI bindings to libatk-1."
+
+[features]
+hide = [
+    "v2_50",
+]
+
+[requires]
+build = [
+    "pkgconfig(atk) >= 2.28",
+]
+lib = [
+    "pkgconfig(atk) >= 2.28",
+]
+features.v2_30 = [
+    "pkgconfig(atk) >= 2.30",
+]
+features.v2_32 = [
+    "pkgconfig(atk) >= 2.32",
+]
+features.v2_34 = [
+    "pkgconfig(atk) >= 2.34",
+]
+features.v2_38 = [
+    "pkgconfig(atk) >= 2.38",
+]
+features.v2_46 = [
+    "pkgconfig(atk) >= 2.46",
+]
+
+[tests]
+run = "none"
+comments = [
+    "tests are broken: https://github.com/gtk-rs/gtk-rs-core/issues/64",
+]
+
