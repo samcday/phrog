@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+    types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
 
 concurrency:
@@ -13,7 +14,7 @@ concurrency:
 jobs:
   build:
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'debs')
-    name: Build unstable .debs (${{ matrix.arch }})
+    name: Build unstable .debs
     runs-on: ${{ matrix.runner }}
     container: debian:unstable
     strategy:
