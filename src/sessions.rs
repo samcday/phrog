@@ -7,6 +7,7 @@ use lazy_static::lazy_static;
 use std::{
   collections::HashMap,
   path::PathBuf,
+  path::Path,
   env,
 };
 
@@ -16,7 +17,13 @@ lazy_static! {
     // Snippet copied from https://github.com/apognu/tuigreet
 
     static ref XDG_DATA_DIRS: Vec<PathBuf> = {
-        let value = env::var("XDG_DATA_DIRS").unwrap_or("/usr/local/share:/usr/share".to_string());
+        let envvar = env::var("XDG_DATA_DIRS");
+
+        let value = match envvar {
+            Ok(var) if !var.is_empty() => var,
+            _ => "/usr/local/share:/usr/share".to_string(),
+        };
+
         env::split_paths(&value).filter(|p| p.is_absolute()).collect()
     };
 }
@@ -29,13 +36,13 @@ pub fn sessions() -> Vec<SessionObject> {
         let x11_dir = dir.join("xsessions/*.desktop");
 
         session_list(
-            &wl_dir.into_os_string().into_string().unwrap(),
+            &wl_dir,
             "wayland",
             &mut sessions,
         );
 
         session_list(
-            &x11_dir.into_os_string().into_string().unwrap(),
+            &x11_dir,
             "x11",
             &mut sessions,
         );        
@@ -44,10 +51,10 @@ pub fn sessions() -> Vec<SessionObject> {
     sessions.values().cloned().collect()
 }
 
-fn session_list(path: &str, session_type: &str, sessions: &mut HashMap<String, SessionObject>) {
-    for f in match glob(path) {
+fn session_list(path: &Path, session_type: &str, sessions: &mut HashMap<String, SessionObject>) {
+    for f in match glob(path.to_str().unwrap()) {
         Err(e) => {
-            warn!("couldn't check sessions in {}: {}", path, e);
+            warn!("couldn't check sessions in {}: {}", path.display(), e);
             return;
         }
         Ok(iter) => iter,
