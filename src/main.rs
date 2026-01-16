@@ -24,6 +24,9 @@ struct Args {
 }
 
 fn main() -> anyhow::Result<()> {
+    let _ = gettextrs::bindtextdomain("phosh", "/usr/share/locale");
+    gettextrs::textdomain("phosh")?;
+
     log::set_logger(&GLIB_LOGGER).unwrap();
     log::set_max_level(log::LevelFilter::Debug);
 
