@@ -4,12 +4,7 @@ use glob::glob;
 use gtk::gio::DesktopAppInfo;
 use gtk::prelude::*;
 use lazy_static::lazy_static;
-use std::{
-  collections::HashMap,
-  path::PathBuf,
-  path::Path,
-  env,
-};
+use std::{collections::HashMap, env, path::Path, path::PathBuf};
 
 static G_LOG_DOMAIN: &str = "phrog-sessions";
 
@@ -35,18 +30,10 @@ pub fn sessions() -> Vec<SessionObject> {
         let wl_dir = dir.join("wayland-sessions/*.desktop");
         let x11_dir = dir.join("xsessions/*.desktop");
 
-        session_list(
-            &wl_dir,
-            "wayland",
-            &mut sessions,
-        );
+        session_list(&wl_dir, "wayland", &mut sessions);
 
-        session_list(
-            &x11_dir,
-            "x11",
-            &mut sessions,
-        );        
-    };
+        session_list(&x11_dir, "x11", &mut sessions);
+    }
 
     sessions.values().cloned().collect()
 }
@@ -87,5 +74,48 @@ fn session_list(path: &Path, session_type: &str, sessions: &mut HashMap<String, 
                     .unwrap_or(String::new()),
             ),
         );
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::session_list;
+    use crate::session_object::SessionObject;
+    use gtk::prelude::ObjectExt;
+    use std::collections::HashMap;
+    use std::fs;
+    use tempfile::tempdir;
+
+    #[test]
+    fn session_list_reads_desktop_keyfile() {
+        let temp = tempdir().expect("create tempdir");
+        let session_dir = temp.path().join("wayland-sessions");
+        fs::create_dir_all(&session_dir).expect("create session dir");
+
+        let desktop_entry = "[Desktop Entry]\n\
+Name=Phosh\n\
+Comment=Phone Shell\n\
+Comment=This session logs you into Phosh\n\
+Exec=phosh-session\n\
+Type=Application\n\
+DesktopNames=Phosh;GNOME;\n";
+
+        let desktop_path = session_dir.join("phosh.desktop");
+        fs::write(&desktop_path, desktop_entry).expect("write desktop file");
+
+        let mut sessions: HashMap<String, SessionObject> = HashMap::new();
+        let pattern = session_dir.join("*.desktop");
+        session_list(&pattern, "wayland", &mut sessions);
+
+        let session = sessions.get("phosh").expect("session added");
+        let name: String = session.property("name");
+        let session_type: String = session.property("session-type");
+        let command: String = session.property("command");
+        let desktop_names: String = session.property("desktop-names");
+
+        assert_eq!(name, "Phosh");
+        assert_eq!(session_type, "wayland");
+        assert_eq!(command, "phosh-session");
+        assert_eq!(desktop_names, "Phosh:GNOME");
     }
 }
