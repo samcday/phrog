@@ -118,4 +118,26 @@ DesktopNames=Phosh;GNOME;\n";
         assert_eq!(command, "phosh-session");
         assert_eq!(desktop_names, "Phosh:GNOME");
     }
+
+    #[test]
+    fn session_list_accepts_keyfile_without_type() {
+        let temp = tempdir().expect("create tempdir");
+        let session_dir = temp.path().join("wayland-sessions");
+        fs::create_dir_all(&session_dir).expect("create session dir");
+
+        let desktop_entry = "[Desktop Entry]\n\
+Name=Phosh\n\
+Comment=Phone Shell\n\
+Exec=phosh-session\n\
+DesktopNames=Phosh;GNOME;\n";
+
+        let desktop_path = session_dir.join("phosh.desktop");
+        fs::write(&desktop_path, desktop_entry).expect("write desktop file");
+
+        let mut sessions: HashMap<String, SessionObject> = HashMap::new();
+        let pattern = session_dir.join("*.desktop");
+        session_list(&pattern, "wayland", &mut sessions);
+
+        assert!(sessions.contains_key("phosh"));
+    }
 }
