@@ -1,8 +1,6 @@
 use crate::session_object::SessionObject;
-use glib::warn;
+use glib::{warn, KeyFile, KeyFileFlags};
 use glob::glob;
-use gtk::gio::DesktopAppInfo;
-use gtk::prelude::*;
 use lazy_static::lazy_static;
 use std::{collections::HashMap, env, path::Path, path::PathBuf};
 
@@ -39,6 +37,13 @@ pub fn sessions() -> Vec<SessionObject> {
 }
 
 fn session_list(path: &Path, session_type: &str, sessions: &mut HashMap<String, SessionObject>) {
+    let keyfile_locale_string = |key_file: &KeyFile, key: &str| {
+        key_file
+            .locale_string("Desktop Entry", key, None)
+            .or_else(|_| key_file.string("Desktop Entry", key))
+            .ok()
+    };
+
     for f in match glob(path.to_str().unwrap()) {
         Err(e) => {
             warn!("couldn't check sessions in {}: {}", path.display(), e);
@@ -53,26 +58,31 @@ fn session_list(path: &Path, session_type: &str, sessions: &mut HashMap<String, 
             continue;
         }
 
-        let info = if let Some(info) = DesktopAppInfo::from_filename(&f) {
-            info
-        } else {
-            warn!("Unable to parse session file {:?}", f);
+        let key_file = KeyFile::new();
+        if let Err(err) = key_file.load_from_file(&f, KeyFileFlags::NONE) {
+            warn!("Unable to parse session file {:?}: {}", f, err);
             continue;
+        }
+
+        let name = match keyfile_locale_string(&key_file, "Name") {
+            Some(value) => value,
+            None => {
+                warn!("Missing Name in session file {:?}", f);
+                continue;
+            }
         };
+        let command = key_file
+            .string("Desktop Entry", "Exec")
+            .ok()
+            .unwrap_or_default();
+        let desktop_names = key_file
+            .string("Desktop Entry", "DesktopNames")
+            .ok()
+            .map(|value| value.trim_end_matches(';').replace(';', ":"))
+            .unwrap_or_default();
         sessions.insert(
             id.clone(),
-            SessionObject::new(
-                &id,
-                info.name().as_ref(),
-                session_type,
-                &info
-                    .commandline()
-                    .map_or(String::new(), |v| v.to_string_lossy().to_string()),
-                &info
-                    .string("DesktopNames")
-                    .map(|v| v.trim_end_matches(';').replace(';', ":"))
-                    .unwrap_or(String::new()),
-            ),
+            SessionObject::new(&id, &name, session_type, &command, &desktop_names),
         );
     }
 }
