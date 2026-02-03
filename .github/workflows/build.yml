@@ -63,6 +63,9 @@ jobs:
       - name: Lint
         run: |
           cargo clippy --all-targets --verbose
+      - name: Lint (fmt)
+        run: |
+          cargo fmt --all --check
       - uses: actions/upload-artifact@v4
         with:
           name: x86-64-debug
