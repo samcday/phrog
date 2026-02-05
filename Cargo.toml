@@ -9,6 +9,7 @@ glob = "0.3.1"
 greetd_ipc = { version = "0.10.0", features = ["sync-codec"] }
 async-channel = "2.2.1"
 anyhow = "1.0.82"
+gettext-rs = "0.7"
 libphosh = "0.0.7"
 clap = { version = "4.5.4", features = ["derive"] }
 wayland-client = "0.31"

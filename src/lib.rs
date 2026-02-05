@@ -47,6 +47,9 @@ fn is_phoc_detected() -> anyhow::Result<bool> {
 pub fn init() -> anyhow::Result<()> {
     gio::resources_register_include!("phrog.gresource").context("failed to register resources.")?;
 
+    let _ = gettextrs::bindtextdomain("phosh", "/usr/share/locale");
+    gettextrs::textdomain("phosh")?;
+
     if !is_phoc_detected().context("failed to detect Wayland compositor globals")? {
         return Err(anyhow!("Phoc parent compositor not detected"));
     }
