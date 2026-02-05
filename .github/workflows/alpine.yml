@@ -2,6 +2,8 @@ name: alpine
 
 on:
   workflow_dispatch: {}
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
   release:
     types: [published]
 
@@ -14,6 +16,7 @@ permissions:
 
 jobs:
   alpine:
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'apk')
     runs-on: ubuntu-24.04${{ matrix.arch == 'aarch64' && '-arm' || '' }}
     strategy:
       matrix:
