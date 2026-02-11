@@ -7,8 +7,10 @@ bump version:
 
     version="{{version}}"
     cargo_version="$version"
+    debian_version="$version"
     if [[ "$version" =~ _rc([0-9]+)$ ]]; then
         cargo_version="${version/_rc/-rc.}"
+        debian_version="${version/_rc/~rc}"
     fi
 
     echo "Bumping phrog to $version"
@@ -42,7 +44,7 @@ bump version:
     sed -i 's/^pkgver=.*_git$/pkgver={{version}}_git/' APKBUILD
 
     # Debian changelog (add new entry)
-    sed -i '1s/.*/phrog ({{version}}-1) unstable; urgency=medium/' debian/changelog
+    sed -i "1s/.*/phrog (${debian_version}-1) unstable; urgency=medium/" debian/changelog
 
     if [[ ! "$version" =~ _rc[0-9]+$ ]]; then
         # README demo video URL (skip for RCs)

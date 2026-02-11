@@ -10,6 +10,10 @@ permissions:
 
 jobs:
   bump-stable:
+    if: |
+      github.event.issue.author_association == 'COLLABORATOR' ||
+      github.event.issue.author_association == 'OWNER' ||
+      contains(github.event.issue.labels.*.name, 'ci-ok')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -49,6 +53,10 @@ jobs:
             --base "${{ github.event.repository.default_branch }}"
 
   bump-rc:
+    if: |
+      github.event.issue.author_association == 'COLLABORATOR' ||
+      github.event.issue.author_association == 'OWNER' ||
+      contains(github.event.issue.labels.*.name, 'ci-ok')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
