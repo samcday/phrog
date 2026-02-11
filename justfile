@@ -5,10 +5,35 @@ bump version:
     #!/usr/bin/env bash
     set -euo pipefail
 
-    echo "Bumping phrog to {{version}}"
+    version="{{version}}"
+    cargo_version="$version"
+    if [[ "$version" =~ _rc([0-9]+)$ ]]; then
+        cargo_version="${version/_rc/-rc.}"
+    fi
 
-    # Cargo.toml workspace version
-    sed -i 's/^version = ".*"/version = "{{version}}"/' Cargo.toml
+    echo "Bumping phrog to $version"
+
+    # Cargo.toml workspace version (package section only)
+    CARGO_VERSION="$cargo_version" python - <<'PY'
+    import os
+    import re
+    from pathlib import Path
+
+    cargo_version = os.environ["CARGO_VERSION"]
+    path = Path("Cargo.toml")
+    text = path.read_text()
+
+    match = re.search(r"(?ms)^\[package\]\n.*?(?=^\[|\Z)", text)
+    if not match:
+        raise SystemExit("package section not found in Cargo.toml")
+
+    block = match.group(0)
+    updated = re.sub(r"(?m)^version = \".*\"$", f'version = "{cargo_version}"', block, count=1)
+    if block == updated:
+        raise SystemExit("package version not found in Cargo.toml")
+
+    path.write_text(text[: match.start()] + updated + text[match.end() :])
+    PY
 
     # RPM spec
     sed -i 's/^Version:        .*/Version:        {{version}}/' phrog.spec
@@ -19,7 +44,7 @@ bump version:
     # Debian changelog (add new entry)
     sed -i '1s/.*/phrog ({{version}}-1) unstable; urgency=medium/' debian/changelog
 
-    if [[ ! "{{version}}" =~ _rc[0-9]+$ ]]; then
+    if [[ ! "$version" =~ _rc[0-9]+$ ]]; then
         # README demo video URL (skip for RCs)
         sed -i "s|releases/download/[^/]\+/demo.webp|releases/download/{{version}}/demo.webp|" README.md
     fi
@@ -32,7 +57,7 @@ bump version:
     echo "  phrog.spec"
     echo "  APKBUILD"
     echo "  debian/changelog"
-    if [[ ! "{{version}}" =~ _rc[0-9]+$ ]]; then
+    if [[ ! "$version" =~ _rc[0-9]+$ ]]; then
         echo "  README.md"
     fi
     echo "  Cargo.lock"
