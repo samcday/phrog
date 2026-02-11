@@ -22,9 +22,9 @@ jobs:
 
       - name: install deps
         run: |
-          apt-get update
-          apt-get -y --no-install-recommends install \
-            dch
+          export DEBIAN_FRONTEND=noninteractive
+          sudo apt-get update
+          sudo apt-get -y install dch
 
       - name: Configure git
         run: |
