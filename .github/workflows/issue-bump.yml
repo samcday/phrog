@@ -24,7 +24,7 @@ jobs:
         run: |
           export DEBIAN_FRONTEND=noninteractive
           sudo apt-get update
-          sudo apt-get -y install dch
+          sudo apt-get -y install devscripts
 
       - name: Configure git
         run: |
