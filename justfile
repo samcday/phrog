@@ -64,8 +64,3 @@ bump version:
     fi
     echo "  Cargo.lock"
     echo ""
-    echo "Next steps:"
-    echo "  1. Review changes: git diff"
-    echo "  2. Commit: git commit -am 'v{{version}}'"
-    echo "  3. Tag: git tag v{{version}}"
-    echo "  4. Push: git push && git push --tags"
