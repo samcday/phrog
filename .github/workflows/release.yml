@@ -9,6 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - id: prerelease
+        run: |
+          if [[ "${GITHUB_REF_NAME}" =~ _rc[0-9]+$ ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
       - run: |
           cat > body.md <<HERE
           <img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/${GITHUB_REF_NAME}/demo.webp">
@@ -17,4 +24,5 @@ jobs:
         with:
           body_path: body.md
           generate_release_notes: true
+          prerelease: ${{ steps.prerelease.outputs.prerelease }}
           token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
