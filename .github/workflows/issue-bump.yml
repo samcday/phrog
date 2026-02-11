@@ -9,7 +9,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  bump-stable:
+  bump:
     if: |
       github.event.issue.author_association == 'COLLABORATOR' ||
       github.event.issue.author_association == 'OWNER' ||
@@ -42,7 +42,7 @@ jobs:
         run: |
           version="${{ steps.parse.outputs.version }}"
           branch="release/v${version}"
-          git checkout -b "$branch"
+          git checkout -B "$branch" "origin/${{ github.event.repository.default_branch }}"
           just bump version="$version"
           git add -A
           git commit -m "release: v${version}"
@@ -52,32 +52,6 @@ jobs:
             --body "Automated bump for v${version}." \
             --base "${{ github.event.repository.default_branch }}"
 
-  bump-rc:
-    if: |
-      github.event.issue.author_association == 'COLLABORATOR' ||
-      github.event.issue.author_association == 'OWNER' ||
-      contains(github.event.issue.labels.*.name, 'ci-ok')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: taiki-e/install-action@just
-
-      - name: Configure git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Parse version
-        id: parse
-        run: |
-          title="${{ github.event.issue.title }}"
-          if [[ "$title" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
-            echo "version=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
-          else
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Create rc bump PR
         if: steps.parse.outputs.skip != 'true'
         env:
@@ -86,7 +60,7 @@ jobs:
           base_version="${{ steps.parse.outputs.version }}"
           version="${base_version}_rc1"
           branch="release/v${version}"
-          git checkout -b "$branch"
+          git checkout -B "$branch" "origin/${{ github.event.repository.default_branch }}"
           just bump version="$version"
           git add -A
           git commit -m "release: v${version}"
