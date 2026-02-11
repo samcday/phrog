@@ -44,7 +44,9 @@ bump version:
     sed -i 's/^pkgver=.*_git$/pkgver={{version}}_git/' APKBUILD
 
     # Debian changelog (add new entry)
-    sed -i "1s/.*/phrog (${debian_version}-1) unstable; urgency=medium/" debian/changelog
+    DEBEMAIL="phrog-ci@example.invalid" DEBFULLNAME="phrog-ci" \
+        dch --newversion "${debian_version}-1" --distribution unstable --urgency medium \
+        "Release ${version}"
 
     if [[ ! "$version" =~ _rc[0-9]+$ ]]; then
         # README demo video URL (skip for RCs)
