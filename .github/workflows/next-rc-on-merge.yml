@@ -49,7 +49,7 @@ jobs:
           version="${{ steps.parse.outputs.version }}"
           branch="release/v${version}"
           git checkout -b "$branch"
-          just bump version="$version"
+          just bump "$version"
           git add -A
           git commit -m "release: v${version}"
           git push -u origin "$branch"

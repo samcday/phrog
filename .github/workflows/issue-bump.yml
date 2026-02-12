@@ -49,7 +49,7 @@ jobs:
           version="${{ steps.parse.outputs.version }}"
           branch="release/v${version}"
           git checkout -B "$branch" "origin/${{ github.event.repository.default_branch }}"
-          just bump version="$version"
+          just bump "$version"
           git add -A
           git commit -m "release: v${version}"
           git push -u origin "$branch"
@@ -67,7 +67,7 @@ jobs:
           version="${base_version}_rc1"
           branch="release/v${version}"
           git checkout -B "$branch" "origin/${{ github.event.repository.default_branch }}"
-          just bump version="$version"
+          just bump "$version"
           git add -A
           git commit -m "release: v${version}"
           git push -u origin "$branch"
