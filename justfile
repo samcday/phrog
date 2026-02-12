@@ -44,6 +44,8 @@ bump version:
     sed -i 's/^pkgver=.*_git$/pkgver={{version}}_git/' APKBUILD
 
     # Debian changelog (add new entry)
+    echo "DEBUG: debian_version=${debian_version}, full version=${debian_version}-1"
+    echo "DEBUG: Running: dch --newversion \"${debian_version}-1\" --distribution unstable --urgency medium \"Release ${version}\""
     DEBEMAIL="phrog@beep.boop" DEBFULLNAME="Phrogbot" \
         dch --newversion "${debian_version}-1" --distribution unstable --urgency medium \
         "Release ${version}"
