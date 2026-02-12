@@ -1,6 +1,6 @@
 # Maintainer: Sam Day <me@samcday.com>
 pkgname=greetd-phrog
-pkgver=0.53.0_rc1_git
+pkgver=0.53.0_rc2_git
 pkgrel=0
 pkgdesc="Mobile device greeter"
 url=https://github.com/samcday/phrog

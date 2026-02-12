@@ -1153,7 +1153,7 @@ checksum = "f38d5652c16fde515bb1ecef450ab0f6a219d619a7274976324d5e377f7dceba"
 
 [[package]]
 name = "phrog"
-version = "0.53.0-rc.1"
+version = "0.53.0-rc.2"
 dependencies = [
  "anyhow",
  "async-channel",
