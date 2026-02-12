@@ -1,3 +1,9 @@
+phrog (0.53.0~rc1-1) unstable; urgency=medium
+
+  * Release 0.53.0_rc1
+
+ -- Phrogbot <phrog@beep.boop>  Thu, 12 Feb 2026 01:06:17 +0000
+
 phrog (0.50.0-1) unstable; urgency=medium
 
   * See https://github.com/samcday/phrog/releases/tag/0.50.0
