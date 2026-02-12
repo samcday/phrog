@@ -1,11 +1,11 @@
 use crate::session_object::SessionObject;
+use crate::shell::Shell;
 use gtk::glib;
 use gtk::glib::{Cast, CastNone, Object};
 use gtk::prelude::*;
 use gtk::subclass::prelude::ObjectSubclassIsExt;
 use libhandy::prelude::{ActionRowExt, ComboRowExt};
 use libhandy::ActionRow;
-use crate::shell::Shell;
 
 glib::wrapper! {
     pub struct UserSessionPage(ObjectSubclass<imp::UserSessionPage>)
@@ -26,7 +26,9 @@ impl UserSessionPage {
     pub fn session(&self) -> SessionObject {
         let shell = Shell::default();
         let session_idx = self.imp().row_sessions.selected_index() as u32;
-        shell.sessions().unwrap()
+        shell
+            .sessions()
+            .unwrap()
             .item(session_idx)
             .clone()
             .and_downcast::<SessionObject>()
@@ -51,6 +53,7 @@ mod imp {
     use futures_util::select;
     use futures_util::StreamExt;
     use glib::subclass::InitializingObject;
+    use glib::{GString, Properties};
     use gtk::gio::{ListStore, Settings};
     use gtk::glib::subclass::Signal;
     use gtk::glib::{clone, closure_local};
@@ -61,7 +64,6 @@ mod imp {
     use libhandy::ActionRow;
     use std::cell::{Cell, OnceCell};
     use std::sync::OnceLock;
-    use glib::{GString, Properties};
 
     #[derive(CompositeTemplate, Default, Properties)]
     #[properties(wrapper_type = super::UserSessionPage)]
@@ -122,8 +124,10 @@ mod imp {
                 last_session = GString::from("phosh");
             }
 
-            for (idx, session) in shell.sessions()
-                .as_ref().unwrap()
+            for (idx, session) in shell
+                .sessions()
+                .as_ref()
+                .unwrap()
                 .iter::<SessionObject>()
                 .flatten()
                 .enumerate()
@@ -207,11 +211,7 @@ mod imp {
 
         fn signals() -> &'static [Signal] {
             static SIGNALS: OnceLock<Vec<Signal>> = OnceLock::new();
-            SIGNALS.get_or_init(|| {
-                vec![
-                    Signal::builder("login").build(),
-                ]
-            })
+            SIGNALS.get_or_init(|| vec![Signal::builder("login").build()])
         }
     }
 

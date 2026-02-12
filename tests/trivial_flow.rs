@@ -9,8 +9,8 @@ use std::sync::atomic::Ordering;
 use common::*;
 use gtk::prelude::*;
 use phrog::lockscreen::Lockscreen;
-use std::time::Duration;
 use phrog::session_object::SessionObject;
+use std::time::Duration;
 
 #[test]
 fn test_trivial_flow() {

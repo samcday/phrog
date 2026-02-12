@@ -6,7 +6,7 @@ use std::time::{Duration, SystemTime};
 use wayland_client::protocol::wl_keyboard::KeymapFormat::XkbV1;
 use wayland_client::protocol::wl_registry;
 use wayland_client::protocol::wl_seat::WlSeat;
-use wayland_client::{Connection, Dispatch, EventQueue, QueueHandle, delegate_noop};
+use wayland_client::{delegate_noop, Connection, Dispatch, EventQueue, QueueHandle};
 use wayland_protocols_misc::zwp_virtual_keyboard_v1::client::zwp_virtual_keyboard_manager_v1::ZwpVirtualKeyboardManagerV1;
 use wayland_protocols_misc::zwp_virtual_keyboard_v1::client::zwp_virtual_keyboard_v1::ZwpVirtualKeyboardV1;
 

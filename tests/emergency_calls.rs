@@ -1,18 +1,18 @@
 pub mod common;
 
+use gtk::{glib, Bin, Button, Grid, Window};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
-use gtk::{glib, Bin, Button, Grid, Window};
 
 use common::*;
+use glib::clone;
 use gtk::gio::Settings;
 use gtk::prelude::*;
-use std::time::Duration;
-use glib::clone;
-use libphosh::LockscreenPage;
 use libphosh::prelude::{LockscreenExt, ShellExt};
+use libphosh::LockscreenPage;
 use serde::{Deserialize, Serialize};
+use std::time::Duration;
 use zbus::object_server::SignalEmitter;
 use zbus::zvariant::{OwnedValue, Type, Value};
 
@@ -31,11 +31,14 @@ struct EmergencyCallsFixture {
 #[zbus::interface(name = "org.gnome.Calls.EmergencyCalls")]
 impl EmergencyCallsFixture {
     #[zbus(signal)]
-    async fn emergency_numbers_changed(signal_emitter: &SignalEmitter<'_>, message: &str) -> zbus::Result<()>;
+    async fn emergency_numbers_changed(
+        signal_emitter: &SignalEmitter<'_>,
+        message: &str,
+    ) -> zbus::Result<()>;
 
     async fn get_emergency_contacts(&self) -> Vec<EmergencyContact> {
         // Not used currently, maybe we expand test later to check this.
-        vec![EmergencyContact{
+        vec![EmergencyContact {
             source: 0,
             name: "Test".to_string(),
             id: "foo".to_string(),
@@ -47,7 +50,6 @@ impl EmergencyCallsFixture {
         self.dialled_numbers.lock().unwrap().push(id);
     }
 }
-
 
 struct CallFixture {}
 

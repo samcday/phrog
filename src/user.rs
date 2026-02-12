@@ -1,10 +1,10 @@
 use crate::dbus::user::UserProxy;
-use futures_util::StreamExt;
 use futures_util::select;
+use futures_util::StreamExt;
 use glib::warn;
 use gtk::gdk_pixbuf::Pixbuf;
 use gtk::gio::Cancellable;
-use gtk::glib::{Object, clone, spawn_future_local};
+use gtk::glib::{clone, spawn_future_local, Object};
 use gtk::prelude::{FileExt, ObjectExt};
 use gtk::{gio, glib};
 use zbus::zvariant::{ObjectPath, OwnedObjectPath};
@@ -88,7 +88,7 @@ mod imp {
     use gtk::gdk_pixbuf::Pixbuf;
     use gtk::gio::{Cancellable, FileMonitorFlags};
     use gtk::glib::subclass::Signal;
-    use gtk::glib::{Properties, clone};
+    use gtk::glib::{clone, Properties};
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
     use gtk::{gio, glib};

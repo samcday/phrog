@@ -15,15 +15,18 @@ fn test_accent_colours() {
 
     let ready_rx = test.ready_rx.clone();
     let if_settings = test.if_settings.clone();
-    test.start("accent-colours", glib::spawn_future_local(async move {
-        let (_, _) = ready_rx.recv().await.unwrap();
-        glib::timeout_future(Duration::from_millis(1500)).await;
+    test.start(
+        "accent-colours",
+        glib::spawn_future_local(async move {
+            let (_, _) = ready_rx.recv().await.unwrap();
+            glib::timeout_future(Duration::from_millis(1500)).await;
 
-        for color in ["red", "slate", "pink", "teal", "red", "purple", "blue"] {
-            if_settings.set_string("accent-color", color).unwrap();
-            glib::timeout_future(Duration::from_millis(500)).await;
-        }
+            for color in ["red", "slate", "pink", "teal", "red", "purple", "blue"] {
+                if_settings.set_string("accent-color", color).unwrap();
+                glib::timeout_future(Duration::from_millis(500)).await;
+            }
 
-        fade_quit();
-    }));
+            fade_quit();
+        }),
+    );
 }

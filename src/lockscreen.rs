@@ -278,7 +278,7 @@ mod imp {
                             // TODO: This might mean that some info messages are swallowed.
                             // Currently, we only care about fprintd's Info message, which blocks
                             // on the response until fingerprint reader is deactivated.
-                            return Some(Request::PostAuthMessageResponse { response: None })
+                            return Some(Request::PostAuthMessageResponse { response: None });
                         }
                         _ => {
                             // TODO: set GtkEntry input-purpose depending on AuthMessageType.
@@ -300,7 +300,8 @@ mod imp {
                     description,
                 } => {
                     warn!("auth error: '{}'", description);
-                    self.obj().set_unlock_status("Login failed, please try again");
+                    self.obj()
+                        .set_unlock_status("Login failed, please try again");
                     self.obj().shake_pin_entry();
                     // Greetd IPC dox seem to suggest that this isn't necessary, but then agreety
                     // does this, and if we don't we get a "session is already being configured"

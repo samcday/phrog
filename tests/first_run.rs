@@ -1,11 +1,11 @@
 pub mod common;
 
-use std::fs::{File, Permissions};
-use std::io::Write;
-use std::os::unix::fs::PermissionsExt;
 use gtk::glib;
 use gtk::glib::clone;
 use libphosh::prelude::ShellExt;
+use std::fs::{File, Permissions};
+use std::io::Write;
+use std::os::unix::fs::PermissionsExt;
 
 use common::*;
 use std::time::Duration;
@@ -22,7 +22,9 @@ fn test_first_run() {
 
     {
         let mut script = File::create(&script_path).unwrap();
-        script.set_permissions(Permissions::from_mode(0o755)).unwrap();
+        script
+            .set_permissions(Permissions::from_mode(0o755))
+            .unwrap();
         script.write_all(format!(
             "#!/bin/bash
             set -uexo pipefail
@@ -38,21 +40,24 @@ fn test_first_run() {
 
     let ready_rx = test.ready_rx.clone();
     let shell = test.shell.clone();
-    test.start("first-run", glib::spawn_future_local(clone!(@weak shell => async move {
-        let _ = ready_rx.recv().await.unwrap();
-        glib::timeout_future(Duration::from_millis(2000)).await;
+    test.start(
+        "first-run",
+        glib::spawn_future_local(clone!(@weak shell => async move {
+            let _ = ready_rx.recv().await.unwrap();
+            glib::timeout_future(Duration::from_millis(2000)).await;
 
-        // The first-run script should have started.
-        assert!(touch.exists());
-        glib::timeout_future(Duration::from_millis(2000)).await;
+            // The first-run script should have started.
+            assert!(touch.exists());
+            glib::timeout_future(Duration::from_millis(2000)).await;
 
-        // Delete the marker, the script will exit.
-        std::fs::remove_file(touch).unwrap();
-        glib::timeout_future(Duration::from_millis(2000)).await;
+            // Delete the marker, the script will exit.
+            std::fs::remove_file(touch).unwrap();
+            glib::timeout_future(Duration::from_millis(2000)).await;
 
-        // The first-run script should have completed, and the shell should now be locked.
-        assert!(shell.is_locked());
+            // The first-run script should have completed, and the shell should now be locked.
+            assert!(shell.is_locked());
 
-        gtk::main_quit();
-    })));
+            gtk::main_quit();
+        })),
+    );
 }

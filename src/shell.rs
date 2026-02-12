@@ -35,11 +35,11 @@ mod imp {
     use gtk::subclass::prelude::*;
     use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass};
     use gtk::{gdk, glib, CssProvider, StyleContext};
+    use libphosh::prelude::ShellExt;
     use libphosh::subclass::shell::ShellImpl;
     use std::cell::RefCell;
     use std::cell::{Cell, OnceCell};
     use std::process::Command;
-    use libphosh::prelude::ShellExt;
 
     #[derive(Default, Properties)]
     #[properties(wrapper_type = super::Shell)]
