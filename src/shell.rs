@@ -11,7 +11,9 @@ glib::wrapper! {
 impl Shell {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Object::builder().build()
+        Object::builder()
+            .property("locale-dir", crate::LOCALEDIR)
+            .build()
     }
 }
 
@@ -50,6 +52,15 @@ mod imp {
         #[property(get, set)]
         pub sessions: RefCell<Option<ListStore>>,
 
+        #[property(get, set, construct_only)]
+        locale_dir: RefCell<String>,
+
+        #[property(get, set, construct_only)]
+        locale: RefCell<Option<String>>,
+
+        #[property(get, set, construct_only)]
+        language: RefCell<Option<String>>,
+
         provider: Cell<CssProvider>,
         pub dbus_connection: OnceCell<zbus::Connection>,
     }
@@ -64,6 +75,21 @@ mod imp {
     #[glib::derived_properties]
     impl ObjectImpl for Shell {
         fn constructed(&self) {
+            let locale_dir = {
+                let locale_dir = self.locale_dir.borrow();
+                if locale_dir.is_empty() {
+                    std::path::PathBuf::from(crate::LOCALEDIR)
+                } else {
+                    std::path::PathBuf::from(locale_dir.as_str())
+                }
+            };
+            let locale = self.locale.borrow().clone();
+            let language = self.language.borrow().clone();
+            if let Err(err) = crate::i18n_setup(&locale_dir, locale.as_deref(), language.as_deref())
+            {
+                warn!("failed to initialize i18n: {err:#}");
+            }
+
             let system_dbus = async_global_executor::block_on(zbus::Connection::system()).unwrap();
             self.dbus_connection.set(system_dbus).unwrap();
 
