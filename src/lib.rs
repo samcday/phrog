@@ -13,6 +13,8 @@ use gtk::{gdk, gio};
 use wayland_client::protocol::wl_registry;
 
 pub const APP_ID: &str = "mobi.phosh.phrog";
+pub const TEXT_DOMAIN: &str = "phrog";
+pub const LOCALEDIR: &str = "/usr/share/locale";
 
 struct DetectPhoc(bool);
 
