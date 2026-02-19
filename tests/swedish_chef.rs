@@ -73,7 +73,10 @@ fn test_swedish_chef_locale() {
         .unwrap();
     assert!(phosh_msgfmt_status.success());
 
-    let locale = detect_available_locale();
+    let Some(locale) = detect_available_locale() else {
+        eprintln!("skipping swedish chef test: no non-C locale available");
+        return;
+    };
 
     let mut test = test_init(Some(TestOptions {
         last_user: Some("agx".into()),
@@ -172,22 +175,23 @@ async fn wait_for_unlock_status(lockscreen: &Lockscreen, expected: &str, timeout
     );
 }
 
-fn detect_available_locale() -> String {
+fn detect_available_locale() -> Option<String> {
     let output = Command::new("locale").arg("-a").output().unwrap();
     let locales = String::from_utf8_lossy(&output.stdout);
 
-    for candidate in [
-        "en_US.UTF-8",
-        "en_US.utf8",
-        "C.UTF-8",
-        "C.utf8",
-        "POSIX",
-        "C",
-    ] {
+    for candidate in ["en_US.UTF-8", "en_US.utf8"] {
         if locales.lines().any(|line| line == candidate) {
-            return candidate.to_string();
+            return Some(candidate.to_string());
         }
     }
 
-    "C".to_string()
+    locales
+        .lines()
+        .map(str::trim)
+        .find(|locale| {
+            !locale.is_empty()
+                && !matches!(locale.to_ascii_uppercase().as_str(), "C" | "POSIX")
+                && !locale.to_ascii_uppercase().starts_with("C.")
+        })
+        .map(ToString::to_string)
 }
