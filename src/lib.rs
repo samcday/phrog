@@ -22,16 +22,20 @@ pub fn i18n_setup(
     locale: Option<&str>,
     language: Option<&str>,
 ) -> anyhow::Result<()> {
+    if let Some(locale) = locale {
+        std::env::set_var("LC_ALL", locale);
+        std::env::set_var("LANG", locale);
+    }
+
     if let Some(language) = language {
         std::env::set_var("LANGUAGE", language);
     }
 
-    let locale = locale.unwrap_or("");
-    gettextrs::setlocale(gettextrs::LocaleCategory::LcAll, locale).with_context(|| {
-        if locale.is_empty() {
-            "failed to set process locale from environment".to_string()
+    gettextrs::setlocale(gettextrs::LocaleCategory::LcAll, "").with_context(|| {
+        if let Some(locale) = locale {
+            format!("failed to set process locale from environment (requested {locale})")
         } else {
-            format!("failed to set process locale to {locale}")
+            "failed to set process locale from environment".to_string()
         }
     })?;
     gettextrs::textdomain("phosh").context("failed to set gettext domain")?;
