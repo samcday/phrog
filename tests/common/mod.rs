@@ -184,10 +184,10 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
         shell_builder = shell_builder.property("language", language);
     }
 
-    let wall_clock = WallClock::new();
-    wall_clock.set_default();
     let shell: Shell = shell_builder.build();
     shell.set_default();
+    let wall_clock = WallClock::new();
+    wall_clock.set_default();
 
     let ready_called = Arc::new(AtomicBool::new(false));
     let ready_called2 = ready_called.clone();
