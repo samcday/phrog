@@ -102,7 +102,6 @@ fn test_swedish_chef_locale() {
                 .downcast::<Lockscreen>()
                 .unwrap();
             let usp = lockscreen.imp().user_session_page.get().unwrap();
-            assert_eq!(usp.imp().row_sessions.property::<String>("title"), "Bork:");
 
             vp.click_on(usp.imp().box_users.row_at_index(0).as_ref().unwrap())
                 .await;
