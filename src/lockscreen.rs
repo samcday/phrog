@@ -189,7 +189,7 @@ mod imp {
             self.session.replace(user.clone());
             let username = user.unwrap();
             info!("creating greetd session for user {}", username);
-            self.obj().set_unlock_status("Please wait...");
+            self.obj().set_unlock_status("Please wait…");
             self.obj().set_sensitive(false);
             let mut req = Some(Request::CreateSession { username });
             while let Some(next_req) = req.take() {
@@ -286,7 +286,7 @@ mod imp {
                     }
                 }
                 Response::Success => {
-                    self.obj().set_unlock_status("Success. Logging in...");
+                    self.obj().set_unlock_status("Success. Logging in…");
                     self.start_session().await.unwrap();
                     g_message!("phrog", "launched session, exiting in {}ms", QUIT_DELAY);
                     Shell::default().fade_out(0);
@@ -330,7 +330,7 @@ mod imp {
     impl LockscreenImpl for Lockscreen {
         fn unlock_submit(&self) {
             glib::spawn_future_local(clone!(@weak self as this => async move {
-                this.obj().set_unlock_status("Please wait...");
+                this.obj().set_unlock_status("Please wait…");
                 this.obj().set_sensitive(false);
                 let mut req = Some(Request::PostAuthMessageResponse {
                     response: Some(this.obj().pin_entry().to_string())
