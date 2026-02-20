@@ -178,9 +178,7 @@ fn detect_available_locale() -> Option<String> {
     let output = match Command::new("locale").arg("-a").output() {
         Ok(output) => output,
         Err(err) => {
-            eprintln!(
-                "skipping swedish chef test: unable to run `locale -a`: {err}"
-            );
+            eprintln!("skipping swedish chef test: unable to run `locale -a`: {err}");
             return None;
         }
     };
