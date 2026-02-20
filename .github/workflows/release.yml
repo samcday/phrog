@@ -99,7 +99,8 @@ jobs:
     if: needs.gate.outputs.enabled == 'true'
     uses: ./.github/workflows/alpine.yml
     with:
-      release_mode: true
+      orchestrated: true
+      release_mode: ${{ needs.gate.outputs.mode == 'tag' }}
     secrets: inherit
 
   release-builds:
