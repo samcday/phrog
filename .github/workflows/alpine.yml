@@ -3,6 +3,11 @@ name: alpine
 on:
   workflow_call:
     inputs:
+      orchestrated:
+        description: Run from release orchestrator regardless of PR branch/labels
+        required: false
+        type: boolean
+        default: false
       release_mode:
         description: Prepare APKBUILD for tag release artifacts
         required: false
@@ -21,7 +26,7 @@ permissions:
 
 jobs:
   alpine:
-    if: inputs.release_mode || github.event_name != 'pull_request' || (contains(github.event.pull_request.labels.*.name, 'apk') && !startsWith(github.event.pull_request.head.ref || '', 'release/v'))
+    if: inputs.orchestrated || github.event_name != 'pull_request' || (contains(github.event.pull_request.labels.*.name, 'apk') && !startsWith(github.event.pull_request.head.ref || '', 'release/v'))
     runs-on: ubuntu-24.04${{ matrix.arch == 'aarch64' && '-arm' || '' }}
     strategy:
       fail-fast: false
