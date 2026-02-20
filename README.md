@@ -63,14 +63,10 @@ If you want to run it manually, you'll need to build from source (see below), an
 cargo install phrog
 ```
 
-If you're using [`cargo-binstall`](https://github.com/cargo-bins/cargo-binstall), this also works:
+[`cargo-binstall`](https://github.com/cargo-bins/cargo-binstall) is supported:
 
 ```sh
 cargo binstall phrog
-```
-
-`cargo-binstall` will use pre-built binaries when available and otherwise fall back to building from source.
-
 ## Development
 
 `libphosh` 0.45 is required to build this project.
