@@ -175,7 +175,25 @@ async fn wait_for_unlock_status(lockscreen: &Lockscreen, expected: &str, timeout
 }
 
 fn detect_available_locale() -> Option<String> {
-    let output = Command::new("locale").arg("-a").output().unwrap();
+    let output = match Command::new("locale").arg("-a").output() {
+        Ok(output) => output,
+        Err(err) => {
+            eprintln!(
+                "skipping swedish chef test: unable to run `locale -a`: {err}"
+            );
+            return None;
+        }
+    };
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        eprintln!(
+            "skipping swedish chef test: `locale -a` failed: {}",
+            stderr.trim()
+        );
+        return None;
+    }
+
     let locales = String::from_utf8_lossy(&output.stdout);
 
     for candidate in ["en_US.UTF-8", "en_US.utf8"] {

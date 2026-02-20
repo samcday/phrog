@@ -1,17 +1,16 @@
 name: build
 
 on:
+  workflow_call: {}
   push:
     branches: [main]
   pull_request_target:
     branches: [main]
     types: [labeled, opened, reopened, synchronize]
-  release:
-    types: [published]
   workflow_dispatch: {}
 
 concurrency:
-  group: ${{ github.workflow }}-${{  github.event.pull_request.head.sha }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.sha || github.sha }}
   cancel-in-progress: true
 
 env:
@@ -31,7 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{  github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: get CI image hash
         id: hash
         run: |
@@ -55,7 +54,7 @@ jobs:
           exit 1
       - uses: actions/checkout@v4
         with:
-          ref: ${{  github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Set up Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
       - name: Build
@@ -118,14 +117,6 @@ jobs:
         with:
           name: demo-video
           path: |
-            demo-video/demo.mp4
-            demo-video/demo.webp
-      - name: upload demo artifacts to release
-        uses: softprops/action-gh-release@v2
-        if: github.event_name == 'release'
-        with:
-          name: ${{ github.event.release.name }}
-          files: |
             demo-video/demo.mp4
             demo-video/demo.webp
       - run: |

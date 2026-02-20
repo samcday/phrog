@@ -1,24 +1,38 @@
 name: release-builds
 
 on:
+  workflow_call: {}
   workflow_dispatch: {}
-  release:
-    types: [published]
 
 permissions:
-  contents: write
+  contents: read
+  packages: read
 
 jobs:
+  image-hash:
+    runs-on: ubuntu-24.04
+    outputs:
+      hash: ${{ steps.hash.outputs.value }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: get CI image hash
+        id: hash
+        run: |
+          set -euo pipefail
+          echo "value=${{ hashFiles('.github/Dockerfile') }}" >> "$GITHUB_OUTPUT"
+
   release-gnu:
     name: release-gnu (${{ matrix.target }})
-    runs-on: ubuntu-24.04${{ matrix.arch == 'aarch64' && '-arm' || '' }}
+    needs: image-hash
+    runs-on: ubuntu-24.04
+    container: ghcr.io/samcday/phrog-ci:${{ needs.image-hash.outputs.hash }}
+    defaults:
+      run:
+        shell: bash
     strategy:
       matrix:
         include:
-          - arch: x86_64
-            target: x86_64-unknown-linux-gnu
-          - arch: aarch64
-            target: aarch64-unknown-linux-gnu
+          - target: x86_64-unknown-linux-gnu
     steps:
       - uses: actions/checkout@v4
       - name: Install Rust
@@ -26,7 +40,7 @@ jobs:
       - name: Build
         run: |
           set -euo pipefail
-          cargo build --release
+          cargo build --release --locked
       - name: Create archive
         run: |
           set -euo pipefail
@@ -36,9 +50,3 @@ jobs:
         with:
           name: release-${{ matrix.target }}
           path: dist/phrog-${{ matrix.target }}.tar.gz
-      - name: Upload binary archive to release
-        if: github.event_name == 'release'
-        uses: softprops/action-gh-release@v2
-        with:
-          name: ${{ github.event.release.name }}
-          files: dist/phrog-${{ matrix.target }}.tar.gz

@@ -1,24 +1,30 @@
 name: alpine
 
 on:
+  workflow_call:
+    inputs:
+      release_mode:
+        description: Prepare APKBUILD for tag release artifacts
+        required: false
+        type: boolean
+        default: false
   workflow_dispatch: {}
   pull_request:
     types: [opened, synchronize, reopened, labeled]
-  release:
-    types: [published]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   alpine:
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'apk')
     runs-on: ubuntu-24.04${{ matrix.arch == 'aarch64' && '-arm' || '' }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - arch: x86_64
@@ -46,11 +52,11 @@ jobs:
           abuild -F deps
         shell: alpine.sh --root {0}
       - name: update sha
-        if: github.event_name != 'release'
+        if: ${{ github.event_name != 'workflow_call' || !inputs.release_mode }}
         run: |
           sed -i -e "s/^_gitrev=main$/_gitrev=$GITHUB_SHA/" APKBUILD
       - name: release prep
-        if: github.event_name == 'release'
+        if: ${{ github.event_name == 'workflow_call' && inputs.release_mode }}
         run: |
           # Remove _git suffix to indicate the stable release.
           # Assumes that the base (unsuffixed) pkgver was already updated to the new version in release commit.
@@ -88,24 +94,3 @@ jobs:
         with:
           name: release-${{ matrix.target }}
           path: ${{ steps.alpine.outputs.root-path }}/dist/phrog-${{ matrix.target }}.tar.gz
-      - name: upload .apk artifacts to release
-        uses: softprops/action-gh-release@v2
-        if: github.event_name == 'release'
-        with:
-          name: ${{ github.event.release.name }}
-          files: |
-            ${{ steps.alpine.outputs.root-path }}/packages/phrog/${{ matrix.arch }}/*.apk
-      - name: upload APKBUILD artifact to release
-        uses: softprops/action-gh-release@v2
-        if: github.event_name == 'release' && matrix.arch == 'x86_64'
-        with:
-          name: ${{ github.event.release.name }}
-          files: |
-            ${{ steps.alpine.outputs.root-path }}/packages/APKBUILD
-      - name: upload musl archive to release
-        uses: softprops/action-gh-release@v2
-        if: github.event_name == 'release'
-        with:
-          name: ${{ github.event.release.name }}
-          files: |
-            ${{ steps.alpine.outputs.root-path }}/dist/phrog-${{ matrix.target }}.tar.gz
