@@ -3,6 +3,9 @@ Build order:
  * rust-glib-sys0.18
  * rust-gobject-sys0.18
  * rust-gio-sys0.18
+ * rust-toml-datetime0.6
+ * rust-toml-edit0.20
+ * rust-proc-macro-crate2
  * rust-glib-macros0.18
  * rust-glib0.18
  * rust-pango-sys0.18
@@ -17,6 +20,7 @@ Build order:
  * rust-pango0.18
  * rust-atk
  * rust-cairo-rs0.18
+ * rust-proc-macro-crate1
  * rust-gtk3-macros
  * rust-gdk
  * rust-gtk

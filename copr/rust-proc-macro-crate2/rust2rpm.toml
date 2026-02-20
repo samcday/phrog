@@ -1,0 +1,3 @@
+[tests]
+run = ["none"]
+comments = ["avoid pulling test-only dependency stack"]
