@@ -90,6 +90,8 @@ jobs:
     needs: [gate, release]
     if: needs.gate.outputs.enabled == 'true'
     uses: ./.github/workflows/build.yml
+    with:
+      release_mode: true
     secrets: inherit
 
   alpine:
