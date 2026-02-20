@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   alpine:
-    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'apk')
+    if: github.event_name != 'pull_request' || (contains(github.event.pull_request.labels.*.name, 'apk') && !startsWith(github.event.pull_request.head.ref || '', 'release/v'))
     runs-on: ubuntu-24.04${{ matrix.arch == 'aarch64' && '-arm' || '' }}
     strategy:
       fail-fast: false
@@ -79,7 +79,20 @@ jobs:
           set -euo pipefail
           cargo build --release --locked --target "${{ matrix.target }}"
           mkdir -p dist
-          tar -C "target/${{ matrix.target }}/release" -czf "dist/phrog-${{ matrix.target }}.tar.gz" phrog
+
+          bin_path="target/${{ matrix.target }}/release/phrog"
+          if [ ! -f "$bin_path" ]; then
+            fallback_path="target/release/phrog"
+            if [ -f "$fallback_path" ]; then
+              bin_path="$fallback_path"
+            else
+              echo "Unable to find phrog binary in target output"
+              ls -R target || true
+              exit 1
+            fi
+          fi
+
+          tar -C "$(dirname "$bin_path")" -czf "dist/phrog-${{ matrix.target }}.tar.gz" "$(basename "$bin_path")"
         shell: alpine.sh --root {0}
       - uses: actions/upload-artifact@v4
         if: matrix.arch == 'x86_64'
