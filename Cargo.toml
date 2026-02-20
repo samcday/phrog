@@ -18,6 +18,7 @@ async-global-executor = "3.0.0"
 futures-util = "0.3.30"
 log = "0.4.22"
 lazy_static = "^1.4"
+gettext-rs = "0.7"
 
 [dependencies.glib]
 version = "0.18"

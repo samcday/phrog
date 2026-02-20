@@ -50,6 +50,7 @@ mod imp {
     use crate::shell::Shell;
     use crate::user::User;
     use crate::APP_ID;
+    use crate::TEXT_DOMAIN;
     use futures_util::select;
     use futures_util::StreamExt;
     use glib::subclass::InitializingObject;
@@ -105,6 +106,9 @@ mod imp {
             let settings = Settings::new(APP_ID);
             let shell = Shell::default();
             let conn = shell.imp().dbus_connection.clone().into_inner().unwrap();
+
+            let session_title = gettextrs::dgettext(TEXT_DOMAIN, "Session");
+            self.row_sessions.set_title(Some(session_title.as_str()));
 
             self.box_users
                 .connect_row_activated(clone!(@weak self as this => move |_, _| {
