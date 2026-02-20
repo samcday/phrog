@@ -26,3 +26,15 @@ jobs:
           generate_release_notes: true
           prerelease: ${{ steps.prerelease.outputs.prerelease }}
           token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+
+  publish-crate:
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish phrog to crates.io
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+          cargo publish --locked --no-verify

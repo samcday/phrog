@@ -20,9 +20,11 @@ jobs:
     runs-on: ubuntu-24.04${{ matrix.arch == 'aarch64' && '-arm' || '' }}
     strategy:
       matrix:
-        arch:
-          - x86_64
-          - aarch64
+        include:
+          - arch: x86_64
+            target: x86_64-unknown-linux-musl
+          - arch: aarch64
+            target: aarch64-unknown-linux-musl
     steps:
       - uses: actions/checkout@v4
       # Using fork (aarch64 branch from bgilbert/setup-alpine) until jirutka/setup-alpine#11 is resolved
@@ -31,7 +33,7 @@ jobs:
         with:
           arch: ${{ matrix.arch }}
           branch: edge
-          packages: alpine-sdk
+          packages: alpine-sdk rust cargo
       - name: setup
         env:
           RSA_PRIV: ${{ secrets.RSA_PRIVATE_KEY }}
@@ -66,6 +68,13 @@ jobs:
             mv $f ${f%.apk}-${{ matrix.arch }}.apk
           done
         shell: alpine.sh --root {0}
+      - name: build musl binary
+        run: |
+          set -euo pipefail
+          cargo build --release
+          mkdir -p dist
+          tar -C target/release -czf "dist/phrog-${{ matrix.target }}.tar.gz" phrog
+        shell: alpine.sh --root {0}
       - uses: actions/upload-artifact@v4
         if: matrix.arch == 'x86_64'
         with:
@@ -75,6 +84,10 @@ jobs:
         with:
           name: packages-${{ matrix.arch }}
           path: ${{ steps.alpine.outputs.root-path }}/packages/phrog/${{ matrix.arch }}/*.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.target }}
+          path: ${{ steps.alpine.outputs.root-path }}/dist/phrog-${{ matrix.target }}.tar.gz
       - name: upload .apk artifacts to release
         uses: softprops/action-gh-release@v2
         if: github.event_name == 'release'
@@ -89,3 +102,10 @@ jobs:
           name: ${{ github.event.release.name }}
           files: |
             ${{ steps.alpine.outputs.root-path }}/packages/APKBUILD
+      - name: upload musl archive to release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'release'
+        with:
+          name: ${{ github.event.release.name }}
+          files: |
+            ${{ steps.alpine.outputs.root-path }}/dist/phrog-${{ matrix.target }}.tar.gz

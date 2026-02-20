@@ -43,3 +43,8 @@ wayland-protocols-misc = { version = "0.3", features = ["client"] }
 wayland-protocols-wlr = { version = "0.3", features = ["client"] }
 tempfile = "3"
 serde = "1.0.217"
+
+[package.metadata.binstall]
+bin-dir = "{ bin }{ binary-ext }"
+pkg-url = "{ repo }/releases/download/{ version }/{ name }-{ target }.tar.gz"
+pkg-fmt = "tgz"
