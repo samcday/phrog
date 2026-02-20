@@ -1,7 +1,13 @@
 name: build
 
 on:
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      release_mode:
+        description: Run via release orchestrator
+        required: false
+        type: boolean
+        default: false
   push:
     branches: [main]
   pull_request_target:
@@ -24,7 +30,7 @@ permissions:
 
 jobs:
   image-hash:
-    if: github.event_name != 'pull_request_target' || !startsWith(github.event.pull_request.head.ref || '', 'release/v')
+    if: inputs.release_mode || github.event_name != 'pull_request_target' || !startsWith(github.event.pull_request.head.ref || '', 'release/v')
     runs-on: ubuntu-24.04
     outputs:
       hash: ${{ steps.hash.outputs.value }}
@@ -38,7 +44,7 @@ jobs:
           set -uexo pipefail
           echo "value=${{ hashFiles('.github/Dockerfile') }}" >> $GITHUB_OUTPUT
   build:
-    if: github.event_name != 'pull_request_target' || !startsWith(github.event.pull_request.head.ref || '', 'release/v')
+    if: inputs.release_mode || github.event_name != 'pull_request_target' || !startsWith(github.event.pull_request.head.ref || '', 'release/v')
     needs: image-hash
     runs-on: ubuntu-24.04
     container: ghcr.io/samcday/phrog-ci:${{ needs.image-hash.outputs.hash }}
@@ -94,7 +100,7 @@ jobs:
           name: test-recordings
           path: demo-video/recordings
   demo:
-    if: (github.event_name != 'pull_request_target' || !startsWith(github.event.pull_request.head.ref || '', 'release/v')) && (github.event_name != 'pull_request_target' || contains(github.event.pull_request.labels.*.name, 'demo'))
+    if: inputs.release_mode || ((github.event_name != 'pull_request_target' || !startsWith(github.event.pull_request.head.ref || '', 'release/v')) && (github.event_name != 'pull_request_target' || contains(github.event.pull_request.labels.*.name, 'demo')))
     needs: build
     runs-on: ubuntu-24.04
     steps:

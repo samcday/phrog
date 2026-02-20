@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   alpine:
-    if: github.event_name != 'pull_request' || (contains(github.event.pull_request.labels.*.name, 'apk') && !startsWith(github.event.pull_request.head.ref || '', 'release/v'))
+    if: inputs.release_mode || github.event_name != 'pull_request' || (contains(github.event.pull_request.labels.*.name, 'apk') && !startsWith(github.event.pull_request.head.ref || '', 'release/v'))
     runs-on: ubuntu-24.04${{ matrix.arch == 'aarch64' && '-arm' || '' }}
     strategy:
       fail-fast: false
@@ -52,11 +52,11 @@ jobs:
           abuild -F deps
         shell: alpine.sh --root {0}
       - name: update sha
-        if: ${{ github.event_name != 'workflow_call' || !inputs.release_mode }}
+        if: ${{ !inputs.release_mode }}
         run: |
           sed -i -e "s/^_gitrev=main$/_gitrev=$GITHUB_SHA/" APKBUILD
       - name: release prep
-        if: ${{ github.event_name == 'workflow_call' && inputs.release_mode }}
+        if: ${{ inputs.release_mode }}
         run: |
           # Remove _git suffix to indicate the stable release.
           # Assumes that the base (unsuffixed) pkgver was already updated to the new version in release commit.
@@ -77,6 +77,7 @@ jobs:
       - name: build musl binary
         run: |
           set -euo pipefail
+          export CARGO_TARGET_DIR="$(pwd)/target"
           cargo build --release --locked --target "${{ matrix.target }}"
           mkdir -p dist
 
