@@ -67,6 +67,8 @@ cargo install phrog
 
 ```sh
 cargo binstall phrog
+```
+
 ## Development
 
 `libphosh` 0.45 is required to build this project.

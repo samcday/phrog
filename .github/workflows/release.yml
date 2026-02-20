@@ -20,22 +20,11 @@ jobs:
           cat > body.md <<HERE
           <img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/${GITHUB_REF_NAME}/demo.webp">
           HERE
-      - name: Build release archive
-        run: |
-          set -euo pipefail
-          rustup toolchain install stable --profile minimal
-          rustup default stable
-          cargo build --release
-
-          mkdir -p dist/
-          tar -C target/release -czf "dist/phrog-x86_64-unknown-linux-gnu.tar.gz" phrog
       - uses: softprops/action-gh-release@v2
         with:
           body_path: body.md
           generate_release_notes: true
           prerelease: ${{ steps.prerelease.outputs.prerelease }}
-          files: |
-            dist/phrog-x86_64-unknown-linux-gnu.tar.gz
           token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
 
   publish-crate:
