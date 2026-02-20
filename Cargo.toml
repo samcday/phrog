@@ -1,8 +1,11 @@
 [package]
 name = "phrog"
+description = "Mobile-friendly greeter for greetd"
 version = "0.53.0-rc.2"
 edition = "2021"
 license = "GPL-3.0-only"
+exclude = ["/demo-video"]
+repository = "https://github.com/samcday/phrog"
 
 [dependencies]
 glob = "0.3.1"
