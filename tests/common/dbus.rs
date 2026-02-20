@@ -65,7 +65,7 @@ struct UserFixture {
 
 #[zbus::interface(name = "org.freedesktop.Accounts")]
 impl AccountsFixture {
-    async fn list_cached_users(&self) -> Vec<ObjectPath> {
+    async fn list_cached_users(&self) -> Vec<ObjectPath<'_>> {
         let mut users = vec![
             ObjectPath::from_static_str_unchecked("/org/freedesktop/Accounts/phoshi"),
             ObjectPath::from_static_str_unchecked("/org/freedesktop/Accounts/agx"),
