@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'debs')
+    if: github.event_name != 'pull_request' || (contains(github.event.pull_request.labels.*.name, 'debs') && !startsWith(github.event.pull_request.head.ref || '', 'release/v'))
     name: Build unstable .debs
     runs-on: ${{ matrix.runner }}
     container: debian:unstable
