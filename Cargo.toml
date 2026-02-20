@@ -45,5 +45,5 @@ serde = "1.0.217"
 
 [package.metadata.binstall]
 bin-dir = "{ bin }{ binary-ext }"
-pkg-url = "{ repo }/releases/download/v{ version }/{ name }-{ target }.tar.gz"
+pkg-url = "{ repo }/releases/download/{ version }/{ name }-{ target }.tar.gz"
 pkg-fmt = "tgz"
