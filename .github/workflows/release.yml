@@ -3,28 +3,77 @@ name: Create release from tag
 on:
   push:
     tags: ['*']
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
   packages: read
 
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.detect.outputs.enabled }}
+      mode: ${{ steps.detect.outputs.mode }}
+      prerelease: ${{ steps.detect.outputs.prerelease }}
+    steps:
+      - id: detect
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          HEAD_REF: ${{ github.head_ref || '' }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name || '' }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          enabled=false
+          mode=none
+          prerelease=false
+          ref_name=""
+
+          if [[ "$EVENT_NAME" == "push" ]]; then
+            enabled=true
+            mode=tag
+            ref_name="$REF_NAME"
+          elif [[ "$EVENT_NAME" == "pull_request" ]] \
+            && [[ "$HEAD_REPO" == "$REPOSITORY" ]] \
+            && [[ "$HEAD_REF" =~ ^release/v[0-9]+\.[0-9]+\.[0-9]+(_rc[0-9]+)?$ ]]; then
+            enabled=true
+            mode=pr
+            ref_name="$HEAD_REF"
+          fi
+
+          if [[ -n "$ref_name" && "$ref_name" =~ _rc[0-9]+$ ]]; then
+            prerelease=true
+          fi
+
+          echo "enabled=$enabled" >> "$GITHUB_OUTPUT"
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+
   release:
+    needs: gate
+    if: needs.gate.outputs.enabled == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - id: prerelease
         run: |
-          if [[ "${GITHUB_REF_NAME}" =~ _rc[0-9]+$ ]]; then
+          if [[ "${{ needs.gate.outputs.prerelease }}" == 'true' ]]; then
             echo "prerelease=true" >> "$GITHUB_OUTPUT"
           else
             echo "prerelease=false" >> "$GITHUB_OUTPUT"
           fi
-      - run: |
+      - if: needs.gate.outputs.mode == 'tag'
+        run: |
           cat > body.md <<HERE
           <img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/${GITHUB_REF_NAME}/demo.webp">
           HERE
-      - uses: softprops/action-gh-release@v2
+      - if: needs.gate.outputs.mode == 'tag'
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           body_path: body.md
@@ -32,26 +81,33 @@ jobs:
           prerelease: ${{ steps.prerelease.outputs.prerelease }}
           draft: true
           token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+      - if: needs.gate.outputs.mode == 'pr'
+        run: |
+          echo "release/v* PR mode: skipping draft creation"
 
   build:
-    needs: release
+    needs: [gate, release]
+    if: needs.gate.outputs.enabled == 'true'
     uses: ./.github/workflows/build.yml
     secrets: inherit
 
   alpine:
-    needs: release
+    needs: [gate, release]
+    if: needs.gate.outputs.enabled == 'true'
     uses: ./.github/workflows/alpine.yml
     with:
       release_mode: true
     secrets: inherit
 
   release-builds:
-    needs: release
+    needs: [gate, release]
+    if: needs.gate.outputs.enabled == 'true'
     uses: ./.github/workflows/release-builds.yml
     secrets: inherit
 
   publish-assets:
-    needs: [build, alpine, release-builds]
+    needs: [gate, build, alpine, release-builds]
+    if: needs.gate.outputs.enabled == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -72,7 +128,8 @@ jobs:
           pattern: release-*
           path: dist/
           merge-multiple: true
-      - name: Upload artifacts to release
+      - if: needs.gate.outputs.mode == 'tag'
+        name: Upload artifacts to release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
@@ -83,13 +140,29 @@ jobs:
             packages/APKBUILD
             packages/*.apk
             dist/*.tar.gz
+      - if: needs.gate.outputs.mode == 'pr'
+        name: Verify staged release artifacts
+        run: |
+          set -euo pipefail
+          test -f demo-video/demo.mp4
+          test -f demo-video/demo.webp
+          test -f packages/APKBUILD
+          compgen -G 'packages/*.apk' >/dev/null
+          compgen -G 'dist/*.tar.gz' >/dev/null
 
   publish-crate:
     runs-on: ubuntu-latest
-    needs: release
+    needs: [gate, release]
+    if: needs.gate.outputs.enabled == 'true'
     steps:
       - uses: actions/checkout@v4
-      - name: Publish phrog to crates.io
+      - if: needs.gate.outputs.mode == 'pr'
+        name: Validate crate publish (dry-run)
+        run: |
+          set -euo pipefail
+          cargo publish --locked --no-verify --dry-run
+      - if: needs.gate.outputs.mode == 'tag'
+        name: Publish phrog to crates.io
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: |
@@ -98,17 +171,17 @@ jobs:
 
   pass:
     name: ✅ Pass
-    needs: [build, alpine, release-builds, publish-assets, publish-crate]
+    needs: [gate, build, alpine, release-builds, publish-assets, publish-crate]
     runs-on: ubuntu-latest
-    if: always()
+    if: always() && needs.gate.outputs.enabled == 'true'
     steps:
       - uses: re-actors/alls-green@release/v1
         with:
           jobs: ${{ toJSON(needs) }}
 
   publish-release:
-    needs: [pass]
-    if: needs.pass.result == 'success'
+    needs: [gate, pass]
+    if: needs.gate.outputs.mode == 'tag' && needs.pass.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Publish draft release
