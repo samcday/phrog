@@ -56,6 +56,10 @@ jobs:
           gh pr create \
             --title "v${version}" \
             --body "Automated bump for v${version}." \
+            --label ci-ok \
+            --label apk \
+            --label debs \
+            --label demo \
             --base "${{ github.event.repository.default_branch }}"
 
       - name: Create rc bump PR
@@ -74,4 +78,8 @@ jobs:
           gh pr create \
             --title "v${version}" \
             --body "Automated bump for v${version}." \
+            --label ci-ok \
+            --label apk \
+            --label debs \
+            --label demo \
             --base "${{ github.event.repository.default_branch }}"
