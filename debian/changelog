@@ -1,3 +1,9 @@
+phrog (0.53.0~rc2-1) unstable; urgency=medium
+
+  * Release 0.53.0_rc2
+
+ -- Phrogbot <phrog@beep.boop>  Thu, 12 Feb 2026 01:33:27 +0000
+
 phrog (0.53.0~rc1-1) unstable; urgency=medium
 
   * Release 0.53.0_rc1
