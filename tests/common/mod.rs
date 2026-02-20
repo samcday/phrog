@@ -95,6 +95,10 @@ pub struct TestOptions {
     pub last_user: Option<String>,
     pub last_session: Option<String>,
     pub first_run: Option<String>,
+    pub fake_greetd: Option<bool>,
+    pub locale_dir: Option<PathBuf>,
+    pub locale: Option<String>,
+    pub language: Option<String>,
 }
 
 pub fn test_init(options: Option<TestOptions>) -> Test {
@@ -151,21 +155,39 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
     let logged_in = Arc::new(AtomicBool::new(false));
     fake_greetd(&logged_in);
 
-    let mut shell_builder = Object::builder();
+    let locale_dir = options
+        .as_ref()
+        .and_then(|opts| opts.locale_dir.as_deref())
+        .unwrap_or_else(|| std::path::Path::new(phrog::LOCALEDIR))
+        .display()
+        .to_string();
+    let mut shell_builder = Object::builder().property("locale-dir", locale_dir);
 
     let sessions_store = ListStore::new::<SessionObject>();
-    sessions_store.extend_from_slice(&options.and_then(|opts| opts.sessions.clone()).unwrap_or(
-        vec![
-            SessionObject::new("gnome", "GNOME", "", "", ""),
-            SessionObject::new("phosh", "Phosh", "", "", ""),
-        ],
-    ));
+    sessions_store.extend_from_slice(
+        &options
+            .as_ref()
+            .and_then(|opts| opts.sessions.clone())
+            .unwrap_or(vec![
+                SessionObject::new("gnome", "GNOME", "", "", ""),
+                SessionObject::new("phosh", "Phosh", "", "", ""),
+            ]),
+    );
     shell_builder = shell_builder.property("sessions", sessions_store);
+    if let Some(fake_greetd) = options.as_ref().and_then(|opts| opts.fake_greetd) {
+        shell_builder = shell_builder.property("fake-greetd", fake_greetd);
+    }
+    if let Some(locale) = options.as_ref().and_then(|opts| opts.locale.as_ref()) {
+        shell_builder = shell_builder.property("locale", locale);
+    }
+    if let Some(language) = options.as_ref().and_then(|opts| opts.language.as_ref()) {
+        shell_builder = shell_builder.property("language", language);
+    }
 
-    let wall_clock = WallClock::new();
-    wall_clock.set_default();
     let shell: Shell = shell_builder.build();
     shell.set_default();
+    let wall_clock = WallClock::new();
+    wall_clock.set_default();
 
     let ready_called = Arc::new(AtomicBool::new(false));
     let ready_called2 = ready_called.clone();

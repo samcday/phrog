@@ -55,6 +55,20 @@ Want to use phrog on another distro? [Please get in touch.](#getting-help)
 
 If you want to run it manually, you'll need to build from source (see below), and then take a look at the existing packaging to understand how to wire up the necessary bits to spawn a functional greeter session under greetd.
 
+### crates.io / cargo-install
+
+`phrog` is also published on crates.io, so you can install it directly with Cargo:
+
+```sh
+cargo install phrog
+```
+
+[`cargo-binstall`](https://github.com/cargo-bins/cargo-binstall) is supported:
+
+```sh
+cargo binstall phrog
+```
+
 ## Development
 
 `libphosh` 0.45 is required to build this project.

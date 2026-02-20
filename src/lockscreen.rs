@@ -4,6 +4,8 @@ use greetd_ipc::ErrorType::AuthError;
 use greetd_ipc::{Request, Response};
 use gtk::glib;
 
+use crate::TEXT_DOMAIN;
+
 static G_LOG_DOMAIN: &str = "phrog-lockscreen";
 
 glib::wrapper! {
@@ -24,7 +26,7 @@ impl Default for Lockscreen {
 }
 
 mod imp {
-    use super::G_LOG_DOMAIN;
+    use super::{tr, G_LOG_DOMAIN};
     use crate::lockscreen::fake_greetd_interaction;
     use crate::shell::Shell;
     use crate::user_session_page::UserSessionPage;
@@ -189,7 +191,7 @@ mod imp {
             self.session.replace(user.clone());
             let username = user.unwrap();
             info!("creating greetd session for user {}", username);
-            self.obj().set_unlock_status("Please wait...");
+            self.obj().set_unlock_status("Please wait…");
             self.obj().set_sensitive(false);
             let mut req = Some(Request::CreateSession { username });
             while let Some(next_req) = req.take() {
@@ -248,7 +250,7 @@ mod imp {
 
             if let Err(err) = resp {
                 error!("failed to send greetd request: {:?}", err);
-                self.obj().set_unlock_status("Error, please try again");
+                self.obj().set_unlock_status(&tr("Error, please try again"));
                 self.obj().set_sensitive(true);
                 return None;
             }
@@ -286,7 +288,7 @@ mod imp {
                     }
                 }
                 Response::Success => {
-                    self.obj().set_unlock_status("Success. Logging in...");
+                    self.obj().set_unlock_status("Success. Logging in…");
                     self.start_session().await.unwrap();
                     g_message!("phrog", "launched session, exiting in {}ms", QUIT_DELAY);
                     Shell::default().fade_out(0);
@@ -301,7 +303,7 @@ mod imp {
                 } => {
                     warn!("auth error: '{}'", description);
                     self.obj()
-                        .set_unlock_status("Login failed, please try again");
+                        .set_unlock_status(&tr("Login failed, please try again"));
                     self.obj().shake_pin_entry();
                     // Greetd IPC dox seem to suggest that this isn't necessary, but then agreety
                     // does this, and if we don't we get a "session is already being configured"
@@ -330,7 +332,7 @@ mod imp {
     impl LockscreenImpl for Lockscreen {
         fn unlock_submit(&self) {
             glib::spawn_future_local(clone!(@weak self as this => async move {
-                this.obj().set_unlock_status("Please wait...");
+                this.obj().set_unlock_status("Please wait…");
                 this.obj().set_sensitive(false);
                 let mut req = Some(Request::PostAuthMessageResponse {
                     response: Some(this.obj().pin_entry().to_string())
@@ -344,17 +346,21 @@ mod imp {
     }
 }
 
+fn tr(msgid: &str) -> String {
+    gettextrs::dgettext(TEXT_DOMAIN, msgid)
+}
+
 fn fake_greetd_interaction(req: Request) -> anyhow::Result<Response> {
     match req {
         Request::CreateSession { .. } => anyhow::Ok(Response::AuthMessage {
             auth_message_type: Secret,
-            auth_message: "Password:".into(),
+            auth_message: tr("Password:"),
         }),
         Request::PostAuthMessageResponse { response } => {
             if response.is_none() || response.unwrap() != "0" {
                 anyhow::Ok(Response::Error {
                     error_type: AuthError,
-                    description: String::from("Incorrect password (hint: it's '0')"),
+                    description: tr("Incorrect password (hint: it's '0')"),
                 })
             } else {
                 anyhow::Ok(Response::Success)

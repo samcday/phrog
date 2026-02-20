@@ -5,6 +5,7 @@ use libphosh::prelude::*;
 use libphosh::WallClock;
 use nix::libc::SIGTERM;
 use phrog::shell::Shell;
+use phrog::LOCALEDIR;
 
 static G_LOG_DOMAIN: &str = "phrog";
 
@@ -40,6 +41,7 @@ fn main() -> anyhow::Result<()> {
 
     let shell: Shell = Object::builder()
         .property("fake-greetd", args.fake)
+        .property("locale-dir", LOCALEDIR)
         .property("overview-visible", false)
         .build();
     shell.set_default();
