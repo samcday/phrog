@@ -103,6 +103,14 @@ jobs:
       release_mode: ${{ needs.gate.outputs.mode == 'tag' }}
     secrets: inherit
 
+  debian:
+    needs: [gate, release]
+    if: needs.gate.outputs.enabled == 'true'
+    uses: ./.github/workflows/debian-unstable.yml
+    with:
+      orchestrated: true
+    secrets: inherit
+
   release-builds:
     needs: [gate, release]
     if: needs.gate.outputs.enabled == 'true'
@@ -110,7 +118,7 @@ jobs:
     secrets: inherit
 
   publish-assets:
-    needs: [gate, build, alpine, release-builds]
+    needs: [gate, build, alpine, debian, release-builds]
     if: needs.gate.outputs.enabled == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -129,6 +137,11 @@ jobs:
           merge-multiple: true
       - uses: actions/download-artifact@v4
         with:
+          pattern: debs-*
+          path: debs/
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
           pattern: release-*
           path: dist/
           merge-multiple: true
@@ -143,6 +156,7 @@ jobs:
             demo-video/demo.webp
             packages/APKBUILD
             packages/*.apk
+            debs/*.deb
             dist/*.tar.gz
       - if: needs.gate.outputs.mode == 'pr'
         name: Verify staged release artifacts
@@ -152,6 +166,7 @@ jobs:
           test -f demo-video/demo.webp
           test -f packages/APKBUILD
           compgen -G 'packages/*.apk' >/dev/null
+          compgen -G 'debs/*.deb' >/dev/null
           compgen -G 'dist/*.tar.gz' >/dev/null
 
   publish-crate:
@@ -175,7 +190,7 @@ jobs:
 
   pass:
     name: ✅ Pass
-    needs: [gate, build, alpine, release-builds, publish-assets, publish-crate]
+    needs: [gate, build, alpine, debian, release-builds, publish-assets, publish-crate]
     runs-on: ubuntu-latest
     if: always() && needs.gate.outputs.enabled == 'true'
     steps:
