@@ -41,13 +41,13 @@ jobs:
             ref_name="$REF_NAME"
           elif [[ "$EVENT_NAME" == "pull_request" ]] \
             && [[ "$HEAD_REPO" == "$REPOSITORY" ]] \
-            && [[ "$HEAD_REF" =~ ^release/v[0-9]+\.[0-9]+\.[0-9]+(_rc[0-9]+)?$ ]]; then
+            && [[ "$HEAD_REF" =~ ^release/v[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$ ]]; then
             enabled=true
             mode=pr
             ref_name="$HEAD_REF"
           fi
 
-          if [[ -n "$ref_name" && "$ref_name" =~ _rc[0-9]+$ ]]; then
+          if [[ -n "$ref_name" && "$ref_name" =~ -rc\.[0-9]+$ ]]; then
             prerelease=true
           fi
 

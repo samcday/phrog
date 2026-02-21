@@ -7,10 +7,21 @@ bump version:
 
     version="{{version}}"
     cargo_version="$version"
+    package_version="$version"
     debian_version="$version"
+    is_rc=false
+
     if [[ "$version" =~ _rc([0-9]+)$ ]]; then
-        cargo_version="${version/_rc/-rc.}"
-        debian_version="${version/_rc/~rc}"
+        echo "Unsupported RC format '$version'. Use canonical semver '-rc.N' (for example: 1.2.3-rc.1)."
+        exit 1
+    fi
+
+    if [[ "$version" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-rc\.([0-9]+)$ ]]; then
+        base="${BASH_REMATCH[1]}"
+        rc="${BASH_REMATCH[2]}"
+        package_version="${base}_rc${rc}"
+        debian_version="${base}~rc${rc}"
+        is_rc=true
     fi
 
     echo "Bumping phrog to $version"
@@ -38,17 +49,17 @@ bump version:
     PY
 
     # RPM spec
-    sed -i 's/^Version:        .*/Version:        {{version}}/' phrog.spec
+    sed -i "s/^Version:        .*/Version:        ${package_version}/" phrog.spec
 
     # Alpine APKBUILD (set base version, keep _git suffix for dev builds)
-    sed -i 's/^pkgver=.*_git$/pkgver={{version}}_git/' APKBUILD
+    sed -i "s/^pkgver=.*_git$/pkgver=${package_version}_git/" APKBUILD
 
     # Debian changelog (add new entry)
     DEBEMAIL="phrog@beep.boop" DEBFULLNAME="Phrogbot" \
         dch --newversion "${debian_version}-1" --distribution unstable --urgency medium \
         "Release ${version}"
 
-    if [[ ! "$version" =~ _rc[0-9]+$ ]]; then
+    if [[ "$is_rc" != "true" ]]; then
         # README demo video URL (skip for RCs)
         sed -i "s|releases/download/[^/]\+/demo.webp|releases/download/{{version}}/demo.webp|" README.md
     fi
@@ -61,7 +72,7 @@ bump version:
     echo "  phrog.spec"
     echo "  APKBUILD"
     echo "  debian/changelog"
-    if [[ ! "$version" =~ _rc[0-9]+$ ]]; then
+    if [[ "$is_rc" != "true" ]]; then
         echo "  README.md"
     fi
     echo "  Cargo.lock"

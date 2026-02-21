@@ -1,45 +1,102 @@
-name: Open next rc PR on merge
+name: Release follow-ups
 
 on:
   pull_request:
     types: [closed]
+  release:
+    types: [published]
 
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
-  next-rc:
-    if: github.event.pull_request.merged == true
+  tag-release-pr:
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.event.pull_request.head.ref, 'release/v')
     runs-on: ubuntu-latest
     steps:
+      - name: Parse tag from release branch
+        id: parse
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          version="${HEAD_REF#release/v}"
+
+          if [[ "$version" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-rc\.([0-9]+)$ ]]; then
+            tag="${BASH_REMATCH[1]}-rc.${BASH_REMATCH[2]}"
+          elif [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            tag="$version"
+          else
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push tag
+        if: steps.parse.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN || github.token }}
+          TAG: ${{ steps.parse.outputs.tag }}
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "$MERGE_SHA" ]]; then
+            echo "No merge commit sha found; skipping"
+            exit 0
+          fi
+
+          if gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}" >/dev/null 2>&1; then
+            echo "Tag ${TAG} already exists; nothing to do"
+            exit 0
+          fi
+
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/git/refs" \
+            -f ref="refs/tags/${TAG}" \
+            -f sha="$MERGE_SHA" >/dev/null
+
+  next-rc:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Parse rc version from published tag
+        id: parse
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$TAG" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-rc\.([0-9]+)$ ]]; then
+            base="${BASH_REMATCH[1]}"
+            rc="${BASH_REMATCH[2]}"
+            next_rc=$((rc + 1))
+            echo "version=${base}-rc.${next_rc}" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.parse.outputs.skip != 'true'
+        with:
+          ref: ${{ github.event.repository.default_branch }}
 
       - uses: taiki-e/install-action@just
+        if: steps.parse.outputs.skip != 'true'
 
       - name: install deps
+        if: steps.parse.outputs.skip != 'true'
         run: |
           export DEBIAN_FRONTEND=noninteractive
           sudo apt-get update
           sudo apt-get -y install devscripts
 
       - name: Configure git
+        if: steps.parse.outputs.skip != 'true'
         run: |
           git config user.name "Phrogbot"
           git config user.email "phrog@beep.boop"
-
-      - name: Parse rc version
-        id: parse
-        run: |
-          ref="${{ github.event.pull_request.head.ref }}"
-          if [[ "$ref" =~ ^release/v([0-9]+\.[0-9]+\.[0-9]+)_rc([0-9]+)$ ]]; then
-            base="${BASH_REMATCH[1]}"
-            rc="${BASH_REMATCH[2]}"
-            next_rc=$((rc + 1))
-            echo "version=${base}_rc${next_rc}" >> "$GITHUB_OUTPUT"
-          else
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          fi
 
       - name: Create next rc PR
         if: steps.parse.outputs.skip != 'true'
@@ -48,6 +105,12 @@ jobs:
         run: |
           version="${{ steps.parse.outputs.version }}"
           branch="release/v${version}"
+
+          if [[ -n "$(git ls-remote --heads origin "$branch")" ]]; then
+            echo "Branch $branch already exists; skipping"
+            exit 0
+          fi
+
           git checkout -b "$branch"
           just bump "$version"
           git add -A
