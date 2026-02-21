@@ -18,7 +18,7 @@ on:
     types: [opened, synchronize, reopened, labeled]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: alpine-${{ github.ref }}-${{ inputs.orchestrated && 'orchestrated' || 'standalone' }}
   cancel-in-progress: true
 
 permissions:
