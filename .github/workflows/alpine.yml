@@ -66,8 +66,16 @@ jobs:
           # Remove _git suffix to indicate the stable release.
           # Assumes that the base (unsuffixed) pkgver was already updated to the new version in release commit.
           sed -i -e 's/^\(pkgver=.*\)_git$/\1/' APKBUILD
-          # Delete _gitrev= var and rewrite usages to pkgver
-          sed -i -e '/^_gitrev=/d' -e 's/_gitrev/pkgver/g' APKBUILD
+
+          pkgver="$(sed -n 's/^pkgver=//p' APKBUILD)"
+          if [[ "$pkgver" =~ _rc[0-9]+$ ]]; then
+            # Alpine package versions use _rcN while Git tags use -rc.N.
+            release_gitrev="${pkgver/_rc/-rc.}"
+          else
+            release_gitrev="$pkgver"
+          fi
+
+          sed -i -e "s/^_gitrev=.*/_gitrev=${release_gitrev}/" APKBUILD
       - name: build package
         run: |
           export PACKAGER_PRIVKEY=$HOME/.abuild/key.rsa
