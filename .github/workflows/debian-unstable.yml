@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: debian-unstable-${{ github.ref }}-${{ inputs.orchestrated && 'orchestrated' || 'standalone' }}
   cancel-in-progress: true
 
 jobs:
