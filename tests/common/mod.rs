@@ -2,6 +2,7 @@ pub mod dbus;
 pub mod virtual_keyboard;
 pub mod virtual_pointer;
 
+use crate::common::dbus::AccountsFixtureOptions;
 use crate::common::virtual_keyboard::VirtualKeyboard;
 use async_channel::Receiver;
 use glib::{g_critical, spawn_future_local, JoinHandle, Object};
@@ -91,6 +92,7 @@ impl Test {
 #[derive(Default)]
 pub struct TestOptions {
     pub num_users: Option<u32>,
+    pub accounts_fixture: Option<AccountsFixtureOptions>,
     pub sessions: Option<Vec<SessionObject>>,
     pub last_user: Option<String>,
     pub last_session: Option<String>,
@@ -136,12 +138,19 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
     if_settings.set_string("accent-color", "green").unwrap();
 
     let num_users = options.as_ref().and_then(|opts| opts.num_users);
+    let accounts_fixture = options
+        .as_ref()
+        .and_then(|opts| opts.accounts_fixture.clone())
+        .unwrap_or(AccountsFixtureOptions {
+            num_users,
+            ..Default::default()
+        });
     let (system_dbus_conn, session_dbus_conn) = async_global_executor::block_on(async move {
         let system = zbus::Connection::system()
             .await
             .expect("failed to connect to system bus");
 
-        dbus::run_accounts_fixture(system.clone(), num_users)
+        dbus::run_accounts_fixture_with_options(system.clone(), accounts_fixture)
             .await
             .unwrap();
 

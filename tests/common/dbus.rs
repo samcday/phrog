@@ -1,7 +1,9 @@
 use crate::common::SupervisedChild;
 use anyhow::Context;
+use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 use zbus::zvariant::ObjectPath;
 
@@ -54,32 +56,79 @@ pub fn dbus_daemon(kind: &str, tmpdir: &Path) -> SupervisedChild {
     SupervisedChild::new("dbus-daemon", child)
 }
 
-struct AccountsFixture {
-    num_users: Option<u32>,
+#[derive(Clone)]
+pub struct AccountsFixtureOptions {
+    pub num_users: Option<u32>,
+    pub users: Vec<UserFixture>,
+    pub cached_users: Option<Vec<String>>,
+    pub homed_users: Vec<String>,
 }
-struct UserFixture {
+
+impl Default for AccountsFixtureOptions {
+    fn default() -> Self {
+        Self {
+            num_users: None,
+            users: vec![
+                UserFixture::new("Phoshi", "phoshi", "phoshi.png", true, false),
+                UserFixture::new("Guido", "agx", "guido.png", true, false),
+                UserFixture::new("Sam", "samcday", "samcday.jpeg", true, false),
+            ],
+            cached_users: None,
+            homed_users: vec![],
+        }
+    }
+}
+
+struct AccountsFixture {
+    state: Arc<Mutex<FixtureState>>,
+}
+
+#[derive(Clone)]
+pub struct UserFixture {
     name: String,
     username: String,
     icon_file: String,
+    local_account: bool,
+    system_account: bool,
+}
+
+#[derive(Default)]
+struct FixtureState {
+    users_by_name: BTreeMap<String, UserFixture>,
+    cached_users: Vec<String>,
+    homed_users: Vec<String>,
 }
 
 #[zbus::interface(name = "org.freedesktop.Accounts")]
 impl AccountsFixture {
     async fn list_cached_users(&self) -> Vec<ObjectPath<'_>> {
-        let mut users = vec![
-            ObjectPath::from_static_str_unchecked("/org/freedesktop/Accounts/phoshi"),
-            ObjectPath::from_static_str_unchecked("/org/freedesktop/Accounts/agx"),
-            ObjectPath::from_static_str_unchecked("/org/freedesktop/Accounts/sam"),
-        ];
-        if let Some(num_users) = self.num_users {
-            users.truncate(num_users as _);
+        let state = self.state.lock().unwrap();
+        state
+            .cached_users
+            .iter()
+            .map(|name| ObjectPath::try_from(format!("/org/freedesktop/Accounts/{name}")).unwrap())
+            .collect::<Vec<_>>()
+    }
+
+    async fn cache_user(&self, name: &str) -> zbus::fdo::Result<ObjectPath<'_>> {
+        let mut state = self.state.lock().unwrap();
+        if !state.cached_users.contains(&name.to_string()) && state.users_by_name.contains_key(name)
+        {
+            state.cached_users.push(name.to_string());
         }
-        users
+
+        Ok(ObjectPath::try_from(format!("/org/freedesktop/Accounts/{name}")).unwrap())
     }
 }
 
 impl UserFixture {
-    fn new(name: &str, username: &str, icon_file: &str) -> Self {
+    pub fn new(
+        name: &str,
+        username: &str,
+        icon_file: &str,
+        local_account: bool,
+        system_account: bool,
+    ) -> Self {
         Self {
             name: name.into(),
             username: username.into(),
@@ -88,6 +137,8 @@ impl UserFixture {
                 .join(icon_file)
                 .display()
                 .to_string(),
+            local_account,
+            system_account,
         }
     }
 }
@@ -106,44 +157,132 @@ impl UserFixture {
     async fn icon_file(&self) -> &str {
         &self.icon_file
     }
+    #[zbus(property)]
+    async fn local_account(&self) -> bool {
+        self.local_account
+    }
+    #[zbus(property)]
+    async fn system_account(&self) -> bool {
+        self.system_account
+    }
+}
+
+struct Home1ManagerFixture {
+    state: Arc<Mutex<FixtureState>>,
+}
+
+#[zbus::interface(name = "org.freedesktop.home1.Manager")]
+impl Home1ManagerFixture {
+    async fn list_homes(
+        &self,
+    ) -> Vec<(
+        String,
+        u32,
+        String,
+        u32,
+        String,
+        String,
+        String,
+        ObjectPath<'_>,
+    )> {
+        let state = self.state.lock().unwrap();
+        state
+            .homed_users
+            .iter()
+            .map(|name| {
+                (
+                    name.clone(),
+                    1000,
+                    "active".to_string(),
+                    1000,
+                    name.clone(),
+                    format!("/home/{name}"),
+                    "/bin/sh".to_string(),
+                    ObjectPath::from_static_str_unchecked("/org/freedesktop/home1/home"),
+                )
+            })
+            .collect()
+    }
 }
 
 pub async fn run_accounts_fixture(
     connection: zbus::Connection,
     num_users: Option<u32>,
 ) -> anyhow::Result<()> {
+    run_accounts_fixture_with_options(
+        connection,
+        AccountsFixtureOptions {
+            num_users,
+            ..Default::default()
+        },
+    )
+    .await
+}
+
+pub async fn run_accounts_fixture_with_options(
+    connection: zbus::Connection,
+    options: AccountsFixtureOptions,
+) -> anyhow::Result<()> {
+    let mut cached_users = options.cached_users.unwrap_or_else(|| {
+        options
+            .users
+            .iter()
+            .map(|user| user.username.clone())
+            .collect()
+    });
+    if let Some(num_users) = options.num_users {
+        cached_users.truncate(num_users as usize);
+    }
+
+    let users_by_name = options
+        .users
+        .iter()
+        .map(|user| (user.username.clone(), user.clone()))
+        .collect();
+
+    let state = Arc::new(Mutex::new(FixtureState {
+        users_by_name,
+        cached_users,
+        homed_users: options.homed_users,
+    }));
+
     connection
         .object_server()
-        .at("/org/freedesktop/Accounts", AccountsFixture { num_users })
+        .at(
+            "/org/freedesktop/Accounts",
+            AccountsFixture {
+                state: state.clone(),
+            },
+        )
         .await
         .context("failed to serve org.freedesktop.Accounts")?;
+
+    for user in options.users {
+        connection
+            .object_server()
+            .at(format!("/org/freedesktop/Accounts/{}", user.username), user)
+            .await
+            .context("failed to serve org.freedesktop.Accounts.User")?;
+    }
+
     connection
         .object_server()
         .at(
-            "/org/freedesktop/Accounts/agx",
-            UserFixture::new("Guido", "agx", "guido.png"),
+            "/org/freedesktop/home1",
+            Home1ManagerFixture {
+                state: state.clone(),
+            },
         )
         .await
-        .context("failed to serve org.freedesktop.Accounts.User")?;
-    connection
-        .object_server()
-        .at(
-            "/org/freedesktop/Accounts/phoshi",
-            UserFixture::new("Phoshi", "phoshi", "phoshi.png"),
-        )
-        .await
-        .context("failed to serve org.freedesktop.Accounts.User")?;
-    connection
-        .object_server()
-        .at(
-            "/org/freedesktop/Accounts/sam",
-            UserFixture::new("Sam", "samcday", "samcday.jpeg"),
-        )
-        .await
-        .context("failed to serve org.freedesktop.Accounts.User")?;
+        .context("failed to serve org.freedesktop.home1.Manager")?;
+
     connection
         .request_name("org.freedesktop.Accounts")
         .await
         .context("failed to request name")?;
+    connection
+        .request_name("org.freedesktop.home1")
+        .await
+        .context("failed to request home1 name")?;
     Ok(())
 }

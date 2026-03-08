@@ -255,3 +255,31 @@ pub mod user {
         fn xsession(&self) -> zbus::Result<String>;
     }
 }
+
+pub mod home1_manager {
+    //! # D-Bus interface proxy for: `org.freedesktop.home1.Manager`
+    use zbus::proxy;
+
+    #[proxy(
+        interface = "org.freedesktop.home1.Manager",
+        default_service = "org.freedesktop.home1",
+        default_path = "/org/freedesktop/home1"
+    )]
+    pub trait Manager {
+        /// ListHomes method
+        fn list_homes(
+            &self,
+        ) -> zbus::Result<
+            Vec<(
+                String,
+                u32,
+                String,
+                u32,
+                String,
+                String,
+                String,
+                zbus::zvariant::OwnedObjectPath,
+            )>,
+        >;
+    }
+}
