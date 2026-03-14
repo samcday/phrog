@@ -71,15 +71,15 @@ cargo binstall phrog
 
 ## Development
 
-`libphosh` 0.45 is required to build this project.
+`phrog` vendors both `./phosh` and `./libphosh-rs`, and static-linking `libphosh` is now the default.
 
-* Alpine (v3.21+): `sudo apk add libphosh`
-* Debian (trixie): `sudo apt install libphosh-0.45-dev`
-* Fedora: `sudo dnf install libphosh-devel`
+Install Phosh build dependencies first:
 
-If `libphosh` is not packaged for your distro, you need to build Phosh+libphosh manually. See the [Phosh][] README for more info.
+* Alpine: `abuild deps`
+* Debian (trixie/sid): `sudo apt-get build-dep -y ./phosh/`
+* Fedora: `sudo dnf builddep phosh`
 
-Once `libphosh` is installed, building and running 🐸 should be quite simple:
+Then build and run:
 
 ```sh
 # To run phrog without greetd, pass --fake
@@ -87,6 +87,13 @@ Once `libphosh` is installed, building and running 🐸 should be quite simple:
 phoc -S -E "cargo run -- --fake"
 
 phoc -S -E "cargo test"
+```
+
+To build against a system `libphosh` instead, disable default features:
+
+```sh
+cargo build --no-default-features
+cargo test --no-default-features
 ```
 
 ## Getting help

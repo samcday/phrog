@@ -51,6 +51,7 @@ phosh_resources = gnome.compile_resources(
   'phosh-resources',
   'phosh.gresources.xml',
   c_name: 'phosh',
+  extra_args: '--manual-register',
 )
 
 libphosh_enum_headers = files('lockscreen.h')
