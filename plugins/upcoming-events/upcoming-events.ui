@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="3.24"/>
+  <template class="PhoshUpcomingEvents" parent="GtkBox">
+    <property name="orientation">vertical</property>
+    <property name="margin-start">12</property>
+    <property name="margin-top">12</property>
+    <property name="margin-end">12</property>
+    <property name="margin-bottom">12</property>
+    <property name="vexpand">1</property>
+    <child>
+      <object class="GtkOverlay">
+        <property name="visible">1</property>
+        <child type="overlay">
+          <object class="GtkToggleButton" id="skip_empty_btn">
+            <property name="halign">end</property>
+            <property name="valign">start</property>
+            <property name="visible">1</property>
+            <signal name="toggled" handler="on_skip_empty_btn_toggled" swapped="no"/>
+          </object>
+        </child>
+        <child>
+          <object class="GtkStack" id="stack">
+            <property name="visible">1</property>
+            <child>
+              <object class="HdyStatusPage">
+                <property name="visible">1</property>
+                <property name="title" translatable="yes">No upcoming events</property>
+                <property name="icon-name">x-office-calendar-symbolic</property>
+                <property name="vexpand">1</property>
+                <property name="valign">center</property>
+              </object>
+              <packing>
+                <property name="name">no-events</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkScrolledWindow">
+                <property name="visible">1</property>
+                <property name="hscrollbar-policy">never</property>
+                <property name="propagate-natural-height">1</property>
+                <child>
+                  <object class="GtkListBox" id="events_box">
+                    <property name="visible">1</property>
+                    <property name="selection-mode">none</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="name">events-window</property>
+              </packing>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

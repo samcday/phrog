@@ -1,0 +1,9 @@
+[Plugin]
+# Translators: This is an internal id, no need to translate it
+Id=@name@
+Name=Location Quick Setting
+Types=quick-setting;
+Comment=Toggle location services on/off
+Plugin=@plugins_dir@/libphosh-plugin-@name@.so
+Icon=location-quick-setting
+

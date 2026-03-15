@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Copyright (C) 2025 Phosh.mobi e.V.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Author: Gotam Gorabh <gautamy672@gmail.com>
+#
+# Scans specified source directories for 'gchar' usage.
+#
+# Usage:
+#   ./g-style src tests plugins
+# If no directories are provided, the whole repository is scanned.
+
+set -e
+
+# Use command-line arguments if given; if none, scan the whole tree
+SOURCE_DIRS=("$@")
+
+status=0
+
+# Search for gchar
+if git grep -q "\bgchar\b" -- "${SOURCE_DIRS[@]}"; then
+    echo "Found 'gchar' in these files:"
+    git grep -nH "\bgchar\b" -- "${SOURCE_DIRS[@]}"
+
+    echo
+    echo "gchar usage detected. Please use 'char' over 'gchar'."
+    status=1
+fi
+
+exit $status

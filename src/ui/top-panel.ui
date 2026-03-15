@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="3.24"/>
+  <object class="GtkPopoverMenu" id="menu_system">
+    <child>
+      <object class="GtkBox">
+        <property name="visible">1</property>
+        <property name="width-request">120</property>
+        <property name="name">system-menu</property>
+        <property name="margin-start">6</property>
+        <property name="margin-top">6</property>
+        <property name="margin-end">6</property>
+        <property name="margin-bottom">6</property>
+        <property name="spacing">6</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkButton">
+            <property name="visible">1</property>
+            <property name="action-name">panel.poweroff</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">1</property>
+                <property name="spacing">6</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">1</property>
+                    <property name="icon-name">system-shutdown-symbolic</property>
+                    <property name="pixel-size">16</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">1</property>
+                    <property name="label" translatable="yes">_Power Off…</property>
+                    <property name="ellipsize">middle</property>
+                    <property name="use-underline">1</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="visible">1</property>
+            <property name="action-name">panel.restart</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">1</property>
+                <property name="spacing">6</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">1</property>
+                    <property name="icon-name">system-reboot-symbolic</property>
+                    <property name="pixel-size">16</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">1</property>
+                    <property name="label" translatable="yes">_Restart…</property>
+                    <property name="ellipsize">middle</property>
+                    <property name="use-underline">1</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="visible">1</property>
+            <property name="action-name">panel.suspend</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">1</property>
+                <property name="spacing">6</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">1</property>
+                    <property name="icon-name">moon-filled-symbolic</property>
+                    <property name="pixel-size">16</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">1</property>
+                    <property name="label" translatable="yes">_Suspend…</property>
+                    <property name="ellipsize">middle</property>
+                    <property name="use-underline">1</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="visible">1</property>
+            <property name="action-name">panel.logout</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">1</property>
+                <property name="spacing">6</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">1</property>
+                    <property name="icon-name">system-log-out-symbolic</property>
+                    <property name="pixel-size">16</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">1</property>
+                    <property name="label" translatable="yes">_Log Out…</property>
+                    <property name="ellipsize">middle</property>
+                    <property name="use-underline">1</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+  <template class="PhoshTopPanel" parent="PhoshDragSurface">
+    <child>
+      <object class="GtkBox" id="box">
+        <property name="visible">1</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkBox" id="box_clock">
+            <property name="visible">1</property>
+            <style>
+              <class name="phosh-clock-box"/>
+            </style>
+            <child>
+              <object class="GtkButton" id="btn_lock">
+                <property name="visible" bind-source="PhoshTopPanel" bind-property="on-lockscreen" bind-flags="sync-create|invert-boolean"/>
+                <property name="action-name">panel.lockscreen</property>
+                <style>
+                  <class name="phosh-topbar-button"/>
+                </style>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">1</property>
+                    <property name="icon-name">padlock-symbolic</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child type="center">
+              <object class="GtkBox">
+                <property name="visible">1</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkLabel" id="lbl_clock2">
+                    <property name="visible">1</property>
+                    <property name="margin-top">2</property>
+                    <style>
+                      <class name="phosh-topbar-clock"/>
+                    </style>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="lbl_date">
+                    <property name="visible">1</property>
+                    <style>
+                      <class name="phosh-topbar-date"/>
+                    </style>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuButton" id="btn_power">
+                <property name="visible" bind-source="PhoshTopPanel" bind-property="on-lockscreen" bind-flags="sync-create|invert-boolean"/>
+                <property name="popover">menu_system</property>
+                <style>
+                  <class name="phosh-topbar-button"/>
+                </style>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">1</property>
+                    <property name="icon-name">system-shutdown-symbolic</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="pack-type">end</property>
+              </packing>
+            </child>
+          </object>
+          <!-- box_clock -->
+        </child>
+        <child>
+          <object class="PhoshSettings" id="settings">
+            <property name="visible">1</property>
+            <signal name="notify::drag-handle-offset" handler="on_settings_drag_handle_offset_changed" swapped="true"/>
+          </object>
+        </child>
+        <child>
+          <object class="GtkStack" id="stack">
+            <property name="visible">1</property>
+            <property name="transition-type">crossfade</property>
+            <child>
+              <object class="GtkBox" id="top_bar_bin">
+                <property name="visible">1</property>
+                <property name="name">top-bar-bin</property>
+                <child>
+                  <object class="GtkBox" id="box_top_bar">
+                    <property name="visible">1</property>
+                    <property name="hexpand">1</property>
+                    <property name="vexpand">1</property>
+                    <property name="valign">end</property>
+                    <property name="name">top-bar</property>
+                    <!-- PHOSH_TOP_PANEL_HEIGHT -->
+                    <property name="height-request">32</property>
+                    <child>
+                      <object class="GtkBox" id="box_network">
+                        <property name="visible">1</property>
+                        <child>
+                          <object class="PhoshRevealer">
+                            <property name="visible">1</property>
+                            <property name="show-child" bind-source="wwaninfo" bind-property="present" bind-flags="sync-create"/>
+                            <property name="child">wwaninfo</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="PhoshRevealer">
+                            <property name="visible">1</property>
+                            <property name="show-child" bind-source="wifiinfo" bind-property="present" bind-flags="sync-create"/>
+                            <property name="child">wifiinfo</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="PhoshRevealer">
+                            <property name="visible">1</property>
+                            <property name="show-child" bind-source="btinfo" bind-property="present" bind-flags="sync-create"/>
+                            <property name="child">btinfo</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="PhoshRevealer">
+                            <property name="visible">1</property>
+                            <property name="show-child" bind-source="vpn_info" bind-property="enabled" bind-flags="sync-create"/>
+                            <property name="child">vpn_info</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="PhoshRevealer">
+                            <property name="visible">1</property>
+                            <property name="show-child" bind-source="connectivity_info" bind-property="connectivity" bind-flags="invert-boolean|sync-create"/>
+                            <property name="child">connectivity_info</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="PhoshRevealer">
+                            <property name="visible">1</property>
+                            <property name="show-child" bind-source="docked_info" bind-property="enabled" bind-flags="sync-create"/>
+                            <property name="child">docked_info</property>
+                          </object>
+                        </child>
+                      </object>
+                      <!-- box_network -->
+                    </child>
+                    <child type="center">
+                      <object class="GtkLabel" id="lbl_clock">
+                        <property name="visible">1</property>
+                        <property name="margin-top">2</property>
+                        <property name="label">00:00</property>
+                        <style>
+                          <class name="phosh-topbar-clock"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox" id="box_indicators">
+                        <property name="visible">1</property>
+                        <property name="halign">end</property>
+                        <style>
+                          <class name="indicators"/>
+                        </style>
+                        <child>
+                          <object class="GtkLabel" id="lbl_lang">
+                            <property name="visible">1</property>
+                            <property name="margin-end">8</property>
+                            <property name="margin-top">2</property>
+                            <property name="justify">center</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="PhoshRevealer">
+                            <property name="visible">1</property>
+                            <property name="show-child" bind-source="hks_info_mic" bind-property="blocked" bind-flags="sync-create"/>
+                            <property name="child">hks_info_mic</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="PhoshRevealer">
+                            <property name="visible">1</property>
+                            <property name="show-child" bind-source="hks_info_camera" bind-property="blocked" bind-flags="sync-create"/>
+                            <property name="child">hks_info_camera</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="PhoshRevealer">
+                            <property name="visible">1</property>
+                            <property name="show-child" bind-source="feedback_info" bind-property="muted" bind-flags="sync-create"/>
+                            <property name="child">feedback_info</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="PhoshRevealer">
+                            <property name="visible">1</property>
+                            <property name="show-child" bind-source="location_info" bind-property="active" bind-flags="sync-create"/>
+                            <property name="child">location_info</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="PhoshBatteryInfo" id="batteryinfo">
+                            <property name="visible">1</property>
+                            <property name="pixel-size">16</property>
+                          </object>
+                        </child>
+                      </object>
+                      <!-- box_indicators -->
+                      <packing>
+                        <property name="pack-type">end</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <!-- box_top_bar -->
+                </child>
+              </object>
+              <!-- top_bar_bin -->
+              <packing>
+                <property name="name">top-bar</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">1</property>
+                <child type="center">
+                  <object class="PhoshArrow" id="arrow">
+                    <property name="visible">1</property>
+                    <property name="vexpand">1</property>
+                    <property name="valign">end</property>
+                    <property name="margin-bottom">6</property>
+                    <!-- place initial focus -->
+                    <property name="has-focus">1</property>
+                    <property name="can-focus">1</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkRevealer" id="launch_settings_revealer">
+                    <property name="visible">1</property>
+                    <property name="transition-type">crossfade</property>
+                    <child>
+                      <object class="GtkButton">
+                        <property name="visible">1</property>
+                        <property name="action-name">panel.launch-mobile-panel</property>
+                        <!-- We send an (sav) parameter, where array contains one variant: empty string -->
+                        <property name="action-target">(&quot;topbar&quot;, [&lt;&quot;&quot;&gt;])</property>
+                        <property name="valign">end</property>
+                        <property name="halign">end</property>
+                        <property name="name">settings-gear</property>
+                        <child>
+                          <object class="GtkImage">
+                            <property name="visible">1</property>
+                            <property name="icon-name">settings-symbolic</property>
+                            <property name="pixel-size">24</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="pack-type">end</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="name">arrow</property>
+              </packing>
+            </child>
+          </object>
+          <!-- stack -->
+        </child>
+      </object>
+    </child>
+  </template>
+  <object class="PhoshWWanInfo" id="wwaninfo">
+    <property name="margin-end">8</property>
+    <property name="pixel-size">16</property>
+    <property name="show-detail">1</property>
+    <style>
+      <class name="phosh-wwan-indicator"/>
+    </style>
+  </object>
+  <object class="PhoshWifiInfo" id="wifiinfo">
+    <property name="pixel-size">16</property>
+    <property name="margin-end">8</property>
+  </object>
+  <object class="PhoshBtInfo" id="btinfo">
+    <property name="pixel-size">16</property>
+    <property name="margin-end">8</property>
+  </object>
+  <object class="PhoshVpnInfo" id="vpn_info">
+    <property name="pixel-size">16</property>
+    <property name="margin-end">8</property>
+  </object>
+  <object class="PhoshConnectivityInfo" id="connectivity_info">
+    <property name="pixel-size">16</property>
+    <property name="margin-end">8</property>
+  </object>
+  <object class="PhoshDockedInfo" id="docked_info">
+    <property name="pixel-size">16</property>
+    <property name="margin-end">8</property>
+  </object>
+  <object class="PhoshHksInfo" id="hks_info_mic">
+    <property name="device-type">mic</property>
+    <property name="pixel-size">16</property>
+    <property name="margin-end">8</property>
+  </object>
+  <object class="PhoshHksInfo" id="hks_info_camera">
+    <property name="device-type">camera</property>
+    <property name="pixel-size">16</property>
+    <property name="margin-end">8</property>
+  </object>
+  <object class="PhoshFeedbackInfo" id="feedback_info">
+    <property name="pixel-size">16</property>
+    <property name="margin-end">8</property>
+  </object>
+  <object class="PhoshLocationInfo" id="location_info">
+    <property name="pixel-size">16</property>
+    <property name="margin-end">8</property>
+  </object>
+  <object class="GtkGestureMultiPress" id="click_gesture">
+    <property name="widget">PhoshTopPanel</property>
+    <property name="propagation-phase">target</property>
+    <signal name="released" handler="released_cb" swapped="true"/>
+  </object>
+</interface>
