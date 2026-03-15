@@ -1,0 +1,6 @@
+[Plugin]
+Id=@name@
+Name=Launcher Box
+Types=lockscreen;
+Comment=Add launchers to the lock screen. <b>This plugin is experimental.</b>
+Plugin=@plugins_dir@/libphosh-plugin-@name@.so

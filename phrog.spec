@@ -22,17 +22,45 @@ BuildRequires:	dbus-daemon
 BuildRequires:  xorg-x11-server-Xvfb
 # first-run test uses foot
 BuildRequires:  foot
-
-%if %{with vendor}
-BuildRequires:  pkgconfig(atk)
-BuildRequires:  pkgconfig(cairo)
-BuildRequires:  pkgconfig(cairo-gobject)
-BuildRequires:  pkgconfig(gdk-3.0)
-BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
+BuildRequires:  gcc
+BuildRequires:  meson
+BuildRequires:  pam-devel
+BuildRequires:  pkgconfig(appstream)
+BuildRequires:  pkgconfig(libecal-2.0)
+BuildRequires:  pkgconfig(libedataserver-1.2)
+BuildRequires:  pkgconfig(fribidi)
+BuildRequires:  pkgconfig(gcr-3)
 BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(gio-2.0)
+BuildRequires:  pkgconfig(gio-unix-2.0)
+BuildRequires:  pkgconfig(gmobile)
+BuildRequires:  pkgconfig(gmodule-no-export-2.0)
+BuildRequires:  pkgconfig(gnome-bluetooth-3.0)
+BuildRequires:  pkgconfig(gnome-desktop-3.0)
+BuildRequires:  pkgconfig(gobject-2.0)
+BuildRequires:  pkgconfig(gsettings-desktop-schemas)
+BuildRequires:  pkgconfig(gtk+-3.0)
+BuildRequires:  pkgconfig(gtk+-wayland-3.0)
+BuildRequires:  pkgconfig(gudev-1.0)
+BuildRequires:  pkgconfig(libfeedback-0.0)
 BuildRequires:  pkgconfig(libhandy-1)
-BuildRequires:  pkgconfig(libphosh-0.45)
-%endif
+BuildRequires:  pkgconfig(libnm)
+BuildRequires:  pkgconfig(polkit-agent-1)
+BuildRequires:  pkgconfig(libsoup-3.0)
+BuildRequires:  pkgconfig(libsystemd)
+BuildRequires:  pkgconfig(mm-glib)
+BuildRequires:  pkgconfig(libsecret-1)
+BuildRequires:  pkgconfig(upower-glib)
+BuildRequires:  pkgconfig(wayland-client)
+BuildRequires:  pkgconfig(wayland-protocols)
+BuildRequires:  pkgconfig(alsa)
+BuildRequires:  pkgconfig(libpulse)
+BuildRequires:  pkgconfig(libpulse-mainloop-glib)
+BuildRequires:  pkgconfig(libcallaudio-0.1)
+BuildRequires:  pkgconfig(gtk4)
+BuildRequires:  pkgconfig(libadwaita-1)
+BuildRequires:  pkgconfig(evince-document-3.0)
+BuildRequires:  pkgconfig(evince-view-3.0)
 
 Requires:       accountsservice
 Requires:       gnome-session
@@ -60,6 +88,8 @@ chmod 0700 /tmp/runtime-dir
 %endif
 
 %build
+export PHROG_LIBPHOSH_BUILD_INTERNAL=always
+export PHOSH_SRC=$PWD/phosh
 %cargo_build
 %cargo_vendor_manifest
 %{cargo_license_summary}
@@ -78,9 +108,15 @@ chmod 0700 /tmp/runtime-dir
 %{__install} -d %{buildroot}%{_datadir}/phrog/autostart
 %{__install} -d %{buildroot}%{_sysconfdir}/phrog/autostart
 %cargo_install
+if ldd %{buildroot}%{_bindir}/phrog | grep -q libphosh; then
+  echo "phrog is dynamically linked against libphosh"
+  exit 1
+fi
 
 %if %{with check}
 %check
+export PHROG_LIBPHOSH_BUILD_INTERNAL=always
+export PHOSH_SRC=$PWD/phosh
 export G_MESSAGES_DEBUG=all
 export XDG_RUNTIME_DIR=/tmp/runtime-dir
 cat > test.sh <<HERE

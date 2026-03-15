@@ -11,13 +11,40 @@ license="GPL-3.0-only"
 depends="
 	phosh
 	greetd
-	greetd-phrog-schemas
-	libphosh"
+	greetd-phrog-schemas"
 makedepends="
+	appstream-dev
+	callaudiod-dev
 	cargo
 	cargo-auditable
+	elogind-dev
+	evince-dev
+	evolution-data-server-dev
+	feedbackd-dev
 	foot
-	libphosh-dev"
+	gcr-dev
+	gettext-dev
+	glib-dev
+	gmobile-dev
+	gnome-bluetooth-dev
+	gnome-desktop-dev
+	gtk+3.0-dev
+	libadwaita-dev
+	libgudev-dev
+	libhandy1-dev
+	libsecret-dev
+	libunistring-dev
+	linux-pam-dev
+	libsoup3-dev
+	meson
+	modemmanager-dev
+	networkmanager-dev
+	polkit-elogind-dev
+	pulseaudio-dev
+	py3-docutils
+	upower-dev
+	wayland-dev
+	wayland-protocols"
 checkdepends="xvfb-run"
 
 _gitrev=main

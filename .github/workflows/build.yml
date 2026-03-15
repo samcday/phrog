@@ -51,6 +51,9 @@ jobs:
     defaults:
       run:
         shell: bash
+    env:
+      PHROG_LIBPHOSH_BUILD_INTERNAL: always
+      PHOSH_SRC: ${{ github.workspace }}/phosh
     steps:
       - if: |
           github.event_name == 'pull_request_target' &&
@@ -69,6 +72,17 @@ jobs:
         run: |
           set -uexo pipefail
           cargo build --all-targets --verbose
+      - name: Verify static libphosh link
+        run: |
+          set -uexo pipefail
+          python3 - <<'PY'
+          import subprocess
+
+          output = subprocess.check_output(["ldd", "target/debug/phrog"], text=True)
+          print(output)
+          if "libphosh" in output:
+              raise SystemExit("phrog is dynamically linked against libphosh")
+          PY
       - name: Lint
         run: |
           cargo clippy --all-targets --verbose
