@@ -10,9 +10,10 @@ macro_rules! skip_assert_initialized {
     () => {};
 }
 
-pub use ffi;
 pub use auto::*;
+pub use ffi;
 #[allow(unused_imports)]
+#[rustfmt::skip]
 mod auto;
 pub mod subclass;
 
