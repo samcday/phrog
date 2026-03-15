@@ -1,0 +1,5 @@
+libphosh/sys/target
+target/
+subprojects/gvc/
+subprojects/libcall-ui/
+subprojects/phosh/
