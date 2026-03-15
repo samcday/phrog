@@ -9,7 +9,18 @@ fn main() {} // prevent linking libraries to avoid documentation failure
 #[cfg(not(docsrs))]
 fn main() {
     if std::env::var("CARGO_FEATURE_STATIC").as_deref() == Ok("1") {
-        std::env::set_var("SYSTEM_DEPS_LIBPHOSH_0_45_BUILD_INTERNAL", "always");
+        let build_internal_mode =
+            std::env::var("PHROG_LIBPHOSH_BUILD_INTERNAL").unwrap_or_else(|_| {
+                if std::env::var_os("GITHUB_ACTIONS").is_some() {
+                    "auto".to_string()
+                } else {
+                    "always".to_string()
+                }
+            });
+        std::env::set_var(
+            "SYSTEM_DEPS_LIBPHOSH_0_45_BUILD_INTERNAL",
+            &build_internal_mode,
+        );
     }
 
     let out_dir = std::env::var("OUT_DIR").unwrap();
