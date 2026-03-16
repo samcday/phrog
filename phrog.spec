@@ -123,6 +123,7 @@ export PHROG_LIBPHOSH_BUILD_INTERNAL=always
 export PHOSH_SRC=$PWD/phosh
 export G_MESSAGES_DEBUG=all
 export XDG_RUNTIME_DIR=/tmp/runtime-dir
+export LD_LIBRARY_PATH=%{_libdir}/pulseaudio${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 cat > test.sh <<HERE
 #!/bin/bash
 %cargo_test
