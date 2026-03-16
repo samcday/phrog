@@ -24,6 +24,7 @@ BuildRequires:  xorg-x11-server-Xvfb
 BuildRequires:  foot
 BuildRequires:  gcc
 BuildRequires:  git-core
+BuildRequires:  gnome-shell-common
 BuildRequires:  gnome-settings-daemon
 BuildRequires:  meson
 BuildRequires:  mutter-common
