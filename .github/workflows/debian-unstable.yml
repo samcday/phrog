@@ -55,6 +55,8 @@ jobs:
         run: |
           set -euo pipefail
           eatmydata apt-get -y --no-install-recommends \
+            build-dep phosh
+          eatmydata apt-get -y --no-install-recommends \
             build-dep .
 
       - name: Build packages

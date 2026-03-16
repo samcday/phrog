@@ -23,6 +23,7 @@ BuildRequires:  xorg-x11-server-Xvfb
 # first-run test uses foot
 BuildRequires:  foot
 BuildRequires:  gcc
+BuildRequires:  git-core
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  pkgconfig(appstream)
