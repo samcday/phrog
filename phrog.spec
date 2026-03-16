@@ -63,6 +63,7 @@ BuildRequires:  pkgconfig(gtk4)
 BuildRequires:  pkgconfig(libadwaita-1)
 BuildRequires:  pkgconfig(evince-document-3.0)
 BuildRequires:  pkgconfig(evince-view-3.0)
+BuildRequires:  phoc
 
 Requires:       accountsservice
 Requires:       gnome-session
