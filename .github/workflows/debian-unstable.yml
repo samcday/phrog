@@ -54,6 +54,8 @@ jobs:
       - name: Install build-deps
         run: |
           set -euo pipefail
+          printf 'deb-src http://deb.debian.org/debian unstable main\n' > /etc/apt/sources.list.d/debian-src.list
+          apt-get update
           eatmydata apt-get -y --no-install-recommends \
             build-dep phosh
           eatmydata apt-get -y --no-install-recommends \
