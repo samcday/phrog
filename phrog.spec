@@ -25,6 +25,7 @@ BuildRequires:  foot
 BuildRequires:  gcc
 BuildRequires:  git-core
 BuildRequires:  meson
+BuildRequires:  mutter-common
 BuildRequires:  pam-devel
 BuildRequires:  pkgconfig(appstream)
 BuildRequires:  pkgconfig(libecal-2.0)
