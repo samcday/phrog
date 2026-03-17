@@ -6,7 +6,7 @@
 %endif
 
 Name:           phrog
-Version:        0.53.0_rc5
+Version:        0.53.0_rc6
 Release:        %autorelease
 Summary:        Mobile-friendly greeter for greetd
 License:        GPL-3.0-only
