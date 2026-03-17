@@ -3,8 +3,6 @@ name: Release follow-ups
 on:
   pull_request:
     types: [closed]
-  release:
-    types: [published]
 
 permissions:
   contents: write
@@ -12,9 +10,19 @@ permissions:
 
 jobs:
   tag-release-pr:
-    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.event.pull_request.head.ref, 'release/v')
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.event.pull_request.head.ref, 'release/v')
     runs-on: ubuntu-latest
     steps:
+      - name: Require release automation token
+        env:
+          RELEASE_GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$RELEASE_GITHUB_TOKEN" ]]; then
+            echo "RELEASE_GITHUB_TOKEN secret is required for release tag automation."
+            exit 1
+          fi
+
       - name: Parse tag from release branch
         id: parse
         env:
@@ -37,7 +45,7 @@ jobs:
       - name: Create and push tag
         if: steps.parse.outputs.skip != 'true'
         env:
-          GH_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN || github.token }}
+          GH_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
           TAG: ${{ steps.parse.outputs.tag }}
           MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
         run: |
@@ -58,17 +66,18 @@ jobs:
             -f sha="$MERGE_SHA" >/dev/null
 
   next-rc:
-    if: github.event_name == 'release'
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.event.pull_request.head.ref, 'release/v')
     runs-on: ubuntu-latest
     steps:
-      - name: Parse rc version from published tag
+      - name: Parse next rc version from merged release branch
         id: parse
         env:
-          TAG: ${{ github.event.release.tag_name }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
           set -euo pipefail
+          version="${HEAD_REF#release/v}"
 
-          if [[ "$TAG" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-rc\.([0-9]+)$ ]]; then
+          if [[ "$version" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-rc\.([0-9]+)$ ]]; then
             base="${BASH_REMATCH[1]}"
             rc="${BASH_REMATCH[2]}"
             next_rc=$((rc + 1))
@@ -77,10 +86,22 @@ jobs:
             echo "skip=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Require release automation token
+        if: steps.parse.outputs.skip != 'true'
+        env:
+          RELEASE_GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$RELEASE_GITHUB_TOKEN" ]]; then
+            echo "RELEASE_GITHUB_TOKEN secret is required for follow-up rc automation."
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
         if: steps.parse.outputs.skip != 'true'
         with:
           ref: ${{ github.event.repository.default_branch }}
+          token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
 
       - uses: taiki-e/install-action@just
         if: steps.parse.outputs.skip != 'true'
@@ -101,10 +122,12 @@ jobs:
       - name: Create next rc PR
         if: steps.parse.outputs.skip != 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
           version="${{ steps.parse.outputs.version }}"
           branch="release/v${version}"
+          base="${{ github.event.repository.default_branch }}"
 
           if [[ -n "$(git ls-remote --heads origin "$branch")" ]]; then
             echo "Branch $branch already exists; skipping"
@@ -113,14 +136,16 @@ jobs:
 
           git checkout -b "$branch"
           just bump "$version"
+
+          if git diff --quiet; then
+            echo "No version changes for $version; skipping"
+            exit 0
+          fi
+
           git add -A
           git commit -m "release: v${version}"
           git push -u origin "$branch"
           gh pr create \
             --title "v${version}" \
             --body "Automated bump for v${version}." \
-            --label ci-ok \
-            --label apk \
-            --label debs \
-            --label demo \
-            --base "${{ github.event.repository.default_branch }}"
+            --base "$base"

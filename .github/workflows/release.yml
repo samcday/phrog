@@ -1,11 +1,11 @@
-name: Create release from tag
+name: Release
 
 on:
   push:
-    tags: ['*']
+    tags:
+      - "*"
   pull_request:
-    branches: [main]
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: write
@@ -19,69 +19,84 @@ jobs:
       enabled: ${{ steps.detect.outputs.enabled }}
       mode: ${{ steps.detect.outputs.mode }}
       prerelease: ${{ steps.detect.outputs.prerelease }}
+      version: ${{ steps.detect.outputs.version }}
+      tag: ${{ steps.detect.outputs.tag }}
     steps:
       - id: detect
         env:
           EVENT_NAME: ${{ github.event_name }}
+          REF_TYPE: ${{ github.ref_type }}
           REF_NAME: ${{ github.ref_name }}
-          HEAD_REF: ${{ github.head_ref || '' }}
-          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name || '' }}
           REPOSITORY: ${{ github.repository }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
         run: |
           set -euo pipefail
 
           enabled=false
           mode=none
           prerelease=false
-          ref_name=""
+          version=""
 
-          if [[ "$EVENT_NAME" == "push" ]]; then
+          if [[ "$EVENT_NAME" == "push" ]] \
+            && [[ "$REF_TYPE" == "tag" ]] \
+            && [[ "$REF_NAME" =~ ^([0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?)$ ]]; then
             enabled=true
             mode=tag
-            ref_name="$REF_NAME"
+            version="${BASH_REMATCH[1]}"
           elif [[ "$EVENT_NAME" == "pull_request" ]] \
-            && [[ "$HEAD_REPO" == "$REPOSITORY" ]] \
-            && [[ "$HEAD_REF" =~ ^release/v[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$ ]]; then
+            && [[ "$PR_HEAD_REPO" == "$REPOSITORY" ]] \
+            && [[ "$PR_HEAD_REF" =~ ^release/v([0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?)$ ]]; then
             enabled=true
             mode=pr
-            ref_name="$HEAD_REF"
+            version="${BASH_REMATCH[1]}"
           fi
 
-          if [[ -n "$ref_name" && "$ref_name" =~ -rc\.[0-9]+$ ]]; then
+          if [[ -n "$version" && "$version" =~ -rc\.[0-9]+$ ]]; then
             prerelease=true
           fi
 
           echo "enabled=$enabled" >> "$GITHUB_OUTPUT"
           echo "mode=$mode" >> "$GITHUB_OUTPUT"
           echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$version" >> "$GITHUB_OUTPUT"
 
   release:
     needs: gate
     if: needs.gate.outputs.enabled == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - id: prerelease
-        run: |
-          if [[ "${{ needs.gate.outputs.prerelease }}" == 'true' ]]; then
-            echo "prerelease=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "prerelease=false" >> "$GITHUB_OUTPUT"
-          fi
       - if: needs.gate.outputs.mode == 'tag'
+        name: Require release automation token
+        env:
+          RELEASE_GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$RELEASE_GITHUB_TOKEN" ]]; then
+            echo "RELEASE_GITHUB_TOKEN secret is required for release automation."
+            exit 1
+          fi
+
+      - if: needs.gate.outputs.mode == 'tag'
+        name: Build release notes header
+        env:
+          TAG_NAME: ${{ needs.gate.outputs.tag }}
         run: |
           cat > body.md <<HERE
-          <img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/${GITHUB_REF_NAME}/demo.webp">
+          <img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/${TAG_NAME}/demo.webp">
           HERE
+
       - if: needs.gate.outputs.mode == 'tag'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ needs.gate.outputs.tag }}
           body_path: body.md
           generate_release_notes: true
-          prerelease: ${{ steps.prerelease.outputs.prerelease }}
+          prerelease: ${{ needs.gate.outputs.prerelease }}
           draft: true
           token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+
       - if: needs.gate.outputs.mode == 'pr'
         run: |
           echo "release/v* PR mode: skipping draft creation"
@@ -99,8 +114,7 @@ jobs:
     if: needs.gate.outputs.enabled == 'true'
     uses: ./.github/workflows/alpine.yml
     with:
-      orchestrated: true
-      release_mode: ${{ needs.gate.outputs.mode == 'tag' }}
+      release_mode: ${{ needs.gate.outputs.mode }}
     secrets: inherit
 
   debian:
@@ -108,7 +122,7 @@ jobs:
     if: needs.gate.outputs.enabled == 'true'
     uses: ./.github/workflows/debian-unstable.yml
     with:
-      orchestrated: true
+      release_mode: ${{ needs.gate.outputs.mode }}
     secrets: inherit
 
   release-builds:
@@ -118,7 +132,7 @@ jobs:
     secrets: inherit
 
   publish-assets:
-    needs: [gate, build, alpine, debian, release-builds]
+    needs: [gate, release, build, alpine, debian, release-builds]
     if: needs.gate.outputs.enabled == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -126,38 +140,30 @@ jobs:
         with:
           name: demo-video
           path: demo-video/
+
       - uses: actions/download-artifact@v4
         with:
           name: APKBUILD
           path: packages/
+
       - uses: actions/download-artifact@v4
         with:
           pattern: packages-*
           path: packages/
           merge-multiple: true
+
       - uses: actions/download-artifact@v4
         with:
           pattern: debs-*
           path: debs/
           merge-multiple: true
+
       - uses: actions/download-artifact@v4
         with:
           pattern: release-*
           path: dist/
           merge-multiple: true
-      - if: needs.gate.outputs.mode == 'tag'
-        name: Upload artifacts to release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
-          files: |
-            demo-video/demo.mp4
-            demo-video/demo.webp
-            packages/APKBUILD
-            packages/*.apk
-            debs/*.deb
-            dist/*.tar.gz
+
       - if: needs.gate.outputs.mode == 'pr'
         name: Verify staged release artifacts
         run: |
@@ -169,17 +175,55 @@ jobs:
           compgen -G 'debs/*.deb' >/dev/null
           compgen -G 'dist/*.tar.gz' >/dev/null
 
+      - if: needs.gate.outputs.mode == 'tag'
+        name: Require release automation token
+        env:
+          RELEASE_GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$RELEASE_GITHUB_TOKEN" ]]; then
+            echo "RELEASE_GITHUB_TOKEN secret is required for release asset publication."
+            exit 1
+          fi
+
+      - if: needs.gate.outputs.mode == 'tag'
+        name: Upload artifacts to draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.gate.outputs.tag }}
+          token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+          files: |
+            demo-video/demo.mp4
+            demo-video/demo.webp
+            packages/APKBUILD
+            packages/*.apk
+            debs/*.deb
+            dist/*.tar.gz
+
   publish-crate:
-    runs-on: ubuntu-latest
     needs: [gate, release]
     if: needs.gate.outputs.enabled == 'true'
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - if: needs.gate.outputs.mode == 'pr'
         name: Validate crate publish (dry-run)
         run: |
           set -euo pipefail
           cargo publish --locked --no-verify --dry-run
+
+      - if: needs.gate.outputs.mode == 'tag'
+        name: Require crates.io token
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$CARGO_REGISTRY_TOKEN" ]]; then
+            echo "CARGO_REGISTRY_TOKEN secret is required for crates.io publishing."
+            exit 1
+          fi
+
       - if: needs.gate.outputs.mode == 'tag'
         name: Publish phrog to crates.io
         env:
@@ -189,8 +233,8 @@ jobs:
           cargo publish --locked --no-verify
 
   pass:
-    name: ✅ Pass
-    needs: [gate, build, alpine, debian, release-builds, publish-assets, publish-crate]
+    name: "✅ Pass"
+    needs: [gate, release, build, alpine, debian, release-builds, publish-assets, publish-crate]
     runs-on: ubuntu-latest
     if: always() && needs.gate.outputs.enabled == 'true'
     steps:
@@ -200,13 +244,31 @@ jobs:
 
   publish-release:
     needs: [gate, pass]
-    if: needs.gate.outputs.mode == 'tag' && needs.pass.result == 'success'
+    if: needs.gate.outputs.enabled == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Publish draft release
+      - if: needs.gate.outputs.mode == 'tag' && needs.pass.result == 'success'
+        name: Publish draft release
         env:
           GH_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+          TAG_NAME: ${{ needs.gate.outputs.tag }}
         run: |
           set -euo pipefail
-          release_id="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${GITHUB_REF_NAME}" --jq .id)"
-          gh api -X PATCH "repos/${GITHUB_REPOSITORY}/releases/${release_id}" -f draft=false >/dev/null
+
+          if [[ -z "$GH_TOKEN" ]]; then
+            echo "RELEASE_GITHUB_TOKEN secret is required to publish draft releases."
+            exit 1
+          fi
+
+          gh release edit "$TAG_NAME" --repo "$GITHUB_REPOSITORY" --draft=false >/dev/null
+
+          draft_state="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG_NAME}" --jq '.draft')"
+          if [[ "$draft_state" != "false" ]]; then
+            echo "::error::release ${TAG_NAME} is still marked as draft"
+            exit 1
+          fi
+
+      - if: needs.gate.outputs.mode == 'pr'
+        name: Skip release publication in PR mode
+        run: |
+          echo "release/v* PR mode: skipping draft publication"
