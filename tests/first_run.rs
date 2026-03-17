@@ -26,9 +26,9 @@ fn test_first_run() {
             .set_permissions(Permissions::from_mode(0o755))
             .unwrap();
         script.write_all(format!(
-            "#!/bin/bash
-            set -uexo pipefail
-            foot bash -c 'touch {touch}; echo This is a first-run wizard; while [[ -f {touch} ]]; do sleep 0.5; done; exit'",
+            "#!/bin/sh
+            set -x
+            foot bash -c 'touch {touch}; echo This is a first-run wizard; while [ -f {touch} ]; do sleep 0.5; done; exit'",
             touch = touch.display()
         ).as_bytes()).unwrap();
     }
