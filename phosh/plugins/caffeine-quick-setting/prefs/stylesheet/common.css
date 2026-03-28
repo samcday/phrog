@@ -1,0 +1,11 @@
+.caffeine-spinbutton {
+  font-size: 200%;
+}
+
+.caffeine-spinbutton > text {
+  padding: 10px;
+}
+
+.caffeine-spinbutton-separator {
+  font-size: 400%;
+}

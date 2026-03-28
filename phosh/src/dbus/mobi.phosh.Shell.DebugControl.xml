@@ -1,0 +1,21 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      mobi.phosh.Shell.DebugControl:
+
+      This interface is exported by the shell to control its runtime
+      debug settings.
+  -->
+
+  <interface name="mobi.phosh.Shell.DebugControl">
+    <!--
+        LogDomains:
+
+        The current log domains
+    -->
+    <property name="LogDomains" type="as" access="readwrite"/>
+
+  </interface>
+</node>

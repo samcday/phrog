@@ -6,6 +6,8 @@ Uploaders: Arnaud Ferraris <aferraris@debian.org>
 Build-Depends:
  debhelper-compat (= 13),
  dh-cargo,
+ meson,
+ ninja-build,
  librust-anyhow-1-dev (>= 1.0.82~~),
  librust-async-channel-2-dev (>= 2.2.1~~),
  librust-async-global-executor-3-dev (>= 3.0.0~~),

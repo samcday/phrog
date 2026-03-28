@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface domain="phosh">
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.6"/>
+  <template class="PhoshPomodoroQuickSettingPrefs" parent="AdwPreferencesDialog">
+    <property name="title" translatable="1">Pomodoro Quick Setting Preferences</property>
+    <child>
+      <object class="AdwPreferencesPage">
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="1">Pomodoro Technique</property>
+            <child>
+              <object class="AdwSpinRow" id="active_duration_spin_row">
+                <property name="title" translatable="1">_Active Duration</property>
+                <property name="subtitle" translatable="1">Duration of the focus session</property>
+                <property name="use-underline">1</property>
+                <property name="adjustment">
+                  <object class="GtkAdjustment">
+                    <property name="lower">1</property>
+                    <property name="upper">100</property>
+                    <property name="page-increment">10</property>
+                    <property name="step-increment">1</property>
+                  </object>
+                </property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwSpinRow" id="break_duration_spin_row">
+                <property name="title" translatable="1">_Break Duration</property>
+                <property name="subtitle" translatable="1">Duration of the break between sessions</property>
+                <property name="use-underline">1</property>
+                <property name="adjustment">
+                  <object class="GtkAdjustment">
+                    <property name="lower">1</property>
+                    <property name="upper">100</property>
+                    <property name="page-increment">10</property>
+                    <property name="step-increment">1</property>
+                  </object>
+                </property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwSwitchRow" id="start_on_unlock_switch_row">
+                <property name="title" translatable="1">_Start on unlock</property>
+                <property name="subtitle" translatable="1">Whether to start the timer on screen unlock</property>
+                <property name="use-underline">1</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

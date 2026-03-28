@@ -10,6 +10,7 @@ jobs:
   - job: copr_build
     manual_trigger: true
     trigger: pull_request
+    enable_net: true
     additional_repos:
       - copr://samcday/phosh-nightly
       - copr://samcday/phrog-nightly

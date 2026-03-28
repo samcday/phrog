@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -e
+
+export WLR_RENDERER=pixman
+export WLR_BACKENDS=headless
+export TOPSRCDIR=@ABS_SRCDIR@
+export TOPBUILDDIR=@ABS_BUILDDIR@
+export PHOSH_DEBUG=fake-builtin
+
+exec umockdev-wrapper pytest $@
