@@ -103,9 +103,6 @@ jobs:
           ref: ${{ github.event.repository.default_branch }}
           token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
 
-      - uses: taiki-e/install-action@just
-        if: steps.parse.outputs.skip != 'true'
-
       - name: install deps
         if: steps.parse.outputs.skip != 'true'
         run: |
@@ -135,7 +132,7 @@ jobs:
           fi
 
           git checkout -b "$branch"
-          just bump "$version"
+          cargo xtask bump "$version"
 
           if git diff --quiet; then
             echo "No version changes for $version; skipping"
