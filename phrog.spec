@@ -5,13 +5,21 @@
 %global _cargo_generate_buildrequires 0
 %endif
 
+# gettext-sys's build.rs falls back to compiling its bundled gettext when
+# this is unset, and that bundled build is broken on Fedora 43+. Force the
+# system libintl path; gettext-devel provides the headers.
+%global gettext_sys_env export GETTEXT_SYSTEM=1
+
 Name:           phrog
 Version:        0.53.0_rc7
 Release:        %autorelease
 Summary:        Mobile-friendly greeter for greetd
 License:        GPL-3.0-only
 URL:            https://github.com/samcday/phrog
-Source:         %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+%if %{with vendor}
+Source1:        %{name}-vendor.tar.gz
+%endif
 
 ExcludeArch:    %{ix86}
 
@@ -32,6 +40,7 @@ BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(libhandy-1)
 BuildRequires:  pkgconfig(libphosh-0.45)
+BuildRequires:  gettext-devel
 %endif
 
 Requires:       accountsservice
@@ -51,7 +60,7 @@ mkdir -p /tmp/runtime-dir
 chmod 0700 /tmp/runtime-dir
 
 %if %{with vendor}
-%{__cargo} vendor --locked --versioned-dirs vendor
+tar -xf %{SOURCE1}
 %cargo_prep -v vendor
 %else
 %cargo_prep
@@ -60,6 +69,7 @@ chmod 0700 /tmp/runtime-dir
 %endif
 
 %build
+%{gettext_sys_env}
 %cargo_build
 %cargo_vendor_manifest
 %{cargo_license_summary}
@@ -77,6 +87,7 @@ chmod 0700 /tmp/runtime-dir
 %{__install} -Dpm 0755 data/phrog-greetd-session -t %{buildroot}%{_libexecdir}/
 %{__install} -d %{buildroot}%{_datadir}/phrog/autostart
 %{__install} -d %{buildroot}%{_sysconfdir}/phrog/autostart
+%{gettext_sys_env}
 %cargo_install
 
 %if %{with check}
@@ -85,6 +96,7 @@ export G_MESSAGES_DEBUG=all
 export XDG_RUNTIME_DIR=/tmp/runtime-dir
 cat > test.sh <<HERE
 #!/bin/bash
+%{gettext_sys_env}
 %cargo_test
 HERE
 chmod +x test.sh

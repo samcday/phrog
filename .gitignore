@@ -5,5 +5,7 @@ debian/phrog/
 debian/phrog.substvars
 debian/tmp_home/
 target/
+vendor/
 *.tar.gz
-*.src.rpm
+*.rpm
+*.log
