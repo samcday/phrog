@@ -159,6 +159,7 @@ mod imp {
                     if let Ok(user) = obj.downcast::<User>() {
                         if user.username() == last_user {
                             this.box_users.select_row(Some(&row));
+                            row.grab_focus();
                         }
                     }
                 }));
@@ -175,16 +176,20 @@ mod imp {
                 }
 
                 // The initial user list has been populated. Select the first item in the list to
-                // ensure something is selected.
+                // ensure something is selected, and grab focus so cursor up/down works without
+                // the user having to tab into the list first.
                 // This will be overridden by the "loaded" signal handler, if the appropriate user
                 // matching the last-user setting was discovered.
-                this.box_users.select_row(
-                    this
-                        .box_users
-                        .children()
-                        .first()
-                        .and_then(|v| v.downcast_ref::<ListBoxRow>()),
-                );
+                let first_row = this
+                    .box_users
+                    .children()
+                    .first()
+                    .cloned()
+                    .and_then(|w| w.downcast::<ListBoxRow>().ok());
+                if let Some(row) = first_row {
+                    this.box_users.select_row(Some(&row));
+                    row.grab_focus();
+                }
 
                 this.obj().set_ready(true);
 
