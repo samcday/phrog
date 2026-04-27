@@ -13,6 +13,7 @@ export INSTALL_DIR=$(CURDIR)/debian/phrog
 # during build and delete it afterwards
 override_dh_auto_build:
 	HOME=$(CURDIR)/debian/tmp_home cargo build
+	HOME=$(CURDIR)/debian/tmp_home cargo xtask dist-data phrog.toml --greetd-vt 7 --greetd-user _greetd
 
 override_dh_auto_install:
 	install -D -m0755 target/$(DEB_HOST_RUST_TYPE)/debug/phrog \

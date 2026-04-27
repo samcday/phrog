@@ -7,6 +7,6 @@ data/mobi.phosh.Phrog.target /usr/lib/systemd/user/
 data/systemd-session.conf usr/lib/systemd/user/gnome-session@phrog.target.d
 
 # Debian-specific config
-data/phrog.toml etc/greetd
+target/dist-data/phrog.toml etc/greetd
 debian/config/phoc.ini usr/share/phrog
 debian/config/systemd/phrog.conf usr/lib/systemd/system/greetd.service.d
