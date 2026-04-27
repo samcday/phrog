@@ -5,8 +5,20 @@ files_to_sync:
   - .packit.yaml
 upstream_package_name: phrog
 downstream_package_name: phrog
+srpm_build_deps:
+  - cargo
+
+# Pre-bake the vendor tarball alongside the spec so SRPMs are self-contained
+# and `mock` builds work fully offline. Used by the default (vendored) build
+# path; the non-vendor path ignores Source1.
+actions:
+  post-upstream-clone:
+    - cargo vendor --locked --versioned-dirs vendor
+    - tar -H pax --create --gzip --sort=name --owner=0 --group=0 --numeric-owner --file phrog-vendor.tar.gz vendor
+
 jobs:
-  # Build PRs
+  # Build PRs against the non-vendor path, leaning on the gtk3-rs RPMs
+  # resurrected in samcday/phrog-nightly.
   - job: copr_build
     manual_trigger: true
     trigger: pull_request
@@ -21,7 +33,8 @@ jobs:
       fedora-rawhide-aarch64: *opts
       fedora-rawhide-x86_64: *opts
 
-  # Build main commits in samcday/phrog-nightly COPR
+  # Build main commits in samcday/phrog-nightly COPR via the vendor path,
+  # mirroring what ships in Fedora dist-git.
   - job: copr_build
     trigger: commit
     branch: main
@@ -30,9 +43,8 @@ jobs:
     additional_repos:
       - copr://samcday/phosh-nightly
 
-  # Build tagged releases in samcday/phrog COPR
+  # Build tagged releases in samcday/phrog COPR via the vendor path.
   - job: copr_build
     trigger: release
-    enable_net: true
     owner: samcday
     project: phrog
