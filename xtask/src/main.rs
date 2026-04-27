@@ -1,6 +1,6 @@
 use std::error::Error;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::process::{self, Command};
 
 use clap::{Parser, Subcommand};
@@ -9,6 +9,7 @@ use toml_edit::{value, DocumentMut};
 
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
+const GREETD_CONFIG_TEMPLATE: &str = include_str!("../../data/greetd-config.toml.in");
 const VERSION_USAGE: &str = "Use X.Y.Z or X.Y.Z-rc.N.";
 
 #[derive(Debug, PartialEq, Eq)]
@@ -33,6 +34,17 @@ enum Commands {
         /// Version to bump to (X.Y.Z or X.Y.Z-rc.N).
         version: String,
     },
+    /// Generate packaging data.
+    DistData {
+        /// File name for the generated greetd config under target/dist-data.
+        file_name: String,
+        /// VT to run greetd on.
+        #[arg(long)]
+        greetd_vt: u8,
+        /// User greetd should use for phrog.
+        #[arg(long)]
+        greetd_user: String,
+    },
 }
 
 fn main() {
@@ -45,6 +57,11 @@ fn main() {
 fn run() -> Result<()> {
     match Cli::parse().command {
         Commands::Bump { version } => bump(&version),
+        Commands::DistData {
+            file_name,
+            greetd_vt,
+            greetd_user,
+        } => dist_data(&file_name, greetd_vt, &greetd_user),
     }
 }
 
@@ -101,6 +118,21 @@ fn bump(version: &str) -> Result<()> {
     Ok(())
 }
 
+fn dist_data(file_name: &str, greetd_vt: u8, greetd_user: &str) -> Result<()> {
+    let root = project_root()?;
+    let out_path = dist_data_path(&root, file_name)?;
+    let out_dir = out_path
+        .parent()
+        .ok_or_else(|| format!("output path '{}' has no parent", out_path.display()))?;
+
+    fs::create_dir_all(&out_dir)?;
+    fs::write(&out_path, render_greetd_config(greetd_vt, greetd_user))?;
+
+    println!("Generated {}", out_path.display());
+
+    Ok(())
+}
+
 fn parse_version(version: &str) -> Result<ReleaseVersion> {
     let parsed = Version::parse(version)
         .map_err(|error| format!("unsupported version '{version}': {error}. {VERSION_USAGE}"))?;
@@ -134,6 +166,24 @@ fn parse_version(version: &str) -> Result<ReleaseVersion> {
     })
 }
 
+fn render_greetd_config(greetd_vt: u8, greetd_user: &str) -> String {
+    GREETD_CONFIG_TEMPLATE
+        .replace("@VT@", &greetd_vt.to_string())
+        .replace("@USER@", greetd_user)
+}
+
+fn dist_data_path(root: &Path, file_name: &str) -> Result<PathBuf> {
+    let path = Path::new(file_name);
+    let mut components = path.components();
+
+    match (components.next(), components.next()) {
+        (Some(Component::Normal(_)), None) => Ok(root.join("target/dist-data").join(path)),
+        _ => {
+            Err(format!("dist-data file name must not contain path separators: {file_name}").into())
+        }
+    }
+}
+
 fn project_root() -> Result<PathBuf> {
     Path::new(env!("CARGO_MANIFEST_DIR"))
         .parent()
@@ -143,6 +193,13 @@ fn project_root() -> Result<PathBuf> {
 
 fn update_cargo_toml(path: &Path, cargo_version: &str) -> Result<()> {
     let text = fs::read_to_string(path)?;
+    let updated = update_cargo_toml_text(&text, cargo_version)?;
+
+    fs::write(path, updated)?;
+    Ok(())
+}
+
+fn update_cargo_toml_text(text: &str, cargo_version: &str) -> Result<String> {
     let mut document = text.parse::<DocumentMut>()?;
     let package = document["package"]
         .as_table_mut()
@@ -154,8 +211,7 @@ fn update_cargo_toml(path: &Path, cargo_version: &str) -> Result<()> {
 
     package["version"] = value(cargo_version);
 
-    fs::write(path, document.to_string())?;
-    Ok(())
+    Ok(document.to_string())
 }
 
 fn replace_line(path: &Path, predicate: impl Fn(&str) -> bool, replacement: &str) -> Result<()> {
@@ -283,6 +339,54 @@ mod tests {
     fn rejects_build_metadata_version() {
         let error = parse_version("1.2.3+build.1").unwrap_err().to_string();
         assert!(error.contains(VERSION_USAGE));
+    }
+
+    #[test]
+    fn renders_greetd_config() {
+        assert_eq!(
+            render_greetd_config(7, "_greetd"),
+            "[terminal]\nvt = 7\n\n[default_session]\ncommand = \"/usr/libexec/phrog-greetd-session\"\nuser = \"_greetd\"\n\n# The session to be used on boot\n#[initial_session]\n#command = \"systemd-cat phosh-session\"\n#user = \"username\"\n"
+        );
+    }
+
+    #[test]
+    fn builds_dist_data_path() {
+        assert_eq!(
+            dist_data_path(Path::new("/tmp/phrog"), "phrog.toml").unwrap(),
+            PathBuf::from("/tmp/phrog/target/dist-data/phrog.toml")
+        );
+    }
+
+    #[test]
+    fn rejects_nested_dist_data_path() {
+        assert_eq!(
+            dist_data_path(Path::new("/tmp/phrog"), "debian/phrog.toml")
+                .unwrap_err()
+                .to_string(),
+            "dist-data file name must not contain path separators: debian/phrog.toml"
+        );
+    }
+
+    #[test]
+    fn updates_cargo_toml_package_version_only() {
+        let text = concat!(
+            "[package]\n",
+            "name = \"phrog\"\n",
+            "version = \"1.2.3\"\n\n",
+            "[dependencies]\n",
+            "clap = { version = \"4\" }\n"
+        );
+
+        assert_eq!(
+            update_cargo_toml_text(text, "2.0.0").unwrap(),
+            concat!(
+                "[package]\n",
+                "name = \"phrog\"\n",
+                "version = \"2.0.0\"\n\n",
+                "[dependencies]\n",
+                "clap = { version = \"4\" }\n"
+            )
+        );
     }
 
     #[test]
