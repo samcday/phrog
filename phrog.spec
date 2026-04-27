@@ -71,6 +71,7 @@ tar -xf %{SOURCE1}
 %build
 %{gettext_sys_env}
 %cargo_build
+%{__cargo} run --frozen --quiet --package xtask -- dist-data greetd-config.toml --greetd-vt 1 --greetd-user greetd
 %cargo_vendor_manifest
 %{cargo_license_summary}
 %{cargo_license} > LICENSE.dependencies
@@ -81,7 +82,7 @@ tar -xf %{SOURCE1}
 %{__install} -Dpm 0644 data/mobi.phosh.phrog.gschema.xml -t %{buildroot}%{_datadir}/glib-2.0/schemas/
 %{__install} -Dpm 0644 data/phrog.session -t %{buildroot}%{_datadir}/gnome-session/sessions/
 %{__install} -Dpm 0644 data/mobi.phosh.Phrog.desktop -t %{buildroot}%{_datadir}/applications/
-%{__install} -Dpm 0644 dist/fedora/greetd-config.toml -t %{buildroot}%{_sysconfdir}/phrog/
+%{__install} -Dpm 0644 target/dist-data/greetd-config.toml -t %{buildroot}%{_sysconfdir}/phrog/
 %{__install} -Dpm 0644 dist/fedora/phrog.service -t %{buildroot}%{_unitdir}/
 %{__install} -Dpm 0644 data/systemd-session.conf -T %{buildroot}%{_userunitdir}/gnome-session@phrog.target.d/session.conf
 %{__install} -Dpm 0755 data/phrog-greetd-session -t %{buildroot}%{_libexecdir}/
