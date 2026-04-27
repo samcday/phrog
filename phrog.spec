@@ -11,7 +11,7 @@
 %global gettext_sys_env export GETTEXT_SYSTEM=1
 
 Name:           phrog
-Version:        0.53.0_rc7
+Version:        0.53.0_rc8
 Release:        %autorelease
 Summary:        Mobile-friendly greeter for greetd
 License:        GPL-3.0-only
