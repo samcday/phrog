@@ -5,6 +5,8 @@ data/mobi.phosh.Phrog.desktop usr/share/applications
 data/mobi.phosh.Phrog.service /usr/lib/systemd/user/
 data/mobi.phosh.Phrog.target /usr/lib/systemd/user/
 data/systemd-session.conf usr/lib/systemd/user/gnome-session@phrog.target.d
+data/phrog-gdm-shim.service usr/lib/systemd/system
+data/org.gnome.DisplayManager.phrog.conf usr/share/dbus-1/system.d
 
 # Debian-specific config
 target/dist-data/phrog.toml etc/greetd
