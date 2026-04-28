@@ -30,6 +30,7 @@ BuildRequires:	dbus-daemon
 BuildRequires:  xorg-x11-server-Xvfb
 # first-run test uses foot
 BuildRequires:  foot
+BuildRequires:  pam-devel
 
 %if %{with vendor}
 BuildRequires:  pkgconfig(atk)
@@ -46,6 +47,7 @@ BuildRequires:  gettext-devel
 Requires:       accountsservice
 Requires:       gnome-session
 Requires:       greetd
+Requires:       pam
 Requires:       phoc
 Requires:       phosh-osk = 1.0
 
@@ -84,6 +86,8 @@ tar -xf %{SOURCE1}
 %{__install} -Dpm 0644 data/mobi.phosh.Phrog.desktop -t %{buildroot}%{_datadir}/applications/
 %{__install} -Dpm 0644 target/dist-data/greetd-config.toml -t %{buildroot}%{_sysconfdir}/phrog/
 %{__install} -Dpm 0644 dist/fedora/phrog.service -t %{buildroot}%{_unitdir}/
+%{__install} -Dpm 0644 data/phrog-gdm-shim.service -t %{buildroot}%{_unitdir}/
+%{__install} -Dpm 0644 data/org.gnome.DisplayManager.phrog.conf -t %{buildroot}%{_datadir}/dbus-1/system.d/
 %{__install} -Dpm 0644 data/systemd-session.conf -T %{buildroot}%{_userunitdir}/gnome-session@phrog.target.d/session.conf
 %{__install} -Dpm 0755 data/phrog-greetd-session -t %{buildroot}%{_libexecdir}/
 %{__install} -d %{buildroot}%{_datadir}/phrog/autostart
@@ -108,6 +112,7 @@ dbus-run-session xvfb-run -a -s -noreset phoc -S -E ./test.sh
 %license LICENSE
 %doc README.md
 %{_bindir}/phrog
+%{_bindir}/phrog-gdm-shim
 %{_datadir}/applications/mobi.phosh.Phrog.desktop
 %{_datadir}/glib-2.0/schemas/mobi.phosh.phrog.gschema.xml
 %{_datadir}/gnome-session/sessions/phrog.session
@@ -118,6 +123,8 @@ dbus-run-session xvfb-run -a -s -noreset phoc -S -E ./test.sh
 %{_sysconfdir}/phrog/autostart
 %config(noreplace) %{_sysconfdir}/phrog/greetd-config.toml
 %{_unitdir}/phrog.service
+%{_unitdir}/phrog-gdm-shim.service
+%{_datadir}/dbus-1/system.d/org.gnome.DisplayManager.phrog.conf
 %{_userunitdir}/gnome-session@phrog.target.d/session.conf
 %{_userunitdir}/mobi.phosh.Phrog.service
 %{_userunitdir}/mobi.phosh.Phrog.target

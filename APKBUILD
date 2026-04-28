@@ -12,12 +12,14 @@ depends="
 	phosh
 	greetd
 	greetd-phrog-schemas
-	libphosh"
+	libphosh
+	linux-pam"
 makedepends="
 	cargo
 	cargo-auditable
 	foot
-	libphosh-dev"
+	libphosh-dev
+	linux-pam-dev"
 checkdepends="xvfb-run"
 
 _gitrev=main
@@ -52,6 +54,7 @@ package() {
 	install -d "$pkgdir"/usr/share/phrog/autostart
 	install -d "$pkgdir"/etc/phrog/autostart
 	install -Dm755 target/release/phrog -t "$pkgdir"/usr/bin/
+	install -Dm755 target/release/phrog-gdm-shim -t "$pkgdir"/usr/bin/
 	install -Dm755 data/phrog-greetd-session -t "$pkgdir"/usr/libexec/
 }
 
