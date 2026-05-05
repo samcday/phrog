@@ -17,7 +17,7 @@ PHOC_INI=/etc/phrog/phoc.ini
 # Need to set XDG_CURRENT_DESKTOP now, otherwise gnome-session defaults it to
 # "GNOME", which is a problem because default desktop files for Squeekboard and
 # phosh-osk-stub specify "OnlyShowIn=Phosh;"
-export XDG_CURRENT_DESKTOP=Phosh:GNOME
+export XDG_CURRENT_DESKTOP=Phrog:Phosh:GNOME
 
 export GNOME_SESSION_AUTOSTART_DIR=/usr/share/phrog/autostart:/etc/phrog/autostart
 
