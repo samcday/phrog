@@ -46,6 +46,7 @@ build() {
 
 package() {
 	install -Dm644 data/mobi.phosh.phrog.gschema.xml -t "$pkgdir"/usr/share/glib-2.0/schemas/
+	install -Dm644 data/00_mobi.phosh.Phrog.gschema.override -t "$pkgdir"/usr/share/glib-2.0/schemas/
 	install -Dm644 data/phrog.session -t "$pkgdir"/usr/share/gnome-session/sessions/
 	install -Dm644 data/mobi.phosh.Phrog.desktop -t "$pkgdir"/usr/share/applications/
 	install -Dm644 target/dist-data/greetd-config.toml -t "$pkgdir"/etc/phrog/
