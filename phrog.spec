@@ -80,6 +80,7 @@ tar -xf %{SOURCE1}
 %{__install} -Dpm 0644 data/mobi.phosh.Phrog.service -t %{buildroot}%{_userunitdir}/
 %{__install} -Dpm 0644 data/mobi.phosh.Phrog.target -t %{buildroot}%{_userunitdir}/
 %{__install} -Dpm 0644 data/mobi.phosh.phrog.gschema.xml -t %{buildroot}%{_datadir}/glib-2.0/schemas/
+%{__install} -Dpm 0644 data/00_mobi.phosh.Phrog.gschema.override -t %{buildroot}%{_datadir}/glib-2.0/schemas/
 %{__install} -Dpm 0644 data/phrog.session -t %{buildroot}%{_datadir}/gnome-session/sessions/
 %{__install} -Dpm 0644 data/mobi.phosh.Phrog.desktop -t %{buildroot}%{_datadir}/applications/
 %{__install} -Dpm 0644 target/dist-data/greetd-config.toml -t %{buildroot}%{_sysconfdir}/phrog/
@@ -110,6 +111,7 @@ dbus-run-session xvfb-run -a -s -noreset phoc -S -E ./test.sh
 %{_bindir}/phrog
 %{_datadir}/applications/mobi.phosh.Phrog.desktop
 %{_datadir}/glib-2.0/schemas/mobi.phosh.phrog.gschema.xml
+%{_datadir}/glib-2.0/schemas/00_mobi.phosh.Phrog.gschema.override
 %{_datadir}/gnome-session/sessions/phrog.session
 %{_datadir}/phrog
 %{_datadir}/phrog/autostart
