@@ -20,13 +20,14 @@ anyhow = "1.0.82"
 libphosh = "0.0.7"
 clap = { version = "4.5.4", features = ["derive"] }
 wayland-client = "0.31"
-zbus = { version = "5", default-features = false, features = ["blocking", "async-io"] }
+zbus = { version = "5", default-features = false, features = ["blocking", "async-io", "p2p"] }
 nix = { version = "0.30", features = ["signal"] }
 async-global-executor = "3.0.0"
 futures-util = "0.3.30"
 log = "0.4.22"
 lazy_static = "^1.4"
 gettext-rs = "0.7"
+pam = "0.8"
 
 [dependencies.glib]
 version = "0.18"

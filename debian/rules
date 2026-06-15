@@ -18,6 +18,8 @@ override_dh_auto_build:
 override_dh_auto_install:
 	install -D -m0755 target/$(DEB_HOST_RUST_TYPE)/debug/phrog \
 		$(INSTALL_DIR)/usr/bin/phrog
+	install -D -m0755 target/$(DEB_HOST_RUST_TYPE)/debug/phrog-gdm-shim \
+		$(INSTALL_DIR)/usr/bin/phrog-gdm-shim
 	install -D -m0755 data/phrog-greetd-session \
 		$(INSTALL_DIR)/usr/libexec/phrog-greetd-session
 

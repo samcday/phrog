@@ -1,0 +1,14 @@
+[Unit]
+Description=Phrog GNOME DisplayManager compatibility shim
+Documentation=https://github.com/samcday/phrog
+Conflicts=gdm.service gdm3.service
+After=dbus.service systemd-logind.service
+
+[Service]
+Type=dbus
+BusName=org.gnome.DisplayManager
+ExecStart=/usr/bin/phrog-gdm-shim
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
