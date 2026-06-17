@@ -1,6 +1,6 @@
 phrog 0.53.0
 ------------
-UNRELEASED
+Released June 2026
 * Find graphical sessions via `XDG_DATA_DIRS`, improving support for NixOS
   and other non-FHS systems
 * Use GLib key-file parsing for session desktop files and accept sessions
