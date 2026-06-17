@@ -78,21 +78,38 @@ jobs:
             exit 1
           fi
 
-      - if: needs.gate.outputs.mode == 'tag'
-        name: Build release notes header
+      - uses: actions/checkout@v4
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Build release notes
         env:
+          MODE: ${{ needs.gate.outputs.mode }}
+          PRERELEASE: ${{ needs.gate.outputs.prerelease }}
           TAG_NAME: ${{ needs.gate.outputs.tag }}
+          VERSION: ${{ needs.gate.outputs.version }}
         run: |
-          cat > body.md <<HERE
-          <img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/${TAG_NAME}/demo.webp">
-          HERE
+          set -euo pipefail
+
+          notes_args=(release-notes "$VERSION")
+          if [[ "$PRERELEASE" == "true" ]]; then
+            notes_args=(release-notes --rc "$VERSION")
+          fi
+
+          if [[ "$MODE" == "tag" ]]; then
+            {
+              printf '<img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/%s/demo.webp">\n\n' "$TAG_NAME"
+              cargo xtask "${notes_args[@]}"
+            } > body.md
+          else
+            cargo xtask "${notes_args[@]}" >/dev/null
+          fi
 
       - if: needs.gate.outputs.mode == 'tag'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.gate.outputs.tag }}
           body_path: body.md
-          generate_release_notes: true
           prerelease: ${{ needs.gate.outputs.prerelease }}
           draft: true
           token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
