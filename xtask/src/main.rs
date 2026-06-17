@@ -45,6 +45,14 @@ enum Commands {
         #[arg(long)]
         greetd_user: String,
     },
+    /// Extract release notes from NEWS.
+    ReleaseNotes {
+        /// Version to extract notes for (X.Y.Z or X.Y.Z-rc.N).
+        version: String,
+        /// Allow an UNRELEASED NEWS entry, for release candidates.
+        #[arg(long)]
+        rc: bool,
+    },
 }
 
 fn main() {
@@ -62,6 +70,7 @@ fn run() -> Result<()> {
             greetd_vt,
             greetd_user,
         } => dist_data(&file_name, greetd_vt, &greetd_user),
+        Commands::ReleaseNotes { version, rc } => release_notes(&version, rc),
     }
 }
 
@@ -131,6 +140,24 @@ fn dist_data(file_name: &str, greetd_vt: u8, greetd_user: &str) -> Result<()> {
     println!("Generated {}", out_path.display());
 
     Ok(())
+}
+
+fn release_notes(version: &str, allow_unreleased: bool) -> Result<()> {
+    let version = parse_version(version)?;
+    let news_version = news_version(&version.cargo);
+    let root = project_root()?;
+    let news = fs::read_to_string(root.join("NEWS"))?;
+    let notes = release_notes_text(&news, news_version, allow_unreleased)?;
+
+    print!("{notes}");
+
+    Ok(())
+}
+
+fn news_version(cargo_version: &str) -> &str {
+    cargo_version
+        .split_once("-rc.")
+        .map_or(cargo_version, |(base, _)| base)
 }
 
 fn parse_version(version: &str) -> Result<ReleaseVersion> {
@@ -281,6 +308,59 @@ fn update_readme_demo_text(text: &str, version: &str) -> Result<String> {
     Ok(updated)
 }
 
+fn release_notes_text(news: &str, version: &str, allow_unreleased: bool) -> Result<String> {
+    let header = format!("phrog {version}");
+    let lines = news.lines().collect::<Vec<_>>();
+    let start = lines
+        .iter()
+        .position(|line| *line == header)
+        .ok_or_else(|| format!("NEWS section '{header}' not found"))?;
+    let underline = lines
+        .get(start + 1)
+        .ok_or_else(|| format!("NEWS section '{header}' is missing an underline"))?;
+
+    if !is_news_underline(underline) {
+        return Err(format!("NEWS section '{header}' is missing an underline").into());
+    }
+
+    let release_state = lines
+        .get(start + 2)
+        .ok_or_else(|| format!("NEWS section '{header}' is missing a release state"))?;
+
+    match *release_state {
+        "UNRELEASED" if allow_unreleased => {}
+        "UNRELEASED" => return Err(format!("NEWS section '{header}' is still UNRELEASED").into()),
+        state if state.starts_with("Released ") => {}
+        _ => {
+            return Err(format!(
+                "NEWS section '{header}' must start with 'Released ...' or 'UNRELEASED'"
+            )
+            .into())
+        }
+    }
+
+    let mut end = lines.len();
+    for idx in start + 1..lines.len().saturating_sub(1) {
+        if lines[idx].starts_with("phrog ") && is_news_underline(lines[idx + 1]) {
+            end = idx;
+            break;
+        }
+    }
+
+    while end > start && lines[end - 1].trim().is_empty() {
+        end -= 1;
+    }
+
+    let mut notes = lines[start + 3..end].join("\n");
+    notes.push('\n');
+
+    Ok(notes)
+}
+
+fn is_news_underline(line: &str) -> bool {
+    !line.is_empty() && line.bytes().all(|byte| byte == b'-')
+}
+
 fn run_command(root: &Path, program: &str, args: &[&str], envs: &[(&str, &str)]) -> Result<()> {
     let mut command = Command::new(program);
     command
@@ -417,6 +497,80 @@ mod tests {
         assert_eq!(
             update_readme_demo_text(text, "2.0.0").unwrap(),
             "releases/download/1.2.3/source.tar.gz releases/download/2.0.0/demo.webp"
+        );
+    }
+
+    #[test]
+    fn uses_base_news_version_for_rc() {
+        assert_eq!(news_version("1.2.3-rc.4"), "1.2.3");
+    }
+
+    #[test]
+    fn extracts_release_notes_section() {
+        let news = concat!(
+            "phrog 2.0.0\n",
+            "------------\n",
+            "Released June 2026\n",
+            "* New stuff\n",
+            "\n",
+            "phrog 1.0.0\n",
+            "------------\n",
+            "Released January 2026\n",
+            "* Old stuff\n"
+        );
+
+        assert_eq!(
+            release_notes_text(news, "2.0.0", false).unwrap(),
+            "* New stuff\n"
+        );
+    }
+
+    #[test]
+    fn allows_unreleased_release_notes_for_rc() {
+        let news = concat!(
+            "phrog 2.0.0\n",
+            "------------\n",
+            "UNRELEASED\n",
+            "* New stuff\n"
+        );
+
+        assert_eq!(
+            release_notes_text(news, "2.0.0", true).unwrap(),
+            "* New stuff\n"
+        );
+    }
+
+    #[test]
+    fn rejects_unreleased_release_notes_for_stable() {
+        let news = concat!(
+            "phrog 2.0.0\n",
+            "------------\n",
+            "UNRELEASED\n",
+            "* New stuff\n"
+        );
+
+        assert_eq!(
+            release_notes_text(news, "2.0.0", false)
+                .unwrap_err()
+                .to_string(),
+            "NEWS section 'phrog 2.0.0' is still UNRELEASED"
+        );
+    }
+
+    #[test]
+    fn rejects_malformed_release_state() {
+        let news = concat!(
+            "phrog 2.0.0\n",
+            "------------\n",
+            "COMING SOON\n",
+            "* New stuff\n"
+        );
+
+        assert_eq!(
+            release_notes_text(news, "2.0.0", true)
+                .unwrap_err()
+                .to_string(),
+            "NEWS section 'phrog 2.0.0' must start with 'Released ...' or 'UNRELEASED'"
         );
     }
 }
