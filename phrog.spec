@@ -71,7 +71,7 @@ tar -xf %{SOURCE1}
 %build
 %{gettext_sys_env}
 %cargo_build
-%{__cargo} run --frozen --quiet --package xtask -- dist-data greetd-config.toml --greetd-vt 1 --greetd-user greetd
+%{__cargo} run --offline --quiet --package xtask -- dist-data greetd-config.toml --greetd-vt 1 --greetd-user greetd
 %cargo_vendor_manifest
 %{cargo_license_summary}
 %{cargo_license} > LICENSE.dependencies
