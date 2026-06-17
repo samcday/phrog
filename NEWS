@@ -1,0 +1,223 @@
+phrog 0.53.0
+------------
+UNRELEASED
+* Find graphical sessions via `XDG_DATA_DIRS`, improving support for NixOS
+  and other non-FHS systems
+* Use GLib key-file parsing for session desktop files and accept sessions
+  without `Type=Application`, fixing Plasma session discovery
+* Set desktop session environment from session metadata
+* Localize Phosh and phrog lockscreen strings via gettext
+* Ellipsize long lockscreen labels and focus the selected user initially
+* Ship generated greetd configuration and schema overrides for distro packages
+* Reworked release automation, including release candidates, crates.io
+  publishing, release tarballs, and distro package build artifacts
+* Issues fixed:
+    * https://github.com/samcday/phrog/issues/149
+    * https://github.com/samcday/phrog/issues/199
+* Contributors:
+    * Guido Günther
+    * hustlerone
+    * Sam Day
+
+phrog 0.50.0
+------------
+Released November 2025
+* Log session startup
+* systemd session now depends on `mobi.phosh.OSK.target`
+* Bump libphosh to 0.0.7 and update async-global-executor
+* Update Matrix room documentation
+* Debian, Alpine, and RPM packaging updates
+* CI improvements, including tagged demo-video recording
+* Contributors:
+    * gmanka
+    * Guido Günther
+    * Matthias Geiger
+    * Sam Day
+
+phrog 0.46.0
+------------
+Released March 2025
+* Remove keypad shuffle quick setting
+* Contributors:
+    * Sam Day
+
+phrog 0.45.0
+------------
+Released February 2025
+* Add support for a configurable first-run application on startup
+* Port DBus code to zbus v5
+* Build against Phosh/Phoc 0.45
+* Various lockscreen fixes, including only delaying Error auth messages
+* Add emergency-call test coverage
+* Debian packaging and CI hardening
+* Contributors:
+    * Arnaud Ferraris
+    * Sam Day
+
+phrog 0.44.1
+------------
+Released February 2025
+* Packaging fixes
+* Contributors:
+    * Sam Day
+
+phrog 0.44.0
+------------
+Released February 2025
+* Build against Phosh 0.44 and libphosh 0.0.5
+* Remove nested Phoc handling
+* Use accent colors on the lockscreen and refine styling
+* Optimize trivial flow and default empty last-session to Phosh
+* Add example greetd setup
+* Use glib-rs log macros
+* Packaging overhaul and CI/test-recording improvements
+* Contributors:
+    * Guido Günther
+    * Sam Day
+
+phrog 0.43.0
+------------
+Released December 2024
+* Add a dedicated CI image
+* Clippy cleanups
+* Drop static builds and vendoring
+* Re-enable Packit
+* Contributors:
+    * Sam Day
+
+phrog 0.42.1
+------------
+Released October 2024
+* Add a quick setting to toggle keypad shuffle
+* Contributors:
+    * Sam Day
+
+phrog 0.42.0
+------------
+Released October 2024
+* Update for Phosh 0.42 and regenerate bindings
+* Reset lockscreen sensitivity after greetd errors
+* Relax Rust dependencies for Debian compatibility
+* Update Alpine/postmarketOS installation documentation and package
+  dependencies
+* Test cleanup
+* Contributors:
+    * Sam Day
+
+phrog 0.10.0
+------------
+Released September 2024
+* Finalize AccountsService implementation
+* Contributors:
+    * Sam Day
+
+phrog 0.9.0
+-----------
+Released September 2024
+* Add and update the demo intro video
+* Increase Phoc scale for CI recordings
+* Contributors:
+    * Sam Day
+
+phrog 0.8.2
+-----------
+Released September 2024
+* Fix Alpine package checks for non-static builds
+* Only statically link x86_64 Alpine builds
+* Clean up spawned wf-recorder and dbus-daemon subprocesses in tests
+* Contributors:
+    * Sam Day
+
+phrog 0.8.1
+-----------
+Released September 2024
+* Only run keypad shuffle tests when the feature is enabled
+* README improvements
+* Contributors:
+    * Sam Day
+
+phrog 0.8.0
+-----------
+Released September 2024
+* Add a statically linked libphosh cargo feature
+* Re-enable keypad shuffle behind a cargo feature
+* Add debug mode
+* Build main and PR commits into Alpine packages
+* Test improvements
+* Contributors:
+    * Sam Day
+
+phrog 0.7.0
+-----------
+Released September 2024
+* Use the `mobi.phosh.phrog` namespace
+* Add built-in `--fake` support
+* Fade in on session start
+* Only launch nested Phoc when the parent compositor lacks Phosh support
+* Use AccountsService for user information
+* Add stylesheet and round off user selection corners
+* Contributors:
+    * Sam Day
+
+phrog 0.6.0
+-----------
+Released August 2024
+* Customize Packit jobs
+* Contributors:
+    * Sam Day
+
+phrog 0.5.0
+-----------
+Released August 2024
+* Add basic CI recording infrastructure
+* Split Phoc spawning and early initialization
+* Add libphosh initialization and teardown helpers
+* Use `OUT_DIR` for internal libphosh builds
+* Add shell-ready and login integration tests
+* Contributors:
+    * Sam Day
+
+phrog 0.4.0
+-----------
+Released May 2024
+* Add infrastructure to statically link an internal libphosh build
+* Add CI, Debian, and Alpine build scaffolding
+* Update bindings for private libphosh builds
+* Contributors:
+    * Sam Day
+
+phrog 0.3.0
+-----------
+Released May 2024
+* Add a quick setting (top bar) to toggle keypad shuffle preference
+* Improve initial loading behavior on slower devices
+* Install GSettings schemas in packages
+* Clean up bindings and formatting
+* Contributors:
+    * Sam Day
+
+phrog 0.2.0
+-----------
+Released May 2024
+* Improve greetd conversation handling
+* Improve lockscreen ergonomics
+* Add basic Alpine packaging and tagged release builds
+* Update postmarketOS and README documentation
+* Update libphosh bindings
+* Contributors:
+    * Sam Day
+
+phrog 0.1.8
+-----------
+Released May 2024
+* Add basic clap CLI infrastructure
+* Spec and README tweaks
+* Contributors:
+    * Sam Day
+
+phrog 0.1.0
+-----------
+Released May 2024
+* Initial experimental release
+* Contributors:
+    * Sam Day
