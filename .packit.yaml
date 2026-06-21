@@ -48,3 +48,9 @@ jobs:
     trigger: release
     owner: samcday
     project: phrog
+
+  # Open Fedora dist-git update PRs for upstream releases.
+  - job: propose_downstream
+    trigger: release
+    dist_git_branches:
+      - fedora-all
