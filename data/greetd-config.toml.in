@@ -1,3 +1,6 @@
+[general]
+service = "@GENERAL_SERVICE@"
+
 [terminal]
 vt = @VT@
 

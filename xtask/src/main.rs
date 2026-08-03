@@ -44,6 +44,8 @@ enum Commands {
         /// User greetd should use for phrog.
         #[arg(long)]
         greetd_user: String,
+        #[arg(long, default_value = "greetd")]
+        greetd_general_service: String,
     },
     /// Extract release notes from NEWS.
     ReleaseNotes {
@@ -69,7 +71,8 @@ fn run() -> Result<()> {
             file_name,
             greetd_vt,
             greetd_user,
-        } => dist_data(&file_name, greetd_vt, &greetd_user),
+            greetd_general_service,
+        } => dist_data(&file_name, greetd_vt, &greetd_user, &greetd_general_service),
         Commands::ReleaseNotes { version, rc } => release_notes(&version, rc),
     }
 }
@@ -127,7 +130,12 @@ fn bump(version: &str) -> Result<()> {
     Ok(())
 }
 
-fn dist_data(file_name: &str, greetd_vt: u8, greetd_user: &str) -> Result<()> {
+fn dist_data(
+    file_name: &str,
+    greetd_vt: u8,
+    greetd_user: &str,
+    greetd_general_service: &str,
+) -> Result<()> {
     let root = project_root()?;
     let out_path = dist_data_path(&root, file_name)?;
     let out_dir = out_path
@@ -135,7 +143,10 @@ fn dist_data(file_name: &str, greetd_vt: u8, greetd_user: &str) -> Result<()> {
         .ok_or_else(|| format!("output path '{}' has no parent", out_path.display()))?;
 
     fs::create_dir_all(&out_dir)?;
-    fs::write(&out_path, render_greetd_config(greetd_vt, greetd_user))?;
+    fs::write(
+        &out_path,
+        render_greetd_config(greetd_vt, greetd_user, greetd_general_service),
+    )?;
 
     println!("Generated {}", out_path.display());
 
@@ -193,10 +204,11 @@ fn parse_version(version: &str) -> Result<ReleaseVersion> {
     })
 }
 
-fn render_greetd_config(greetd_vt: u8, greetd_user: &str) -> String {
+fn render_greetd_config(greetd_vt: u8, greetd_user: &str, greetd_general_service: &str) -> String {
     GREETD_CONFIG_TEMPLATE
         .replace("@VT@", &greetd_vt.to_string())
         .replace("@USER@", greetd_user)
+        .replace("@GENERAL_SERVICE@", greetd_general_service)
 }
 
 fn dist_data_path(root: &Path, file_name: &str) -> Result<PathBuf> {
