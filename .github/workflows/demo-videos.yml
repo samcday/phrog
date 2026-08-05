@@ -1,0 +1,740 @@
+name: Demo videos
+
+on:
+  issue_comment:
+    types: [created]
+
+# Nothing in this workflow inherits a write permission. In particular, the job
+# which checks out and renders PR-controlled data cannot see repository secrets.
+permissions: {}
+
+jobs:
+  locate-recordings:
+    if: >-
+      github.event.issue.pull_request &&
+      github.event.comment.body == '/demo-videos'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      actions: read
+      issues: write
+      pull-requests: read
+    outputs:
+      artifact-id: ${{ steps.locate.outputs.artifact_id }}
+      comment-id: ${{ steps.locate.outputs.comment_id }}
+      head-repository: ${{ steps.locate.outputs.head_repository }}
+      head-repository-id: ${{ steps.locate.outputs.head_repository_id }}
+      head-sha: ${{ steps.locate.outputs.head_sha }}
+      pr-number: ${{ steps.locate.outputs.pr_number }}
+      request-id: ${{ steps.locate.outputs.request_id }}
+      source-run-attempt: ${{ steps.locate.outputs.source_run_attempt }}
+      source-run-id: ${{ steps.locate.outputs.source_run_id }}
+    steps:
+      - name: Authorize request and locate recordings
+        id: locate
+        env:
+          COMMENTER: ${{ github.event.comment.user.login }}
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          REPOSITORY: ${{ github.repository }}
+          REQUEST_ID: ${{ github.event.comment.id }}
+          SERVER_URL: ${{ github.server_url }}
+        run: |
+          set -euo pipefail
+
+          if [[ ! "$PR_NUMBER" =~ ^[0-9]+$ || ! "$REQUEST_ID" =~ ^[0-9]+$ ]]; then
+            echo "The PR number or command comment ID was malformed."
+            exit 1
+          fi
+
+          can_push="$({
+            gh api \
+              "repos/$REPOSITORY/collaborators/$COMMENTER/permission" \
+              --jq '.user.permissions.push == true'
+          } 2>/dev/null || true)"
+          if [[ "$can_push" != true ]]; then
+            echo "@$COMMENTER does not have write permission to $REPOSITORY."
+            exit 1
+          fi
+
+          pr_json="$(mktemp)"
+          gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" > "$pr_json"
+
+          state="$(jq -r '.state' "$pr_json")"
+          head_ref="$(jq -r '.head.ref // empty' "$pr_json")"
+          head_sha="$(jq -r '.head.sha // empty' "$pr_json")"
+          head_repository="$(jq -r '.head.repo.full_name // empty' "$pr_json")"
+          head_repository_id="$(jq -r '.head.repo.id // empty' "$pr_json")"
+          head_repository_private="$(jq -r '.head.repo.private // true' "$pr_json")"
+
+          if [[ "$state" != open ]]; then
+            echo "PR #$PR_NUMBER is not open."
+            exit 1
+          fi
+          if [[ ! "$head_sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "The PR head SHA was missing or malformed."
+            exit 1
+          fi
+          if [[ ! "$head_repository" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+            echo "The PR head repository was missing or malformed."
+            exit 1
+          fi
+          if [[ ! "$head_repository_id" =~ ^[0-9]+$ ]]; then
+            echo "The PR head repository ID was missing or malformed."
+            exit 1
+          fi
+          if [[ "$head_repository_private" != false ]]; then
+            echo "Demo rendering only supports public PR head repositories."
+            exit 1
+          fi
+
+          source_workflow=build.yml
+          if [[ "$head_repository" == "$REPOSITORY" && "$head_ref" == release/v* ]]; then
+            # Standalone build.yml jobs intentionally skip release PRs; their
+            # recordings belong to the release orchestrator run instead.
+            source_workflow=release.yml
+          fi
+
+          marker="<!-- phrog-demo-videos request=$REQUEST_ID -->"
+          status_file="$(mktemp)"
+
+          write_status() {
+            local message="$1"
+            cat > "$status_file" <<EOF
+          $marker
+          ### Demo videos
+
+          $message
+
+          Requested by @$COMMENTER for [\`${head_sha:0:12}\`]($SERVER_URL/$head_repository/commit/$head_sha).
+          [Command run]($SERVER_URL/$REPOSITORY/actions/runs/${{ github.run_id }}).
+          EOF
+          }
+
+          write_status "⏳ Looking for the matching CI recording artifact."
+          comment_id="$(
+            gh api --method POST \
+              "repos/$REPOSITORY/issues/$PR_NUMBER/comments" \
+              -f body="$(<"$status_file")" \
+              --jq '.id'
+          )"
+
+          update_status() {
+            local message="$1"
+            local current_body
+            current_body="$(
+              gh api "repos/$REPOSITORY/issues/comments/$comment_id" --jq '.body'
+            )"
+            if [[ "$current_body" != *"$marker"* ]]; then
+              echo "This request no longer owns its status comment."
+              exit 1
+            fi
+            write_status "$message"
+            gh api --method PATCH \
+              "repos/$REPOSITORY/issues/comments/$comment_id" \
+              -f body="$(<"$status_file")" >/dev/null
+          }
+
+          fail_request() {
+            local message="$1"
+            update_status "❌ $message"
+            echo "$message"
+            exit 1
+          }
+
+          assert_current_head() {
+            local current
+            current="$(
+              gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" \
+                --jq '[.state, .head.sha, (.head.repo.id | tostring)] | @tsv'
+            )"
+            if [[ "$current" != $'open\t'"$head_sha"$'\t'"$head_repository_id" ]]; then
+              fail_request "The PR head changed while this request was waiting. Run \`/demo-videos\` again for the new commit."
+            fi
+          }
+
+          latest_run_id() {
+            gh api --method GET \
+              "repos/$REPOSITORY/actions/workflows/$source_workflow/runs" \
+              -f event=pull_request \
+              -f head_sha="$head_sha" \
+              -f per_page=100 |
+              jq -r \
+                --arg sha "$head_sha" \
+                --argjson repo_id "$head_repository_id" \
+                '[.workflow_runs[] |
+                  select(.event == "pull_request") |
+                  select(.head_sha == $sha) |
+                  select((.head_repository.id // 0) == $repo_id)] |
+                 sort_by(.created_at, .id) | last | .id // empty'
+          }
+
+          run_id=""
+          # A workflow run can take a few seconds to become visible through the
+          # Actions API. Wait briefly before declaring that there is no run.
+          for _ in $(seq 1 12); do
+            assert_current_head
+            run_id="$(latest_run_id)"
+            [[ -n "$run_id" ]] && break
+            sleep 10
+          done
+
+          if [[ ! "$run_id" =~ ^[0-9]+$ ]]; then
+            fail_request "No \`$source_workflow\` pull-request run exists for this exact commit and head repository."
+          fi
+
+          run_url="$SERVER_URL/$REPOSITORY/actions/runs/$run_id"
+          update_status "⏳ Waiting for the [matching CI run]($run_url) to finish."
+
+          run_status=""
+          run_conclusion=""
+          run_attempt=""
+          # Twenty minutes is long enough for the normal build while avoiding a
+          # runner waiting indefinitely for a fork run which still needs approval.
+          for _ in $(seq 1 80); do
+            assert_current_head
+            newest_run_id="$(latest_run_id)"
+            if [[ "$newest_run_id" =~ ^[0-9]+$ && "$newest_run_id" != "$run_id" ]]; then
+              run_id="$newest_run_id"
+              run_url="$SERVER_URL/$REPOSITORY/actions/runs/$run_id"
+              run_attempt=""
+              update_status "⏳ A newer matching CI run appeared; waiting for [that run]($run_url) to finish."
+            fi
+            run_json="$(gh api "repos/$REPOSITORY/actions/runs/$run_id")"
+            run_status="$(jq -r '.status' <<<"$run_json")"
+            run_conclusion="$(jq -r '.conclusion // empty' <<<"$run_json")"
+            run_attempt="$(jq -r '.run_attempt // empty' <<<"$run_json")"
+            if [[ "$run_status" == completed ]]; then
+              newest_run_id="$(latest_run_id)"
+              if [[ "$newest_run_id" =~ ^[0-9]+$ && "$newest_run_id" != "$run_id" ]]; then
+                run_id="$newest_run_id"
+                run_url="$SERVER_URL/$REPOSITORY/actions/runs/$run_id"
+                run_status=""
+                run_conclusion=""
+                run_attempt=""
+                update_status "⏳ A newer matching CI run appeared; waiting for [that run]($run_url) to finish."
+                continue
+              fi
+              break
+            fi
+            sleep 15
+          done
+
+          if [[ "$run_status" != completed ]]; then
+            fail_request "The [matching CI run]($run_url) did not finish within 20 minutes."
+          fi
+          if [[ "$run_conclusion" != success ]]; then
+            fail_request "The [matching CI run]($run_url) completed with conclusion \`$run_conclusion\`."
+          fi
+          if [[ ! "$run_attempt" =~ ^[0-9]+$ ]]; then
+            fail_request "The matching CI run attempt was malformed."
+          fi
+
+          assert_current_head
+          artifacts_json="$(mktemp)"
+          gh api "repos/$REPOSITORY/actions/runs/$run_id/artifacts?per_page=100" > "$artifacts_json"
+          artifact_count="$(
+            jq '[.artifacts[] | select(.name == "test-recordings") | select(.expired == false)] | length' \
+              "$artifacts_json"
+          )"
+          if [[ "$artifact_count" != 1 ]]; then
+            fail_request "The successful [CI run]($run_url) does not have exactly one unexpired \`test-recordings\` artifact."
+          fi
+          artifact_id="$(
+            jq -r '.artifacts[] | select(.name == "test-recordings") | select(.expired == false) | .id' \
+              "$artifacts_json"
+          )"
+          if [[ ! "$artifact_id" =~ ^[0-9]+$ ]]; then
+            fail_request "The recording artifact ID was malformed."
+          fi
+
+          newest_run_id="$(latest_run_id)"
+          if [[ "$newest_run_id" =~ ^[0-9]+$ && "$newest_run_id" != "$run_id" ]]; then
+            fail_request "A newer matching CI run appeared while recordings were being selected. Run \`/demo-videos\` again once it finishes."
+          fi
+          confirmed_run="$(
+            gh api "repos/$REPOSITORY/actions/runs/$run_id" \
+              --jq '[.status, (.conclusion // ""), (.run_attempt | tostring)] | @tsv'
+          )"
+          if [[ "$confirmed_run" != $'completed\tsuccess\t'"$run_attempt" ]]; then
+            fail_request "The selected CI run was rerun while recordings were being selected. Run \`/demo-videos\` again once it finishes."
+          fi
+
+          update_status "🎞️ Rendering previews from the [successful CI recordings]($run_url)."
+
+          {
+            echo "artifact_id=$artifact_id"
+            echo "comment_id=$comment_id"
+            echo "head_repository=$head_repository"
+            echo "head_repository_id=$head_repository_id"
+            echo "head_sha=$head_sha"
+            echo "pr_number=$PR_NUMBER"
+            echo "request_id=$REQUEST_ID"
+            echo "source_run_attempt=$run_attempt"
+            echo "source_run_id=$run_id"
+          } >> "$GITHUB_OUTPUT"
+
+  render:
+    needs: locate-recordings
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - name: Check out the exact PR head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          repository: ${{ needs.locate-recordings.outputs.head-repository }}
+          ref: ${{ needs.locate-recordings.outputs.head-sha }}
+          path: source
+          persist-credentials: false
+
+      - name: Download the exact recording artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ needs.locate-recordings.outputs.artifact-id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ needs.locate-recordings.outputs.source-run-id }}
+          path: recordings
+          merge-multiple: true
+
+      - name: Validate recording artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          mapfile -d '' entries < <(find recordings -mindepth 1 -maxdepth 1 -print0)
+          if (( ${#entries[@]} < 1 || ${#entries[@]} > 20 )); then
+            echo "Expected between 1 and 20 recording files, got ${#entries[@]}."
+            exit 1
+          fi
+
+          total_size=0
+          for path in "${entries[@]}"; do
+            name="${path#recordings/}"
+            if [[ ! -f "$path" || -L "$path" || "$name" == demo.mp4 || ! "$name" =~ ^[a-z0-9][a-z0-9_-]{0,63}\.mp4$ ]]; then
+              echo "Rejected recording artifact entry: $name"
+              exit 1
+            fi
+            size="$(stat -c '%s' -- "$path")"
+            if (( size < 1 || size > 104857600 )); then
+              echo "Rejected recording size for $name: $size"
+              exit 1
+            fi
+            total_size=$((total_size + size))
+            if [[ "$(dd if="$path" bs=1 skip=4 count=4 status=none)" != ftyp ]]; then
+              echo "Rejected non-MP4 recording: $name"
+              exit 1
+            fi
+          done
+          if (( total_size > 536870912 )); then
+            echo "Recording artifact exceeds the 512 MiB total limit."
+            exit 1
+          fi
+      - name: Prepare isolated render input
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p render-work
+          cp -a -- source/demo-video/. render-work/
+          rm -rf -- render-work/recordings
+          rm -f -- render-work/demo.mp4 render-work/demo.webp
+          mkdir -p render-work/recordings
+          cp -- recordings/*.mp4 render-work/recordings/
+
+      - name: Render demo videos without network access
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            --network none \
+            --cap-drop ALL \
+            --security-opt no-new-privileges \
+            --pids-limit 512 \
+            --memory 6g \
+            --memory-swap 6g \
+            --cpus 2 \
+            --read-only \
+            --tmpfs /tmp:rw,nosuid,nodev,size=1g \
+            --shm-size 1g \
+            --user "$(id -u):$(id -g)" \
+            --env HOME=/tmp \
+            --volume "$PWD/render-work:/work:rw" \
+            --workdir /work \
+            ghcr.io/samcday/editly@sha256:65795ffd7ef9d3aa6a58c590a71e5fa0a9bea17641fcd24921ae4b9a2d40c3d7 \
+            bash -euo pipefail -c '
+              editly --json editly.json5
+              ffmpeg -nostdin -v error -i demo.mp4 \
+                -vcodec libwebp -filter:v fps=fps=60 -lossless 0 -loop 0 \
+                -preset default -an -vsync 0 -s 160:320 demo.webp
+              for input in recordings/*.mp4; do
+                output="${input%.mp4}.webp"
+                ffmpeg -nostdin -v error -i "$input" \
+                  -vcodec libwebp -filter:v fps=fps=60 -lossless 0 -loop 0 \
+                  -preset default -an -vsync 0 -s 160:320 "$output"
+              done
+            '
+
+      - name: Collect and validate previews
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          mkdir -p preview
+
+          validate_webp() {
+            local path="$1"
+            local name="$2"
+            local size
+            if [[ ! -f "$path" || -L "$path" ]]; then
+              echo "Missing or unsafe WebP output: $name"
+              exit 1
+            fi
+            size="$(stat -c '%s' -- "$path")"
+            if (( size < 12 || size > 52428800 )); then
+              echo "Rejected WebP size for $name: $size"
+              exit 1
+            fi
+            if [[ "$(dd if="$path" bs=1 count=4 status=none)" != RIFF ]] ||
+               [[ "$(dd if="$path" bs=1 skip=8 count=4 status=none)" != WEBP ]]; then
+              echo "Rejected non-WebP output: $name"
+              exit 1
+            fi
+          }
+
+          validate_webp render-work/demo.webp demo.webp
+          cp -- render-work/demo.webp preview/demo.webp
+
+          total_size="$(stat -c '%s' render-work/demo.webp)"
+          recordings=(recordings/*.mp4)
+          for input in "${recordings[@]}"; do
+            name="${input#recordings/}"
+            name="${name%.mp4}.webp"
+            output="render-work/recordings/$name"
+            validate_webp "$output" "$name"
+            cp -- "$output" "preview/$name"
+            total_size=$((total_size + $(stat -c '%s' -- "$output")))
+          done
+          if (( total_size > 209715200 )); then
+            echo "Generated previews exceed the 200 MiB total limit."
+            exit 1
+          fi
+
+      - name: Upload ready-to-publish previews
+        id: upload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: demo-preview
+          path: preview/*.webp
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+
+  publish:
+    if: ${{ always() && needs.locate-recordings.result == 'success' }}
+    needs: [locate-recordings, render]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      issues: write
+      pull-requests: read
+    steps:
+      - name: Report render failure
+        if: ${{ needs.render.result != 'success' }}
+        env:
+          COMMENT_ID: ${{ needs.locate-recordings.outputs.comment-id }}
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ needs.locate-recordings.outputs.head-sha }}
+          PR_NUMBER: ${{ needs.locate-recordings.outputs.pr-number }}
+          REPOSITORY: ${{ github.repository }}
+          REQUEST_ID: ${{ needs.locate-recordings.outputs.request-id }}
+          SERVER_URL: ${{ github.server_url }}
+        run: |
+          set -euo pipefail
+          marker="<!-- phrog-demo-videos request=$REQUEST_ID -->"
+          current_body="$(gh api "repos/$REPOSITORY/issues/comments/$COMMENT_ID" --jq '.body')"
+          if [[ "$current_body" == *"$marker"* ]]; then
+            body="$marker
+          ### Demo videos
+
+          ❌ Rendering failed for \`${HEAD_SHA:0:12}\`. See the [command run]($SERVER_URL/$REPOSITORY/actions/runs/${{ github.run_id }})."
+            gh api --method PATCH \
+              "repos/$REPOSITORY/issues/comments/$COMMENT_ID" \
+              -f body="$body" >/dev/null
+          fi
+
+      - name: Fail after reporting render failure
+        if: ${{ needs.render.result != 'success' }}
+        run: exit 1
+
+      - name: Download the exact rendered preview artifact
+        if: ${{ needs.render.result == 'success' }}
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ needs.render.outputs.artifact-id }}
+          path: preview
+          merge-multiple: true
+
+      - name: Validate opaque preview files
+        if: ${{ needs.render.result == 'success' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -d '' entries < <(find preview -mindepth 1 -maxdepth 1 -print0)
+          if (( ${#entries[@]} < 2 || ${#entries[@]} > 21 )); then
+            echo "Expected between 2 and 21 preview files, got ${#entries[@]}."
+            exit 1
+          fi
+
+          found_demo=false
+          total_size=0
+          for path in "${entries[@]}"; do
+            name="${path#preview/}"
+            if [[ ! -f "$path" || -L "$path" || ! "$name" =~ ^[a-z0-9][a-z0-9_-]{0,63}\.webp$ ]]; then
+              echo "Rejected preview artifact entry: $name"
+              exit 1
+            fi
+            [[ "$name" == demo.webp ]] && found_demo=true
+            size="$(stat -c '%s' -- "$path")"
+            if (( size < 12 || size > 52428800 )); then
+              echo "Rejected preview size for $name: $size"
+              exit 1
+            fi
+            total_size=$((total_size + size))
+            if [[ "$(dd if="$path" bs=1 count=4 status=none)" != RIFF ]] ||
+               [[ "$(dd if="$path" bs=1 skip=8 count=4 status=none)" != WEBP ]]; then
+              echo "Rejected non-WebP preview: $name"
+              exit 1
+            fi
+          done
+          if [[ "$found_demo" != true || "$total_size" -gt 209715200 ]]; then
+            echo "The preview artifact is incomplete or too large."
+            exit 1
+          fi
+
+      - name: Revalidate request before publication
+        if: ${{ needs.render.result == 'success' }}
+        env:
+          COMMENT_ID: ${{ needs.locate-recordings.outputs.comment-id }}
+          GH_TOKEN: ${{ github.token }}
+          HEAD_REPOSITORY_ID: ${{ needs.locate-recordings.outputs.head-repository-id }}
+          HEAD_SHA: ${{ needs.locate-recordings.outputs.head-sha }}
+          PR_NUMBER: ${{ needs.locate-recordings.outputs.pr-number }}
+          REPOSITORY: ${{ github.repository }}
+          REQUEST_ID: ${{ needs.locate-recordings.outputs.request-id }}
+          SOURCE_RUN_ATTEMPT: ${{ needs.locate-recordings.outputs.source-run-attempt }}
+          SOURCE_RUN_ID: ${{ needs.locate-recordings.outputs.source-run-id }}
+        run: |
+          set -euo pipefail
+          marker="<!-- phrog-demo-videos request=$REQUEST_ID -->"
+          current_body="$(gh api "repos/$REPOSITORY/issues/comments/$COMMENT_ID" --jq '.body')"
+          if [[ "$current_body" != *"$marker"* ]]; then
+            echo "This request's status comment changed before publication."
+            touch "$RUNNER_TEMP/demo-status-detached"
+            exit 1
+          fi
+
+          fail_publication() {
+            local message="$1"
+            local body
+            body="$marker
+          ### Demo videos
+
+          ❌ $message"
+            gh api --method PATCH \
+              "repos/$REPOSITORY/issues/comments/$COMMENT_ID" \
+              -f body="$body" >/dev/null
+            touch "$RUNNER_TEMP/demo-failure-reported"
+            exit 1
+          }
+
+          current="$(
+            gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" \
+              --jq '[.state, .head.sha, (.head.repo.id | tostring)] | @tsv'
+          )"
+          if [[ "$current" != $'open\t'"$HEAD_SHA"$'\t'"$HEAD_REPOSITORY_ID" ]]; then
+            fail_publication "The PR head changed before publication. Run \`/demo-videos\` again for the new commit."
+          fi
+
+          source_current="$(
+            gh api "repos/$REPOSITORY/actions/runs/$SOURCE_RUN_ID" \
+              --jq '[.status, (.conclusion // ""), (.run_attempt | tostring)] | @tsv'
+          )"
+          if [[ "$source_current" != $'completed\tsuccess\t'"$SOURCE_RUN_ATTEMPT" ]]; then
+            fail_publication "The source CI run was rerun after rendering began. Run \`/demo-videos\` again once it finishes."
+          fi
+
+          request_json="$(gh api "repos/$REPOSITORY/issues/comments/$REQUEST_ID")"
+          requester="$(jq -r '.user.login // empty' <<<"$request_json")"
+          request_body="$(jq -r '.body // empty' <<<"$request_json")"
+          if [[ ! "$requester" =~ ^[A-Za-z0-9-]{1,39}$ || "$request_body" != /demo-videos ]]; then
+            fail_publication "The original \`/demo-videos\` request was changed or removed."
+          fi
+          can_push="$({
+            gh api \
+              "repos/$REPOSITORY/collaborators/$requester/permission" \
+              --jq '.user.permissions.push == true'
+          } 2>/dev/null || true)"
+          if [[ "$can_push" != true ]]; then
+            fail_publication "@$requester no longer has write permission to this repository."
+          fi
+
+      - name: Upload previews to B2
+        if: ${{ needs.render.result == 'success' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.B2_APPLICATION_ID }}
+          AWS_EC2_METADATA_DISABLED: "true"
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.B2_APPLICATION_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+          B2_BUCKET: samcday-phrog-videos
+          B2_ENDPOINT: https://s3.eu-central-003.backblazeb2.com
+          HEAD_SHA: ${{ needs.locate-recordings.outputs.head-sha }}
+          PR_NUMBER: ${{ needs.locate-recordings.outputs.pr-number }}
+          SOURCE_RUN_ATTEMPT: ${{ needs.locate-recordings.outputs.source-run-attempt }}
+          SOURCE_RUN_ID: ${{ needs.locate-recordings.outputs.source-run-id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          prefix="ci-previews/v1/pr-$PR_NUMBER/$HEAD_SHA/${{ github.run_id }}-${{ github.run_attempt }}"
+          previews=(preview/*.webp)
+          for path in "${previews[@]}"; do
+            name="${path#preview/}"
+            aws s3api put-object \
+              --endpoint-url "$B2_ENDPOINT" \
+              --bucket "$B2_BUCKET" \
+              --key "$prefix/$name" \
+              --body "$path" \
+              --content-type image/webp \
+              --cache-control 'public, max-age=31536000, immutable' \
+              --metadata "pr=$PR_NUMBER,head-sha=$HEAD_SHA,source-run=$SOURCE_RUN_ID,source-attempt=$SOURCE_RUN_ATTEMPT" \
+              >/dev/null
+          done
+
+      - name: Publish PR comment
+        if: ${{ needs.render.result == 'success' }}
+        env:
+          COMMENT_ID: ${{ needs.locate-recordings.outputs.comment-id }}
+          GH_TOKEN: ${{ github.token }}
+          HEAD_REPOSITORY: ${{ needs.locate-recordings.outputs.head-repository }}
+          HEAD_REPOSITORY_ID: ${{ needs.locate-recordings.outputs.head-repository-id }}
+          HEAD_SHA: ${{ needs.locate-recordings.outputs.head-sha }}
+          PR_NUMBER: ${{ needs.locate-recordings.outputs.pr-number }}
+          REPOSITORY: ${{ github.repository }}
+          REQUEST_ID: ${{ needs.locate-recordings.outputs.request-id }}
+          SERVER_URL: ${{ github.server_url }}
+          SOURCE_RUN_ATTEMPT: ${{ needs.locate-recordings.outputs.source-run-attempt }}
+          SOURCE_RUN_ID: ${{ needs.locate-recordings.outputs.source-run-id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          marker="<!-- phrog-demo-videos request=$REQUEST_ID -->"
+          current_body="$(gh api "repos/$REPOSITORY/issues/comments/$COMMENT_ID" --jq '.body')"
+          if [[ "$current_body" != *"$marker"* ]]; then
+            echo "This request's status comment changed after upload; leaving its immutable files unreferenced."
+            exit 0
+          fi
+
+          current="$(
+            gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" \
+              --jq '[.state, .head.sha, (.head.repo.id | tostring)] | @tsv'
+          )"
+          if [[ "$current" != $'open\t'"$HEAD_SHA"$'\t'"$HEAD_REPOSITORY_ID" ]]; then
+            body="$marker
+          ### Demo videos
+
+          ❌ The PR head changed during publication. Run \`/demo-videos\` again for the new commit."
+            gh api --method PATCH \
+              "repos/$REPOSITORY/issues/comments/$COMMENT_ID" \
+              -f body="$body" >/dev/null
+            touch "$RUNNER_TEMP/demo-failure-reported"
+            exit 1
+          fi
+
+          source_current="$(
+            gh api "repos/$REPOSITORY/actions/runs/$SOURCE_RUN_ID" \
+              --jq '[.status, (.conclusion // ""), (.run_attempt | tostring)] | @tsv'
+          )"
+          if [[ "$source_current" != $'completed\tsuccess\t'"$SOURCE_RUN_ATTEMPT" ]]; then
+            body="$marker
+          ### Demo videos
+
+          ❌ The source CI run was rerun during publication. Run \`/demo-videos\` again once it finishes."
+            gh api --method PATCH \
+              "repos/$REPOSITORY/issues/comments/$COMMENT_ID" \
+              -f body="$body" >/dev/null
+            touch "$RUNNER_TEMP/demo-failure-reported"
+            exit 1
+          fi
+
+          base_url="https://samcday-phrog-videos.s3.eu-central-003.backblazeb2.com/ci-previews/v1/pr-$PR_NUMBER/$HEAD_SHA/${{ github.run_id }}-${{ github.run_attempt }}"
+          body_file="$(mktemp)"
+          cat > "$body_file" <<EOF
+          $marker
+          ### Demo videos
+
+          Generated for [\`${HEAD_SHA:0:12}\`]($SERVER_URL/$HEAD_REPOSITORY/commit/$HEAD_SHA) from [CI run $SOURCE_RUN_ID]($SERVER_URL/$REPOSITORY/actions/runs/$SOURCE_RUN_ID). [Render and publication log]($SERVER_URL/$REPOSITORY/actions/runs/${{ github.run_id }}).
+
+          <details open><summary>demo</summary><p>
+
+          <img width="180" height="360" src="$base_url/demo.webp">
+
+          </p></details>
+
+          EOF
+
+          for path in preview/*.webp; do
+            name="${path#preview/}"
+            [[ "$name" == demo.webp ]] && continue
+            label="${name%.webp}"
+            cat >> "$body_file" <<EOF
+          <details><summary>$label</summary><p>
+
+          <img width="180" height="360" src="$base_url/$name">
+
+          </p></details>
+
+          EOF
+          done
+
+          # Recheck the marker immediately before updating this request's comment.
+          current_body="$(gh api "repos/$REPOSITORY/issues/comments/$COMMENT_ID" --jq '.body')"
+          if [[ "$current_body" != *"$marker"* ]]; then
+            echo "This request's status comment changed while the result was being prepared."
+            exit 0
+          fi
+          gh api --method PATCH \
+            "repos/$REPOSITORY/issues/comments/$COMMENT_ID" \
+            -f body="$(<"$body_file")" >/dev/null
+
+      - name: Report unexpected publication failure
+        if: ${{ failure() && needs.render.result == 'success' }}
+        env:
+          COMMENT_ID: ${{ needs.locate-recordings.outputs.comment-id }}
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ needs.locate-recordings.outputs.head-sha }}
+          REPOSITORY: ${{ github.repository }}
+          REQUEST_ID: ${{ needs.locate-recordings.outputs.request-id }}
+          SERVER_URL: ${{ github.server_url }}
+        run: |
+          set -euo pipefail
+          if [[ -e "$RUNNER_TEMP/demo-failure-reported" || -e "$RUNNER_TEMP/demo-status-detached" ]]; then
+            exit 0
+          fi
+          marker="<!-- phrog-demo-videos request=$REQUEST_ID -->"
+          current_body="$(gh api "repos/$REPOSITORY/issues/comments/$COMMENT_ID" --jq '.body')"
+          if [[ "$current_body" == *"$marker"* ]]; then
+            body="$marker
+          ### Demo videos
+
+          ❌ Publication failed for \`${HEAD_SHA:0:12}\`. See the [command run]($SERVER_URL/$REPOSITORY/actions/runs/${{ github.run_id }})."
+            gh api --method PATCH \
+              "repos/$REPOSITORY/issues/comments/$COMMENT_ID" \
+              -f body="$body" >/dev/null
+          fi

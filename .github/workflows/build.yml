@@ -10,9 +10,9 @@ on:
         default: false
   push:
     branches: [main]
-  pull_request_target:
+  pull_request:
     branches: [main]
-    types: [labeled, opened, reopened, synchronize]
+    types: [opened, reopened, synchronize]
   workflow_dispatch: {}
 
 concurrency:
@@ -24,27 +24,33 @@ env:
   RUSTFLAGS: "-Dwarnings"
 
 permissions:
-  contents: write
-  packages: write
-  pull-requests: write
+  contents: read
 
 jobs:
   image-hash:
-    if: inputs.release_mode || github.event_name != 'pull_request_target' || !startsWith(github.event.pull_request.head.ref || '', 'release/v')
+    if: >-
+      inputs.release_mode ||
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name != github.repository ||
+      !startsWith(github.event.pull_request.head.ref || '', 'release/v')
     runs-on: ubuntu-24.04
     outputs:
       hash: ${{ steps.hash.outputs.value }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
       - name: get CI image hash
         id: hash
         run: |
           set -uexo pipefail
-          echo "value=${{ hashFiles('.github/Dockerfile') }}" >> $GITHUB_OUTPUT
+          echo "value=${{ hashFiles('.github/Dockerfile') }}" >> "$GITHUB_OUTPUT"
   build:
-    if: inputs.release_mode || github.event_name != 'pull_request_target' || !startsWith(github.event.pull_request.head.ref || '', 'release/v')
+    if: >-
+      inputs.release_mode ||
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name != github.repository ||
+      !startsWith(github.event.pull_request.head.ref || '', 'release/v')
     needs: image-hash
     runs-on: ubuntu-24.04
     container: ghcr.io/samcday/phrog-ci:${{ needs.image-hash.outputs.hash }}
@@ -52,17 +58,9 @@ jobs:
       run:
         shell: bash
     steps:
-      - if: |
-          github.event_name == 'pull_request_target' &&
-          github.event.pull_request.author_association != 'COLLABORATOR'
-          && github.event.pull_request.author_association != 'OWNER'
-          && !contains(github.event.pull_request.labels.*.name, 'ci-ok')
-        run: |
-          echo This PR has not yet been marked as safe with a ci-ok label
-          exit 1
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
       - name: Set up Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
       - name: Build
@@ -75,10 +73,6 @@ jobs:
       - name: Lint (fmt)
         run: |
           cargo fmt --all --check
-      - uses: actions/upload-artifact@v4
-        with:
-          name: x86-64-debug
-          path: target/debug/phrog
       - name: Test
         run: |
           set -uexo pipefail
@@ -86,7 +80,7 @@ jobs:
           export XDG_RUNTIME_DIR=/tmp
 
           # run tests
-          export RECORD_TESTS=`pwd`/demo-video/recordings/
+          export RECORD_TESTS="$PWD/demo-video/recordings/"
           export G_MESSAGES_DEBUG=all
           cat > phoc.ini <<HERE
           [output:X11-1]
@@ -98,13 +92,18 @@ jobs:
         if: always()
         with:
           name: test-recordings
-          path: demo-video/recordings
+          path: demo-video/recordings/*.mp4
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
   demo:
-    if: inputs.release_mode || ((github.event_name != 'pull_request_target' || !startsWith(github.event.pull_request.head.ref || '', 'release/v')) && (github.event_name != 'pull_request_target' || contains(github.event.pull_request.labels.*.name, 'demo')))
+    if: inputs.release_mode
     needs: build
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
           name: test-recordings
@@ -113,13 +112,11 @@ jobs:
         run: |
           set -uexo pipefail
           docker run \
-            -v `pwd`/demo-video:/work \
-            -i ghcr.io/samcday/editly:latest \
+            --rm \
+            -v "$PWD/demo-video:/work" \
+            -i ghcr.io/samcday/editly@sha256:65795ffd7ef9d3aa6a58c590a71e5fa0a9bea17641fcd24921ae4b9a2d40c3d7 \
             bash -c 'cd /work; editly --json editly.json5; \
-            ffmpeg -i demo.mp4 -vcodec libwebp -filter:v fps=fps=60 -lossless 0 -loop 0 -preset default -an -vsync 0 -s 160:320 demo.webp; \
-            for f in recordings/*.mp4; do \
-              ffmpeg -i $f -vcodec libwebp -filter:v fps=fps=60 -lossless 0 -loop 0 -preset default -an -vsync 0 -s 160:320 "${f%.mp4}.webp"; \
-            done \
+            ffmpeg -i demo.mp4 -vcodec libwebp -filter:v fps=fps=60 -lossless 0 -loop 0 -preset default -an -vsync 0 -s 160:320 demo.webp \
             '
       - uses: actions/upload-artifact@v4
         with:
@@ -127,51 +124,3 @@ jobs:
           path: |
             demo-video/demo.mp4
             demo-video/demo.webp
-      - run: |
-          set -uexo pipefail
-          mkdir blob-upload/
-          cp demo-video/demo.webp demo-video/recordings/*.webp blob-upload/
-          
-          cat > comment.txt <<HERE
-          [The CI build recorded and generated some videos](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-
-          <details><summary>Demo video (shown on README and release notes)</summary>
-          <p>
-
-          <img width="180" height="360" src="https://samcday-phrog-videos.s3.eu-central-003.backblazeb2.com/${{ github.run_id }}/demo.webp">
-
-          </p>
-          </details>
-
-          HERE
-          for f in demo-video/recordings/*.webp; do
-            name="${f%.webp}"
-            name="${name#demo-video/recordings/}"
-            cat >> comment.txt <<HERE
-          <details><summary>${name}</summary>
-          <p>
-
-          <img width="180" height="360" src="https://samcday-phrog-videos.s3.eu-central-003.backblazeb2.com/${{ github.run_id }}/${name}.webp">
-
-          </p>
-          </details>
-
-          HERE
-          done
-      - uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --content-type=b2/x-auto
-        env:
-          AWS_S3_BUCKET: samcday-phrog-videos
-          AWS_ACCESS_KEY_ID: ${{ secrets.B2_APPLICATION_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.B2_APPLICATION_KEY }}
-          AWS_S3_ENDPOINT: https://s3.eu-central-003.backblazeb2.com
-          SOURCE_DIR: 'blob-upload'
-          DEST_DIR: ${{ github.run_id }}
-      - uses: marocchino/sticky-pull-request-comment@v2
-        if: github.event_name == 'pull_request_target' || (inputs.release_mode && github.event_name == 'pull_request')
-        with:
-          header: ci-recordings
-          hide_and_recreate: true
-          hide_classify: OUTDATED
-          path: comment.txt
