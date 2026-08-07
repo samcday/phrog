@@ -79,6 +79,8 @@ jobs:
           fi
 
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - uses: actions-rust-lang/setup-rust-toolchain@v1
 
@@ -124,7 +126,6 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       release_mode: true
-    secrets: inherit
 
   alpine:
     needs: [gate, release]
@@ -223,6 +224,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - if: needs.gate.outputs.mode == 'pr'
         name: Validate crate publish (dry-run)

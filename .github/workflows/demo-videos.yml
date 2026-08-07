@@ -1,0 +1,359 @@
+name: Demo videos
+
+on:
+  issue_comment:
+    types: [created]
+
+# The PR-controlled renderer and the secret-bearing publisher are separate jobs.
+permissions: {}
+
+jobs:
+  resolve:
+    if: >-
+      github.event.issue.pull_request &&
+      github.event.comment.body == '/demo-videos'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      actions: read
+      issues: write
+      pull-requests: read
+    outputs:
+      comment-id: ${{ steps.resolve.outputs.comment_id }}
+      head-repository: ${{ steps.resolve.outputs.head_repository }}
+      head-sha: ${{ steps.resolve.outputs.head_sha }}
+      pr-number: ${{ steps.resolve.outputs.pr_number }}
+      source-run-id: ${{ steps.resolve.outputs.source_run_id }}
+    steps:
+      - name: Authorize request and find recordings
+        id: resolve
+        env:
+          COMMENTER: ${{ github.event.comment.user.login }}
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          REPOSITORY: ${{ github.repository }}
+          SERVER_URL: ${{ github.server_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          permission="$(
+            gh api "repos/$REPOSITORY/collaborators/$COMMENTER/permission" \
+              --jq '.permission' 2>/dev/null || true
+          )"
+          if [[ "$permission" != write && "$permission" != admin ]]; then
+            echo "@$COMMENTER does not have write permission to $REPOSITORY."
+            exit 1
+          fi
+
+          pr="$(gh api "repos/$REPOSITORY/pulls/$PR_NUMBER")"
+          state="$(jq -r '.state' <<<"$pr")"
+          head_ref="$(jq -r '.head.ref // empty' <<<"$pr")"
+          head_sha="$(jq -r '.head.sha // empty' <<<"$pr")"
+          head_repository="$(jq -r '.head.repo.full_name // empty' <<<"$pr")"
+
+          if [[ "$state" != open ||
+                ! "$head_sha" =~ ^[0-9a-f]{40}$ ||
+                ! "$head_repository" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+            echo "The PR head is closed, unavailable, or malformed."
+            exit 1
+          fi
+
+          source_workflow=build.yml
+          if [[ "$head_repository" == "$REPOSITORY" && "$head_ref" == release/v* ]]; then
+            source_workflow=release.yml
+          fi
+
+          command_url="$SERVER_URL/$REPOSITORY/actions/runs/${{ github.run_id }}"
+          comment_id="$(
+            gh api --method POST \
+              "repos/$REPOSITORY/issues/$PR_NUMBER/comments" \
+              -f body="### Demo videos
+
+          ⏳ Finding recordings for \`${head_sha:0:12}\`.
+
+          [Command run]($command_url)." \
+              --jq '.id'
+          )"
+
+          update_comment() {
+            local message="$1"
+            gh api --method PATCH \
+              "repos/$REPOSITORY/issues/comments/$comment_id" \
+              -f body="### Demo videos
+
+          $message
+
+          [Command run]($command_url)." >/dev/null
+          }
+
+          fail() {
+            update_comment "❌ $1"
+            exit 1
+          }
+
+          find_run() {
+            gh api --method GET \
+              "repos/$REPOSITORY/actions/workflows/$source_workflow/runs" \
+              -f event=pull_request -f head_sha="$head_sha" -f per_page=100 |
+              jq -r --arg head_repository "$head_repository" \
+                '[.workflow_runs[] |
+                  select(.head_repository.full_name == $head_repository)] |
+                 sort_by(.created_at, .id) | last | .id // empty'
+          }
+
+          run_id=""
+          for _ in $(seq 1 8); do
+            run_id="$(find_run)"
+            [[ -n "$run_id" ]] && break
+            sleep 15
+          done
+          [[ "$run_id" =~ ^[0-9]+$ ]] ||
+            fail "No matching CI run appeared for this exact PR commit."
+
+          run_url="$SERVER_URL/$REPOSITORY/actions/runs/$run_id"
+          update_comment "⏳ Waiting for the [matching CI run]($run_url)."
+
+          completed=false
+          for _ in $(seq 1 80); do
+            run="$(gh api "repos/$REPOSITORY/actions/runs/$run_id")"
+            status="$(jq -r '.status' <<<"$run")"
+            conclusion="$(jq -r '.conclusion // empty' <<<"$run")"
+            if [[ "$status" == completed ]]; then
+              [[ "$conclusion" == success ]] ||
+                fail "The [matching CI run]($run_url) finished with \`$conclusion\`."
+              completed=true
+              break
+            fi
+            sleep 15
+          done
+          [[ "$completed" == true ]] ||
+            fail "The [matching CI run]($run_url) did not finish within 20 minutes."
+
+          update_comment "🎞️ Rendering previews from the [CI recordings]($run_url)."
+          {
+            echo "comment_id=$comment_id"
+            echo "head_repository=$head_repository"
+            echo "head_sha=$head_sha"
+            echo "pr_number=$PR_NUMBER"
+            echo "source_run_id=$run_id"
+          } >> "$GITHUB_OUTPUT"
+
+  render:
+    needs: resolve
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Check out the exact PR head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          repository: ${{ needs.resolve.outputs.head-repository }}
+          ref: ${{ needs.resolve.outputs.head-sha }}
+          path: source
+          persist-credentials: false
+
+      - name: Download recordings
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: test-recordings
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ needs.resolve.outputs.source-run-id }}
+          path: recordings
+
+      - name: Prepare render input
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -d '' entries < <(find recordings -mindepth 1 -maxdepth 1 -print0)
+          (( ${#entries[@]} >= 1 && ${#entries[@]} <= 20 )) ||
+            { echo "Expected between 1 and 20 recordings."; exit 1; }
+
+          mkdir -p render-work
+          cp -a -- source/demo-video/. render-work/
+          rm -rf -- render-work/recordings
+          rm -f -- render-work/demo.mp4 render-work/demo.webp
+          mkdir render-work/recordings
+
+          total_size=0
+          for path in "${entries[@]}"; do
+            name="${path#recordings/}"
+            [[ -f "$path" && ! -L "$path" &&
+               "$name" =~ ^[a-z0-9][a-z0-9_-]{0,63}\.mp4$ &&
+               "$name" != demo.mp4 ]] ||
+              { echo "Rejected recording: $name"; exit 1; }
+            size="$(stat -c '%s' -- "$path")"
+            (( size >= 1 && size <= 104857600 )) ||
+              { echo "Rejected recording size: $name"; exit 1; }
+            total_size=$((total_size + size))
+            cp -- "$path" "render-work/recordings/$name"
+          done
+          (( total_size <= 536870912 )) ||
+            { echo "Recordings exceed 512 MiB."; exit 1; }
+
+      - name: Render without network or secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            --network none \
+            --cap-drop ALL \
+            --security-opt no-new-privileges \
+            --read-only \
+            --tmpfs /tmp:rw,nosuid,nodev,size=1g \
+            --shm-size 1g \
+            --user "$(id -u):$(id -g)" \
+            --env HOME=/tmp \
+            --volume "$PWD/render-work:/work:rw" \
+            --workdir /work \
+            ghcr.io/samcday/editly@sha256:65795ffd7ef9d3aa6a58c590a71e5fa0a9bea17641fcd24921ae4b9a2d40c3d7 \
+            bash -euo pipefail -c '
+              editly --json editly.json5
+              ffmpeg -nostdin -v error -i demo.mp4 \
+                -vcodec libwebp -filter:v fps=fps=60 -lossless 0 -loop 0 \
+                -preset default -an -vsync 0 -s 160:320 demo.webp
+              for input in recordings/*.mp4; do
+                ffmpeg -nostdin -v error -i "$input" \
+                  -vcodec libwebp -filter:v fps=fps=60 -lossless 0 -loop 0 \
+                  -preset default -an -vsync 0 -s 160:320 "${input%.mp4}.webp"
+              done
+            '
+
+      - name: Collect previews
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ -s render-work/demo.webp ]] ||
+            { echo "Composite preview was not generated."; exit 1; }
+
+          mkdir preview
+          cp -- render-work/demo.webp preview/demo.webp
+          for input in render-work/recordings/*.mp4; do
+            output="${input%.mp4}.webp"
+            [[ -s "$output" && ! -L "$output" ]] ||
+              { echo "Missing preview for $input"; exit 1; }
+            cp -- "$output" preview/
+          done
+
+      - name: Upload rendered previews
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: demo-preview
+          path: preview/*.webp
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+
+  publish:
+    if: ${{ always() && needs.resolve.result == 'success' }}
+    needs: [resolve, render]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      issues: write
+      pull-requests: read
+    steps:
+      - name: Download rendered previews
+        if: ${{ needs.render.result == 'success' }}
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: demo-preview
+          path: preview
+
+      - name: Publish previews
+        if: ${{ needs.render.result == 'success' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.B2_APPLICATION_ID }}
+          AWS_DEFAULT_REGION: eu-central-003
+          AWS_EC2_METADATA_DISABLED: "true"
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.B2_APPLICATION_KEY }}
+          B2_BUCKET: samcday-phrog-videos
+          B2_ENDPOINT: https://s3.eu-central-003.backblazeb2.com
+          COMMENT_ID: ${{ needs.resolve.outputs.comment-id }}
+          GH_TOKEN: ${{ github.token }}
+          HEAD_REPOSITORY: ${{ needs.resolve.outputs.head-repository }}
+          HEAD_SHA: ${{ needs.resolve.outputs.head-sha }}
+          PR_NUMBER: ${{ needs.resolve.outputs.pr-number }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SERVER_URL: ${{ github.server_url }}
+          SOURCE_RUN_ID: ${{ needs.resolve.outputs.source-run-id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -d '' previews < <(find preview -mindepth 1 -maxdepth 1 -print0)
+          (( ${#previews[@]} >= 2 && ${#previews[@]} <= 21 )) ||
+            { echo "Unexpected preview count."; exit 1; }
+
+          found_demo=false
+          total_size=0
+          for path in "${previews[@]}"; do
+            name="${path#preview/}"
+            [[ -f "$path" && ! -L "$path" &&
+               "$name" =~ ^[a-z0-9][a-z0-9_-]{0,63}\.webp$ ]] ||
+              { echo "Rejected preview: $name"; exit 1; }
+            [[ "$name" == demo.webp ]] && found_demo=true
+            size="$(stat -c '%s' -- "$path")"
+            (( size >= 12 && size <= 52428800 )) ||
+              { echo "Rejected preview size: $name"; exit 1; }
+            total_size=$((total_size + size))
+          done
+          [[ "$found_demo" == true && "$total_size" -le 209715200 ]] ||
+            { echo "Preview set is incomplete or too large."; exit 1; }
+
+          prefix="ci-previews/v1/pr-$PR_NUMBER/$HEAD_SHA/${{ github.run_id }}-${{ github.run_attempt }}"
+          base_url="https://samcday-phrog-videos.s3.eu-central-003.backblazeb2.com/$prefix"
+          body_file="$(mktemp)"
+          {
+            printf '### Demo videos\n\n'
+            printf "Generated for [\`%s\`](%s/%s/commit/%s) from [CI run %s](%s/%s/actions/runs/%s). [Command run](%s).\n\n" \
+              "${HEAD_SHA:0:12}" "$SERVER_URL" "$HEAD_REPOSITORY" "$HEAD_SHA" \
+              "$SOURCE_RUN_ID" "$SERVER_URL" "$REPOSITORY" "$SOURCE_RUN_ID" "$RUN_URL"
+            printf '<details open><summary>demo</summary><p>\n\n<img width="180" height="360" src="%s/demo.webp">\n\n</p></details>\n\n' \
+              "$base_url"
+          } > "$body_file"
+
+          for path in "${previews[@]}"; do
+            name="${path#preview/}"
+            aws s3api put-object \
+              --endpoint-url "$B2_ENDPOINT" \
+              --bucket "$B2_BUCKET" \
+              --key "$prefix/$name" \
+              --body "$path" \
+              --content-type image/webp \
+              --cache-control 'public, max-age=31536000, immutable' \
+              >/dev/null
+
+            [[ "$name" == demo.webp ]] && continue
+            label="${name%.webp}"
+            printf '<details><summary>%s</summary><p>\n\n<img width="180" height="360" src="%s/%s">\n\n</p></details>\n\n' \
+              "$label" "$base_url" "$name" >> "$body_file"
+          done
+
+          current="$(gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" --jq '[.state, .head.sha] | @tsv')"
+          [[ "$current" == $'open\t'"$HEAD_SHA" ]] ||
+            { echo "The PR head changed during publication."; exit 1; }
+          gh api --method PATCH \
+            "repos/$REPOSITORY/issues/comments/$COMMENT_ID" \
+            -f body="$(<"$body_file")" >/dev/null
+
+      - name: Report failure
+        if: ${{ always() && (needs.render.result != 'success' || failure()) }}
+        env:
+          COMMENT_ID: ${{ needs.resolve.outputs.comment-id }}
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          phase=publication
+          [[ "${{ needs.render.result }}" == success ]] || phase=rendering
+          gh api --method PATCH \
+            "repos/$REPOSITORY/issues/comments/$COMMENT_ID" \
+            -f body="### Demo videos
+
+          ❌ Demo $phase failed. [Command run]($RUN_URL)." >/dev/null
+          exit 1
