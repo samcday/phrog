@@ -14,7 +14,9 @@ ARG PHOSH_REMOTE=https://gitlab.gnome.org/guidog/phosh.git
 ARG PHOSH_REF=37d48c69b2414fb8b8f9cee19eae60a700c4c551
 
 ARG PHOC_REMOTE=https://gitlab.gnome.org/World/Phosh/phoc.git
-ARG PHOC_REF=v0.51.0
+# 0.51 does not compile against trixie's libinput (KEYPAD_SLIDE switch warning
+# is fatal with -Werror); 0.57 is the first release that handles it.
+ARG PHOC_REF=v0.57.0
 
 # The custom GTK in /usr/local must win over the distro GTK for building and
 # running phrog.
