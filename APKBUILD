@@ -18,7 +18,6 @@ makedepends="
 	cargo
 	cargo-auditable
 	elogind-dev
-	evince-dev
 	evolution-data-server-dev
 	feedbackd-dev
 	foot
@@ -28,10 +27,9 @@ makedepends="
 	gmobile-dev
 	gnome-bluetooth-dev
 	gnome-desktop-dev
-	gtk+3.0-dev
+	gtk4.0-dev
 	libadwaita-dev
 	libgudev-dev
-	libhandy1-dev
 	libsecret-dev
 	libunistring-dev
 	linux-pam-dev
@@ -45,6 +43,10 @@ makedepends="
 	upower-dev
 	wayland-dev
 	wayland-protocols"
+# NOTE: the vendored phosh build derives its layer surface from GtkPlain, which
+# only exists in the GTK custom-surface work (guidog/gtk#custom-surface) that
+# Alpine does not ship yet. APK builds therefore need that GTK until the work
+# lands upstream, in the same way as the CI image does.
 checkdepends="xvfb-run"
 
 _gitrev=main
