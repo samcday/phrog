@@ -6,10 +6,10 @@
 #![cfg(unix)]
 
 use phosh_sys::*;
-use std::mem::{align_of, size_of};
 use std::env;
 use std::error::Error;
 use std::ffi::OsString;
+use std::mem::{align_of, size_of};
 use std::path::Path;
 use std::process::{Command, Stdio};
 use std::str;
@@ -67,8 +67,7 @@ fn pkg_config_cflags(packages: &[&str]) -> Result<Vec<String>, Box<dyn Error>> {
     if packages.is_empty() {
         return Ok(Vec::new());
     }
-    let pkg_config = env::var_os("PKG_CONFIG")
-        .unwrap_or_else(|| OsString::from("pkg-config"));
+    let pkg_config = env::var_os("PKG_CONFIG").unwrap_or_else(|| OsString::from("pkg-config"));
     let mut cmd = Command::new(pkg_config);
     cmd.arg("--cflags");
     cmd.args(packages);
@@ -81,7 +80,6 @@ fn pkg_config_cflags(packages: &[&str]) -> Result<Vec<String>, Box<dyn Error>> {
     let stdout = str::from_utf8(&out.stdout)?;
     Ok(shell_words::split(stdout.trim())?)
 }
-
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 struct Layout {
@@ -164,8 +162,7 @@ fn cross_validate_layout_with_c() {
 
     let mut results = Results::default();
 
-    for ((rust_name, rust_layout), (c_name, c_layout)) in
-        RUST_LAYOUTS.iter().zip(c_layouts.iter())
+    for ((rust_name, rust_layout), (c_name, c_layout)) in RUST_LAYOUTS.iter().zip(c_layouts.iter())
     {
         if rust_name != c_name {
             results.record_failed();
@@ -175,9 +172,7 @@ fn cross_validate_layout_with_c() {
 
         if rust_layout != c_layout {
             results.record_failed();
-            eprintln!(
-                "Layout mismatch for {rust_name}\nRust: {rust_layout:?}\nC:    {c_layout:?}",
-            );
+            eprintln!("Layout mismatch for {rust_name}\nRust: {rust_layout:?}\nC:    {c_layout:?}",);
             continue;
         }
 
@@ -207,27 +202,153 @@ fn get_c_output(name: &str) -> Result<String, Box<dyn Error>> {
 }
 
 const RUST_LAYOUTS: &[(&str, Layout)] = &[
-    ("PhoshDBusScreenshotProxyClass", Layout {size: size_of::<PhoshDBusScreenshotProxyClass>(), alignment: align_of::<PhoshDBusScreenshotProxyClass>()}),
-    ("PhoshDBusScreenshotSkeletonClass", Layout {size: size_of::<PhoshDBusScreenshotSkeletonClass>(), alignment: align_of::<PhoshDBusScreenshotSkeletonClass>()}),
-    ("PhoshLayerSurface", Layout {size: size_of::<PhoshLayerSurface>(), alignment: align_of::<PhoshLayerSurface>()}),
-    ("PhoshLayerSurfaceAnchor", Layout {size: size_of::<PhoshLayerSurfaceAnchor>(), alignment: align_of::<PhoshLayerSurfaceAnchor>()}),
-    ("PhoshLayerSurfaceClass", Layout {size: size_of::<PhoshLayerSurfaceClass>(), alignment: align_of::<PhoshLayerSurfaceClass>()}),
-    ("PhoshLayerSurfaceLayer", Layout {size: size_of::<PhoshLayerSurfaceLayer>(), alignment: align_of::<PhoshLayerSurfaceLayer>()}),
-    ("PhoshLockscreen", Layout {size: size_of::<PhoshLockscreen>(), alignment: align_of::<PhoshLockscreen>()}),
-    ("PhoshLockscreenClass", Layout {size: size_of::<PhoshLockscreenClass>(), alignment: align_of::<PhoshLockscreenClass>()}),
-    ("PhoshLockscreenManagerClass", Layout {size: size_of::<PhoshLockscreenManagerClass>(), alignment: align_of::<PhoshLockscreenManagerClass>()}),
-    ("PhoshLockscreenPage", Layout {size: size_of::<PhoshLockscreenPage>(), alignment: align_of::<PhoshLockscreenPage>()}),
-    ("PhoshQuickSetting", Layout {size: size_of::<PhoshQuickSetting>(), alignment: align_of::<PhoshQuickSetting>()}),
-    ("PhoshQuickSettingClass", Layout {size: size_of::<PhoshQuickSettingClass>(), alignment: align_of::<PhoshQuickSettingClass>()}),
-    ("PhoshScreenshotManagerClass", Layout {size: size_of::<PhoshScreenshotManagerClass>(), alignment: align_of::<PhoshScreenshotManagerClass>()}),
-    ("PhoshShell", Layout {size: size_of::<PhoshShell>(), alignment: align_of::<PhoshShell>()}),
-    ("PhoshShellClass", Layout {size: size_of::<PhoshShellClass>(), alignment: align_of::<PhoshShellClass>()}),
-    ("PhoshStatusIcon", Layout {size: size_of::<PhoshStatusIcon>(), alignment: align_of::<PhoshStatusIcon>()}),
-    ("PhoshStatusIconClass", Layout {size: size_of::<PhoshStatusIconClass>(), alignment: align_of::<PhoshStatusIconClass>()}),
-    ("PhoshStatusPage", Layout {size: size_of::<PhoshStatusPage>(), alignment: align_of::<PhoshStatusPage>()}),
-    ("PhoshStatusPageClass", Layout {size: size_of::<PhoshStatusPageClass>(), alignment: align_of::<PhoshStatusPageClass>()}),
-    ("PhoshWallClock", Layout {size: size_of::<PhoshWallClock>(), alignment: align_of::<PhoshWallClock>()}),
-    ("PhoshWallClockClass", Layout {size: size_of::<PhoshWallClockClass>(), alignment: align_of::<PhoshWallClockClass>()}),
+    (
+        "PhoshDBusScreenshotProxyClass",
+        Layout {
+            size: size_of::<PhoshDBusScreenshotProxyClass>(),
+            alignment: align_of::<PhoshDBusScreenshotProxyClass>(),
+        },
+    ),
+    (
+        "PhoshDBusScreenshotSkeletonClass",
+        Layout {
+            size: size_of::<PhoshDBusScreenshotSkeletonClass>(),
+            alignment: align_of::<PhoshDBusScreenshotSkeletonClass>(),
+        },
+    ),
+    (
+        "PhoshLayerSurface",
+        Layout {
+            size: size_of::<PhoshLayerSurface>(),
+            alignment: align_of::<PhoshLayerSurface>(),
+        },
+    ),
+    (
+        "PhoshLayerSurfaceAnchor",
+        Layout {
+            size: size_of::<PhoshLayerSurfaceAnchor>(),
+            alignment: align_of::<PhoshLayerSurfaceAnchor>(),
+        },
+    ),
+    (
+        "PhoshLayerSurfaceClass",
+        Layout {
+            size: size_of::<PhoshLayerSurfaceClass>(),
+            alignment: align_of::<PhoshLayerSurfaceClass>(),
+        },
+    ),
+    (
+        "PhoshLayerSurfaceLayer",
+        Layout {
+            size: size_of::<PhoshLayerSurfaceLayer>(),
+            alignment: align_of::<PhoshLayerSurfaceLayer>(),
+        },
+    ),
+    (
+        "PhoshLockscreen",
+        Layout {
+            size: size_of::<PhoshLockscreen>(),
+            alignment: align_of::<PhoshLockscreen>(),
+        },
+    ),
+    (
+        "PhoshLockscreenClass",
+        Layout {
+            size: size_of::<PhoshLockscreenClass>(),
+            alignment: align_of::<PhoshLockscreenClass>(),
+        },
+    ),
+    (
+        "PhoshLockscreenManagerClass",
+        Layout {
+            size: size_of::<PhoshLockscreenManagerClass>(),
+            alignment: align_of::<PhoshLockscreenManagerClass>(),
+        },
+    ),
+    (
+        "PhoshLockscreenPage",
+        Layout {
+            size: size_of::<PhoshLockscreenPage>(),
+            alignment: align_of::<PhoshLockscreenPage>(),
+        },
+    ),
+    (
+        "PhoshQuickSetting",
+        Layout {
+            size: size_of::<PhoshQuickSetting>(),
+            alignment: align_of::<PhoshQuickSetting>(),
+        },
+    ),
+    (
+        "PhoshQuickSettingClass",
+        Layout {
+            size: size_of::<PhoshQuickSettingClass>(),
+            alignment: align_of::<PhoshQuickSettingClass>(),
+        },
+    ),
+    (
+        "PhoshScreenshotManagerClass",
+        Layout {
+            size: size_of::<PhoshScreenshotManagerClass>(),
+            alignment: align_of::<PhoshScreenshotManagerClass>(),
+        },
+    ),
+    (
+        "PhoshShell",
+        Layout {
+            size: size_of::<PhoshShell>(),
+            alignment: align_of::<PhoshShell>(),
+        },
+    ),
+    (
+        "PhoshShellClass",
+        Layout {
+            size: size_of::<PhoshShellClass>(),
+            alignment: align_of::<PhoshShellClass>(),
+        },
+    ),
+    (
+        "PhoshStatusIcon",
+        Layout {
+            size: size_of::<PhoshStatusIcon>(),
+            alignment: align_of::<PhoshStatusIcon>(),
+        },
+    ),
+    (
+        "PhoshStatusIconClass",
+        Layout {
+            size: size_of::<PhoshStatusIconClass>(),
+            alignment: align_of::<PhoshStatusIconClass>(),
+        },
+    ),
+    (
+        "PhoshStatusPage",
+        Layout {
+            size: size_of::<PhoshStatusPage>(),
+            alignment: align_of::<PhoshStatusPage>(),
+        },
+    ),
+    (
+        "PhoshStatusPageClass",
+        Layout {
+            size: size_of::<PhoshStatusPageClass>(),
+            alignment: align_of::<PhoshStatusPageClass>(),
+        },
+    ),
+    (
+        "PhoshWallClock",
+        Layout {
+            size: size_of::<PhoshWallClock>(),
+            alignment: align_of::<PhoshWallClock>(),
+        },
+    ),
+    (
+        "PhoshWallClockClass",
+        Layout {
+            size: size_of::<PhoshWallClockClass>(),
+            alignment: align_of::<PhoshWallClockClass>(),
+        },
+    ),
 ];
 
 const RUST_CONSTANTS: &[(&str, &str)] = &[
@@ -244,5 +365,3 @@ const RUST_CONSTANTS: &[(&str, &str)] = &[
     ("(gint) PHOSH_LOCKSCREEN_PAGE_INFO", "0"),
     ("(gint) PHOSH_LOCKSCREEN_PAGE_UNLOCK", "2"),
 ];
-
-
