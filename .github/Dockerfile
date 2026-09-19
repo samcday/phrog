@@ -29,7 +29,22 @@ RUN export DEBIAN_FRONTEND=noninteractive \
    && eatmydata git clone ${GTK_REMOTE} \
    && cd gtk \
    && git checkout ${GTK_REF} \
-   && eatmydata apt-get --no-install-recommends -y build-dep . \
+   && eatmydata apt-get --no-install-recommends -y install \
+    meson \
+    ninja-build \
+    pkg-config \
+    libglib2.0-dev \
+    libgdk-pixbuf-2.0-dev \
+    libpango1.0-dev \
+    libcairo2-dev \
+    libgraphene-1.0-dev \
+    libepoxy-dev \
+    libegl1-mesa-dev \
+    libwayland-dev \
+    wayland-protocols \
+    libxkbcommon-dev \
+    iso-codes \
+    shared-mime-info \
    && eatmydata meson setup --prefix=/usr/local -Dlibdir=lib -Dbuild-tests=false -Dbuild-demos=false -Dbuild-examples=false -Ddocumentation=false -Dintrospection=disabled _build . \
    && eatmydata meson compile -C _build \
    && eatmydata meson install -C _build \
