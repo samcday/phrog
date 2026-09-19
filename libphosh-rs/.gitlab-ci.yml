@@ -45,14 +45,17 @@ variables:
     - if [ -n "$UPSTREAM_BRANCH" ]; then cd subprojects/phosh && git fetch origin "$UPSTREAM_BRANCH" && git checkout FETCH_HEAD && cd -; fi
     - cd subprojects/phosh && eatmydata apt -y --no-install-recommends build-dep . && cd -
 
-build:
-  stage: build
-  <<: *common_before_script
-  script:
+.common_phosh_build: &common_phosh_build
     # Build phosh
     - meson setup _build
     - meson compile -C _build
     - meson install -C _build
+
+build:
+  stage: build
+  <<: *common_before_script
+  script:
+    - *common_phosh_build
     # Build gir
     - cd gir && cargo build && cd -
     # Rebuild bindings
@@ -63,10 +66,11 @@ build-doc:
   needs: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-    RUSTFLAGS: --cfg docsrs
     RUST_VERSION: nightly
   <<: *common_before_script
   script:
+    - *common_phosh_build
+    # Build doc
     - ./build-doc.sh
     - mv target/doc/ docs
   artifacts:
