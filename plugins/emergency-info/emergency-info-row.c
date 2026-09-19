@@ -9,7 +9,6 @@
 #include "emergency-info-row.h"
 
 #include <glib/gi18n.h>
-#include <handy.h>
 
 enum {
   PROP_0,
@@ -19,12 +18,12 @@ enum {
 static GParamSpec *props[PROP_LAST_PROP];
 
 struct _PhoshEmergencyInfoRow {
-  HdyActionRow parent;
+  AdwActionRow parent;
 
   GtkLabel    *label_contact;
 };
 
-G_DEFINE_TYPE (PhoshEmergencyInfoRow, phosh_emergency_info_row, HDY_TYPE_ACTION_ROW)
+G_DEFINE_TYPE (PhoshEmergencyInfoRow, phosh_emergency_info_row, ADW_TYPE_ACTION_ROW)
 
 /* TODO: Clicking on the emergency contact does nothing. */
 

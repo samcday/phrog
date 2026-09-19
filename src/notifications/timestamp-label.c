@@ -22,7 +22,7 @@
 
 
 struct _PhoshTimestampLabel {
-  GtkBin     parent;
+  GtkWidget  parent;
 
   GtkLabel  *label;
   GDateTime *date;
@@ -38,7 +38,7 @@ enum {
 static GParamSpec *props[LAST_PROP];
 
 
-G_DEFINE_TYPE (PhoshTimestampLabel, phosh_timestamp_label, GTK_TYPE_BIN)
+G_DEFINE_TYPE (PhoshTimestampLabel, phosh_timestamp_label, GTK_TYPE_WIDGET)
 
 
 #define SECONDS_PER_MINUTE 60.0
@@ -315,6 +315,8 @@ phosh_timestamp_label_dispose (GObject *object)
   g_clear_pointer (&self->date, g_date_time_unref);
   g_clear_handle_id (&(self->refresh_time), g_source_remove);
 
+  gtk_widget_dispose_template (GTK_WIDGET (self), PHOSH_TYPE_TIMESTAMP_LABEL);
+
   G_OBJECT_CLASS (phosh_timestamp_label_parent_class)->dispose (object);
 }
 
@@ -342,6 +344,8 @@ phosh_timestamp_label_class_init (PhoshTimestampLabelClass *klass)
   gtk_widget_class_set_template_from_resource (widget_class, "/mobi/phosh/ui/timestamp-label.ui");
 
   gtk_widget_class_bind_template_child (widget_class, PhoshTimestampLabel, label);
+
+  gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
 }
 
 

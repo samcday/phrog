@@ -76,24 +76,31 @@ phosh_lockscreen_bg_configured (PhoshLayerSurface *layer_surface)
 }
 
 
-static gboolean
-phosh_lockscreen_bg_draw (GtkWidget *widget, cairo_t *cr)
+static void
+phosh_lockscreen_bg_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
 {
-  GtkStyleContext *context;
   PhoshLockscreenBg *self = PHOSH_LOCKSCREEN_BG (widget);
+  graphene_rect_t bounds;
   int x = 0, y = 0, width, height;
+  cairo_t *cr;
 
-  g_return_val_if_fail (PHOSH_IS_LOCKSCREEN_BG (self), GDK_EVENT_PROPAGATE);
+  g_return_if_fail (PHOSH_IS_LOCKSCREEN_BG (self));
 
   if (!self->configured)
-    return GDK_EVENT_PROPAGATE;
+    return;
 
+  bounds.origin.x = 0;
+  bounds.origin.y = 0;
+  bounds.size.width = gtk_widget_get_width (GTK_WIDGET (self));
+  bounds.size.height = gtk_widget_get_height (GTK_WIDGET (self));
+
+  cr = gtk_snapshot_append_cairo (snapshot, &bounds);
   cairo_save (cr);
-  context = gtk_widget_get_style_context (GTK_WIDGET (self));
 
-  width = gtk_widget_get_allocated_width (GTK_WIDGET (self));
-  height = gtk_widget_get_allocated_height (GTK_WIDGET (self));
-  gtk_render_background (context, cr, 0, 0, width, height);
+  width = gtk_widget_get_width (GTK_WIDGET (self));
+  height = gtk_widget_get_height (GTK_WIDGET (self));
+  // FIXME Port to GTK 4
+  // gtk_render_background (context, cr, 0, 0, width, height);
 
   if (self->pixbuf && self->use_background) {
     gdk_cairo_set_source_pixbuf (cr, self->pixbuf, x, y);
@@ -101,8 +108,7 @@ phosh_lockscreen_bg_draw (GtkWidget *widget, cairo_t *cr)
   }
 
   cairo_restore (cr);
-
-  return GDK_EVENT_PROPAGATE;
+  cairo_destroy (cr);
 }
 
 
@@ -138,7 +144,7 @@ phosh_lockscreen_bg_class_init (PhoshLockscreenBgClass *klass)
 
   object_class->finalize = phosh_lockscreen_bg_finalize;
 
-  widget_class->draw = phosh_lockscreen_bg_draw;
+  widget_class->snapshot = phosh_lockscreen_bg_snapshot;
 
   layer_surface_class->configured = phosh_lockscreen_bg_configured;
 
@@ -162,10 +168,9 @@ phosh_lockscreen_bg_init (PhoshLockscreenBg *self)
 
 
 PhoshLockscreenBg *
-phosh_lockscreen_bg_new (struct zwlr_layer_shell_v1 *layer_shell, struct wl_output *wl_output)
+phosh_lockscreen_bg_new (struct wl_output *wl_output)
 {
   return g_object_new (PHOSH_TYPE_LOCKSCREEN_BG,
-                       "layer-shell", layer_shell,
                        "wl-output", wl_output,
                        "anchor", (ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP |
                                   ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM |

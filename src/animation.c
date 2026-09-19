@@ -9,7 +9,7 @@
 #include "phosh-config.h"
 
 #include "animation.h"
-#include <handy.h>
+#include <adwaita.h>
 
 G_DEFINE_BOXED_TYPE (PhoshAnimation, phosh_animation, phosh_animation_ref, phosh_animation_unref)
 
@@ -93,7 +93,7 @@ interpolate (PhoshAnimationType type, double t)
 {
   switch (type) {
   case PHOSH_ANIMATION_TYPE_EASE_OUT_CUBIC:
-    return hdy_ease_out_cubic (t);
+    return adw_easing_ease (ADW_EASE_OUT_CUBIC, t);
 
   case PHOSH_ANIMATION_TYPE_EASE_IN_QUINTIC:
     return ease_in_quintic (t);
@@ -220,7 +220,7 @@ phosh_animation_start (PhoshAnimation *self)
 {
   g_return_if_fail (self != NULL);
 
-  if (!hdy_get_enable_animations (self->widget) ||
+  if (!adw_get_enable_animations (self->widget) ||
       !gtk_widget_get_mapped (self->widget) ||
       self->duration <= 0) {
     set_value (self, self->value_to);

@@ -7,7 +7,7 @@
 #pragma once
 
 #define GCR_API_SUBJECT_TO_CHANGE
-#include <gcr/gcr-base.h>
+#include <gcr/gcr.h>
 
 GcrSystemPrompter *phosh_system_prompter_register(void);
 void               phosh_system_prompter_unregister(void);

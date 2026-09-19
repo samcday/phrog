@@ -127,11 +127,11 @@ phosh_wifi_hotspot_quick_setting_init (PhoshWifiHotspotQuickSetting *self)
   css_provider = gtk_css_provider_new ();
   gtk_css_provider_load_from_resource (css_provider,
                                        "/mobi/phosh/plugins/wifi-hotspot-quick-setting/style.css");
-  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
+  gtk_style_context_add_provider_for_display (gdk_display_get_default (),
                                              GTK_STYLE_PROVIDER (css_provider),
                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_default (),
+  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_for_display (gdk_display_get_default ()),
                                     "/mobi/phosh/plugins/wifi-hotspot-quick-setting/icons");
 
   self->wifi = phosh_shell_get_wifi_manager (shell);

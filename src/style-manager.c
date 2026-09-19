@@ -13,7 +13,7 @@
 #include "style-manager.h"
 #include "util.h"
 
-#include <gtk/gtk.h>
+#include <adwaita.h>
 #include <gdesktop-enums.h>
 
 #define IF_KEY_ACCENT_COLOR     "accent-color"
@@ -66,8 +66,8 @@ on_accent_color_changed (PhoshStyleManager *self)
   g_autoptr (GtkCssProvider) provider = gtk_css_provider_new ();
 
   if (self->accent_css_provider) {
-    gtk_style_context_remove_provider_for_screen (gdk_screen_get_default (),
-                                                  GTK_STYLE_PROVIDER (self->accent_css_provider));
+    gtk_style_context_remove_provider_for_display (gdk_display_get_default (),
+                                                   GTK_STYLE_PROVIDER (self->accent_css_provider));
   }
 
   /* Only enable accent colors on Adwaita */
@@ -110,11 +110,11 @@ on_accent_color_changed (PhoshStyleManager *self)
   css = g_strdup_printf ("@define-color theme_selected_bg_color %s;\n"
                          "@define-color theme_selected_fg_color %s;",
                          color, ACCENT_COLOR_FOREGROUND);
-  gtk_css_provider_load_from_data (provider, css, -1, NULL);
-  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
-                                             GTK_STYLE_PROVIDER (provider),
-                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION + 1);
-  g_set_object (&self->accent_css_provider, provider);
+  gtk_css_provider_load_from_string (provider, css);
+  gtk_style_context_add_provider_for_display (gdk_display_get_default (),
+                                              GTK_STYLE_PROVIDER (provider),
+                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION + 1);
+  g_set_object (&self->css_provider, provider);
 }
 
 
@@ -134,16 +134,16 @@ on_gtk_theme_name_changed (PhoshStyleManager *self, GParamSpec *pspec, GtkSettin
   g_debug ("GTK theme: %s", self->theme_name);
 
   if (self->css_provider) {
-    gtk_style_context_remove_provider_for_screen (gdk_screen_get_default (),
-                                                  GTK_STYLE_PROVIDER (self->css_provider));
+    gtk_style_context_remove_provider_for_display (gdk_display_get_default (),
+                                                   GTK_STYLE_PROVIDER (self->css_provider));
   }
 
   style = phosh_style_manager_get_stylesheet (self->theme_name);
 
   gtk_css_provider_load_from_resource (provider, style);
-  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
-                                             GTK_STYLE_PROVIDER (provider),
-                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  gtk_style_context_add_provider_for_display (gdk_display_get_default (),
+                                              GTK_STYLE_PROVIDER (provider),
+                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   g_set_object (&self->css_provider, provider);
 
   /* Refresh accent color */
@@ -208,8 +208,9 @@ static void
 phosh_style_manager_init (PhoshStyleManager *self)
 {
   GtkSettings *gtk_settings = gtk_settings_get_default ();
+  AdwStyleManager *adw_manager = adw_style_manager_get_default ();
 
-  g_object_set (G_OBJECT (gtk_settings), "gtk-application-prefer-dark-theme", TRUE, NULL);
+  adw_style_manager_set_color_scheme (adw_manager, ADW_COLOR_SCHEME_FORCE_DARK);
 
   self->interface_settings = g_settings_new (IF_SCHEMA_NAME);
 

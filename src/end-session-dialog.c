@@ -325,7 +325,7 @@ add_inhibitor (PhoshEndSessionDialog *self, GDBusProxy *inhibitor)
                         "label", name,
                         "valign", GTK_ALIGN_END,
                         NULL);
-  gtk_box_pack_start (GTK_BOX (box_text), label, TRUE, TRUE, 0);
+  gtk_box_prepend (GTK_BOX (box_text), label);
 
   if (reason) {
     lbl_reason = g_object_new (GTK_TYPE_LABEL,
@@ -336,7 +336,7 @@ add_inhibitor (PhoshEndSessionDialog *self, GDBusProxy *inhibitor)
                                "label", reason,
                                "valign", GTK_ALIGN_START,
                                NULL);
-    gtk_box_pack_end (GTK_BOX (box_text), lbl_reason, TRUE, TRUE, 0);
+    gtk_box_append (GTK_BOX (box_text), lbl_reason);
   } else {
     gtk_widget_set_valign (label, GTK_ALIGN_FILL);
   }
@@ -349,8 +349,8 @@ add_inhibitor (PhoshEndSessionDialog *self, GDBusProxy *inhibitor)
                       "spacing", 12,
                       NULL);
 
-  gtk_box_pack_start (GTK_BOX (box), img, TRUE, TRUE, 0);
-  gtk_box_pack_end (GTK_BOX (box), box_text, FALSE, FALSE, 0);
+  gtk_box_prepend (GTK_BOX (box), img);
+  gtk_box_append (GTK_BOX (box), box_text);
 
   gtk_list_box_insert (GTK_LIST_BOX (self->listbox), GTK_WIDGET (box), -1);
   gtk_widget_set_visible (GTK_WIDGET (self->sw_inhibitors), TRUE);
@@ -385,9 +385,7 @@ clear_inhibitors (PhoshEndSessionDialog *self)
 
   g_return_if_fail (GTK_IS_LIST_BOX (self->listbox));
 
-  children = gtk_container_get_children (GTK_CONTAINER (self->listbox));
-  for (GList *child = children; child; child = child->next)
-    gtk_container_remove (GTK_CONTAINER (self->listbox), child->data);
+  gtk_list_box_remove_all (GTK_LIST_BOX (self->listbox));
 
   gtk_widget_set_visible (self->sw_inhibitors, FALSE);
 }
@@ -476,6 +474,8 @@ phosh_end_session_dialog_dispose (GObject *obj)
 
   if (self->listbox)
     clear_inhibitors (self);
+
+  gtk_widget_dispose_template (GTK_WIDGET (obj), PHOSH_TYPE_END_SESSION_DIALOG);
 
   G_OBJECT_CLASS (phosh_end_session_dialog_parent_class)->dispose (obj);
 }

@@ -1,33 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
-  <requires lib="libhandy" version="1.8"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshLockscreen" parent="PhoshLayerSurface">
-    <initial-focus name="btn_submit"/>
-    <child>
-      <object class="HdyCarousel" id="carousel">
+    <property name="namespace">phosh lockscreen</property>
+    <property name="anchor">15</property> <!-- anchor all edges -->
+    <property name="layer">3</property> <!-- overlay -->
+    <property name="child">
+      <object class="AdwCarousel" id="carousel">
         <property name="visible">1</property>
         <property name="orientation">vertical</property>
-        <property name="animation-duration">400</property>
         <signal name="notify::position" handler="carousel_position_notified_cb" swapped="yes"/>
         <signal name="page-changed" handler="carousel_page_changed_cb" swapped="yes"/>
         <child>
-          <object class="HdyDeck" id="deck">
+          <object class="AdwNavigationView" id="deck">
             <property name="visible">1</property>
             <property name="vexpand">1</property>
-            <property name="can-swipe-back">1</property>
-            <property name="transition-duration">400</property>
-            <property name="visible-child">box_info</property>
-            <signal name="notify::visible-child" handler="on_deck_visible_child_changed" swapped="yes"/>
-            <signal name="notify::transition-running" handler="on_deck_transition_running_changed" swapped="yes"/>
+            <signal name="get-next-page" handler="on_deck_get_next_page" swapped="yes"/>
             <child>
-              <object class="GtkBox" id="box_widget_box">
+              <object class="AdwNavigationPage">
+                <property name="title">box_widget_box</property>
+                <property name="tag">box_widget_box</property>
+                <property name="child">
+              <object class="GtkCenterBox" id="box_widget_box">
                 <property name="visible">1</property>
                 <property name="orientation">vertical</property>
                 <!-- PHOSH_TOP_PANEL_HEIGHT -->
                 <property name="margin-top">32</property>
-                <property name="spacing">12</property>
-                <child>
+                <property name="start-widget">
                   <object class="GtkButton">
                     <property name="visible">1</property>
                     <property name="halign">start</property>
@@ -38,11 +37,6 @@
                       <class name="image-button"/>
                       <class name="circular"/>
                     </style>
-                    <child internal-child="accessible">
-                      <object class="AtkObject">
-                        <property name="accessible-name" translatable="yes">Back</property>
-                      </object>
-                    </child>
                     <child>
                       <object class="GtkImage">
                         <property name="visible">1</property>
@@ -51,9 +45,9 @@
                       </object>
                     </child>
                   </object>
-                </child>
-                <child type="center">
-                  <object class="HdyClamp">
+                </property>
+                <property name="center-widget">
+                  <object class="AdwClamp">
                     <property name="visible">1</property>
                     <property name="maximum-size">720</property>
                     <child>
@@ -62,17 +56,23 @@
                       </object>
                     </child>
                   </object>
-                </child>
+                </property>
+              </object>
+                </property>
               </object>
               <!-- box_wiget_box -->
             </child>
             <child>
-              <object class="GtkBox" id="box_info">
+              <object class="AdwNavigationPage">
+                <property name="title">box_info</property>
+                <property name="tag">box_info</property>
+                <property name="child">
+              <object class="GtkCenterBox" id="box_info">
                 <property name="visible">1</property>
                 <property name="orientation">vertical</property>
                 <property name="hexpand">1</property>
                 <property name="vexpand">1</property>
-                <child>
+                <property name="end-widget">
                   <object class="GtkBox">
                     <property name="visible">1</property>
                     <property name="orientation">vertical</property>
@@ -99,11 +99,8 @@
                       </object>
                     </child>
                   </object>
-                  <packing>
-                    <property name="pack-type">end</property>
-                  </packing>
-                </child>
-                <child type="center">
+                </property>
+                <property name="center-widget">
                   <object class="GtkBox" id="box_datetime">
                     <property name="visible">1</property>
                     <property name="valign">center</property>
@@ -122,7 +119,6 @@
                         <property name="hexpand">1</property>
                         <property name="label">00:00</property>
                         <property name="single-line-mode">1</property>
-                        <property name="track-visited-links">0</property>
                       </object>
                     </child>
                     <child>
@@ -137,7 +133,7 @@
                         <property name="visible">1</property>
                         <property name="hscrollbar-policy">never</property>
                         <property name="propagate-natural-height">1</property>
-                        <child>
+                        <property name="child">
                           <object class="GtkBox">
                             <property name="visible">1</property>
                             <property name="orientation">vertical</property>
@@ -145,14 +141,14 @@
                               <object class="GtkRevealer" id="rev_call_notifications">
                                 <property name="visible">1</property>
                                 <signal name="notify::reveal-child" handler="on_info_reveal_child_changed" object="PhoshLockscreen" swapped="yes"/>
-                                <child>
-                                  <object class="HdyClamp">
+                                <property name="child">
+                                  <object class="AdwClamp">
                                     <property name="visible">1</property>
                                     <property name="maximum-size">360</property>
                                     <property name="margin-top">6</property>
                                     <property name="vexpand">1</property>
                                     <property name="valign">center</property>
-                                    <child>
+                                    <property name="child">
                                       <object class="GtkListBox" id="list_calls">
                                         <property name="visible">1</property>
                                         <property name="selection-mode">none</property>
@@ -161,9 +157,9 @@
                                           <class name="phosh-notification-tray"/>
                                         </style>
                                       </object>
-                                    </child>
+                                    </property>
                                   </object>
-                                </child>
+                                </property>
                               </object>
                             </child>
                             <child>
@@ -171,36 +167,36 @@
                                 <property name="visible">1</property>
                                 <property name="reveal-child" bind-source="media_player" bind-property="playable" bind-flags="sync-create"/>
                                 <signal name="notify::reveal-child" handler="on_info_reveal_child_changed" object="PhoshLockscreen" swapped="yes"/>
-                                <child>
-                                  <object class="HdyClamp">
+                                <property name="child">
+                                  <object class="AdwClamp">
                                     <property name="visible">1</property>
                                     <property name="maximum-size">360</property>
                                     <property name="margin-top">6</property>
                                     <property name="vexpand">1</property>
                                     <property name="valign">center</property>
-                                    <child>
+                                    <property name="child">
                                       <object class="PhoshDefaultMediaPlayer" id="media_player">
                                         <property name="visible">1</property>
                                         <property name="valign">center</property>
                                         <signal name="player-raised" handler="show_unlock_page" object="PhoshLockscreen" swapped="yes"/>
                                       </object>
-                                    </child>
+                                    </property>
                                   </object>
-                                </child>
+                                </property>
                               </object>
                             </child>
                             <child>
                               <object class="GtkRevealer" id="rev_notifications">
                                 <property name="visible">1</property>
                                 <signal name="notify::reveal-child" handler="on_info_reveal_child_changed" object="PhoshLockscreen" swapped="yes"/>
-                                <child>
-                                  <object class="HdyClamp">
+                                <property name="child">
+                                  <object class="AdwClamp">
                                     <property name="visible">1</property>
                                     <property name="maximum-size">360</property>
                                     <property name="margin-top">6</property>
                                     <property name="vexpand">1</property>
                                     <property name="valign">center</property>
-                                    <child>
+                                    <property name="child">
                                       <object class="GtkListBox" id="list_notifications">
                                         <property name="visible">1</property>
                                         <property name="selection-mode">none</property>
@@ -208,28 +204,33 @@
                                           <class name="phosh-notification-tray"/>
                                         </style>
                                       </object>
-                                    </child>
+                                    </property>
                                   </object>
-                                </child>
+                                </property>
                               </object>
                             </child>
                           </object>
-                        </child>
+                        </property>
                       </object>
                     </child>
                   </object>
-                </child>
+                </property>
               </object>
               <!-- box_info -->
+                </property>
+              </object>
             </child>
             <child>
-              <object class="GtkBox" id="box_call_display">
+              <object class="AdwNavigationPage">
+                <property name="title">box_call_display</property>
+                <property name="tag">box_call_display</property>
+                <property name="child">
+              <object class="GtkCenterBox" id="box_call_display">
                 <property name="visible">1</property>
                 <property name="orientation">vertical</property>
                 <!-- PHOSH_TOP_PANEL_HEIGHT -->
                 <property name="margin-top">32</property>
-                <property name="spacing">12</property>
-                <child>
+                <property name="start-widget">
                   <object class="GtkButton">
                     <property name="visible">1</property>
                     <property name="halign">start</property>
@@ -240,11 +241,6 @@
                       <class name="image-button"/>
                       <class name="circular"/>
                     </style>
-                    <child internal-child="accessible">
-                      <object class="AtkObject" id="a11y-deck-sub-back">
-                        <property name="accessible-name" translatable="yes">Back</property>
-                      </object>
-                    </child>
                     <child>
                       <object class="GtkImage">
                         <property name="visible">1</property>
@@ -253,17 +249,19 @@
                       </object>
                     </child>
                   </object>
-                </child>
-                <child type="center">
+                </property>
+                <property name="center-widget">
                   <object class="CuiCallDisplay" id="call_display">
                     <property name="visible">1</property>
                   </object>
-                </child>
+                </property>
+                  </object>
+                </property>
               </object>
               <!-- box_call_display -->
             </child>
           </object>
-          <!-- HdyDeck -->
+          <!-- AdwDeck -->
         </child>
         <child>
           <object class="GtkBox" id="box_unlock">
@@ -288,13 +286,13 @@
             <child>
               <object class="GtkEntry" id="entry_pin">
                 <property name="visible">1</property>
-                <property name="can-focus">1</property>
+                <property name="focusable">1</property>
                 <property name="has-frame">0</property>
                 <property name="margin-top">12</property>
                 <property name="margin-bottom">12</property>
                 <property name="visibility">0</property>
                 <property name="xalign">0.5</property>
-                <property name="input-purpose">GTK_INPUT_PURPOSE_PASSWORD</property>
+                <property name="input-purpose">password</property>
                 <property name="buffer">pin_buffer</property>
                 <style>
                   <class name="phosh-lockscreen-pin"/>
@@ -343,19 +341,25 @@
         </child>
         <!-- box_unlock -->
       </object>
+    </property>
+<!--
+    <child>
+      <object class="GtkEventControllerKey">
+        <signal name="key-pressed" handler="key_press_event_cb" swapped="true"/>
+      </object>
     </child>
+    <child>
+      <object class="GtkGestureZoom" id="zoom_gesture">
+        <property name="propagation-phase">capture</property>
+        <signal name="begin" handler="on_zoom_gesture_begin" swapped="true"/>
+        <signal name="update" handler="on_zoom_gesture_update" swapped="true"/>
+      </object>
+      </child>
+-->
   </template>
-  <object class="GtkGestureSwipe" id="swipe_gesture">
-    <property name="widget">PhoshLockscreen</property>
-    <property name="propagation-phase">capture</property>
-    <property name="touch-only">1</property>
-    <property name="n-points">2</property>
-    <signal name="begin" handler="on_swipe_gesture_begin" swapped="true"/>
-    <signal name="update" handler="on_swipe_gesture_update" swapped="true"/>
-  </object>
   <object class="GtkButton" id="btn_delete">
     <property name="visible">1</property>
-    <property name="can-focus">1</property>
+    <property name="focusable">1</property>
     <property name="focus-on-click">0</property>
     <signal name="clicked" handler="delete_button_clicked_cb" object="PhoshLockscreen" swapped="true"/>
     <child>
@@ -364,10 +368,15 @@
         <property name="icon-name">edit-clear-symbolic</property>
       </object>
     </child>
+    <child>
+      <object class="GtkGestureLongPress" id="long_press_del_gesture">
+        <signal name="pressed" handler="long_press_del_cb" object="PhoshLockscreen" swapped="true"/>
+      </object>
+    </child>
   </object>
   <object class="GtkButton" id="btn_keyboard">
     <property name="visible">1</property>
-    <property name="can-focus">1</property>
+    <property name="focusable">1</property>
     <signal name="clicked" handler="osk_button_clicked_cb" object="PhoshLockscreen" swapped="true"/>
     <child>
       <object class="GtkImage">
@@ -376,9 +385,5 @@
       </object>
     </child>
   </object>
-  <object class="GtkGestureLongPress" id="long_press_del_gesture">
-    <property name="widget">btn_delete</property>
-    <signal name="pressed" handler="long_press_del_cb" object="PhoshLockscreen" swapped="true"/>
-  </object>
-  <object class="GcrSecureEntryBuffer" id="pin_buffer"/>
+  <object class="GtkPasswordEntryBuffer" id="pin_buffer"/>
 </interface>

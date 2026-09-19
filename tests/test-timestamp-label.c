@@ -49,7 +49,7 @@ test_phosh_timestamp_label_get_set_timestamp (void)
 static void
 test_phosh_timestamp_label_destroy (void)
 {
-  PhoshTimestampLabel *widget = phosh_timestamp_label_new ();
+  PhoshTimestampLabel *widget = g_object_ref_sink (phosh_timestamp_label_new ());
   GDateTime  *item_set_to = NULL;
   g_autoptr (GDateTime) now = g_date_time_new_now_local ();
 
@@ -62,10 +62,7 @@ test_phosh_timestamp_label_destroy (void)
   item_set_to = phosh_timestamp_label_get_timestamp (PHOSH_TIMESTAMP_LABEL (widget));
   g_assert_true (item_set_to == now);
 
-  gtk_widget_destroy (GTK_WIDGET(widget));
-  item_set_to = phosh_timestamp_label_get_timestamp (PHOSH_TIMESTAMP_LABEL (widget));
-  g_assert_null (item_set_to);
-  g_object_ref_sink (widget);
+  g_object_unref (GTK_WIDGET(widget));
 }
 
 

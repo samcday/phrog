@@ -8,12 +8,12 @@
 
 #include "bluetooth-device.h"
 
-#include <handy.h>
+#include <adwaita.h>
 
 G_BEGIN_DECLS
 
 #define PHOSH_TYPE_BT_DEVICE_ROW phosh_bt_device_row_get_type ()
-G_DECLARE_FINAL_TYPE (PhoshBtDeviceRow, phosh_bt_device_row, PHOSH, BT_DEVICE_ROW, HdyActionRow)
+G_DECLARE_FINAL_TYPE (PhoshBtDeviceRow, phosh_bt_device_row, PHOSH, BT_DEVICE_ROW, AdwActionRow)
 
 GtkWidget *phosh_bt_device_row_new      (BluetoothDevice  *device);
 

@@ -13,8 +13,6 @@
 #include "shell-priv.h"
 #include "util.h"
 
-#include <gdk/gdkwayland.h>
-
 /**
  * PhoshToplevel:
  *

@@ -48,7 +48,7 @@ enum {
 static guint signals[N_SIGNALS] = { 0 };
 
 typedef struct _PhoshSettings {
-  GtkBin     parent;
+  GtkWidget  parent;
 
   gboolean   on_lockscreen;
   gint       drag_handle_offset;
@@ -76,7 +76,7 @@ typedef struct _PhoshSettings {
 } PhoshSettings;
 
 
-G_DEFINE_TYPE (PhoshSettings, phosh_settings, GTK_TYPE_BIN)
+G_DEFINE_TYPE (PhoshSettings, phosh_settings, GTK_TYPE_WIDGET)
 
 
 static void
@@ -136,16 +136,17 @@ calc_drag_handle_offset (PhoshSettings *self)
 {
   int h = 0;
   int box_height, sw_height, qs_height = 0;
+  graphene_point_t origin = {0, 0}, qs_origin;
   int qs_y = 0;
   gboolean success;
 
-  h = gtk_widget_get_allocated_height (GTK_WIDGET (self));
+  h = gtk_widget_get_height (GTK_WIDGET (self));
   /* On the lock screen the whole surface is fine */
   if (self->on_lockscreen)
     goto out;
 
-  box_height = gtk_widget_get_allocated_height (self->box_settings);
-  sw_height = gtk_widget_get_allocated_height (self->scrolled_window);
+  box_height = gtk_widget_get_height (self->box_settings);
+  sw_height = gtk_widget_get_height (self->scrolled_window);
   if (box_height > sw_height) {
     h = 0; /* Don't enlarge drag handle if box needs scrolling */
     goto out;
@@ -153,15 +154,16 @@ calc_drag_handle_offset (PhoshSettings *self)
 
   g_debug ("Calculating drag offset: on quick-settings");
 
-  success = gtk_widget_translate_coordinates (self->quick_settings, GTK_WIDGET (self),
-                                              0, 0, NULL, &qs_y);
+  success = gtk_widget_compute_point (self->quick_settings, GTK_WIDGET (self),
+                                      &origin, &qs_origin);
 
   if (!success) {
     g_warning ("Calculating drag offset: Unable to get quick-setting's y coordinate");
     goto out;
   }
 
-  qs_height = gtk_widget_get_allocated_height (self->quick_settings);
+  qs_y = qs_origin.y;
+  qs_height = gtk_widget_get_height (self->quick_settings);
   h = qs_y + qs_height;
 
   g_debug ("Calculating drag offset: QS_y = %d, QS_height = %d, height = %d",
@@ -262,7 +264,7 @@ create_notification_row (gpointer item, gpointer data)
     phosh_notification_frame_set_animate_show (PHOSH_NOTIFICATION_FRAME (frame), FALSE);
   gtk_widget_set_visible (frame, TRUE);
 
-  gtk_container_add (GTK_CONTAINER (row), frame);
+  gtk_list_box_row_set_child (GTK_LIST_BOX_ROW (row), frame);
 
   return row;
 }
@@ -388,6 +390,8 @@ phosh_settings_dispose (GObject *object)
 
   g_clear_object (&self->torch_manager);
 
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_SETTINGS);
+
   G_OBJECT_CLASS (phosh_settings_parent_class)->dispose (object);
 }
 
@@ -468,6 +472,8 @@ phosh_settings_class_init (PhoshSettingsClass *klass)
   gtk_widget_class_bind_template_callback (widget_class, on_notifications_clear_all_clicked);
   gtk_widget_class_bind_template_callback (widget_class, on_torch_scale_value_changed);
   gtk_widget_class_bind_template_callback (widget_class, update_drag_handle_offset);
+
+  gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
 }
 
 
@@ -476,7 +482,8 @@ phosh_settings_init (PhoshSettings *self)
 {
   gtk_widget_init_template (GTK_WIDGET (self));
 
-  g_signal_connect (self, "size-allocate", G_CALLBACK (on_size_allocate), NULL);
+  g_signal_connect (self, "notify::default-width", G_CALLBACK (on_size_allocate), NULL);
+  g_signal_connect (self, "notify::default-height", G_CALLBACK (on_size_allocate), NULL);
 }
 
 

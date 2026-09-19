@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
+  <requires lib="gtk" version="4.0"/>
   <object class="GtkPopoverMenu" id="menu_system">
-    <child>
+    <property name="child">
       <object class="GtkBox">
         <property name="visible">1</property>
         <property name="width-request">120</property>
@@ -122,20 +122,23 @@
           </object>
         </child>
       </object>
-    </child>
+    </property>
   </object>
   <template class="PhoshTopPanel" parent="PhoshDragSurface">
-    <child>
+    <property name="anchor">top|left|right</property>
+    <property name="namespace">phosh top-panel</property>
+    <property name="layer">top</property>
+    <property name="child">
       <object class="GtkBox" id="box">
         <property name="visible">1</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkBox" id="box_clock">
+          <object class="GtkCenterBox" id="box_clock">
             <property name="visible">1</property>
             <style>
               <class name="phosh-clock-box"/>
             </style>
-            <child>
+            <property name="start-widget">
               <object class="GtkButton" id="btn_lock">
                 <property name="visible" bind-source="PhoshTopPanel" bind-property="on-lockscreen" bind-flags="sync-create|invert-boolean"/>
                 <property name="action-name">panel.lockscreen</property>
@@ -149,8 +152,8 @@
                   </object>
                 </child>
               </object>
-            </child>
-            <child type="center">
+            </property>
+            <property name="center-widget">
               <object class="GtkBox">
                 <property name="visible">1</property>
                 <property name="orientation">vertical</property>
@@ -172,8 +175,8 @@
                   </object>
                 </child>
               </object>
-            </child>
-            <child>
+            </property>
+            <property name="end-widget">
               <object class="GtkMenuButton" id="btn_power">
                 <property name="visible" bind-source="PhoshTopPanel" bind-property="on-lockscreen" bind-flags="sync-create|invert-boolean"/>
                 <property name="popover">menu_system</property>
@@ -187,10 +190,7 @@
                   </object>
                 </child>
               </object>
-              <packing>
-                <property name="pack-type">end</property>
-              </packing>
-            </child>
+            </property>
           </object>
           <!-- box_clock -->
         </child>
@@ -205,11 +205,14 @@
             <property name="visible">1</property>
             <property name="transition-type">crossfade</property>
             <child>
+              <object class="GtkStackPage">
+                <property name="name">top-bar</property>
+                <property name="child">
               <object class="GtkBox" id="top_bar_bin">
                 <property name="visible">1</property>
                 <property name="name">top-bar-bin</property>
                 <child>
-                  <object class="GtkBox" id="box_top_bar">
+                  <object class="GtkCenterBox" id="box_top_bar">
                     <property name="visible">1</property>
                     <property name="hexpand">1</property>
                     <property name="vexpand">1</property>
@@ -217,7 +220,9 @@
                     <property name="name">top-bar</property>
                     <!-- PHOSH_TOP_PANEL_HEIGHT -->
                     <property name="height-request">32</property>
-                    <child>
+                    <property name="start-widget">
+                      <object class="GtkBox">
+                        <child>
                       <object class="GtkBox" id="box_network">
                         <property name="visible">1</property>
                         <child>
@@ -265,7 +270,9 @@
                       </object>
                       <!-- box_network -->
                     </child>
-                    <child type="center">
+                      </object>
+                    </property>
+                    <property name="center-widget">
                       <object class="GtkLabel" id="lbl_clock">
                         <property name="visible">1</property>
                         <property name="margin-top">2</property>
@@ -274,8 +281,10 @@
                           <class name="phosh-topbar-clock"/>
                         </style>
                       </object>
-                    </child>
-                    <child>
+                    </property>
+                    <property name="end-widget">
+                      <object class="GtkBox">
+                        <child>
                       <object class="GtkBox" id="box_indicators">
                         <property name="visible">1</property>
                         <property name="halign">end</property>
@@ -326,34 +335,34 @@
                         </child>
                       </object>
                       <!-- box_indicators -->
-                      <packing>
-                        <property name="pack-type">end</property>
-                      </packing>
                     </child>
+                  </object>
+                    </property>
                   </object>
                   <!-- box_top_bar -->
                 </child>
               </object>
               <!-- top_bar_bin -->
-              <packing>
-                <property name="name">top-bar</property>
-              </packing>
-            </child>
+            </property>
+          </object>
+        </child>
             <child>
-              <object class="GtkBox">
+              <object class="GtkStackPage">
+                <property name="name">arrow</property>
+                <property name="child">
+              <object class="GtkCenterBox">
                 <property name="visible">1</property>
-                <child type="center">
+                <property name="center-widget">
                   <object class="PhoshArrow" id="arrow">
                     <property name="visible">1</property>
                     <property name="vexpand">1</property>
                     <property name="valign">end</property>
                     <property name="margin-bottom">6</property>
                     <!-- place initial focus -->
-                    <property name="has-focus">1</property>
                     <property name="can-focus">1</property>
                   </object>
-                </child>
-                <child>
+                </property>
+                <property name="end-widget">
                   <object class="GtkRevealer" id="launch_settings_revealer">
                     <property name="visible">1</property>
                     <property name="transition-type">crossfade</property>
@@ -361,8 +370,7 @@
                       <object class="GtkButton">
                         <property name="visible">1</property>
                         <property name="action-name">panel.launch-mobile-panel</property>
-                        <!-- We send an (sav) parameter, where array contains one variant: empty string -->
-                        <property name="action-target">(&quot;topbar&quot;, [&lt;&quot;&quot;&gt;])</property>
+                        <property name="action-target">&quot;topbar&quot;</property>
                         <property name="valign">end</property>
                         <property name="halign">end</property>
                         <property name="name">settings-gear</property>
@@ -376,18 +384,20 @@
                       </object>
                     </child>
                   </object>
-                  <packing>
-                    <property name="pack-type">end</property>
-                  </packing>
-                </child>
+                </property>
               </object>
-              <packing>
-                <property name="name">arrow</property>
-              </packing>
+                </property>
+              </object>
             </child>
           </object>
           <!-- stack -->
         </child>
+      </object>
+    </property>
+    <child>
+      <object class="GtkGestureClick" id="click_gesture">
+        <property name="propagation-phase">target</property>
+        <signal name="released" handler="released_cb" swapped="true"/>
       </object>
     </child>
   </template>
@@ -436,10 +446,5 @@
   <object class="PhoshLocationInfo" id="location_info">
     <property name="pixel-size">16</property>
     <property name="margin-end">8</property>
-  </object>
-  <object class="GtkGestureMultiPress" id="click_gesture">
-    <property name="widget">PhoshTopPanel</property>
-    <property name="propagation-phase">target</property>
-    <signal name="released" handler="released_cb" swapped="true"/>
   </object>
 </interface>

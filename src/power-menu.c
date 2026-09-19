@@ -93,6 +93,15 @@ phosh_power_menu_get_property (GObject    *object,
 
 
 static void
+phosh_power_menu_dispose (GObject *object)
+{
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_POWER_MENU);
+
+  G_OBJECT_CLASS (phosh_power_menu_parent_class)->dispose (object);
+}
+
+
+static void
 phosh_power_menu_class_init (PhoshPowerMenuClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
@@ -100,6 +109,7 @@ phosh_power_menu_class_init (PhoshPowerMenuClass *klass)
 
   object_class->get_property = phosh_power_menu_get_property;
   object_class->set_property = phosh_power_menu_set_property;
+  object_class->dispose = phosh_power_menu_dispose;
 
   /**
    * PowerMenu:show-suspend:

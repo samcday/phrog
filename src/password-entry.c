@@ -44,9 +44,21 @@ on_icon_press (PhoshPasswordEntry *self, gpointer user_data)
 
 
 static void
+phosh_password_entry_dispose (GObject *object)
+{
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_PASSWORD_ENTRY);
+
+  G_OBJECT_CLASS (phosh_password_entry_parent_class)->dispose (object);
+}
+
+
+static void
 phosh_password_entry_class_init (PhoshPasswordEntryClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
+
+  object_class->dispose = phosh_password_entry_dispose;
 
   gtk_widget_class_set_template_from_resource (widget_class,
                                                "/mobi/phosh/ui/password-entry.ui");

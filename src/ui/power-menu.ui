@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshPowerMenu" parent="PhoshSystemModalDialog">
     <signal name="dialog-canceled" handler="on_power_menu_done"/>
     <child type="phosh-dialog-content">
@@ -43,6 +43,9 @@
               <object class="GtkStack" id="stack">
                 <property name="visible">1</property>
                 <child>
+                  <object class="GtkStackPage">
+                    <property name="name">poweroff</property>
+                    <property name="child">
                   <object class="GtkButton" id="btn_poweroff">
                     <property name="visible">1</property>
                     <property name="vexpand">1</property>
@@ -73,16 +76,18 @@
                           </object>
                         </child>
                       </object>
-                    </child>
+                      </child>
                     <style>
                       <class name="flat"/>
                     </style>
+                    </object>
+                  </property>
                   </object>
-                  <packing>
-                    <property name="name">poweroff</property>
-                  </packing>
                 </child>
                 <child>
+                  <object class="GtkStackPage">
+                    <property name="name">suspend</property>
+                    <property name="child">
                   <object class="GtkButton" id="btn_suspend">
                     <property name="visible">1</property>
                     <property name="vexpand">1</property>
@@ -118,15 +123,14 @@
                       <class name="flat"/>
                     </style>
                   </object>
-                  <packing>
-                    <property name="name">suspend</property>
-                  </packing>
+                    </property>
+                  </object>
                 </child>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">0</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left-attach">0</property>
-                <property name="top-attach">0</property>
-              </packing>
             </child>
             <child>
               <object class="GtkButton" id="btn_lock">
@@ -163,11 +167,11 @@
                 <style>
                   <class name="flat"/>
                 </style>
+                <layout>
+                  <property name="column">1</property>
+                  <property name="row">0</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left-attach">1</property>
-                <property name="top-attach">0</property>
-              </packing>
             </child>
             <child>
               <object class="GtkButton" id="btn_screenshot">
@@ -204,11 +208,11 @@
                 <style>
                   <class name="flat"/>
                 </style>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">1</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left-attach">0</property>
-                <property name="top-attach">1</property>
-              </packing>
             </child>
             <child>
               <object class="GtkButton" id="btn_emergency_call">
@@ -246,11 +250,11 @@
                   <class name="flat"/>
                   <class name="emergency-button"/>
                 </style>
+                <layout>
+                  <property name="column">1</property>
+                  <property name="row">1</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left-attach">1</property>
-                <property name="top-attach">1</property>
-              </packing>
             </child>
           </object>
         </child>

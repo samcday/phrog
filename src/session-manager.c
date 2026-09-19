@@ -244,7 +244,8 @@ on_end_session (PhoshSessionManager                  *self,
 static void
 on_stop (PhoshSessionManager *self, PhoshDBusSessionManagerClientPrivate *object)
 {
-  gtk_main_quit ();
+  // FIXME Port to GTK 4
+  // gtk_main_quit ();
 }
 
 

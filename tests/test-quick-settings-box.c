@@ -10,6 +10,24 @@
 #include "quick-setting.h"
 
 
+static guint
+count_children (PhoshQuickSettingsBox *box)
+{
+  int count = 0;
+  GtkWidget *child = gtk_widget_get_first_child (GTK_WIDGET (box));
+
+  g_return_val_if_fail (GTK_IS_REVEALER (child), 0);
+
+  child = gtk_widget_get_next_sibling (child);
+  while (child != NULL) {
+    count += 1;
+    child = gtk_widget_get_next_sibling (child);
+  }
+
+  return count;
+}
+
+
 static void
 test_phosh_quick_settings_box_new (void)
 {
@@ -17,14 +35,15 @@ test_phosh_quick_settings_box_new (void)
   int max_columns;
   int spacing;
   gboolean can_show_status;
+  guint count;
   g_autoptr (GList) children = NULL;
 
   box = g_object_new (PHOSH_TYPE_QUICK_SETTINGS_BOX, NULL);
   g_object_ref_sink (box);
   g_assert_true (PHOSH_IS_QUICK_SETTINGS_BOX (box));
 
-  children = gtk_container_get_children (GTK_CONTAINER (box));
-  g_assert_cmpuint (g_list_length (children), ==, 0);
+  count = count_children (box);
+  g_assert_cmpuint (count, ==, 0);
 
   max_columns = phosh_quick_settings_box_get_max_columns (box);
   g_assert_cmpuint (max_columns, ==, 3);
@@ -47,18 +66,17 @@ test_phosh_quick_settings_box_new (void)
 static void
 test_phosh_quick_settings_box_add (void)
 {
-  GtkContainer *box;
+  GtkWidget *box;
   GtkWidget *child;
-  g_autoptr (GList) children = NULL;
+  guint count;
 
-  box = GTK_CONTAINER (phosh_quick_settings_box_new (3, 0));
+  box = phosh_quick_settings_box_new (3, 0);
   g_object_ref_sink (box);
   child = phosh_quick_setting_new (NULL);
 
   phosh_quick_settings_box_add (PHOSH_QUICK_SETTINGS_BOX (box), PHOSH_QUICK_SETTING (child));
-  children = gtk_container_get_children (box);
-  g_assert_cmpuint (g_list_length (children), ==, 1);
-  g_assert_true (g_list_nth_data (children, 0) == child);
+  count = count_children (PHOSH_QUICK_SETTINGS_BOX (box));
+  g_assert_cmpuint (count, ==, 1);
 
   g_assert_finalize_object (box);
 }
@@ -67,18 +85,19 @@ test_phosh_quick_settings_box_add (void)
 static void
 test_phosh_quick_settings_box_remove (void)
 {
-  GtkContainer *box;
+  GtkWidget *box;
   GtkWidget *child;
-  g_autoptr (GList) children = NULL;
+  guint count;
 
-  box = GTK_CONTAINER (phosh_quick_settings_box_new (3, 0));
+
+  box = phosh_quick_settings_box_new (3, 0);
   g_object_ref_sink (box);
   child = phosh_quick_setting_new (NULL);
 
   phosh_quick_settings_box_add (PHOSH_QUICK_SETTINGS_BOX (box), PHOSH_QUICK_SETTING (child));
   phosh_quick_settings_box_remove (PHOSH_QUICK_SETTINGS_BOX (box), PHOSH_QUICK_SETTING (child));
-  children = gtk_container_get_children (box);
-  g_assert_cmpuint (g_list_length (children), ==, 0);
+  count = count_children (PHOSH_QUICK_SETTINGS_BOX (box));
+  g_assert_cmpuint (count, ==, 0);
 
   g_assert_finalize_object (box);
 }
@@ -134,9 +153,9 @@ test_phosh_quick_settings_box_set_can_show_status (void)
   box = PHOSH_QUICK_SETTINGS_BOX (phosh_quick_settings_box_new (3, 0));
   g_object_ref_sink (box);
   child_a = g_object_new (PHOSH_TYPE_QUICK_SETTING, "can-show-status", TRUE, NULL);
-  gtk_container_add (GTK_CONTAINER (box), GTK_WIDGET (child_a));
+  phosh_quick_settings_box_add (box, child_a);
   child_b = g_object_new (PHOSH_TYPE_QUICK_SETTING, "can-show-status", FALSE, NULL);
-  gtk_container_add (GTK_CONTAINER (box), GTK_WIDGET (child_b));
+  phosh_quick_settings_box_add (box, child_b);
 
   can_show_status = TRUE;
   phosh_quick_settings_box_set_can_show_status (box, can_show_status);

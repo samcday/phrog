@@ -11,68 +11,67 @@
  * notify-server-standalone
  */
 
-#include <gtk/gtk.h>
+#include <adwaita.h>
 #include <gio/gdesktopappinfo.h>
 #include <notifications/notification-frame.h>
 #include <notifications/notification.h>
 
 
 static void
-empty (PhoshNotificationFrame *self, GtkWidget *box)
+empty (PhoshNotificationFrame *self, GtkBox *box)
 {
-  gtk_container_remove (GTK_CONTAINER (box), GTK_WIDGET (self));
+  gtk_box_remove (box, GTK_WIDGET (self));
 }
 
 
-int
-main (int argc, char **argv)
+static void
+css_setup (void)
 {
-  GtkWidget *window = NULL;
-  GtkWidget *scrolled = NULL;
-  GtkWidget *box = NULL;
-  GtkWidget *frame = NULL;
-  GDesktopAppInfo *app = NULL;
-  GStrv actions = (char *[]) { "ok", "Okay", NULL };
-  GIcon *image = NULL;
-  PhoshNotification *notification = NULL;
   GtkCssProvider *provider = NULL;
   GFile *file = NULL;
-  GError *error = NULL;
-  g_autoptr (GDateTime) now = g_date_time_new_now_local ();
-
-  gtk_init (&argc, &argv);
 
   provider = gtk_css_provider_new ();
   file = g_file_new_for_uri ("resource:///mobi/phosh/stylesheet/adwaita-dark.css");
+  gtk_css_provider_load_from_file (provider, file);
+  gtk_style_context_add_provider_for_display (gdk_display_get_default (),
+                                              GTK_STYLE_PROVIDER (provider),
+                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  g_object_unref (file);
 
-  if (!gtk_css_provider_load_from_file (provider, file, &error)) {
-    g_warning ("Failed to load CSS file: %s", error->message);
-    g_clear_error (&error);
-    return 1;
-  }
-  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
-                                             GTK_STYLE_PROVIDER (provider),
-                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-
-  g_object_set (gtk_settings_get_default (),
-                "gtk-application-prefer-dark-theme", TRUE,
+  g_object_set (adw_style_manager_get_default (),
+                "color-scheme", ADW_COLOR_SCHEME_FORCE_DARK,
                 NULL);
+}
 
-  window = g_object_new (GTK_TYPE_WINDOW,
-                         "visible", TRUE,
+
+static void
+on_activate (AdwApplication *app)
+{
+  GtkWindow *window;
+  GtkScrolledWindow *scrolled;
+  GtkBox *box;
+  GtkWidget *frame;
+  GDesktopAppInfo *info;
+  GStrv actions = (char *[]) { "ok", "Okay", NULL };
+  GIcon *image = NULL;
+  PhoshNotification *notification = NULL;
+  g_autoptr (GDateTime) now = g_date_time_new_now_local ();
+
+  css_setup ();
+
+  window = g_object_new (GTK_TYPE_APPLICATION_WINDOW,
+                         "application", app,
                          "default-height", 640,
                          "default-width", 360,
                          "height-request", 640,
                          "width-request", 360,
                          "title", "PhoshNotificationFrame Demo",
                          NULL);
-  g_signal_connect (window, "delete-event", G_CALLBACK (gtk_main_quit), NULL);
 
   scrolled = g_object_new (GTK_TYPE_SCROLLED_WINDOW,
                            "vscrollbar-policy", GTK_POLICY_NEVER,
-                           "visible", TRUE,
                            NULL);
-  gtk_container_add (GTK_CONTAINER (window), scrolled);
+  gtk_window_set_child (window, GTK_WIDGET (scrolled));
 
   box = g_object_new (GTK_TYPE_BOX,
                       "margin-start", 6,
@@ -80,14 +79,13 @@ main (int argc, char **argv)
                       "margin-end", 6,
                       "margin-bottom", 6,
                       "orientation", GTK_ORIENTATION_VERTICAL,
-                      "visible", TRUE,
                       NULL);
-  gtk_container_add (GTK_CONTAINER (scrolled), box);
+  gtk_scrolled_window_set_child (scrolled, GTK_WIDGET (box));
 
-  app = g_desktop_app_info_new ("org.gnome.Calculator.desktop");
+  info = g_desktop_app_info_new ("org.gnome.Calculator.desktop");
   notification = phosh_notification_new (0,
                                          "Not Shown",
-                                         G_APP_INFO (app),
+                                         G_APP_INFO (info),
                                          "2 + 2",
                                          "= 4",
                                          NULL,
@@ -103,7 +101,7 @@ main (int argc, char **argv)
   phosh_notification_frame_bind_notification (PHOSH_NOTIFICATION_FRAME (frame),
                                               notification);
   g_signal_connect (frame, "empty", G_CALLBACK (empty), box);
-  gtk_container_add (GTK_CONTAINER (box), frame);
+  gtk_box_append (box, frame);
 
   image = g_themed_icon_new ("org.gnome.Software");
   notification = phosh_notification_new (1,
@@ -124,9 +122,19 @@ main (int argc, char **argv)
   phosh_notification_frame_bind_notification (PHOSH_NOTIFICATION_FRAME (frame),
                                               notification);
   g_signal_connect (frame, "empty", G_CALLBACK (empty), box);
-  gtk_container_add (GTK_CONTAINER (box), frame);
+  gtk_box_append (box, frame);
 
-  gtk_main ();
+  gtk_window_present (window);
+}
 
-  return 0;
+
+int
+main (int argc, char **argv)
+{
+  g_autoptr (AdwApplication) app = NULL;
+
+  app = adw_application_new ("mobi.phosh.tools.NotificationFrameDemo",
+                             G_APPLICATION_DEFAULT_FLAGS);
+  g_signal_connect (app, "activate", G_CALLBACK (on_activate), NULL);
+  return g_application_run (G_APPLICATION (app), argc, argv);
 }

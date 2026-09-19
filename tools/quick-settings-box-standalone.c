@@ -12,6 +12,8 @@
 #include "quick-settings-box.h"
 #include "status-icon.h"
 
+#include <adwaita.h>
+
 #define SPACING 12
 #define COLUMNS 3
 
@@ -47,14 +49,10 @@ on_child_clicked (PhoshQuickSetting *child)
 static void
 on_child_long_pressed (PhoshQuickSetting *child)
 {
-  GtkWidget *dialog = gtk_message_dialog_new (NULL,
-                                              GTK_DIALOG_MODAL,
-                                              GTK_MESSAGE_INFO,
-                                              GTK_BUTTONS_CLOSE,
-                                              "You long-pressed or right-clicked on a child.");
-
-  gtk_dialog_run (GTK_DIALOG (dialog));
-  gtk_widget_destroy (GTK_WIDGET (dialog));
+  AdwDialog *dialog = adw_alert_dialog_new (NULL,
+                                            "You long-pressed or right-clicked on a child.");
+  adw_alert_dialog_add_responses (ADW_ALERT_DIALOG (dialog), "ok", "OK", NULL);
+  adw_dialog_present (dialog, GTK_WIDGET (child));
 }
 
 
@@ -78,10 +76,7 @@ make_status_page (GtkWidget *child)
   if (g_random_boolean ())
     return NULL;
 
-  image = g_object_new (GTK_TYPE_IMAGE,
-                        "icon-name", "face-cool-symbolic",
-                        "pixel-size", 16,
-                        NULL);
+  image = gtk_image_new_from_icon_name ("face-cool-symbolic");
   gtk_widget_set_visible (image, TRUE);
   g_object_set_data (G_OBJECT (child), "image", image);
 
@@ -90,9 +85,8 @@ make_status_page (GtkWidget *child)
   gtk_widget_set_visible (GTK_WIDGET (status_page), TRUE);
 
   if (g_random_boolean ()) {
-    scrollw = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_set_visible (scrollw, TRUE);
-    gtk_container_add (GTK_CONTAINER (scrollw), image);
+    scrollw = gtk_scrolled_window_new ();
+    gtk_scrolled_window_set_child (GTK_SCROLLED_WINDOW (scrollw), image);
     gtk_widget_set_hexpand (scrollw, TRUE);
     phosh_status_page_set_content (status_page, scrollw);
   } else {
@@ -133,10 +127,10 @@ static void
 on_del_clicked (GtkWidget *child)
 {
   GtkWidget *box = g_object_get_data (G_OBJECT (child), "box");
-  GtkWidget *controls_grid = g_object_get_data (G_OBJECT (child), "controls_grid");
+  GtkGrid *controls_grid = g_object_get_data (G_OBJECT (child), "controls_grid");
   GtkWidget *controls_box = g_object_get_data (G_OBJECT (child), "controls_box");
 
-  gtk_container_remove (GTK_CONTAINER (controls_grid), controls_box);
+  gtk_grid_remove (controls_grid, controls_box);
   phosh_quick_settings_box_remove (PHOSH_QUICK_SETTINGS_BOX (box), PHOSH_QUICK_SETTING (child));
 }
 
@@ -156,32 +150,19 @@ make_controls_box (GtkWidget *child, int i)
   g_autofree char *label = g_strdup_printf ("%d", i);
   GtkWidget *box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
   GtkWidget *check = gtk_check_button_new_with_label (label);
-  GtkWidget *del_img = g_object_new (GTK_TYPE_IMAGE,
-                                     "icon-name", "user-trash-symbolic",
-                                     "pixel-size", 16,
-                                     NULL);
-  GtkWidget *restatus_img = g_object_new (GTK_TYPE_IMAGE,
-                                          "icon-name", "view-refresh-symbolic",
-                                          "pixel-size", 16,
-                                          NULL);
-  GtkWidget *del_btn = g_object_new (GTK_TYPE_BUTTON, "image", del_img, NULL);
-  GtkWidget *restatus_btn = g_object_new (GTK_TYPE_BUTTON, "image", restatus_img, NULL);
+  GtkWidget *del_btn = gtk_button_new_from_icon_name ("user-trash-symbolic");
+  GtkWidget *restatus_btn = gtk_button_new_from_icon_name ("view-refresh-symbolic");
 
   g_object_bind_property (check, "active", child, "visible", G_BINDING_SYNC_CREATE);
   g_signal_connect_object (del_btn, "clicked", G_CALLBACK (on_del_clicked), child,
                            G_CONNECT_SWAPPED);
   g_signal_connect_object (restatus_btn, "clicked", G_CALLBACK (on_restatus_clicked), child,
                            G_CONNECT_SWAPPED);
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (check), TRUE);
+  gtk_check_button_set_active (GTK_CHECK_BUTTON (check), TRUE);
 
-  gtk_container_add (GTK_CONTAINER (box), check);
-  gtk_container_add (GTK_CONTAINER (box), del_btn);
-  gtk_container_add (GTK_CONTAINER (box), restatus_btn);
-
-  gtk_widget_set_visible (box, TRUE);
-  gtk_widget_set_visible (check, TRUE);
-  gtk_widget_set_visible (del_btn, TRUE);
-  gtk_widget_set_visible (restatus_btn, TRUE);
+  gtk_box_append (GTK_BOX (box), check);
+  gtk_box_append (GTK_BOX (box), del_btn);
+  gtk_box_append (GTK_BOX (box), restatus_btn);
 
   return box;
 }
@@ -227,24 +208,14 @@ make_ui (void)
   g_object_bind_property (spacing_spin, "value", box, "spacing", G_BINDING_SYNC_CREATE);
   gtk_spin_button_set_value (GTK_SPIN_BUTTON (spacing_spin), SPACING);
 
-  gtk_widget_set_visible (root_box, TRUE);
-  gtk_widget_set_visible (box, TRUE);
-  gtk_widget_set_visible (controls_grid, TRUE);
-  gtk_widget_set_visible (add_btn, TRUE);
-  gtk_widget_set_visible (status_toggle, TRUE);
-  gtk_widget_set_visible (max_columns_lbl, TRUE);
-  gtk_widget_set_visible (max_columns_spin, TRUE);
-  gtk_widget_set_visible (spacing_lbl, TRUE);
-  gtk_widget_set_visible (spacing_spin, TRUE);
-
-  gtk_container_add (GTK_CONTAINER (root_box), box);
-  gtk_container_add (GTK_CONTAINER (root_box), controls_grid);
-  gtk_container_add (GTK_CONTAINER (root_box), add_btn);
-  gtk_container_add (GTK_CONTAINER (root_box), status_toggle);
-  gtk_container_add (GTK_CONTAINER (root_box), max_columns_lbl);
-  gtk_container_add (GTK_CONTAINER (root_box), max_columns_spin);
-  gtk_container_add (GTK_CONTAINER (root_box), spacing_lbl);
-  gtk_container_add (GTK_CONTAINER (root_box), spacing_spin);
+  gtk_box_append (GTK_BOX (root_box), box);
+  gtk_box_append (GTK_BOX (root_box), controls_grid);
+  gtk_box_append (GTK_BOX (root_box), add_btn);
+  gtk_box_append (GTK_BOX (root_box), status_toggle);
+  gtk_box_append (GTK_BOX (root_box), max_columns_lbl);
+  gtk_box_append (GTK_BOX (root_box), max_columns_spin);
+  gtk_box_append (GTK_BOX (root_box), spacing_lbl);
+  gtk_box_append (GTK_BOX (root_box), spacing_spin);
 
   return root_box;
 }
@@ -253,46 +224,50 @@ make_ui (void)
 static void
 css_setup (void)
 {
-  g_autoptr (GtkCssProvider) provider = NULL;
-  g_autoptr (GFile) file = NULL;
-  g_autoptr (GError) error = NULL;
+  GtkCssProvider *provider;
+  GFile *file;
 
   provider = gtk_css_provider_new ();
   file = g_file_new_for_uri ("resource:///mobi/phosh/stylesheet/adwaita-dark.css");
 
-  if (!gtk_css_provider_load_from_file (provider, file, &error)) {
-    g_warning ("Failed to load CSS file: %s", error->message);
-    return;
-  }
-  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
-                                             GTK_STYLE_PROVIDER (provider),
-                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  gtk_css_provider_load_from_file (provider, file);
+  gtk_style_context_add_provider_for_display (gdk_display_get_default (),
+                                              GTK_STYLE_PROVIDER (provider),
+                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  g_object_unref (file);
+
+  g_object_set (adw_style_manager_get_default (),
+                "color-scheme", ADW_COLOR_SCHEME_FORCE_DARK,
+                NULL);
+}
+
+
+static void
+on_activate (AdwApplication *app)
+{
+  GtkWindow *window;
+  GtkWidget *box;
+
+  css_setup ();
+
+  window = g_object_new (GTK_TYPE_APPLICATION_WINDOW,
+                         "application", app,
+                         "title", "QuickSettings Box",
+                         NULL);
+  box = make_ui ();
+  gtk_window_set_child (window, box);
+
+  gtk_window_present (window);
 }
 
 
 int
 main (int argc, char *argv[])
 {
-  GtkWidget *win;
-  GtkWidget *box;
+  g_autoptr (AdwApplication) app = NULL;
 
-  gtk_init (&argc, &argv);
-
-  css_setup ();
-
-  g_object_set (gtk_settings_get_default (),
-                "gtk-application-prefer-dark-theme", TRUE,
-                NULL);
-
-  win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title (GTK_WINDOW (win), "Quick Settings Box");
-  gtk_widget_set_visible (win, TRUE);
-  g_signal_connect (win, "delete-event", G_CALLBACK (gtk_main_quit), NULL);
-
-  box = make_ui ();
-  gtk_container_add (GTK_CONTAINER (win), box);
-
-  gtk_main ();
-
-  return 0;
+  app = adw_application_new ("mobi.phosh.tools.QuickSettingsBoxStandalone",
+                             G_APPLICATION_DEFAULT_FLAGS);
+  g_signal_connect (app, "activate", G_CALLBACK (on_activate), NULL);
+  return g_application_run (G_APPLICATION (app), argc, argv);
 }

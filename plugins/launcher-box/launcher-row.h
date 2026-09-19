@@ -9,7 +9,7 @@
 #include "launcher-item.h"
 
 #include <gtk/gtk.h>
-#include <handy.h>
+#include <adwaita.h>
 
 #include <gio/gdesktopappinfo.h>
 
@@ -17,7 +17,7 @@ G_BEGIN_DECLS
 
 #define PHOSH_TYPE_LAUNCHER_ROW (phosh_launcher_row_get_type ())
 
-G_DECLARE_FINAL_TYPE (PhoshLauncherRow, phosh_launcher_row, PHOSH, LAUNCHER_ROW, HdyActionRow)
+G_DECLARE_FINAL_TYPE (PhoshLauncherRow, phosh_launcher_row, PHOSH, LAUNCHER_ROW, AdwActionRow)
 
 GtkWidget         *phosh_launcher_row_new      (PhoshLauncherItem *item);
 PhoshLauncherItem *phosh_launcher_row_get_item (PhoshLauncherRow *self);

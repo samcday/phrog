@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshSplash" parent="PhoshLayerSurface">
     <child>
       <object class="GtkBox" id="box">
@@ -10,7 +10,6 @@
         <child>
           <object class="GtkImage" id="img_app">
             <property name="visible">1</property>
-            <property name="stock">gtk-missing-image</property>
             <property name="pixel-size">192</property>
             <property name="valign">end</property>
             <property name="vexpand">1</property>
@@ -22,7 +21,7 @@
         <child>
           <object class="GtkSpinner">
             <property name="visible">1</property>
-            <property name="active">1</property>
+            <property name="spinning">1</property>
             <property name="margin-top">80</property>
             <property name="width-request">32</property>
             <property name="height-request">32</property>
@@ -31,6 +30,11 @@
             <property name="vexpand">1</property>
           </object>
         </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkEventControllerKey">
+        <signal name="key-pressed" handler="phosh_splash_key_press_event" swapped="true"/>
       </object>
     </child>
   </template>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
-  <template class="PhoshAudioSettings" parent="GtkBin">
+  <requires lib="gtk" version="4.0"/>
+  <template class="PhoshAudioSettings" parent="GtkWidget">
     <child>
       <object class="GtkBox">
         <property name="visible">1</property>
@@ -10,7 +10,7 @@
           <object class="GtkBox" id="box_ouput_vol_slider">
             <property name="visible">1</property>
             <child>
-              <object class="PhoshChannelBar" id="output_vol_bar">
+              <object class="GvcChannelBar" id="output_vol_bar">
                 <property name="visible">1</property>
                 <property name="icon-name">audio-speakers</property>
               </object>
@@ -28,22 +28,26 @@
                     <property name="visible">1</property>
                     <property name="transition-type">crossfade</property>
                     <child>
+                      <object class="GtkStackPage">
+                        <property name="name">no-audio-details</property>
+                        <property name="child">
                       <object class="GtkImage">
                         <property name="visible">1</property>
                         <property name="icon-name">go-next-symbolic</property>
                       </object>
-                      <packing>
-                        <property name="name">no-audio-details</property>
-                      </packing>
+                        </property>
+                      </object>
                     </child>
                     <child>
+                      <object class="GtkStackPage">
+                        <property name="name">audio-details</property>
+                        <property name="child">
                       <object class="GtkImage">
                         <property name="visible">1</property>
                         <property name="icon-name">go-down-symbolic</property>
                       </object>
-                      <packing>
-                        <property name="name">audio-details</property>
-                      </packing>
+                        </property>
+                      </object>
                     </child>
                   </object>
                 </child>
@@ -59,7 +63,7 @@
           <object class="GtkRevealer">
             <property name="visible">1</property>
             <property name="reveal-child" bind-source="toggle_audio_details" bind-property="active" bind-flags="sync-create"/>
-            <child>
+            <property name="child">
               <object class="GtkBox">
                 <property name="visible">1</property>
                 <property name="width-request">120</property>
@@ -129,7 +133,7 @@
                   <object class="GtkButton">
                     <property name="visible">1</property>
                     <property name="action-name">panel.launch-panel</property>
-                    <property name="action-target">(&quot;sound&quot;, [&lt;&quot;&quot;&gt;])</property>
+                    <property name="action-target">&quot;sound&quot;</property>
                     <child>
                       <object class="GtkLabel">
                         <property name="visible">1</property>
@@ -139,7 +143,7 @@
                   </object>
                 </child>
               </object>
-            </child>
+            </property>
           </object>
         </child>
       </object>

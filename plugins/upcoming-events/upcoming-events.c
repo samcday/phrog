@@ -11,11 +11,10 @@
 #include "event-list.h"
 #include "calendar-event.h"
 #include "upcoming-events.h"
-#include "gtkfilterlistmodel.h"
 
 #include "phosh-plugin-upcoming-events-phosh-calendar-dbus.h"
 
-#include <handy.h>
+#include <adwaita.h>
 #include <gmobile.h>
 #include <glib/gi18n.h>
 
@@ -40,6 +39,7 @@ struct _PhoshUpcomingEvents {
   GtkStack                      *stack;
   GtkListBox                    *events_box;
   GListModel                    *event_lists;
+  GtkFilter                     *event_lists_filter;
   GtkFilterListModel            *event_lists_filtered;
   GListStore                    *events;
   GHashTable                    *event_ids;
@@ -164,7 +164,7 @@ refilter_event_lists (PhoshUpcomingEvents *self)
 {
   const char *child_name = "no-events";
 
-  gtk_filter_list_model_refilter (self->event_lists_filtered);
+  gtk_filter_changed (self->event_lists_filter, GTK_FILTER_CHANGE_DIFFERENT);
 
   if (!self->skip_empty || g_list_model_get_n_items (G_LIST_MODEL (self->event_lists_filtered)))
     child_name = "events-window";
@@ -357,8 +357,7 @@ on_skip_empty_changed (PhoshUpcomingEvents *self)
   self->skip_empty = g_settings_get_boolean (self->settings, UPCOMING_EVENT_SKIP_DAYS_KEY);
   icon_name = self->skip_empty ? EXPAND_LIST_ICON : SHRINK_LIST_ICON;
 
-  gtk_button_set_image (GTK_BUTTON (self->skip_empty_btn),
-                        gtk_image_new_from_icon_name (icon_name, GTK_ICON_SIZE_BUTTON));
+  gtk_button_set_icon_name (GTK_BUTTON (self->skip_empty_btn), icon_name);
 
   refilter_event_lists (self);
 }
@@ -401,13 +400,13 @@ static void
 on_num_days_changed (PhoshUpcomingEvents *self)
 {
   g_autofree char *desc = NULL;
-  HdyStatusPage *no_events = HDY_STATUS_PAGE (gtk_stack_get_child_by_name (self->stack,
+  AdwStatusPage *no_events = ADW_STATUS_PAGE (gtk_stack_get_child_by_name (self->stack,
                                                                            "no-events"));
 
   self->num_days = g_settings_get_uint (self->settings, UPCOMING_EVENT_DAYS_KEY);
   desc = g_strdup_printf (_("No events for the next %d days"), self->num_days);
 
-  hdy_status_page_set_description (no_events, desc);
+  adw_status_page_set_description (no_events, desc);
 
   g_debug ("Number of days changed to %u; reconfiguring event lists", self->num_days);
 
@@ -488,10 +487,10 @@ phosh_upcoming_events_init (PhoshUpcomingEvents *self)
                            G_CONNECT_SWAPPED);
 
   self->event_lists = G_LIST_MODEL (g_list_store_new (PHOSH_TYPE_EVENT_LIST));
-  self->event_lists_filtered = gtk_filter_list_model_new (self->event_lists,
-                                                          filter_event_lists_func,
-                                                          self,
-                                                          NULL);
+  self->event_lists_filter = GTK_FILTER (gtk_custom_filter_new (filter_event_lists_func,
+                                                                self,
+                                                                NULL));
+  self->event_lists_filtered = gtk_filter_list_model_new (self->event_lists, self->event_lists_filter);
   self->events = g_list_store_new (PHOSH_TYPE_CALENDAR_EVENT);
 
   self->event_ids = g_hash_table_new_full (g_str_hash,
@@ -514,10 +513,10 @@ phosh_upcoming_events_init (PhoshUpcomingEvents *self)
   css_provider = gtk_css_provider_new ();
   gtk_css_provider_load_from_resource (css_provider,
                                        "/mobi/phosh/plugins/upcoming-events/stylesheet/common.css");
-  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
-                                             GTK_STYLE_PROVIDER (css_provider),
-                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_default (),
+  gtk_style_context_add_provider_for_display (gdk_display_get_default (),
+                                              GTK_STYLE_PROVIDER (css_provider),
+                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_for_display (gdk_display_get_default ()),
                                     "/mobi/phosh/plugins/upcoming-events/icons");
 
   tz = g_file_new_for_path ("/etc/localtime");

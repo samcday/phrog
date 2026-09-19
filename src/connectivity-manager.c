@@ -51,11 +51,22 @@ G_DEFINE_TYPE (PhoshConnectivityManager, phosh_connectivity_manager, PHOSH_TYPE_
 
 
 static void
-on_notification_actioned (PhoshConnectivityManager *self)
+on_uri_launch_ready (GtkUriLauncher *launcher, GAsyncResult *result, gpointer user_data)
 {
   gboolean success;
-  const char *check_uri;
   g_autoptr (GError) err = NULL;
+
+  success = gtk_uri_launcher_launch_finish (launcher, result, &err);
+  if (!success)
+    g_warning ("Failed to show uri '%s': %s", gtk_uri_launcher_get_uri (launcher), err->message);
+}
+
+
+static void
+on_notification_actioned (PhoshConnectivityManager *self)
+{
+  const char *check_uri;
+  g_autoptr (GtkUriLauncher) launcher = NULL;
 
   check_uri = nm_client_connectivity_check_get_uri (self->nmclient);
   if (check_uri == NULL) {
@@ -63,9 +74,12 @@ on_notification_actioned (PhoshConnectivityManager *self)
     return;
   }
 
-  success = gtk_show_uri_on_window (NULL, check_uri, GDK_CURRENT_TIME, &err);
-  if (!success)
-    g_warning ("Failed to show uri '%s': %s", check_uri, err->message);
+  launcher = gtk_uri_launcher_new (check_uri);
+  gtk_uri_launcher_launch (launcher,
+                           NULL,
+                           self->cancel,
+                           (GAsyncReadyCallback) on_uri_launch_ready,
+                           NULL);
 }
 
 

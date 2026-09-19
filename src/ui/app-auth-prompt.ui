@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshAppAuthPrompt" parent="PhoshSystemModalDialog">
+    <property name="default-widget">btn_grant</property>
     <signal name="dialog-canceled" handler="on_dialog_canceled"/>
     <child type="phosh-dialog-content">
       <object class="GtkBox">
@@ -42,10 +43,9 @@
           <object class="GtkCheckButton" id="checkbtn_remember">
             <property name="label" translatable="yes">Remember decision</property>
             <property name="visible">1</property>
-            <property name="can-focus">1</property>
+            <property name="focusable">1</property>
             <property name="halign">center</property>
             <property name="use-underline">1</property>
-            <property name="draw-indicator">1</property>
           </object>
         </child>
       </object>
@@ -54,7 +54,7 @@
       <object class="GtkButton" id="btn_deny">
         <property name="label" translatable="yes">Cancel</property>
         <property name="visible">1</property>
-        <property name="can-focus">1</property>
+        <property name="focusable">1</property>
         <property name="valign">center</property>
         <signal name="clicked" handler="on_dialog_canceled" object="PhoshAppAuthPrompt" swapped="yes"/>
       </object>
@@ -63,9 +63,7 @@
       <object class="GtkButton" id="btn_grant">
         <property name="label" translatable="yes">Ok</property>
         <property name="visible">1</property>
-        <property name="can-focus">1</property>
-        <property name="can-default">1</property>
-        <property name="has-default">1</property>
+        <property name="focusable">1</property>
         <property name="valign">center</property>
         <signal name="clicked" handler="on_btn_grant_clicked" object="PhoshAppAuthPrompt" swapped="yes"/>
         <style>

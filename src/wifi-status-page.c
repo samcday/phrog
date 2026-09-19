@@ -182,6 +182,8 @@ phosh_wifi_status_page_dispose (GObject *object)
 
   g_clear_pointer (&self->connecting_network, g_free);
 
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_WIFI_STATUS_PAGE);
+
   G_OBJECT_CLASS (phosh_wifi_status_page_parent_class)->dispose (object);
 }
 

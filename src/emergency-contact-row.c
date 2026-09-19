@@ -36,7 +36,7 @@
  * the contact object.
  */
 struct _PhoshEmergencyContactRow {
-  HdyActionRow           parent;
+  AdwActionRow           parent;
 
   GtkLabel              *name_label;
   GtkLabel              *id_label;
@@ -44,7 +44,7 @@ struct _PhoshEmergencyContactRow {
   PhoshEmergencyContact *contact;
 };
 
-G_DEFINE_TYPE (PhoshEmergencyContactRow, phosh_emergency_contact_row, HDY_TYPE_ACTION_ROW)
+G_DEFINE_TYPE (PhoshEmergencyContactRow, phosh_emergency_contact_row, ADW_TYPE_ACTION_ROW)
 
 
 enum {
@@ -114,6 +114,8 @@ emergency_contact_row_dispose (GObject *object)
   PhoshEmergencyContactRow *self = PHOSH_EMERGENCY_CONTACT_ROW (object);
 
   g_clear_object (&self->contact);
+
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_EMERGENCY_CONTACT_ROW);
 
   G_OBJECT_CLASS (phosh_emergency_contact_row_parent_class)->dispose (object);
 }

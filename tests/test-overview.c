@@ -8,14 +8,14 @@
 
 #include "overview.h"
 
-#include <handy.h>
+#include <adwaita.h>
 
 static void
 test_phosh_overview_new(void)
 {
-  GtkWidget *window = phosh_overview_new ();
+  GtkWidget *window = g_object_ref_sink (phosh_overview_new ());
   g_assert (window);
-  gtk_widget_destroy (window);
+  g_object_unref (window);
 }
 
 
@@ -24,7 +24,7 @@ main (int   argc,
       char *argv[])
 {
   gtk_test_init (&argc, &argv, NULL);
-  hdy_init ();
+  adw_init ();
 
   g_test_add_func("/phosh/overview/new", test_phosh_overview_new);
   return g_test_run();
