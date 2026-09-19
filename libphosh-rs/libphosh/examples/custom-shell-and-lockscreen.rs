@@ -131,9 +131,6 @@ mod custom_lockscreen {
         }
 
         impl WidgetImpl for CustomLockscreen {}
-        impl ContainerImpl for CustomLockscreen {}
-        impl BinImpl for CustomLockscreen {}
-        impl WindowImpl for CustomLockscreen {}
         impl LockscreenImpl for CustomLockscreen {}
     }
 }

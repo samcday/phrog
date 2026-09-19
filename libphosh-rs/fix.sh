@@ -17,3 +17,7 @@ xmlstarlet ed -L \
 	-d '///_:include[@name="Gcr"]' \
 	-d '///_:include[@name="GnomeBluetooth"]' \
 	Phosh-0.gir
+
+# GtkPlain is not introspected yet (WIP GTK custom-surface work), so g-i
+# emits unnamed <type> elements for the parent_instance field that trip up gir.
+xmlstarlet ed -L -d '//_:field[_:type[not(@name)]]' Phosh-0.gir

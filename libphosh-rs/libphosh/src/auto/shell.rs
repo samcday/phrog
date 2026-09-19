@@ -75,6 +75,10 @@ pub struct ShellBuilder {
                             Self { builder: self.builder.property("locked", locked), }
                         }
 
+                            pub fn log_domains(self, log_domains: impl Into<glib::StrV>) -> Self {
+                            Self { builder: self.builder.property("log-domains", log_domains.into()), }
+                        }
+
                             pub fn overview_visible(self, overview_visible: bool) -> Self {
                             Self { builder: self.builder.property("overview-visible", overview_visible), }
                         }
@@ -160,6 +164,16 @@ pub trait ShellExt: IsA<Shell> + 'static {
         ObjectExt::set_property(self.as_ref(),"locked", locked)
     }
 
+    #[doc(alias = "log-domains")]
+    fn log_domains(&self) -> Vec<glib::GString> {
+        ObjectExt::property(self.as_ref(), "log-domains")
+    }
+
+    #[doc(alias = "log-domains")]
+    fn set_log_domains(&self, log_domains: &[&str]) {
+        ObjectExt::set_property(self.as_ref(),"log-domains", log_domains)
+    }
+
     #[doc(alias = "overview-visible")]
     fn is_overview_visible(&self) -> bool {
         ObjectExt::property(self.as_ref(), "overview-visible")
@@ -206,6 +220,19 @@ pub trait ShellExt: IsA<Shell> + 'static {
             let f: Box_<F> = Box_::new(f);
             connect_raw(self.as_ptr() as *mut _, c"notify::locked".as_ptr() as *const _,
                 Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(notify_locked_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
+        }
+    }
+
+    #[doc(alias = "log-domains")]
+    fn connect_log_domains_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_log_domains_trampoline<P: IsA<Shell>, F: Fn(&P) + 'static>(this: *mut ffi::PhoshShell, _param_spec: glib::ffi::gpointer, f: glib::ffi::gpointer) {
+            let f: &F = &*(f as *const F);
+            f(Shell::from_glib_borrow(this).unsafe_cast_ref())
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, c"notify::log-domains".as_ptr() as *const _,
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(notify_log_domains_trampoline::<Self, F> as *const ())), Box_::into_raw(f))
         }
     }
 
