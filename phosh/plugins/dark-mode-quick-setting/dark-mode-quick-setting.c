@@ -118,7 +118,7 @@ phosh_dark_mode_quick_setting_init (PhoshDarkModeQuickSetting *self)
 {
   gtk_widget_init_template (GTK_WIDGET (self));
 
-  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_default (),
+  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_for_display (gdk_display_get_default ()),
                                     "/mobi/phosh/plugins/dark-mode-quick-setting/icons");
 
   self->settings = g_settings_new ("org.gnome.desktop.interface");

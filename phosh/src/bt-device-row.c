@@ -34,7 +34,7 @@ static guint signals[N_SIGNALS];
 
 
 struct _PhoshBtDeviceRow {
-  HdyActionRow      parent;
+  AdwActionRow      parent;
 
   GtkWidget        *icon;
   GtkSpinner       *spinner;
@@ -46,7 +46,7 @@ struct _PhoshBtDeviceRow {
   GCancellable     *cancellable;
 };
 
-G_DEFINE_TYPE (PhoshBtDeviceRow, phosh_bt_device_row, HDY_TYPE_ACTION_ROW);
+G_DEFINE_TYPE (PhoshBtDeviceRow, phosh_bt_device_row, ADW_TYPE_ACTION_ROW);
 
 
 static void
@@ -67,7 +67,7 @@ bat_level_cb (PhoshBtDeviceRow *self, GParamSpec *pspec, BluetoothDevice *device
                 NULL);
 
   if (!connected || type != BLUETOOTH_BATTERY_TYPE_PERCENTAGE) {
-    hdy_action_row_set_subtitle (HDY_ACTION_ROW (self), "");
+    adw_action_row_set_subtitle (ADW_ACTION_ROW (self), "");
     self->bat_percentage = -1.0;
     return;
   }
@@ -79,7 +79,7 @@ bat_level_cb (PhoshBtDeviceRow *self, GParamSpec *pspec, BluetoothDevice *device
   self->bat_percentage = current;
   /* Translators: a battery level in percent */
   subtitle = g_strdup_printf (_("Battery %.0f%%"), self->bat_percentage);
-  hdy_action_row_set_subtitle (HDY_ACTION_ROW (self), subtitle);
+  adw_action_row_set_subtitle (ADW_ACTION_ROW (self), subtitle);
 }
 
 
@@ -95,7 +95,7 @@ phosh_bt_device_row_set_device (PhoshBtDeviceRow *self, BluetoothDevice *device)
                           G_BINDING_DEFAULT | G_BINDING_SYNC_CREATE);
 
   g_object_bind_property (self->device,
-                          "alias",
+                          "name",
                           self,
                           "title",
                           G_BINDING_DEFAULT | G_BINDING_SYNC_CREATE);
@@ -113,10 +113,10 @@ phosh_bt_device_row_set_device (PhoshBtDeviceRow *self, BluetoothDevice *device)
                           G_BINDING_DEFAULT | G_BINDING_SYNC_CREATE);
 
   g_object_connect (self->device,
-                    "swapped-object-signal::notify::battery-percentage", bat_level_cb, self,
-                    "swapped-object-signal::notify::battery-type", bat_level_cb, self,
-                    "swapped-object-signal::notify::connected", bat_level_cb, self,
-                    NULL);
+    "swapped-object-signal::notify::battery-percentage", bat_level_cb, self,
+    "swapped-object-signal::notify::battery-type", bat_level_cb, self,
+    "swapped-object-signal::notify::connected", bat_level_cb, self,
+    NULL);
   bat_level_cb (self, NULL, device);
 }
 
@@ -149,6 +149,8 @@ phosh_bt_device_row_dispose (GObject *object)
 
   g_clear_object (&self->device);
 
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_BT_DEVICE_ROW);
+
   G_OBJECT_CLASS (phosh_bt_device_row_parent_class)->dispose (object);
 }
 
@@ -180,7 +182,7 @@ on_bt_row_activated (PhoshBtDeviceRow *self)
   gboolean connected;
   g_autofree char *name = NULL;
 
-  g_object_get (self->device, "connected", &connected, "alias", &name, NULL);
+  g_object_get (self->device, "connected", &connected, "name", &name, NULL);
 
   g_cancellable_cancel (self->cancellable);
   g_set_object (&self->cancellable, g_cancellable_new ());

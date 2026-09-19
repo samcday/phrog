@@ -14,15 +14,10 @@ static const char *
 load_theme (const char *theme_name)
 {
   const char *style;
-  g_autoptr (GtkCssProvider) provider = gtk_css_provider_new ();
 
   g_debug ("GTK theme: %s", theme_name);
 
   style = phosh_style_manager_get_stylesheet (theme_name);
-  gtk_css_provider_load_from_resource (provider, style);
-  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
-                                             GTK_STYLE_PROVIDER (provider),
-                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
   return style;
 }

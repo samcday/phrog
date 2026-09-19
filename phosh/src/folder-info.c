@@ -12,7 +12,6 @@
 #include "util.h"
 
 #include "favorite-list-model.h"
-#include "gtk-list-models/gtkfilterlistmodel.h"
 
 #include <gmobile.h>
 
@@ -52,6 +51,7 @@ struct _PhoshFolderInfo {
   GListStore             *app_infos;
   /* Filters the above to show only required apps,
    * like non-favorite etc. */
+  GtkFilter              *filter;
   GtkFilterListModel     *filtered_app_infos;
 
   PhoshFavoriteListModel *favorites;
@@ -259,7 +259,6 @@ phosh_folder_info_dispose (GObject *object)
   g_clear_pointer (&self->path, g_free);
   g_clear_pointer (&self->name, g_free);
   g_clear_object (&self->filtered_app_infos);
-  g_clear_object (&self->app_infos);
   g_clear_object (&self->settings);
 
   G_OBJECT_CLASS (phosh_folder_info_parent_class)->dispose (object);
@@ -275,11 +274,10 @@ phosh_folder_info_constructed (GObject *object)
   G_OBJECT_CLASS (phosh_folder_info_parent_class)->constructed (object);
 
   self->app_infos = g_list_store_new (G_TYPE_APP_INFO);
+  self->filter = GTK_FILTER (gtk_custom_filter_new (filter_app, self, NULL));
   self->favorites = phosh_favorite_list_model_get_default ();
   self->filtered_app_infos = gtk_filter_list_model_new (G_LIST_MODEL (self->app_infos),
-                                                        filter_app,
-                                                        self,
-                                                        NULL);
+                                                        self->filter);
   path = g_strconcat (FOLDERS_PREFIX, "/", self->path, "/", NULL);
   self->settings = g_settings_new_with_path (FOLDER_SCHEMA_ID, path);
 
@@ -290,7 +288,6 @@ phosh_folder_info_constructed (GObject *object)
 
   on_settings_name_changed (self, NULL, NULL);
   load_apps (self);
-  gtk_filter_list_model_refilter (self->filtered_app_infos);
 }
 
 static void
@@ -423,7 +420,7 @@ phosh_folder_info_refilter (PhoshFolderInfo *self, const char *search)
   g_return_val_if_fail (PHOSH_IS_FOLDER_INFO (self), FALSE);
 
   self->search = search;
-  gtk_filter_list_model_refilter (self->filtered_app_infos);
+  gtk_filter_changed (self->filter, GTK_FILTER_CHANGE_DIFFERENT);
   self->search = NULL;
 
   item = g_list_model_get_item (G_LIST_MODEL (self->filtered_app_infos), 0);

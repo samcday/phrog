@@ -9,7 +9,6 @@
 #include "testlib-compositor.h"
 
 #include "drag-surface.h"
-#include <gdk/gdkwayland.h>
 
 #include <glib.h>
 
@@ -19,7 +18,7 @@ test_drag_surface_g_object_new (PhoshTestCompositorFixture *fixture, gconstpoint
 {
   g_autofree char *namespace = g_strdup_printf ("phosh test %s", __func__);
   PhoshMonitor *monitor = phosh_test_get_monitor (fixture->state);
-  GtkWidget *surface = g_object_new (PHOSH_TYPE_DRAG_SURFACE,
+  GtkWidget *surface = g_object_ref_sink (g_object_new (PHOSH_TYPE_DRAG_SURFACE,
                                      "layer-shell", phosh_wayland_get_zwlr_layer_shell_v1 (
                                        fixture->state->wl),
                                      "layer-shell-effects",
@@ -38,7 +37,7 @@ test_drag_surface_g_object_new (PhoshTestCompositorFixture *fixture, gconstpoint
                                      "drag-handle", 10,
                                      "drag-mode", PHOSH_DRAG_SURFACE_DRAG_MODE_HANDLE,
                                      "threshold", 0.1,
-                                     NULL);
+                                     NULL));
 
   g_assert_true (PHOSH_IS_DRAG_SURFACE (surface));
   gtk_widget_set_visible (surface, TRUE);
@@ -55,7 +54,7 @@ test_drag_surface_g_object_new (PhoshTestCompositorFixture *fixture, gconstpoint
   gtk_widget_set_visible (surface, FALSE);
   g_assert_false (gtk_widget_get_visible (surface));
   g_assert_false (gtk_widget_get_mapped (surface));
-  gtk_widget_destroy (surface);
+  g_object_unref (surface);
 }
 
 
@@ -64,7 +63,7 @@ test_drag_surface_set_state (PhoshTestCompositorFixture *fixture, gconstpointer 
 {
   g_autofree char *namespace = g_strdup_printf ("phosh test %s", __func__);
   PhoshMonitor *monitor = phosh_test_get_monitor (fixture->state);
-  GtkWidget *surface = g_object_new (PHOSH_TYPE_DRAG_SURFACE,
+  GtkWidget *surface = g_object_ref_sink (g_object_new (PHOSH_TYPE_DRAG_SURFACE,
                                      "layer-shell", phosh_wayland_get_zwlr_layer_shell_v1 (
                                        fixture->state->wl),
                                      "layer-shell-effects",
@@ -78,7 +77,7 @@ test_drag_surface_set_state (PhoshTestCompositorFixture *fixture, gconstpointer 
                                      "anchor", (ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM |
                                                 ZWLR_LAYER_SURFACE_V1_ANCHOR_LEFT |
                                                 ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT),
-                                     NULL);
+                                     NULL));
 
   g_assert_true (PHOSH_IS_DRAG_SURFACE (surface));
   gtk_widget_set_visible (surface, TRUE);
@@ -90,7 +89,7 @@ test_drag_surface_set_state (PhoshTestCompositorFixture *fixture, gconstpointer 
                    ==, PHOSH_DRAG_SURFACE_STATE_FOLDED);
 
   gtk_widget_set_visible (surface, FALSE);
-  gtk_widget_destroy (surface);
+  g_object_unref (surface);
 }
 
 

@@ -12,7 +12,7 @@
 #include "phosh-enums.h"
 #include "phosh-wayland.h"
 
-#include <gdk/gdkwayland.h>
+#include <gdk/wayland/gdkwayland.h>
 
 /**
  * PhoshWayland:

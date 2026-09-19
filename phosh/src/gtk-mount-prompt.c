@@ -143,8 +143,7 @@ set_icon_name (PhoshGtkMountPrompt *self, const char *icon_name)
 
   gtk_image_set_from_icon_name (GTK_IMAGE (self->img_icon),
                                 (icon_name && strlen (icon_name)) ?
-                                self->icon_name : "dialog-password",
-                                -1);
+                                self->icon_name : "dialog-password");
 
   g_object_notify_by_pspec (G_OBJECT (self), props[PROP_ICON_NAME]);
 }
@@ -161,7 +160,7 @@ set_default_user (PhoshGtkMountPrompt *self, const char *default_user)
   g_clear_pointer (&self->default_user, g_free);
   self->default_user = g_strdup (default_user);
 
-  gtk_entry_set_text (GTK_ENTRY (self->entry_domain), self->default_user);
+  gtk_editable_set_text (GTK_EDITABLE (self->entry_domain), self->default_user);
 
   g_object_notify_by_pspec (G_OBJECT (self), props[PROP_DEFAULT_USER]);
 }
@@ -178,7 +177,7 @@ set_default_domain (PhoshGtkMountPrompt *self, const char *default_domain)
   g_clear_pointer (&self->default_domain, g_free);
   self->default_domain = g_strdup (default_domain);
 
-  gtk_entry_set_text (GTK_ENTRY (self->entry_domain), self->default_domain);
+  gtk_editable_set_text (GTK_EDITABLE (self->entry_domain), self->default_domain);
 
   g_object_notify_by_pspec (G_OBJECT (self), props[PROP_DEFAULT_DOMAIN]);
 }
@@ -213,7 +212,7 @@ set_choices (PhoshGtkMountPrompt *self, GStrv choices)
   self->choices = g_strdupv (choices);
   buttons = phosh_system_modal_dialog_get_buttons (PHOSH_SYSTEM_MODAL_DIALOG (self));
   for (GList *elem = buttons; elem; elem = elem->next)
-    gtk_widget_destroy (GTK_WIDGET (elem->data));
+    phosh_system_modal_dialog_remove_button (PHOSH_SYSTEM_MODAL_DIALOG (self), GTK_WIDGET (elem->data));
 
   for (int i = 0; i < g_strv_length (self->choices); i++) {
     GtkWidget *btn = gtk_button_new_with_label (self->choices[i]);
@@ -223,8 +222,7 @@ set_choices (PhoshGtkMountPrompt *self, GStrv choices)
     g_signal_connect_swapped (btn, "clicked", G_CALLBACK (on_button_clicked), self);
 
     if (i == 0) {
-      GtkStyleContext *context = gtk_widget_get_style_context (btn);
-      gtk_style_context_add_class (context, "suggested-action");
+      gtk_widget_add_css_class (btn, "suggested-action");
       gtk_widget_grab_focus (btn);
     }
   }
@@ -355,6 +353,15 @@ on_dialog_canceled (PhoshGtkMountPrompt *self)
 
 
 static void
+phosh_gtk_mount_prompt_dispose (GObject *obj)
+{
+  gtk_widget_dispose_template (GTK_WIDGET (obj), PHOSH_TYPE_GTK_MOUNT_PROMPT);
+
+  G_OBJECT_CLASS (phosh_gtk_mount_prompt_parent_class)->dispose (obj);
+}
+
+
+static void
 phosh_gtk_mount_prompt_finalize (GObject *obj)
 {
   PhoshGtkMountPrompt *self = PHOSH_GTK_MOUNT_PROMPT (obj);
@@ -378,6 +385,7 @@ phosh_gtk_mount_prompt_class_init (PhoshGtkMountPromptClass *klass)
 
   object_class->get_property = phosh_gtk_mount_prompt_get_property;
   object_class->set_property = phosh_gtk_mount_prompt_set_property;
+  object_class->dispose = phosh_gtk_mount_prompt_dispose;
   object_class->finalize = phosh_gtk_mount_prompt_finalize;
 
   props[PROP_MESSAGE] =

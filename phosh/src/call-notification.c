@@ -17,7 +17,7 @@
 #include <gmobile.h>
 
 #include <cui-call.h>
-#include <handy.h>
+#include <adwaita.h>
 #include <glib/gi18n.h>
 
 /**
@@ -38,7 +38,7 @@ static GParamSpec *props[PROP_LAST_PROP];
 struct _PhoshCallNotification {
   GtkListBoxRow parent;
 
-  HdyAvatar    *avatar;
+  AdwAvatar    *avatar;
   GtkLabel     *call_duration;
   GtkLabel     *call_state;
   GtkLabel     *caller;
@@ -230,6 +230,8 @@ phosh_call_notification_dispose (GObject *object)
   PhoshCallNotification *self = PHOSH_CALL_NOTIFICATION (object);
 
   g_clear_object (&self->call);
+
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_CALL_NOTIFICATION);
 
   G_OBJECT_CLASS (phosh_call_notification_parent_class)->dispose (object);
 }

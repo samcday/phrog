@@ -31,7 +31,7 @@ test_osd_window_new (PhoshTestCompositorFixture *fixture, gconstpointer unused)
                 NULL);
 
   gtk_widget_set_visible (osd, TRUE);
-  gtk_widget_destroy (osd);
+  g_object_unref (osd);
 }
 
 int

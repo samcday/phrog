@@ -16,29 +16,31 @@
 
 #include "phosh-config.h"
 
-#include <handy.h>
+#include <adwaita.h>
 
 #include "plugin-loader.h"
 #include "quick-setting.h"
 #include "quick-settings-box.h"
 
+
 static void
 css_setup (void)
 {
-  g_autoptr (GtkCssProvider) provider = NULL;
-  g_autoptr (GFile) file = NULL;
-  g_autoptr (GError) error = NULL;
+  GtkCssProvider *provider;
+  GFile *file;
 
   provider = gtk_css_provider_new ();
   file = g_file_new_for_uri ("resource:///mobi/phosh/stylesheet/adwaita-dark.css");
 
-  if (!gtk_css_provider_load_from_file (provider, file, &error)) {
-    g_warning ("Failed to load CSS file: %s", error->message);
-    return;
-  }
-  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
-                                             GTK_STYLE_PROVIDER (provider),
-                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  gtk_css_provider_load_from_file (provider, file);
+  gtk_style_context_add_provider_for_display (gdk_display_get_default (),
+                                              GTK_STYLE_PROVIDER (provider),
+                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  g_object_unref (file);
+
+  g_object_set (adw_style_manager_get_default (),
+                "color-scheme", ADW_COLOR_SCHEME_FORCE_DARK,
+                NULL);
 }
 
 
@@ -58,61 +60,75 @@ get_plugin_dirs (GStrv plugins)
 
 
 static GtkWidget *
-setup_plugins (GStrv plugin_dirs, GStrv plugins, const char *const *enabled)
+setup_plugins (const char *const *enabled)
 {
-  GtkWidget *box;
+  PhoshQuickSettingsBox *box;
+  g_auto (GStrv) plugins = g_strsplit (PLUGINS, " ", -1);
+  g_auto (GStrv) plugin_dirs = NULL;
   g_autoptr (PhoshPluginLoader) loader = NULL;
 
-  box = phosh_quick_settings_box_new (3, 12);
+  plugin_dirs = get_plugin_dirs (plugins);
+
+  box = PHOSH_QUICK_SETTINGS_BOX (phosh_quick_settings_box_new (3, 12));
   loader = phosh_plugin_loader_new (plugin_dirs, PHOSH_EXTENSION_POINT_QUICK_SETTING_WIDGET);
 
   for (int i = 0; i < g_strv_length (plugins); i++) {
     char *plugin = plugins[i];
-    GtkWidget* widget;
+    PhoshQuickSetting* widget;
 
     if (!g_strv_contains (enabled, plugin))
       continue;
 
-    widget = phosh_plugin_loader_load_plugin (loader, plugin);
+    widget = PHOSH_QUICK_SETTING (phosh_plugin_loader_load_plugin (loader, plugin));
     if (widget == NULL) {
       g_warning ("Unable to load plugin: %s", plugin);
     } else {
       g_print ("Adding custom quick setting '%s'\n", plugin);
-      gtk_container_add (GTK_CONTAINER (box), widget);
+      phosh_quick_settings_box_add (box, widget);
     }
   }
 
-  return box;
+  return GTK_WIDGET (box);
+}
+
+
+static void
+on_activate (AdwApplication *app, const char *const *enabled)
+{
+  GtkWidget *box;
+  GtkWindow *window;
+
+  css_setup ();
+
+  box = setup_plugins (enabled);
+  window = g_object_new (GTK_TYPE_APPLICATION_WINDOW,
+                         "application", app,
+                         "title", "Custom Quick Settings",
+                         NULL);
+  gtk_window_set_child (window, box);
+
+  gtk_window_present (window);
 }
 
 
 int
 main (int argc, char *argv[])
 {
-  GtkWidget *win;
-  GtkWidget *box;
   g_autoptr (GOptionContext) opt_context = NULL;
   g_autoptr (GError) err = NULL;
   g_autoptr (GStrvBuilder) plugins_builder = g_strv_builder_new ();
-  g_auto (GStrv) plugins = g_strsplit (PLUGINS, " ", -1);
-  g_auto (GStrv) plugin_dirs = NULL;
   g_auto (GStrv) enabled = NULL;
   const GOptionEntry options [] = {
     { NULL, 0, 0, G_OPTION_ARG_NONE, NULL, NULL, NULL }
   };
+  g_autoptr (AdwApplication) app = NULL;
 
   opt_context = g_option_context_new ("- spawn your quick setting");
   g_option_context_add_main_entries (opt_context, options, NULL);
-  g_option_context_add_group (opt_context, gtk_get_option_group (FALSE));
   if (!g_option_context_parse (opt_context, &argc, &argv, &err)) {
     g_warning ("%s", err->message);
     return 1;
   }
-
-  gtk_init (&argc, &argv);
-  hdy_init ();
-
-  css_setup ();
 
   if (argc < 2) {
     g_print ("Pass at least one plugin name\n");
@@ -123,22 +139,9 @@ main (int argc, char *argv[])
     g_strv_builder_add (plugins_builder, argv[i]);
   enabled = g_strv_builder_end (plugins_builder);
 
-  g_object_set (gtk_settings_get_default (),
-                "gtk-application-prefer-dark-theme", TRUE,
-                NULL);
-
-  win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title (GTK_WINDOW (win), "Custom Quick Settings");
-  g_signal_connect (win, "delete-event", G_CALLBACK (gtk_main_quit), NULL);
-  gtk_widget_set_visible (win, TRUE);
-
-  plugin_dirs = get_plugin_dirs (plugins);
-  box = setup_plugins (plugin_dirs, plugins, (const char * const *)enabled);
-  gtk_widget_set_visible (box, TRUE);
-
-  gtk_container_add (GTK_CONTAINER (win), box);
-
-  gtk_main ();
-
+  app = adw_application_new ("mobi.phosh.tools.CustomQuickSettingsStandalone",
+                             G_APPLICATION_DEFAULT_FLAGS);
+  g_signal_connect (app, "activate", G_CALLBACK (on_activate), enabled);
+  return g_application_run (G_APPLICATION (app), 0, NULL);
   return 0;
 }

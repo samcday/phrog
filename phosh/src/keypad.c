@@ -61,12 +61,15 @@ static GParamSpec *props[PROP_LAST_PROP];
 static void
 symbol_clicked (PhoshKeypad *self, char symbol)
 {
-  g_autofree char *string = g_strdup_printf ("%c", symbol);
+  int position;
+  g_autofree gchar *string = g_strdup_printf ("%c", symbol);
 
   if (!self->entry)
     return;
 
-  g_signal_emit_by_name (self->entry, "insert-at-cursor", string, NULL);
+  position = gtk_editable_get_position (GTK_EDITABLE (self->entry));
+  gtk_editable_insert_text (GTK_EDITABLE (self->entry), string, -1, &position);
+  gtk_editable_set_position (GTK_EDITABLE (self->entry), position);
   /* Set focus to the entry only when it can get focus
    * https://gitlab.gnome.org/GNOME/gtk/issues/2204
    */
@@ -79,7 +82,7 @@ static void
 on_button_clicked (PhoshKeypad *self,
                    GtkButton   *btn)
 {
-  GtkWidget *label = gtk_bin_get_child (GTK_BIN (btn));
+  GtkWidget *label = gtk_button_get_child (btn);
   const char *text = gtk_label_get_label (GTK_LABEL (label));
 
   g_return_if_fail (!gm_str_is_null_or_empty (text));
@@ -158,10 +161,10 @@ swap_buttons (PhoshKeypad *self, int pos_a, int pos_b)
     return;
 
   a = gtk_grid_get_child_at (GTK_GRID (self), c_a, r_a);
-  gtk_container_remove (GTK_CONTAINER (self), a);
+  gtk_grid_remove (GTK_GRID (self), a);
 
   b = gtk_grid_get_child_at (GTK_GRID (self), c_b, r_b);
-  gtk_container_remove (GTK_CONTAINER (self), b);
+  gtk_grid_remove (GTK_GRID (self), b);
 
   gtk_grid_attach (GTK_GRID (self), a, c_b, r_b, 1, 1);
   gtk_grid_attach (GTK_GRID (self), b, c_a, r_a, 1, 1);
@@ -185,7 +188,7 @@ distribute_buttons (PhoshKeypad *self, gboolean shuffle)
       int r = btn_pos[i][1];
 
       old = gtk_grid_get_child_at (GTK_GRID (self), c, r);
-      gtk_container_remove (GTK_CONTAINER (self), old);
+      gtk_grid_remove (GTK_GRID (self), old);
     }
 
     for (int i = 0; i < NUM_DIGITS; i++) {
@@ -283,7 +286,8 @@ phosh_keypad_class_init (PhoshKeypadClass *klass)
 
   gtk_widget_class_bind_template_callback (widget_class, on_button_clicked);
 
-  gtk_widget_class_set_accessible_role (widget_class, ATK_ROLE_DIAL);
+  // FIXME Update to GTK 4
+  // gtk_widget_class_set_accessible_role (widget_class, ATK_ROLE_DIAL);
   gtk_widget_class_set_css_name (widget_class, "phosh-keypad");
 }
 
@@ -390,7 +394,7 @@ phosh_keypad_set_start_action (PhoshKeypad *self,
     return;
 
   if (old_widget != NULL)
-    gtk_container_remove (GTK_CONTAINER (self), old_widget);
+    gtk_grid_remove (GTK_GRID (self), old_widget);
 
   if (start_action != NULL)
     gtk_grid_attach (GTK_GRID (self), start_action, 0, 3, 1, 1);
@@ -440,7 +444,7 @@ phosh_keypad_set_end_action (PhoshKeypad *self,
     return;
 
   if (old_widget != NULL)
-    gtk_container_remove (GTK_CONTAINER (self), old_widget);
+    gtk_grid_remove (GTK_GRID (self), old_widget);
 
   if (end_action != NULL)
     gtk_grid_attach (GTK_GRID (self), end_action, 2, 3, 1, 1);

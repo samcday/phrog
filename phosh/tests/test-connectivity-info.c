@@ -13,10 +13,10 @@ test_phosh_connectivity_info_new (void)
 {
   GtkWidget *widget;
 
-  widget = phosh_connectivity_info_new ();
+  widget = g_object_ref_sink (phosh_connectivity_info_new ());
   g_assert_true (PHOSH_IS_CONNECTIVITY_INFO (widget));
 
-  gtk_widget_destroy (widget);
+  g_object_unref (widget);
 }
 
 int

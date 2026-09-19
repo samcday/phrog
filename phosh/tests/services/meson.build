@@ -23,5 +23,5 @@ mock_search_provider_exec = executable(
   'mock-search-provider',
   sources,
   include_directories: root_inc,
-  dependencies: [gio_dep, glib_dep, gtk_dep],
+  dependencies: [gio_dep, gio_unix_dep, glib_dep, gtk_dep],
 )

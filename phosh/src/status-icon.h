@@ -12,7 +12,7 @@ G_BEGIN_DECLS
 
 #define PHOSH_TYPE_STATUS_ICON (phosh_status_icon_get_type())
 
-G_DECLARE_DERIVABLE_TYPE (PhoshStatusIcon, phosh_status_icon, PHOSH, STATUS_ICON, GtkBin)
+G_DECLARE_DERIVABLE_TYPE (PhoshStatusIcon, phosh_status_icon, PHOSH, STATUS_ICON, GtkWidget)
 
 /**
  * PhoshStatusIconClass:
@@ -20,7 +20,7 @@ G_DECLARE_DERIVABLE_TYPE (PhoshStatusIcon, phosh_status_icon, PHOSH, STATUS_ICON
  * @idle_init: a callback to be invoked once on idle
  */
 struct _PhoshStatusIconClass {
-  GtkBinClass parent_class;
+  GtkWidgetClass parent_class;
 
   void        (*idle_init) (PhoshStatusIcon *self);
 
@@ -37,8 +37,6 @@ struct _PhoshStatusIconClass {
 };
 
 GtkWidget * phosh_status_icon_new (void);
-void phosh_status_icon_set_icon_size (PhoshStatusIcon *self, GtkIconSize size) G_GNUC_DEPRECATED_FOR (phosh_status_icon_set_pixel_size);
-GtkIconSize phosh_status_icon_get_icon_size (PhoshStatusIcon *self) G_GNUC_DEPRECATED_FOR (phosh_status_icon_get_pixel_size);
 void phosh_status_icon_set_pixel_size (PhoshStatusIcon *self, guint size);
 guint phosh_status_icon_get_pixel_size (PhoshStatusIcon *self);
 void phosh_status_icon_set_icon_name (PhoshStatusIcon *self, const char *icon_name);

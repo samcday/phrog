@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshEventList" parent="GtkBox">
     <property name="orientation">vertical</property>
     <property name="spacing">6</property>
@@ -21,6 +21,9 @@
       <object class="GtkStack" id="stack_events">
         <property name="visible">1</property>
         <child>
+          <object class="GtkStackPage">
+            <property name="name">no-events</property>
+            <property name="child">
           <object class="GtkLabel">
             <property name="visible">1</property>
             <property name="label" translatable="yes">No events</property>
@@ -30,11 +33,13 @@
               <class name="dim-label"/>
             </style>
           </object>
-          <packing>
-            <property name="name">no-events</property>
-          </packing>
+            </property>
+          </object>
         </child>
         <child>
+          <object class="GtkStackPage">
+            <property name="name">events</property>
+            <property name="child">
           <object class="GtkListBox" id="lb_events">
             <property name="visible">1</property>
             <property name="selection-mode">none</property>
@@ -42,9 +47,8 @@
               <class name="event-list-listbox"/>
             </style>
           </object>
-          <packing>
-            <property name="name">events</property>
-          </packing>
+            </property>
+          </object>
         </child>
       </object>
     </child>

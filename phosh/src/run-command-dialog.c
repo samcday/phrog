@@ -37,7 +37,7 @@ G_DEFINE_TYPE (PhoshRunCommandDialog, phosh_run_command_dialog, PHOSH_TYPE_SYSTE
 static void
 on_activated (PhoshRunCommandDialog *self, GtkEntry *entry)
 {
-  const char *command = gtk_entry_get_text (entry);
+  const char *command = gtk_editable_get_text (GTK_EDITABLE (entry));
 
   g_signal_emit (self, signals[SUBMITTED], 0, command);
 }
@@ -47,6 +47,14 @@ on_run_command_dialog_canceled (PhoshRunCommandDialog *self)
 {
   g_return_if_fail (PHOSH_IS_RUN_COMMAND_DIALOG (self));
   g_signal_emit (self, signals[CANCELLED], 0);
+}
+
+static void
+phosh_run_command_dialog_dispose (GObject *obj)
+{
+  gtk_widget_dispose_template (GTK_WIDGET (obj), PHOSH_TYPE_RUN_COMMAND_DIALOG);
+
+  G_OBJECT_CLASS (phosh_run_command_dialog_parent_class)->dispose (obj);
 }
 
 static void
@@ -76,6 +84,7 @@ phosh_run_command_dialog_class_init (PhoshRunCommandDialogClass *klass)
   GObjectClass *object_class = (GObjectClass *)klass;
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
+  object_class->dispose = phosh_run_command_dialog_dispose;
   object_class->finalize = phosh_run_command_dialog_finalize;
 
   /**

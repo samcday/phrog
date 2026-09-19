@@ -78,7 +78,6 @@ gboolean         phosh_util_matches_app_info (GAppInfo *info, const char *search
 GStrv            phosh_util_append_to_strv (GStrv array, const char *element);
 GStrv            phosh_util_remove_from_strv (GStrv array, const char *element);
 void             phosh_util_open_settings_panel (const char         *panel,
-                                                 GVariant           *params,
                                                  gboolean            mobile,
                                                  GCancellable       *cancellable,
                                                  GAsyncReadyCallback callback,
@@ -88,13 +87,6 @@ float *          phosh_util_calculate_supported_mode_scales (guint32   width,
                                                              guint32   height,
                                                              int      *n_supported_scales,
                                                              gboolean  fractional);
-void             phosh_util_activate_action (GAppInfo           *info,
-                                             const char         *action,
-                                             GVariant           *params,
-                                             GCancellable       *cancellable,
-                                             GAsyncReadyCallback callback,
-                                             gpointer            user_data);
-gboolean         phosh_util_activate_action_finish (GAsyncResult *res, GError **err);
 GVariant *       phosh_util_get_platform_data (GAppInfo *info);
 
 

@@ -36,7 +36,7 @@ enum {
 static GParamSpec *props[PROP_LAST_PROP];
 
 struct _PhoshStatusPagePlaceholder {
-  GtkBin        parent;
+  GtkWidget     parent;
 
   GtkBox       *toplevel_box;
 
@@ -46,7 +46,7 @@ struct _PhoshStatusPagePlaceholder {
 
   GtkWidget    *extra_widget;
 };
-G_DEFINE_TYPE (PhoshStatusPagePlaceholder, phosh_status_page_placeholder, GTK_TYPE_BIN)
+G_DEFINE_TYPE (PhoshStatusPagePlaceholder, phosh_status_page_placeholder, GTK_TYPE_WIDGET)
 
 
 static void
@@ -114,19 +114,11 @@ phosh_status_page_placeholder_dispose (GObject *object)
   PhoshStatusPagePlaceholder *self = PHOSH_STATUS_PAGE_PLACEHOLDER (object);
 
   g_clear_pointer (&self->icon_name, g_free);
-
-  G_OBJECT_CLASS (phosh_status_page_placeholder_parent_class)->dispose (object);
-}
-
-
-static void
-phosh_status_page_placeholder_destroy (GtkWidget *widget)
-{
-  PhoshStatusPagePlaceholder *self = PHOSH_STATUS_PAGE_PLACEHOLDER (widget);
-
   phosh_status_page_placeholder_set_extra_widget (self, NULL);
 
-  GTK_WIDGET_CLASS (phosh_status_page_placeholder_parent_class)->destroy (widget);
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_STATUS_PAGE_PLACEHOLDER);
+
+  G_OBJECT_CLASS (phosh_status_page_placeholder_parent_class)->dispose (object);
 }
 
 
@@ -139,8 +131,6 @@ phosh_status_page_placeholder_class_init (PhoshStatusPagePlaceholderClass *klass
   object_class->get_property = phosh_status_page_placeholder_get_property;
   object_class->set_property = phosh_status_page_placeholder_set_property;
   object_class->dispose = phosh_status_page_placeholder_dispose;
-
-  widget_class->destroy = phosh_status_page_placeholder_destroy;
 
   /**
    * PhoshStatusPagePlaceholder:title:
@@ -181,6 +171,8 @@ phosh_status_page_placeholder_class_init (PhoshStatusPagePlaceholderClass *klass
   gtk_widget_class_bind_template_child (widget_class, PhoshStatusPagePlaceholder, toplevel_box);
 
   gtk_widget_class_set_css_name (widget_class, "phosh-status-page-placeholder");
+
+  gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
 }
 
 
@@ -272,12 +264,12 @@ phosh_status_page_placeholder_set_extra_widget (PhoshStatusPagePlaceholder *self
     return;
 
   if (self->extra_widget)
-    gtk_container_remove (GTK_CONTAINER (self->toplevel_box), self->extra_widget);
+    gtk_box_remove (self->toplevel_box, self->extra_widget);
 
   self->extra_widget = extra_widget;
 
   if (self->extra_widget)
-    gtk_container_add (GTK_CONTAINER (self->toplevel_box), self->extra_widget);
+    gtk_box_append (self->toplevel_box, self->extra_widget);
 
   g_object_notify_by_pspec (G_OBJECT (self), props[PROP_EXTRA_WIDGET]);
 }

@@ -193,17 +193,17 @@ on_interval_row_activated (GtkListBox                *listbox,
                            PhoshCaffeineQuickSetting *self)
 {
   uint selected_idx = 0;
-  g_autoptr (GList) children = NULL;
 
   if (self->cur_row != row) {
+    GtkListBoxRow *child;
     phosh_caffeine_quick_setting_clear_timer (self);
 
-    children = gtk_container_get_children (GTK_CONTAINER (self->listbox));
-    for (GList *child = children; child; child = child->next) {
-      if (child->data == row)
+    child = gtk_list_box_get_row_at_index (self->listbox, selected_idx);
+    while (child) {
+      if (child == row)
         break;
-
       selected_idx++;
+      child = gtk_list_box_get_row_at_index (self->listbox, selected_idx);
     }
 
     g_settings_set_uint (self->settings, CAFFEINE_SELECTED_KEY, selected_idx);
@@ -317,8 +317,14 @@ static void
 on_selected_index_changed (PhoshCaffeineQuickSetting *self)
 {
   uint selected_idx = g_settings_get_uint (self->settings, CAFFEINE_SELECTED_KEY);
-  g_autoptr (GList) children = gtk_container_get_children (GTK_CONTAINER (self->listbox));
-  uint len = g_list_length (children);
+  GtkListBoxRow *child;
+  uint len = 0;
+
+  child = gtk_list_box_get_row_at_index (self->listbox, len);
+  while (child) {
+    len++;
+    child = gtk_list_box_get_row_at_index (self->listbox, len);
+  }
 
   phosh_caffeine_quick_setting_clear_timer (self);
 
@@ -346,14 +352,12 @@ on_intervals_changed (PhoshCaffeineQuickSetting *self)
   GVariantIter iter;
   PhoshIntervalRow* row = NULL;
   g_autoptr (GVariant) intervals = NULL;
-  g_autoptr (GList) children = gtk_container_get_children (GTK_CONTAINER (self->listbox));
 
   g_debug ("Intervals changed, reconfiguring listbox...");
 
   self->cur_row = NULL;
 
-  for (GList *child = children; child; child = child->next)
-    gtk_container_remove (GTK_CONTAINER (self->listbox), child->data);
+  gtk_list_box_remove_all (self->listbox);
 
   intervals = g_settings_get_value (self->settings, CAFFEINE_INTERVALS_KEY);
 
@@ -373,7 +377,7 @@ static void
 phosh_caffeine_quick_setting_init (PhoshCaffeineQuickSetting *self) {
   gtk_widget_init_template (GTK_WIDGET (self));
 
-  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_default (),
+  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_for_display (gdk_display_get_default ()),
                                     "/mobi/phosh/plugins/caffeine-quick-setting/icons");
 
   self->settings = g_settings_new (CAFFEINE_QUICK_SETTING_SCHEMA);

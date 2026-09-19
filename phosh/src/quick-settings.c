@@ -36,7 +36,7 @@
  */
 
 struct _PhoshQuickSettings {
-  GtkBin parent;
+  GtkWidget parent;
 
   PhoshQuickSettingsBox *box;
 
@@ -45,7 +45,7 @@ struct _PhoshQuickSettings {
   GPtrArray *custom_quick_settings;
 };
 
-G_DEFINE_TYPE (PhoshQuickSettings, phosh_quick_settings, GTK_TYPE_BIN);
+G_DEFINE_TYPE (PhoshQuickSettings, phosh_quick_settings, GTK_TYPE_WIDGET);
 
 
 static void
@@ -96,13 +96,9 @@ on_bt_clicked (PhoshQuickSettings *self, PhoshQuickSetting *child)
 static void
 on_battery_clicked (PhoshQuickSettings *self, PhoshQuickSetting *child)
 {
-  GActionGroup *group;
-
-  group = gtk_widget_get_action_group (GTK_WIDGET (self), "settings");
-  g_return_if_fail (group);
-  g_action_group_activate_action (group,
-                                  "launch-panel",
-                                  g_variant_new ("(s@av)", "power", g_variant_new ("av", NULL)));
+  gtk_widget_activate_action_variant (GTK_WIDGET (self),
+                                      "settings.launch-panel",
+                                      g_variant_new_string ("power"));
 }
 
 
@@ -261,6 +257,8 @@ phosh_quick_settings_dispose (GObject *object)
     self->custom_quick_settings = NULL;
   }
 
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_QUICK_SETTINGS);
+
   G_OBJECT_CLASS (phosh_quick_settings_parent_class)->dispose (object);
 }
 
@@ -295,6 +293,8 @@ phosh_quick_settings_class_init (PhoshQuickSettingsClass *klass)
   gtk_widget_class_bind_template_callback (widget_class, on_torch_clicked);
   gtk_widget_class_bind_template_callback (widget_class, on_docked_clicked);
   gtk_widget_class_bind_template_callback (widget_class, on_vpn_clicked);
+
+  gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
 }
 
 

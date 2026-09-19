@@ -49,7 +49,7 @@ typedef struct _PhoshCall {
   PhoshDBusCallsCall *proxy; /* DBus proxy to a single call on gnome-calls' DBus service */
   GCancellable       *cancel;
 
-  GLoadableIcon      *avatar_icon;
+  GdkPaintable       *avatar_icon;
   gboolean            can_dtmf;
 
   GTimer             *timer;
@@ -64,7 +64,7 @@ G_DEFINE_TYPE_WITH_CODE (PhoshCall, phosh_call, G_TYPE_OBJECT,
                                                 phosh_call_cui_call_interface_init))
 
 
-static GLoadableIcon *
+static GdkPaintable *
 phosh_call_get_avatar_icon (CuiCall *call)
 {
   g_return_val_if_fail (PHOSH_IS_CALL (call), NULL);
@@ -279,14 +279,18 @@ phosh_call_constructed (GObject *object)
   PhoshCall *self = PHOSH_CALL (object);
   g_autoptr (GFile) file = NULL;
   const char *path = NULL;
+  g_autoptr (GError) error = NULL;
 
   G_OBJECT_CLASS (phosh_call_parent_class)->constructed (object);
 
   path = phosh_dbus_calls_call_get_image_path (self->proxy);
   if (!gm_str_is_null_or_empty (path)) {
     file = g_file_new_for_path (path);
-    if (file)
-      self->avatar_icon = G_LOADABLE_ICON (g_file_icon_new (file));
+    if (file) {
+      self->avatar_icon = GDK_PAINTABLE (gdk_texture_new_from_file (file, &error));
+      if (error != NULL)
+        g_critical ("Failed to load avatar: %s", error->message);
+    }
   }
 
   /* Sync active property */

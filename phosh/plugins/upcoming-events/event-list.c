@@ -10,7 +10,6 @@
 
 #include "calendar-event.h"
 #include "event-list.h"
-#include "gtkfilterlistmodel.h"
 #include "upcoming-event.h"
 
 #include <glib/gi18n.h>
@@ -43,6 +42,7 @@ struct _PhoshEventList {
   GtkLabel           *label;
 
   GListModel         *model;
+  GtkFilter          *filter;
   GtkFilterListModel *filtered_model;
   GtkStack           *stack_events;
 
@@ -167,7 +167,7 @@ phosh_event_list_set_day_offset (PhoshEventList *self, guint offset)
   gtk_label_set_label (self->label, str);
 
   if (self->filtered_model)
-    gtk_filter_list_model_refilter (self->filtered_model);
+    gtk_filter_changed (self->filter, GTK_FILTER_CHANGE_DIFFERENT);
 }
 
 
@@ -337,10 +337,9 @@ phosh_event_list_bind_model (PhoshEventList *self, GListModel *model)
   g_clear_object (&self->filtered_model);
 
   if (self->model) {
+    self->filter = GTK_FILTER (gtk_custom_filter_new (filter_day, self, NULL));
     self->filtered_model = gtk_filter_list_model_new (self->model,
-                                                      filter_day,
-                                                      self,
-                                                      NULL);
+                                                      self->filter);
     gtk_list_box_bind_model (self->lb_events,
                              G_LIST_MODEL (self->filtered_model),
                              create_upcoming_event_row,

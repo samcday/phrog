@@ -15,9 +15,8 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PhoshTopPanelBg, phosh_top_panel_bg, PHOSH, TOP_PANEL_BG, PhoshLayerSurface)
 
-PhoshTopPanelBg  *phosh_top_panel_bg_new              (struct zwlr_layer_shell_v1 *layer_shell,
-                                                       PhoshMonitor               *monitor,
-                                                       guint32                     layer);
+PhoshTopPanelBg  *phosh_top_panel_bg_new              (PhoshMonitor    *monitor,
+                                                       guint32          layer);
 void              phosh_top_panel_bg_set_transparency (PhoshTopPanelBg *self,
                                                        double            transparency);
 

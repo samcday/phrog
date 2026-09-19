@@ -1,5 +1,5 @@
 [wrap-git]
 directory=gvc
-url=https://gitlab.gnome.org/GNOME/libgnome-volume-control.git
-revision=d2442f455844e5292cb4a74ffc66ecc8d7595a9f
+url=https://gitlab.gnome.org/guidog/libgnome-volume-control.git
+revision=phosh/0.52.1
 depth=1

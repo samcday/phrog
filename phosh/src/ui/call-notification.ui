@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshCallNotification" parent="GtkListBoxRow">
-    <child>
+    <property name="child">
       <object class="GtkBox" id="box">
         <property name="visible">1</property>
         <property name="orientation">vertical</property>
@@ -65,7 +65,7 @@
             <property name="visible">1</property>
             <property name="spacing">12</property>
             <child>
-              <object class="HdyAvatar" id="avatar">
+              <object class="AdwAvatar" id="avatar">
                 <property name="visible">1</property>
                 <property name="halign">start</property>
                 <property name="valign">center</property>
@@ -115,6 +115,6 @@
         </child>
         <!-- body -->
       </object>
-    </child>
+    </property>
   </template>
 </interface>
