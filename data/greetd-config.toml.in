@@ -1,10 +1,12 @@
-[terminal]
-vt = 7
+[general]
+service = "@GENERAL_SERVICE@"
 
-# The default session, also known as the greeter.
+[terminal]
+vt = @VT@
+
 [default_session]
 command = "/usr/libexec/phrog-greetd-session"
-user = "_greetd"
+user = "@USER@"
 
 # The session to be used on boot
 #[initial_session]

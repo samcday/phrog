@@ -1,0 +1,3 @@
+[tests]
+run = ["none"]
+comments = ["avoid pulling optional debug/test dependency stack into COPR"]

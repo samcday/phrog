@@ -3,11 +3,11 @@ name: debian-unstable
 on:
   workflow_call:
     inputs:
-      orchestrated:
-        description: Run from release orchestrator regardless of PR branch/labels
+      release_mode:
+        description: Release mode from orchestrator
         required: false
-        type: boolean
-        default: false
+        type: string
+        default: none
   push:
     branches: [main]
   pull_request:
@@ -15,12 +15,12 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: debian-unstable-${{ github.ref }}-${{ inputs.orchestrated && 'orchestrated' || 'standalone' }}
+  group: debian-unstable-${{ github.ref }}-${{ inputs.release_mode || 'none' }}
   cancel-in-progress: true
 
 jobs:
   build:
-    if: inputs.orchestrated || github.event_name != 'pull_request' || (contains(github.event.pull_request.labels.*.name, 'debs') && !startsWith(github.event.pull_request.head.ref || '', 'release/v'))
+    if: inputs.release_mode == 'pr' || inputs.release_mode == 'tag' || github.event_name != 'pull_request' || (contains(github.event.pull_request.labels.*.name, 'debs') && !startsWith(github.event.pull_request.head.ref || '', 'release/v'))
     name: Build unstable .debs
     runs-on: ${{ matrix.runner }}
     container: debian:unstable

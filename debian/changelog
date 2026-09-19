@@ -1,3 +1,33 @@
+phrog (0.53.0-1) unstable; urgency=medium
+
+  * Release 0.53.0
+
+ -- Phrogbot <phrog@beep.boop>  Wed, 17 Jun 2026 17:23:15 +1000
+
+phrog (0.53.0~rc8-1) unstable; urgency=medium
+
+  * Release 0.53.0-rc.8
+
+ -- Phrogbot <phrog@beep.boop>  Mon, 27 Apr 2026 10:13:12 +0000
+
+phrog (0.53.0~rc7-1) unstable; urgency=medium
+
+  * Release 0.53.0-rc.7
+
+ -- Phrogbot <phrog@beep.boop>  Tue, 17 Mar 2026 04:08:05 +0000
+
+phrog (0.53.0~rc6-1) unstable; urgency=medium
+
+  * Release 0.53.0-rc.6
+
+ -- Phrogbot <phrog@beep.boop>  Tue, 17 Mar 2026 03:19:27 +0000
+
+phrog (0.53.0~rc5-1) unstable; urgency=medium
+
+  * Release 0.53.0-rc.5
+
+ -- Phrogbot <phrog@beep.boop>  Tue, 17 Mar 2026 13:46:36 +1100
+
 phrog (0.53.0~rc4-1) unstable; urgency=medium
 
   * Release 0.53.0-rc.4
