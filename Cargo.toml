@@ -22,6 +22,7 @@ clap = { version = "4.5.4", features = ["derive"] }
 wayland-client = "0.31"
 zbus = { version = "5", default-features = false, features = ["blocking", "async-io"] }
 nix = { version = "0.30", features = ["signal"] }
+signal-hook = "0.3"
 async-global-executor = "3.0.0"
 futures-util = "0.3.30"
 log = "0.4.22"
@@ -33,19 +34,19 @@ default = ["static"]
 static = ["libphosh/static"]
 
 [dependencies.glib]
-version = "0.18"
+version = "0.22"
 features = ["log_macros"]
 
 [dependencies.gtk]
-version = "0.18"
-features = ["v3_24"]
-
-[dependencies.libhandy]
+package = "gtk4"
 version = "0.11"
-features = ["v1_6"]
+features = ["v4_10"]
+
+[dependencies.libadwaita]
+version = "0.9"
 
 [build-dependencies]
-glib-build-tools = "<0.22"
+glib-build-tools = "0.22"
 
 [dev-dependencies]
 input-event-codes = "6.2.0"

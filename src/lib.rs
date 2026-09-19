@@ -17,6 +17,20 @@ pub const APP_ID: &str = "mobi.phosh.phrog";
 pub const TEXT_DOMAIN: &str = "phrog";
 pub const LOCALEDIR: &str = "/usr/share/locale";
 
+lazy_static::lazy_static! {
+    static ref MAIN_LOOP: glib::MainLoop = glib::MainLoop::new(None, false);
+}
+
+/// Runs the GLib main loop until [quit] is called.
+/// (gtk4-rs no longer wraps gtk_main, so we drive the GLib main loop directly.)
+pub fn run() {
+    MAIN_LOOP.run();
+}
+
+pub fn quit() {
+    MAIN_LOOP.quit();
+}
+
 pub fn i18n_setup(
     locale_dir: &Path,
     locale: Option<&str>,
@@ -89,14 +103,13 @@ pub fn init() -> anyhow::Result<()> {
 
     gdk::set_allowed_backends("wayland");
 
-    gdk::init();
+    gtk::init().map_err(|err| anyhow!("failed GDK/GTK init: {err}"))?;
+    libadwaita::init().map_err(|err| anyhow!("failed libadwaita init: {err}"))?;
 
     let display = gdk::Display::default();
     if display.is_none() {
         return Err(anyhow!("failed GDK init"));
     }
 
-    gtk::init()?;
-    libhandy::init();
     Ok(())
 }

@@ -81,11 +81,12 @@ impl VirtualPointer {
     }
 
     pub async fn click_on(&mut self, widget: &impl IsA<Widget>) {
+        let root = widget.root().unwrap();
         let (mut x, y) = widget
-            .translate_coordinates(&widget.toplevel().unwrap(), 0, 0)
+            .translate_coordinates(root.upcast_ref::<Widget>(), 0.0, 0.0)
             .unwrap();
-        x += widget.allocated_width() / 2;
-        self.click_at(x as _, y as _).await;
+        x += widget.allocated_width() as f64 / 2.0;
+        self.click_at(x as u32, y as u32).await;
     }
 
     pub async fn click_at(&mut self, x: u32, y: u32) {

@@ -42,22 +42,26 @@ fn test_first_run() {
     let shell = test.shell.clone();
     test.start(
         "first-run",
-        glib::spawn_future_local(clone!(@weak shell => async move {
-            let _ = ready_rx.recv().await.unwrap();
-            glib::timeout_future(Duration::from_millis(2000)).await;
+        glib::spawn_future_local(clone!(
+            #[weak]
+            shell,
+            async move {
+                let _ = ready_rx.recv().await.unwrap();
+                glib::timeout_future(Duration::from_millis(2000)).await;
 
-            // The first-run script should have started.
-            assert!(touch.exists());
-            glib::timeout_future(Duration::from_millis(2000)).await;
+                // The first-run script should have started.
+                assert!(touch.exists());
+                glib::timeout_future(Duration::from_millis(2000)).await;
 
-            // Delete the marker, the script will exit.
-            std::fs::remove_file(touch).unwrap();
-            glib::timeout_future(Duration::from_millis(2000)).await;
+                // Delete the marker, the script will exit.
+                std::fs::remove_file(touch).unwrap();
+                glib::timeout_future(Duration::from_millis(2000)).await;
 
-            // The first-run script should have completed, and the shell should now be locked.
-            assert!(shell.is_locked());
+                // The first-run script should have completed, and the shell should now be locked.
+                assert!(shell.is_locked());
 
-            gtk::main_quit();
-        })),
+                phrog::quit();
+            }
+        )),
     );
 }

@@ -1,15 +1,15 @@
 use crate::session_object::SessionObject;
 use crate::shell::Shell;
 use gtk::glib;
-use gtk::glib::{Cast, CastNone, Object};
+use gtk::glib::Object;
 use gtk::prelude::*;
 use gtk::subclass::prelude::ObjectSubclassIsExt;
-use libhandy::prelude::{ActionRowExt, ComboRowExt};
-use libhandy::ActionRow;
+use libadwaita::prelude::*;
+use libadwaita::ActionRow;
 
 glib::wrapper! {
     pub struct UserSessionPage(ObjectSubclass<imp::UserSessionPage>)
-        @extends gtk::Widget, gtk::Box;
+        @extends gtk::Box, gtk::Widget, gtk::Accessible, gtk::Buildable, gtk::ConstraintTarget;
 }
 
 impl Default for UserSessionPage {
@@ -25,7 +25,7 @@ impl UserSessionPage {
 
     pub fn session(&self) -> SessionObject {
         let shell = Shell::default();
-        let session_idx = self.imp().row_sessions.selected_index() as u32;
+        let session_idx = self.imp().row_sessions.selected();
         shell
             .sessions()
             .unwrap()
@@ -55,14 +55,17 @@ mod imp {
     use futures_util::StreamExt;
     use glib::subclass::InitializingObject;
     use glib::{GString, Properties};
+    use gtk::gdk::Texture;
+    use gtk::gdk_pixbuf::Pixbuf;
     use gtk::gio::{ListStore, Settings};
     use gtk::glib::subclass::Signal;
     use gtk::glib::{clone, closure_local};
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
-    use gtk::{glib, CompositeTemplate, Image, ListBox, ListBoxRow};
-    use libhandy::prelude::*;
-    use libhandy::ActionRow;
+    use gtk::{glib, CompositeTemplate, Image, ListBox};
+    use libadwaita as adw;
+    use libadwaita::prelude::*;
+    use libadwaita::ActionRow;
     use std::cell::{Cell, OnceCell};
     use std::sync::OnceLock;
 
@@ -74,7 +77,7 @@ mod imp {
         pub box_users: TemplateChild<ListBox>,
 
         #[template_child]
-        pub row_sessions: TemplateChild<libhandy::ComboRow>,
+        pub row_sessions: TemplateChild<adw::ComboRow>,
 
         users: OnceCell<ListStore>,
 
@@ -108,19 +111,24 @@ mod imp {
             let conn = shell.imp().dbus_connection.clone().into_inner().unwrap();
 
             let session_title = gettextrs::dgettext(TEXT_DOMAIN, "Session");
-            self.row_sessions.set_title(Some(session_title.as_str()));
+            self.row_sessions.set_title(&session_title);
 
-            self.box_users
-                .connect_row_activated(clone!(@weak self as this => move |_, _| {
+            self.box_users.connect_row_activated(clone!(
+                #[weak(rename_to = this)]
+                self,
+                move |_, _| {
                     this.obj().emit_by_name::<()>("login", &[]);
-                }));
+                }
+            ));
 
-            self.row_sessions.bind_name_model(
-                Some(shell.sessions().as_ref().unwrap()),
-                Some(Box::new(|v| {
-                    v.downcast_ref::<SessionObject>().unwrap().name()
-                })),
-            );
+            self.row_sessions
+                .set_model(Some(shell.sessions().as_ref().unwrap()));
+            self.row_sessions
+                .set_expression(Some(gtk::PropertyExpression::new(
+                    SessionObject::static_type(),
+                    None::<&gtk::Expression>,
+                    "name",
+                )));
             let mut last_session = settings.string("last-session");
 
             if last_session.is_empty() {
@@ -137,7 +145,7 @@ mod imp {
                 .enumerate()
             {
                 if session.id() == last_session {
-                    self.row_sessions.set_selected_index(idx as _);
+                    self.row_sessions.set_selected(idx as _);
                     break;
                 }
             }
@@ -145,77 +153,104 @@ mod imp {
             let users = ListStore::new::<User>();
             let last_user = settings.string("last-user");
 
-            self.box_users.bind_model(Some(&users), clone!(@weak self as this, @strong last_user => @default-panic, move |v| {
-                let user = v.downcast_ref::<User>().unwrap();
-                let row = ActionRow::builder().activatable(true).build();
-                user.bind_property("username", &row, "subtitle").build();
-                user.bind_property("name", &row, "title").build();
-                let image = Image::new();
-                row.add_prefix(&image);
-                image.show();
-                user.bind_property("icon-pixbuf", &image, "pixbuf").build();
+            self.box_users.bind_model(
+                Some(&users),
+                clone!(
+                    #[weak(rename_to = this)]
+                    self,
+                    #[strong]
+                    last_user,
+                    #[upgrade_or_panic]
+                    move |v| {
+                        let user = v.downcast_ref::<User>().unwrap();
+                        let row = ActionRow::builder().activatable(true).build();
+                        user.bind_property("username", &row, "subtitle").build();
+                        user.bind_property("name", &row, "title").build();
+                        let image = Image::new();
+                        row.add_prefix(&image);
+                        image.set_visible(true);
+                        user.bind_property("icon-pixbuf", &image, "paintable")
+                            .transform_to(|_, pixbuf: Option<&Pixbuf>| {
+                                pixbuf
+                                    .map(Texture::for_pixbuf)
+                                    .map(|texture| texture.to_value())
+                            })
+                            .build();
 
-                user.connect_closure("loaded", false, closure_local!(@strong this, @strong last_user, @strong row => move |obj: glib::Object| {
-                    if let Ok(user) = obj.downcast::<User>() {
-                        if user.username() == last_user {
-                            this.box_users.select_row(Some(&row));
-                            row.grab_focus();
-                        }
-                    }
-                }));
-
-                row.upcast()
-            }));
-
-            self.users.set(users.clone()).unwrap();
-            glib::spawn_future_local(clone!(@weak self as this, @strong last_user => async move {
-                let accounts_proxy = AccountsProxy::new(&conn).await.unwrap();
-
-                for path in accounts_proxy.list_cached_users().await.unwrap() {
-                    users.append(&User::new(conn.clone(), path.into()));
-                }
-
-                // The initial user list has been populated. Select the first item in the list to
-                // ensure something is selected, and grab focus so cursor up/down works without
-                // the user having to tab into the list first.
-                // This will be overridden by the "loaded" signal handler, if the appropriate user
-                // matching the last-user setting was discovered.
-                let first_row = this
-                    .box_users
-                    .children()
-                    .first()
-                    .cloned()
-                    .and_then(|w| w.downcast::<ListBoxRow>().ok());
-                if let Some(row) = first_row {
-                    this.box_users.select_row(Some(&row));
-                    row.grab_focus();
-                }
-
-                this.obj().set_ready(true);
-
-                let mut added_stream = accounts_proxy.receive_user_added().await.unwrap();
-                let mut deleted_stream = accounts_proxy.receive_user_deleted().await.unwrap();
-
-                loop {
-                    select! {
-                        added = added_stream.next() => if let Some(added) = added {
-                            if let Some(path) = added.args().ok().map(|v| v.user) {
-                                users.append(&User::new(conn.clone(), path));
-                            }
-                        },
-                        deleted = deleted_stream.next() => if let Some(deleted) = deleted {
-                            if let Some(path) = deleted.args().ok().map(|v| v.user) {
-                                for (idx, user) in users.iter::<User>().flatten().enumerate() {
-                                    if user.path() == path.as_str() {
-                                        users.remove(idx as _);
-                                        break;
+                        user.connect_closure(
+                            "loaded",
+                            false,
+                            closure_local!(
+                                #[strong]
+                                this,
+                                #[strong]
+                                last_user,
+                                #[strong]
+                                row,
+                                move |obj: glib::Object| {
+                                    if let Ok(user) = obj.downcast::<User>() {
+                                        if user.username() == last_user {
+                                            this.box_users.select_row(Some(&row));
+                                            row.grab_focus();
+                                        }
                                     }
                                 }
-                            }
-                        },
+                            ),
+                        );
+
+                        row.upcast()
+                    }
+                ),
+            );
+
+            self.users.set(users.clone()).unwrap();
+            glib::spawn_future_local(clone!(
+                #[weak(rename_to = this)]
+                self,
+                async move {
+                    let accounts_proxy = AccountsProxy::new(&conn).await.unwrap();
+
+                    for path in accounts_proxy.list_cached_users().await.unwrap() {
+                        users.append(&User::new(conn.clone(), path.into()));
+                    }
+
+                    // The initial user list has been populated. Select the first item in the list to
+                    // ensure something is selected, and grab focus so cursor up/down works without
+                    // the user having to tab into the list first.
+                    // This will be overridden by the "loaded" signal handler, if the appropriate user
+                    // matching the last-user setting was discovered.
+                    let first_row = this.box_users.row_at_index(0);
+                    if let Some(row) = first_row {
+                        this.box_users.select_row(Some(&row));
+                        row.grab_focus();
+                    }
+
+                    this.obj().set_ready(true);
+
+                    let mut added_stream = accounts_proxy.receive_user_added().await.unwrap();
+                    let mut deleted_stream = accounts_proxy.receive_user_deleted().await.unwrap();
+
+                    loop {
+                        select! {
+                            added = added_stream.next() => if let Some(added) = added {
+                                if let Some(path) = added.args().ok().map(|v| v.user) {
+                                    users.append(&User::new(conn.clone(), path));
+                                }
+                            },
+                            deleted = deleted_stream.next() => if let Some(deleted) = deleted {
+                                if let Some(path) = deleted.args().ok().map(|v| v.user) {
+                                    for (idx, user) in users.iter::<User>().flatten().enumerate() {
+                                        if user.path() == path.as_str() {
+                                            users.remove(idx as _);
+                                            break;
+                                        }
+                                    }
+                                }
+                            },
+                        }
                     }
                 }
-            }));
+            ));
         }
 
         fn signals() -> &'static [Signal] {
@@ -225,6 +260,5 @@ mod imp {
     }
 
     impl WidgetImpl for UserSessionPage {}
-    impl ContainerImpl for UserSessionPage {}
     impl BoxImpl for UserSessionPage {}
 }

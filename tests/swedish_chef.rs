@@ -91,71 +91,52 @@ fn test_swedish_chef_locale() {
     let shell = test.shell.clone();
     test.start(
         "swedish-chef",
-        glib::spawn_future_local(clone!(@weak shell => async move {
-            let (mut vp, _) = ready_rx.recv().await.unwrap();
-            glib::timeout_future(Duration::from_millis(2000)).await;
+        glib::spawn_future_local(clone!(
+            #[weak]
+            shell,
+            async move {
+                let (mut vp, _) = ready_rx.recv().await.unwrap();
+                glib::timeout_future(Duration::from_millis(2000)).await;
 
-            let mut lockscreen = shell
-                .lockscreen_manager()
-                .lockscreen()
-                .unwrap()
-                .downcast::<Lockscreen>()
-                .unwrap();
-            let usp = lockscreen.imp().user_session_page.get().unwrap();
+                let lockscreen = shell
+                    .lockscreen_manager()
+                    .lockscreen()
+                    .unwrap()
+                    .downcast::<Lockscreen>()
+                    .unwrap();
+                let usp = lockscreen.imp().user_session_page.get().unwrap();
 
-            vp.click_on(usp.imp().box_users.row_at_index(0).as_ref().unwrap())
+                vp.click_on(usp.imp().box_users.row_at_index(0).as_ref().unwrap())
+                    .await;
+                wait_for_unlock_status(&lockscreen, "Bork bork bork:", Duration::from_millis(1500))
+                    .await;
+                assert_eq!(lockscreen.page(), libphosh::LockscreenPage::Unlock);
+                glib::timeout_future(Duration::from_millis(1500)).await;
+
+                let (keypad, submit_btn) = get_lockscreen_bits(&lockscreen);
+                vp.click_on(&keypad_digit(&keypad, 1)).await;
+                vp.click_on(&submit_btn).await;
+
+                wait_for_unlock_status(
+                    &lockscreen,
+                    "Bork bork bork, pleeze-a try bork bork",
+                    Duration::from_millis(1500),
+                )
                 .await;
-            wait_for_unlock_status(
-                &lockscreen,
-                "Bork bork bork:",
-                Duration::from_millis(1500),
-            )
-            .await;
-            assert_eq!(lockscreen.page(), libphosh::LockscreenPage::Unlock);
-            glib::timeout_future(Duration::from_millis(1500)).await;
+                assert_eq!(lockscreen.page(), libphosh::LockscreenPage::Unlock);
+                glib::timeout_future(Duration::from_millis(1500)).await;
 
-            let (keypad, submit_btn) = get_lockscreen_bits(&mut lockscreen);
-            vp.click_on(&keypad_digit(&keypad, 1)).await;
-            vp.click_on(&submit_btn).await;
+                lockscreen.set_page(libphosh::LockscreenPage::Info);
+                glib::timeout_future(Duration::from_millis(2000)).await;
 
-            wait_for_unlock_status(
-                &lockscreen,
-                "Bork bork bork, pleeze-a try bork bork",
-                Duration::from_millis(1500),
-            )
-            .await;
-            assert_eq!(lockscreen.page(), libphosh::LockscreenPage::Unlock);
-            glib::timeout_future(Duration::from_millis(1500)).await;
-
-            lockscreen.set_page(libphosh::LockscreenPage::Info);
-            glib::timeout_future(Duration::from_millis(2000)).await;
-
-            fade_quit();
-        })),
+                fade_quit();
+            }
+        )),
     );
 }
 
 fn lockscreen_unlock_status(lockscreen: &Lockscreen) -> String {
-    let carousel = lockscreen
-        .child()
-        .unwrap()
-        .downcast::<libhandy::Carousel>()
-        .unwrap();
-    let keypad_page = carousel
-        .children()
-        .get(2)
-        .unwrap()
-        .clone()
-        .downcast::<gtk::Box>()
-        .unwrap();
-    let label = keypad_page
-        .children()
-        .first()
-        .unwrap()
-        .clone()
-        .downcast::<gtk::Label>()
-        .unwrap();
-    label.label().to_string()
+    get_unlock_status_label(lockscreen).label().to_string()
 }
 
 async fn wait_for_unlock_status(lockscreen: &Lockscreen, expected: &str, timeout: Duration) {
