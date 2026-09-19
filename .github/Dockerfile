@@ -33,8 +33,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
    && eatmydata git clone ${PHOC_REMOTE} \
    && cd phoc \
    && git checkout ${PHOC_REF} \
-   && DEB_BUILD_PROFILES=pkg.phoc.embedwlroots eatmydata apt-get --no-install-recommends -y build-dep . \
-   && eatmydata meson setup --prefix=/usr -Dembed-wlroots=enabled --force-fallback-for=gmobile _build . \
+   && eatmydata apt-get --no-install-recommends -y build-dep . \
+   && eatmydata meson setup --prefix=/usr --force-fallback-for=gmobile _build . \
    && eatmydata meson compile -C _build \
    && eatmydata meson install -C _build \
    && cd .. \
