@@ -49,6 +49,7 @@ fn main() {
                 .arg("-Dtests=false")
                 .arg("-Dphoc_tests=disabled")
                 .arg("-Dlockscreen-plugins=false")
+                .arg("-Dlockscreen-plugins=false")
                 .arg("-Dquick-setting-plugins=false")
                 .arg(&path)
                 .arg(&build_dir)

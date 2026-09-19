@@ -1696,6 +1696,9 @@ backgrounds using GTK.</doc>
       <property name="wl-output" writable="1" transfer-ownership="none">
         <type name="gpointer" c:type="gpointer"/>
       </property>
+      <field name="parent_instance" introspectable="0">
+        <type c:type="GtkWidget" name="Gtk.Widget"/>
+      </field>
       <glib:signal name="configured" when="last">
         <doc xml:space="preserve" filename="src/layersurface.c" line="641">This signal is emitted once we received the configure event from the
 compositor.</doc>
