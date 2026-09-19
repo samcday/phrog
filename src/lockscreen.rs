@@ -116,6 +116,27 @@ mod imp {
             self_obj.add_extra_page(&usp);
             self_obj.set_default_page(LockscreenPage::Extra);
 
+            // GTK4 removed GtkWidget's "show" signal, which the GTK4 phosh still uses to apply
+            // the default page when the lockscreen appears, and GtkPlain-based layer surfaces
+            // never fire realize/map. The LayerSurface's "configured" signal is the closest
+            // "we are on screen" moment, so use it to land on our extra page.
+            {
+                let weak = self_obj.downgrade();
+                self_obj.connect_closure(
+                    "configured",
+                    false,
+                    glib::RustClosure::new_local(move |_| {
+                        let obj = weak.upgrade()?;
+                        // Only bounce back to the extra page if we're still sitting on the
+                        // info page (i.e. we just appeared, the user hasn't navigated yet).
+                        if obj.page() == LockscreenPage::Info {
+                            obj.set_page(LockscreenPage::Extra);
+                        }
+                        None
+                    }),
+                );
+            }
+
             // Add a signal handler for when Phosh.Lockscreen active page changes.
             // We hook up greetd session initiation/cancellation to this.
             self_obj.connect_page_notify(clone!(

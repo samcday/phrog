@@ -295,12 +295,19 @@ pub fn nth_child(widget: &impl IsA<gtk::Widget>, idx: u32) -> gtk::Widget {
 }
 
 pub fn get_unlock_box(lockscreen: &Lockscreen) -> gtk::Box {
-    // The PhoshLockscreen's content is an AdwCarousel whose second page is the PIN entry
-    // ("unlock") box. See phosh/src/ui/lockscreen.ui.
-    let carousel = nth_child(lockscreen, 0)
-        .downcast::<adw::Carousel>()
+    // The PhoshLockscreen's content includes an AdwCarousel with the pages
+    // [navigation view, extra page, unlock box]. The extra page in the middle is
+    // phrog's UserSessionPage. See phosh/src/ui/lockscreen.ui.
+    let carousel = (0..lockscreen.observe_children().n_items())
+        .filter_map(|i| {
+            lockscreen
+                .observe_children()
+                .item(i)
+                .and_downcast::<adw::Carousel>()
+        })
+        .next()
         .unwrap();
-    nth_child(&carousel, 1).downcast::<gtk::Box>().unwrap()
+    nth_child(&carousel, 2).downcast::<gtk::Box>().unwrap()
 }
 
 pub fn get_lockscreen_bits(lockscreen: &Lockscreen) -> (Grid, Button) {
