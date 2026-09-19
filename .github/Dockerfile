@@ -13,13 +13,9 @@ ARG GTK_REF=a4cba2e3c84fafc4745c7d4cacbe062b32774e0e
 ARG PHOSH_REMOTE=https://gitlab.gnome.org/guidog/phosh.git
 ARG PHOSH_REF=37d48c69b2414fb8b8f9cee19eae60a700c4c551
 
-ARG PHOC_REMOTE=https://gitlab.gnome.org/World/Phosh/phoc.git
-# 0.51 does not compile against trixie's libinput (KEYPAD_SLIDE switch warning
-# is fatal with -Werror); 0.57 is the first release that handles it.
-ARG PHOC_REF=v0.57.0
-
 # The custom GTK in /usr/local must win over the distro GTK for building and
-# running phrog.
+# running phrog. phoc comes from the base image (phosh's own CI image ships
+# it); building it here would drag in wlroots, which Debian does not package.
 ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 ENV LD_LIBRARY_PATH=/usr/local/lib
 
@@ -30,14 +26,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     dh-cargo \
     foot \
     wf-recorder \
-   && eatmydata git clone ${PHOC_REMOTE} \
-   && cd phoc \
-   && git checkout ${PHOC_REF} \
-   && eatmydata apt-get --no-install-recommends -y build-dep . \
-   && eatmydata meson setup --prefix=/usr --force-fallback-for=gmobile _build . \
-   && eatmydata meson compile -C _build \
-   && eatmydata meson install -C _build \
-   && cd .. \
    && eatmydata git clone ${GTK_REMOTE} \
    && cd gtk \
    && git checkout ${GTK_REF} \
@@ -53,6 +41,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
    && apt-get --no-install-recommends -y install \
     libgcr-4-dev \
     libgnome-desktop-4-dev \
+    phoc \
    && eatmydata meson setup --prefix=/usr -Dbindings-lib=true -Dtests=false _build . \
    && eatmydata meson compile -C _build \
    && eatmydata meson install -C _build \
