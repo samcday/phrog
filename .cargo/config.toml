@@ -1,2 +1,3 @@
 [alias]
 xtask = "run --quiet --package xtask --"
+vendored-phosh = "run --quiet --config .cargo/vendor.toml --package xtask -- vendored-phosh"

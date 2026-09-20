@@ -1,0 +1,13 @@
+# Opt in from the repository root. Ordinary builds and publication use crates.io.
+[patch.crates-io]
+libphosh = { path = "libphosh-rs/libphosh" }
+libphosh-sys = { path = "libphosh-rs/libphosh/sys" }
+
+[env]
+PHROG_LIBPHOSH_BUILD_INTERNAL = { value = "always", force = true }
+
+[build]
+target-dir = "target/vendor"
+
+[target.'cfg(unix)']
+runner = ".cargo/vendor-runner.sh"
