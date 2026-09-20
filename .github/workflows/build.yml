@@ -10,13 +10,13 @@ on:
         default: false
   push:
     branches: [main]
-  pull_request_target:
-    branches: [main]
+  pull_request:
+    branches: [main, vendor-base]
     types: [labeled, opened, reopened, synchronize]
   workflow_dispatch: {}
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.head.sha || github.sha }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.head.sha || github.sha }}
   cancel-in-progress: true
 
 env:
@@ -30,7 +30,7 @@ permissions:
 
 jobs:
   image-hash:
-    if: inputs.release_mode || github.event_name != 'pull_request_target' || !startsWith(github.event.pull_request.head.ref || '', 'release/v')
+    if: inputs.release_mode || github.event_name != 'pull_request' || !startsWith(github.event.pull_request.head.ref || '', 'release/v')
     runs-on: ubuntu-24.04
     outputs:
       hash: ${{ steps.hash.outputs.value }}
@@ -44,16 +44,28 @@ jobs:
           set -uexo pipefail
           echo "value=${{ hashFiles('.github/Dockerfile') }}" >> $GITHUB_OUTPUT
   build:
-    if: inputs.release_mode || github.event_name != 'pull_request_target' || !startsWith(github.event.pull_request.head.ref || '', 'release/v')
+    if: inputs.release_mode || github.event_name != 'pull_request' || !startsWith(github.event.pull_request.head.ref || '', 'release/v')
     needs: image-hash
     runs-on: ubuntu-24.04
     container: ghcr.io/samcday/phrog-ci:${{ needs.image-hash.outputs.hash }}
     defaults:
       run:
         shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - libphosh: system
+            cargo: cargo
+            build_flags: --locked
+            target: target
+          - libphosh: bundled
+            cargo: cargo vendored-phosh
+            build_flags: ''
+            target: target/vendor
     steps:
       - if: |
-          github.event_name == 'pull_request_target' &&
+          github.event_name == 'pull_request' &&
           github.event.pull_request.author_association != 'COLLABORATOR'
           && github.event.pull_request.author_association != 'OWNER'
           && !contains(github.event.pull_request.labels.*.name, 'ci-ok')
@@ -68,17 +80,40 @@ jobs:
       - name: Build
         run: |
           set -uexo pipefail
-          cargo build --all-targets --verbose
+          ${{ matrix.cargo }} build ${{ matrix.build_flags }} --all-targets --verbose
+      - name: Check generic vendor commands
+        if: matrix.libphosh == 'bundled'
+        run: |
+          cargo vendored-phosh tree --locked -i libphosh
+          cargo vendored-phosh run --locked -- --help
+          cargo fmt --manifest-path .cargo/vendored-phosh/Cargo.toml --check
+          cargo clippy --locked --manifest-path .cargo/vendored-phosh/Cargo.toml -- -D warnings
+      - name: Verify libphosh link mode
+        run: |
+          set -euo pipefail
+          dependencies="$(LC_ALL=C readelf -d ${{ matrix.target }}/debug/phrog)"
+          case "$dependencies" in
+            *'Shared library: [libphosh-'*) actual=system ;;
+            *) actual=bundled ;;
+          esac
+          test "$actual" = '${{ matrix.libphosh }}'
       - name: Lint
         run: |
-          cargo clippy --all-targets --verbose
+          ${{ matrix.cargo }} clippy --locked --all-targets --verbose -- -D warnings
+      - name: Test embedding build support
+        if: matrix.libphosh == 'bundled'
+        run: cargo vendored-phosh test --locked --manifest-path libphosh-rs/Cargo.toml -p libphosh-sys --test build_metadata --test native_source
+      - name: Verify registry package
+        if: matrix.libphosh == 'system'
+        run: cargo package --locked --no-verify
       - name: Lint (fmt)
         run: |
-          cargo fmt --all --check
+          ${{ matrix.cargo }} fmt --all --check
+          ${{ matrix.cargo }} fmt --manifest-path libphosh-rs/Cargo.toml --all --check
       - uses: actions/upload-artifact@v4
         with:
-          name: x86-64-debug
-          path: target/debug/phrog
+          name: x86-64-debug${{ matrix.libphosh == 'bundled' && '-bundled' || '' }}
+          path: ${{ matrix.target }}/debug/phrog
       - name: Test
         run: |
           set -uexo pipefail
@@ -86,21 +121,25 @@ jobs:
           export XDG_RUNTIME_DIR=/tmp
 
           # run tests
-          export RECORD_TESTS=`pwd`/demo-video/recordings/
+          if [ '${{ matrix.libphosh }}' = system ]; then
+            export RECORD_TESTS="$PWD/demo-video/recordings/"
+          fi
           export G_MESSAGES_DEBUG=all
           cat > phoc.ini <<HERE
           [output:X11-1]
           mode = 720x1440
           scale = 2
           HERE
-          dbus-run-session xvfb-run -a -s -noreset phoc -C phoc.ini -S -E "cargo test --verbose -- --test-threads=1 --nocapture"
+          dbus-run-session xvfb-run -a -s -noreset phoc -C phoc.ini -S -E "${{ matrix.cargo }} test --locked --verbose -- --test-threads=1 --nocapture"
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && matrix.libphosh == 'system'
         with:
           name: test-recordings
           path: demo-video/recordings
   demo:
-    if: inputs.release_mode || ((github.event_name != 'pull_request_target' || !startsWith(github.event.pull_request.head.ref || '', 'release/v')) && (github.event_name != 'pull_request_target' || contains(github.event.pull_request.labels.*.name, 'demo')))
+    # Fork PRs can produce recording artifacts, but cannot access B2 secrets or
+    # the write token needed to publish hosted demos and PR comments.
+    if: (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && (inputs.release_mode || ((github.event_name != 'pull_request' || !startsWith(github.event.pull_request.head.ref || '', 'release/v')) && (github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'demo'))))
     needs: build
     runs-on: ubuntu-24.04
     steps:
@@ -169,7 +208,7 @@ jobs:
           SOURCE_DIR: 'blob-upload'
           DEST_DIR: ${{ github.run_id }}
       - uses: marocchino/sticky-pull-request-comment@v2
-        if: github.event_name == 'pull_request_target' || (inputs.release_mode && github.event_name == 'pull_request')
+        if: github.event_name == 'pull_request' || (inputs.release_mode && github.event_name == 'pull_request')
         with:
           header: ci-recordings
           hide_and_recreate: true

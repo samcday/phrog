@@ -4,6 +4,7 @@
 // DO NOT EDIT
 
 #![cfg(unix)]
+#![rustfmt::skip]
 
 use phosh_sys::*;
 use std::mem::{align_of, size_of};
@@ -233,5 +234,4 @@ const RUST_CONSTANTS: &[(&str, &str)] = &[
     ("(gint) PHOSH_LOCKSCREEN_PAGE_INFO", "0"),
     ("(gint) PHOSH_LOCKSCREEN_PAGE_UNLOCK", "2"),
 ];
-
 
