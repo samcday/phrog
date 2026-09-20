@@ -17,3 +17,11 @@ xmlstarlet ed -L \
 	-d '///_:include[@name="Gcr"]' \
 	-d '///_:include[@name="GnomeBluetooth"]' \
 	Phosh-0.gir
+
+# GtkPlain is not introspected yet (WIP GTK custom-surface work): g-i emits
+# unnamed <type> elements for the parent_instance field, which trip up gir.
+# Point them at Gtk.Widget so instance structs keep a workable layout.
+xmlstarlet ed -L \
+	-i '//_:field[_:type[not(@name)]]/_:type' -t attr -n 'name' -v 'Gtk.Widget' \
+	-u '//_:field[_:type[@c:type="GtkPlain"]]/_:type/@c:type' -v 'GtkWidget' \
+	Phosh-0.gir

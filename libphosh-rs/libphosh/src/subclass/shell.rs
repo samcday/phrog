@@ -1,7 +1,8 @@
-use glib::{Class, prelude::*, subclass::prelude::*, Type};
-use glib::ffi::GType;
-use glib::translate::*;
 use crate::Shell;
+use glib::ffi::GType;
+use glib::object::Cast;
+use glib::translate::*;
+use glib::{subclass::prelude::*, Class, Type};
 
 pub trait ShellImpl: ShellImplExt + ObjectImpl {
     fn get_lockscreen_type(&self) -> Type {
@@ -22,7 +23,7 @@ pub trait ShellImplExt: sealed::Sealed + ObjectSubclass {
             if let Some(f) = (*parent_class).get_lockscreen_type {
                 return from_glib(f(self.obj().unsafe_cast_ref::<Shell>().to_glib_none().0));
             }
-            return Type::UNIT;
+            Type::UNIT
         }
     }
 }

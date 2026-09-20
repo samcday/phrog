@@ -10,8 +10,8 @@ macro_rules! skip_assert_initialized {
     () => {};
 }
 
-pub use ffi;
 pub use auto::*;
+pub use ffi;
 #[allow(unused_imports)]
 mod auto;
 pub mod subclass;
