@@ -1,0 +1,430 @@
+---
+include:
+  - project: 'guidog/meta-phosh'
+    ref: '992eb10ac05e479d9cff3dc0ee119a029e298e0c'
+    file: '/ci/phosh-common-jobs.yml'
+  - project: 'Infrastructure/freedesktop-ci-templates'
+    ref: 'd03cddbcff35f26861429fc816c00323f48e99af'
+    file: '/templates/ci-fairy.yml'
+
+stages:
+  - build
+  - test+docs
+  - style-checks
+  - analyze
+  - package
+  - deploy
+  - triggers
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    # Don't trigger a branch pipeline if there is an open MR
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH
+
+default:
+  # Protect CI infra from rogue jobs
+  timeout: 15 minutes
+  # Allow jobs to be caneled on new commits
+  interruptible: true
+  # Retry on infra hickups automatically
+  retry:
+    max: 1
+    when:
+      - 'api_failure'
+      - 'runner_system_failure'
+      - 'scheduler_failure'
+      - 'stuck_or_timeout_failure'
+
+variables:
+  # For ci-fairy
+  FDO_UPSTREAM_REPO: World/Phosh/phosh
+  # screenshot and asan builds on DEBIAN_IMAGE so keep them in sync
+  IMAGE_VERSION: v0.0.2025-11-06
+  DEBIAN_IMAGE: $CI_REGISTRY/world/phosh/phosh/debian:$IMAGE_VERSION
+  SCREENSHOT_IMAGE: $CI_REGISTRY/world/phosh/phosh/screenshot:$IMAGE_VERSION
+  ASAN_IMAGE: $CI_REGISTRY/world/phosh/phosh/asan:$IMAGE_VERSION
+  XVFB_RUN: xvfb-run -a -s -noreset
+  COMMON_BUILD_OPTS: -Db_coverage=true --werror -Dtools=true
+  ALPINE_EDGE_DEPS: alpine-sdk callaudiod-dev elogind-dev evince-dev evolution-data-server-dev feedbackd-dev
+                    gcovr gcr-dev git glib-dev gmobile-dev gnome-bluetooth-dev gnome-desktop-dev
+                    gsettings-desktop-schemas gtk+3.0-dev json-glib-dev libadwaita-dev libgudev-dev
+                    libhandy1-dev libsecret-dev linux-pam-dev meson modemmanager-dev musl-dev networkmanager
+                    networkmanager-dev ninja polkit-elogind-dev pulseaudio-dev qrcodegen-dev ttf-dejavu
+                    upower-dev vala wayland-dev wayland-protocols
+  RUST_BINDINGS_BRANCH: main
+  LIBPHOSH: libphosh-0.45
+  BUILD_OPTS: -Dcallui-i18n=true -Dphoc_tests=enabled -Dsearchd=true ${COMMON_BUILD_OPTS}
+
+.test_before_script: &test_before_script
+  before_script:
+    - export DEBIAN_FRONTEND=noninteractive
+    - apt -y update
+    - apt -y build-dep .
+    - if [ -n "$SID_PKGS" ]; then
+        echo "deb http://deb.debian.org/debian/ sid main" >> /etc/apt/sources.list.d/sid.list;
+        eatmydata apt-get -y update;
+        apt -y install $SID_PKGS;
+      fi
+
+.build_before_script: &build_before_script
+  before_script:
+    - export DEBIAN_FRONTEND=noninteractive
+    - apt -y update
+    - apt -y build-dep .
+    - if [ -n "$SID_PKGS" ]; then
+        echo "deb http://deb.debian.org/debian/ sid main" >> /etc/apt/sources.list.d/sid.list;
+        eatmydata apt-get -y update;
+        apt -y install $SID_PKGS;
+      fi
+
+.build_step: &build_step
+  script:
+    - 'echo "Build opts: ${BUILD_OPTS}"'
+    - meson setup ${BUILD_OPTS} _build
+    - meson compile -C _build
+
+.test_step: &test_step
+  script:
+    - export LC_ALL=C.UTF-8
+    - meson configure ${BUILD_OPTS} _build
+    - ${XVFB_RUN} meson test --logbase=tools --print-errorlogs -C _build --suite tools
+    - ${XVFB_RUN} meson test --logbase=unit --print-errorlogs -C _build --suite unit
+    - ${XVFB_RUN} meson test --logbase=lint --print-errorlogs -C _build --suite lint
+    - ${XVFB_RUN} meson test --logbase=integration --print-errorlogs -C _build --suite integration
+  after_script:
+    - gcovr --json --gcov-ignore-errors=no_working_dir_found --output=coverage-${CI_JOB_NAME}.json
+
+# Sanity checks of MR settings and commit logs
+commit-log-check:
+  extends:
+    - .fdo.ci-fairy
+  stage: style-checks
+  variables:
+    GIT_DEPTH: "100"
+  needs: []
+  script: |
+    ci-fairy check-commits --signed-off-by --junit-xml=commit-message-junit-report.xml
+  artifacts:
+    reports:
+      junit: commit-message-junit-report.xml
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+
+build:native-debian-forky:
+  stage: build
+  image: ${DEBIAN_IMAGE}
+  <<: *build_before_script
+  <<: *build_step
+  artifacts:
+    paths:
+      - _build
+
+build:lib-debian-forky:
+  stage: build
+  image: ${DEBIAN_IMAGE}
+  variables:
+    BUILD_OPTS: --werror -Dtests=false -Dtools=false -Dbindings-lib=true -Dvapi=true -Dsearchd=true
+  <<: *build_before_script
+  script:
+    - meson setup ${BUILD_OPTS} _build
+    - meson compile -C _build
+    - meson install -C _build
+    - "gcc -Wall -O2 $(pkgconf --cflags $LIBPHOSH) .gitlab-ci/libphosh-test.c $(pkgconf --libs $LIBPHOSH)"
+  artifacts:
+    paths:
+      - _build
+
+unit-test:native-debian-forky:
+  stage: test+docs
+  image: ${DEBIAN_IMAGE}
+  needs:
+    - build:native-debian-forky
+  <<: *test_before_script
+  <<: *test_step
+  artifacts:
+    when: always
+    paths:
+      - _build
+      - coverage-*.json
+      - _build/meson-logs/*.junit.xml
+    reports:
+      junit: _build/meson-logs/*.junit.xml
+
+asan-test:native-debian-forky:
+  stage: test+docs
+  image: ${ASAN_IMAGE}
+  tags: [asan]
+  needs: []
+  <<: *test_before_script
+  script:
+    - meson setup -Dphoc_tests=enabled -Dtools=false -Db_sanitize=address -Dbuildtype=debug -Dsearchd=true _build-asan
+    - ${XVFB_RUN} meson test --print-errorlogs -C _build-asan --suite unit --timeout-multiplier 5
+  allow_failure: true
+
+screenshot:native-debian-forky:
+  stage: test+docs
+  image: ${SCREENSHOT_IMAGE}
+  needs:
+    - build:native-debian-forky
+  variables:
+    LC_ALL: C.UTF-8
+    G_MESSAGES_DEBUG: all
+  <<: *test_before_script
+  script:
+    # Make sure tests can find the plugins and po files
+    - "meson install -C _build"
+    - ${XVFB_RUN} meson test -C _build --print-errorlogs --suite screenshots
+    - tools/montage-screenshots _build/
+    - mv _build/tests/screenshots/* screenshots/
+  after_script:
+    - gcovr --json --gcov-ignore-errors=no_working_dir_found --output=screenshots/coverage-${CI_JOB_NAME}.json
+  artifacts:
+    when: always
+    expose_as: 'Screenshots'
+    paths:
+      - screenshots/
+      - _build/meson-logs/testlog.txt
+      - _build/meson-logs/testlog.junit.xml
+    reports:
+      junit: _build/meson-logs/testlog.junit.xml
+
+integration:native-debian-forky:
+  stage: test+docs
+  image: ${DEBIAN_IMAGE}
+  needs:
+    - build:native-debian-forky
+  <<: *test_before_script
+  variables:
+    SID_PKGS: phoc
+    # exports
+    LC_ALL: C.UTF-8
+    NO_AT_BRIDGE: 1
+  script:
+    - export TOPSRCDIR="${PWD}"
+    - export TOPBUILDDIR="${PWD}/_build"
+    # Make sure tests can find the plugins and po files
+    - "meson install -C _build"
+    - ${XVFB_RUN} dbus-run-session _build/tests/integration/run-pytest --junitxml=report-integration-${CI_JOB_NAME}.xml -v tests/integration
+  after_script:
+    - gcovr --json --gcov-ignore-errors=no_working_dir_found --output=coverage-integration-${CI_JOB_NAME}.json
+  artifacts:
+    paths:
+      - coverage-integration-${CI_JOB_NAME}.json
+      - report-integration-${CI_JOB_NAME}.xml
+    reports:
+      junit: report-integration-${CI_JOB_NAME}.xml
+
+build-doc:
+  stage: test+docs
+  image: ${DEBIAN_IMAGE}
+  variables:
+    BUILD_OPTS: -Dtools=false -Dtests=false -Dgtk_doc=true
+  <<: *build_before_script
+  needs: []
+  script:
+    - git clean -dfx
+    - 'echo "Build opts: ${BUILD_OPTS}"'
+    - meson setup ${BUILD_OPTS} _build
+    - meson compile -C _build
+    - mv _build/docs/phosh-0/ _reference/
+  artifacts:
+    paths:
+      - _reference
+
+check-po:
+  # Checks .ui files for simplification
+  stage: test+docs
+  extends: .phosh-check-po
+
+check-ui:
+  stage: test+docs
+  image: ${DEBIAN_IMAGE}
+  variables:
+    PHOSH_ADDITIONAL_PKGS: >
+      libgtk-3-bin
+      libgtk-4-bin
+      xvfb
+  needs: []
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - "**/*.ui"
+  script:
+    - !reference [.phosh-prepare-apt]
+    - |
+      git remote add target $CI_MERGE_REQUEST_PROJECT_URL.git
+      echo "Fetching MR target branch $CI_MERGE_REQUEST_TARGET_BRANCH_NAME from $CI_MERGE_REQUEST_PROJECT_URL"
+      git fetch target "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+    - ${XVFB_RUN} ./.gitlab-ci/check-ui target/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME $CI_COMMIT_SHA
+
+check-license-headers:
+  stage: test+docs
+  image: ${DEBIAN_IMAGE}
+  needs: []
+  script:
+    # Checks .c and .h files begin with a license header as
+    # defined in HACKING.md
+    - ./tools/check-license-headers.py
+
+release-tarball:
+  stage: test+docs
+  extends: .phosh-check-dist
+  variables:
+    MESON_DIST_OPTIONS: --no-tests
+
+build:native-alpinelinux-edge:
+  stage: build
+  image: alpine:edge
+  allow_failure: true
+  before_script:
+    - echo "https://alpine.global.ssl.fastly.net/alpine/edge/testing" >> /etc/apk/repositories
+    - apk add $ALPINE_EDGE_DEPS
+  artifacts:
+    paths:
+      - _build
+  script:
+    - meson setup --werror -Dphoc_tests=disabled  _build
+    - meson compile -C _build
+
+unit-test:native-alpinelinux-edge:
+  stage: test+docs
+  image: alpine:edge
+  allow_failure: true
+  needs:
+    - build:native-alpinelinux-edge
+  variables:
+    LC_ALL: C.UTF-8
+  before_script:
+    - echo "https://alpine.global.ssl.fastly.net/alpine/edge/testing" >> /etc/apk/repositories
+    - apk add xvfb-run $ALPINE_EDGE_DEPS
+  script:
+    - ${XVFB_RUN} meson test -C _build --suite unit
+  artifacts:
+    when: always
+    paths:
+      - _build
+  when: manual
+
+build:native-debian-forky-clang:
+  stage: build
+  image: ${DEBIAN_IMAGE}
+  <<: *build_before_script
+  script:
+    - CC=clang CC_LD=lld meson setup ${BUILD_OPTS} _build
+    - meson compile -C _build
+  artifacts:
+    paths:
+      - _build
+
+check-consistency:
+  stage: test+docs
+  extends: .phosh-check-consistency
+
+check-markdown:
+  stage: style-checks
+  extends: .phosh-check-markdown
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - "*.md"
+          - "docs/*.md"
+
+check-meson:
+  stage: style-checks
+  extends:
+    - .phosh-check-meson
+
+check-style:
+  stage: style-checks
+  extends: .phosh-format-check
+  allow_failure: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+coverage:
+  image: ${DEBIAN_IMAGE}
+  stage: analyze
+  script:
+    - mkdir coverage-report
+    - gcovr --add-tracefile 'coverage-*.json'
+        --add-tracefile 'screenshots/coverage-*.json'
+        --html-details --print-summary --output coverage-report/index.html
+    - gcovr --add-tracefile 'coverage-*.json'
+        --add-tracefile 'screenshots/coverage-*.json'
+        --xml --output coverage-report/coverage.xml
+  artifacts:
+    expose_as: 'Coverage Report'
+    paths:
+      - coverage-report
+      - coverage-report/index.html
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage-report/coverage.xml
+  coverage: '/^lines: (\d+\.\d+\%)/'
+  needs:
+    - unit-test:native-debian-forky
+    - screenshot:native-debian-forky
+    - integration:native-debian-forky
+
+abi-compliance-checker:
+  image: ${DEBIAN_IMAGE}
+  stage: analyze
+  needs: [build:lib-debian-forky]
+  <<: *build_before_script
+  script:
+    - meson setup --reconfigure -Dabi-check=true _build .
+    - meson compile -C _build
+  artifacts:
+    paths:
+      - _build/src/libphosh-abi.dump
+      - _build/src/abi-compliance-check-report.html
+    when: always
+  rules:
+    - if: $CI_COMMIT_TAG
+    - changes:
+        paths:
+          - NEWS
+          - src/libphosh.syms.in
+    - when: manual
+
+package:deb-debian-forky:arm64:
+  stage: package
+  variables:
+    PHOSH_DOCKER_IMAGE: debian:forky
+    DEB_BUILD_PROFILES: "nodoc nocheck"
+    DEB_BUILD_OPTIONS: nocheck
+  extends: .phosh-build-debian-package
+  tags:
+    - aarch64
+
+pages:
+  stage: deploy
+  needs:
+    - build-doc
+  script:
+    - mv _reference/ public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
+
+rust-bindings:
+  stage: triggers
+  variables:
+    UPSTREAM_BRANCH: $CI_COMMIT_REF_NAME
+  needs: []
+  trigger:
+    project: World/Phosh/libphosh-rs
+    branch: $RUST_BINDINGS_BRANCH
+  rules:
+    - if: $CI_COMMIT_BRANCH == $RUST_BINDINGS_BRANCH
+      changes:
+        - src/**/*

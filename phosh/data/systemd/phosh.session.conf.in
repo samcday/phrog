@@ -1,0 +1,6 @@
+[Unit]
+@gsd_wants@
+
+Wants=mobi.phosh.OSK.target
+
+Requires=@app_id@.target
