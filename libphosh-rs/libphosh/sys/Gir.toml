@@ -1,0 +1,43 @@
+[options]
+work_mode = "sys"
+library = "Phosh"
+version = "0"
+girs_directories = ["../../gir-files", "../../"]
+min_cfg_version = "1"
+external_libraries = [
+   "GLib",
+   "GObject",
+   "Gio",
+   "Gtk",
+   "Gdk",
+   "GdkPixbuf",
+   "Pango",
+   "Handy",
+]
+
+ignore = [
+    "Phosh.DBusScreenshot",
+    "Phosh.DBusScreenshotIface",
+    "Phosh.DBusScreenshotProxy",
+    "Phosh.DBusScreenshotSkeleton",
+    "Phosh.QuickSettings",
+]
+
+[[object]]
+name = "Phosh.WallClock"
+status = "generate"
+  [[object.function]]
+  # We don't want to bother with libgnome-desktop
+  name = "string_for_datetime"
+  ignore = true
+
+[[object]]
+name = "Phosh.LayerSurface"
+status = "generate"
+# Ignore functions that return Wayland types for the moment
+  [[object.function]]
+  name = "get_wl_surface"
+  ignore = true
+  [[object.function]]
+  name = "get_layer_surface"
+  ignore = true
