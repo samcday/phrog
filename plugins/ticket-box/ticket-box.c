@@ -10,8 +10,9 @@
 #include "ticket-box.h"
 #include "ticket-row.h"
 
-#include <evince-document.h>
-#include <evince-view.h>
+#define I_KNOW_THE_PAPERS_LIBS_ARE_UNSTABLE_AND_HAVE_TALKED_WITH_THE_AUTHORS
+#include <papers-document.h>
+#include <papers-view.h>
 
 #define TICKET_BOX_SCHEMA_ID "sm.puri.phosh.plugins.ticket-box"
 #define TICKET_BOX_FOLDER_KEY "folder"
@@ -34,12 +35,10 @@ struct _PhoshTicketBox {
   GtkListBox   *lb_tickets;
   GtkStack     *stack_tickets;
 
-  EvView       *view;
+  PpsView   *view;
 };
 
 G_DEFINE_TYPE (PhoshTicketBox, phosh_ticket_box, GTK_TYPE_BOX);
-
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (EvDocument, g_object_unref)
 
 static void
 on_row_selected (PhoshTicketBox *self,
@@ -48,8 +47,9 @@ on_row_selected (PhoshTicketBox *self,
 {
   g_autoptr (GError) err = NULL;
   g_autoptr (PhoshTicket) ticket = NULL;
-  g_autoptr (EvDocument) doc = NULL;
-  g_autoptr (EvDocumentModel) model = NULL;
+  g_autoptr (PpsDocument) doc = NULL;
+  g_autoptr (PpsDocumentModel) model = NULL;
+  g_autofree char *uri = NULL;
 
   if (row == NULL)
     return;
@@ -57,16 +57,14 @@ on_row_selected (PhoshTicketBox *self,
   g_object_get (row, "ticket", &ticket, NULL);
   g_debug ("row selected: %s", phosh_ticket_get_display_name (ticket));
 
-  doc = ev_document_factory_get_document_for_gfile (phosh_ticket_get_file (ticket),
-                                                    EV_DOCUMENT_LOAD_FLAG_NONE,
-                                                    self->cancel,
-                                                    &err);
+  uri = g_file_get_uri (phosh_ticket_get_file (ticket));
+  doc = pps_document_factory_get_document (uri, &err);
   if (doc == NULL) {
     g_warning ("Failed to load %s: %s", phosh_ticket_get_display_name (ticket), err->message);
     return;
   }
-  model = ev_document_model_new_with_document (doc);
-  ev_view_set_model (self->view, model);
+  model = pps_document_model_new_with_document (doc);
+  pps_view_set_model (self->view, model);
 
   gtk_stack_set_visible_child_name (self->stack_tickets, "ticket-view");
 
@@ -106,7 +104,7 @@ phosh_ticket_box_class_init (PhoshTicketBoxClass *klass)
 
   object_class->finalize = phosh_ticket_box_finalize;
 
-  g_type_ensure (EV_TYPE_VIEW);
+  g_type_ensure (PPS_TYPE_VIEW);
   g_type_ensure (PHOSH_TYPE_TICKET_ROW);
 
   gtk_widget_class_set_template_from_resource (widget_class,
@@ -221,7 +219,7 @@ phosh_ticket_box_init (PhoshTicketBox *self)
 {
   g_autoptr (GtkCssProvider) css_provider = NULL;
 
-  ev_init ();
+  pps_init ();
 
   gtk_widget_init_template (GTK_WIDGET (self));
 
@@ -230,9 +228,9 @@ phosh_ticket_box_init (PhoshTicketBox *self)
   css_provider = gtk_css_provider_new ();
   gtk_css_provider_load_from_resource (css_provider,
                                        "/mobi/phosh/plugins/ticket-box/stylesheet/common.css");
-  gtk_style_context_add_provider (gtk_widget_get_style_context (GTK_WIDGET (self)),
-                                  GTK_STYLE_PROVIDER (css_provider),
-                                  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  gtk_style_context_add_provider_for_display (gdk_display_get_default (),
+                                              GTK_STYLE_PROVIDER (css_provider),
+                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
   gtk_list_box_bind_model (self->lb_tickets,
                            G_LIST_MODEL (self->model),

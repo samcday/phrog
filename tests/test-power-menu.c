@@ -16,7 +16,7 @@ test_phosh_power_menu_new (PhoshTestCompositorFixture *fixture, gconstpointer da
   PhoshPowerMenu *menu;
 
   menu = phosh_power_menu_new (phosh_test_get_monitor (fixture->state));
-  gtk_widget_destroy (GTK_WIDGET (menu));
+  g_object_unref (GTK_WIDGET (menu));
 }
 
 int

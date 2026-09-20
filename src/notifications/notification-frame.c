@@ -38,7 +38,7 @@ static GParamSpec *props[LAST_PROP];
 
 
 struct _PhoshNotificationFrame {
-  GtkEventBox parent;
+  GtkBox parent;
 
   GListModel *model;
   gulong      model_watch;
@@ -70,7 +70,7 @@ struct _PhoshNotificationFrame {
 typedef struct _PhoshNotificationFrame PhoshNotificationFrame;
 
 
-G_DEFINE_TYPE (PhoshNotificationFrame, phosh_notification_frame, GTK_TYPE_EVENT_BOX)
+G_DEFINE_TYPE (PhoshNotificationFrame, phosh_notification_frame, GTK_TYPE_BOX)
 
 
 #define DRAG_THRESHOLD_DISTANCE 16
@@ -134,6 +134,15 @@ phosh_notification_frame_get_property (GObject    *object,
 
 
 static void
+phosh_notification_frame_dispose (GObject *object)
+{
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_NOTIFICATION_FRAME);
+
+  G_OBJECT_CLASS (phosh_notification_frame_parent_class)->dispose (object);
+}
+
+
+static void
 phosh_notification_frame_finalize (GObject *object)
 {
   PhoshNotificationFrame *self = PHOSH_NOTIFICATION_FRAME (object);
@@ -148,30 +157,31 @@ phosh_notification_frame_finalize (GObject *object)
   G_OBJECT_CLASS (phosh_notification_frame_parent_class)->finalize (object);
 }
 
-
-static gboolean
+static void
 motion_notify (PhoshNotificationFrame *self,
-               GdkEventMotion         *event)
+               double                  x,
+               double                  y)
 {
   if (self->start_x >= 0 && self->start_y >= 0) {
-    int current_x, current_y;
+    graphene_point_t src = {x, y};
+    graphene_point_t current;
     double dx, dy;
+    gboolean success;
 
-    gtk_widget_translate_coordinates (GTK_WIDGET (self->box),
-                                      gtk_widget_get_toplevel (GTK_WIDGET (self)),
-                                      event->x, event->y,
-                                      &current_x, &current_y);
+    success = gtk_widget_compute_point (GTK_WIDGET (self->box),
+                                      GTK_WIDGET (gtk_widget_get_root (GTK_WIDGET (self))),
+                                      &src,
+                                      &current);
+    g_return_if_fail (success);
 
-    dx = current_x - self->start_x;
-    dy = current_y - self->start_y;
+    dx = current.x - self->start_x;
+    dy = current.y - self->start_y;
 
     if (sqrt (dx * dx + dy * dy) > DRAG_THRESHOLD_DISTANCE) {
       gtk_gesture_set_state (self->header_click_gesture, GTK_EVENT_SEQUENCE_DENIED);
       gtk_gesture_set_state (self->list_click_gesture, GTK_EVENT_SEQUENCE_DENIED);
     }
   }
-
-  return GDK_EVENT_PROPAGATE;
 }
 
 
@@ -183,26 +193,29 @@ pressed (PhoshNotificationFrame *self,
          GtkGesture             *gesture,
          GtkGesture             *other_gesture)
 {
-  GdkEventSequence *sequence =
-    gtk_gesture_single_get_current_sequence (GTK_GESTURE_SINGLE (gesture));
+  graphene_point_t src, dst;
+  gboolean success;
 
   if (n_press != 1) {
-    gtk_gesture_set_sequence_state (gesture, sequence, GTK_EVENT_SEQUENCE_DENIED);
+    gtk_gesture_set_state (gesture,GTK_EVENT_SEQUENCE_DENIED);
 
     return;
   }
 
-  gtk_widget_translate_coordinates (self->box,
-                                    gtk_widget_get_toplevel (GTK_WIDGET (self)),
-                                    x, y,
-                                    &self->start_x, &self->start_y);
+  src.x = x;
+  src.y = y;
+  success = gtk_widget_compute_point (self->box,
+                                      GTK_WIDGET (gtk_widget_get_root (GTK_WIDGET (self))),
+                                      &src,
+                                      &dst);
+  g_return_if_fail (success);
 
   /* When the title row is clicked we proxy it to the first item */
   self->active_row =
     gtk_list_box_get_row_at_y (GTK_LIST_BOX (self->list_notifs),
                                gesture == self->header_click_gesture ? 0 : y);
 
-  gtk_gesture_set_sequence_state (other_gesture, sequence, GTK_EVENT_SEQUENCE_DENIED);
+  gtk_gesture_set_state (other_gesture, GTK_EVENT_SEQUENCE_DENIED);
 }
 
 static void
@@ -367,6 +380,7 @@ phosh_notification_frame_class_init (PhoshNotificationFrameClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
+  object_class->dispose = phosh_notification_frame_dispose;
   object_class->finalize = phosh_notification_frame_finalize;
   object_class->set_property = phosh_notification_frame_set_property;
   object_class->get_property = phosh_notification_frame_get_property;

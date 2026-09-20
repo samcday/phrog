@@ -1,7 +1,7 @@
 project(
   'phosh',
   'c',
-  version: '0.53.0',
+  version: '0.52.1',
   license: 'GPL-3.0-or-later',
   meson_version: '>= 1.7.0',
   default_options: [
@@ -122,6 +122,11 @@ endif
 
 add_project_arguments(global_c_args, language: 'c')
 
+run_data = configuration_data()
+run_data.set('ABS_BUILDDIR', meson.current_build_dir())
+run_data.set('ABS_SRCDIR', meson.current_source_dir())
+configure_file(input: 'run.in', output: 'run', configuration: run_data)
+
 gnome = import('gnome')
 i18n = import('i18n')
 pkgconfig = import('pkgconfig')
@@ -130,11 +135,12 @@ appstream_dep = dependency('appstream', version: '>= 1.0.0')
 ecal_dep = dependency('libecal-2.0', version: '>= 3.33.1')
 eds_dep = dependency('libedataserver-1.2', version: '>= 3.33.1')
 fribidi_dep = dependency('fribidi')
-gcr_dep = dependency('gcr-3', version: '>= 3.7.5')
+gcr_dep = dependency('gcr-4', version: '>= 4.3.0')
 glib_dep = dependency('glib-2.0', version: glib_ver_cmp)
 gio_dep = dependency('gio-2.0', version: glib_ver_cmp)
-gio_unix_dep = dependency('gio-unix-2.0', version: glib_ver_cmp)
-gnome_bluetooth_dep = dependency('gnome-bluetooth-3.0', version: '>= 46.0')
+gio_unix_dep =  dependency('gio-unix-2.0', version: glib_ver_cmp)
+gnome_bg_dep = dependency('gnome-bg-4')
+gnome_bluetooth_dep = dependency ('gnome-bluetooth-3.0', version: '>= 46.0')
 gmobile_dep = dependency(
   'gmobile',
   version: '>= 0.1.0',
@@ -147,15 +153,15 @@ gmobile_dep = dependency(
   ],
 )
 gmodule_dep = dependency('gmodule-no-export-2.0', version: glib_ver_cmp)
-gnome_desktop_dep = dependency('gnome-desktop-3.0', version: '>=3.26')
+gnome_desktop_dep = dependency('gnome-desktop-4', version: '>=4.0')
 gobject_dep = dependency('gobject-2.0', version: glib_ver_cmp)
 gsettings_desktop_schemas_dep = dependency(
   'gsettings-desktop-schemas',
   version: '>=47',
 )
-gtk_dep = dependency('gtk+-3.0', version: '>=3.22')
-gtk_wayland_dep = dependency('gtk+-wayland-3.0', version: '>=3.22')
+gtk_dep = dependency('gtk4', version: '>=4.15')
 gudev_dep = dependency('gudev-1.0')
+libadwaita_dep = dependency('libadwaita-1')
 libcall_ui = subproject(
   'libcall-ui',
   default_options: [
@@ -189,12 +195,6 @@ libgvc = subproject(
   ],
 )
 libgvc_dep = libgvc.get_variable('libgvc_dep')
-libhandy_dep = dependency(
-  'libhandy-1',
-  version: '>=1.1.90',
-  fallback: ['libhandy', 'libhandy_dep'],
-  default_options: ['introspection=disabled'],
-)
 libcall_ui_dep = libcall_ui.get_variable('libcall_ui_dep')
 libnm_dep = dependency('libnm', version: '>= 1.14')
 libpolkit_agent_dep = dependency('polkit-agent-1', version: '>= 0.122')
@@ -249,19 +249,11 @@ configure_file(
   install_dir: lib_inc_dir,
 )
 
-
 subdir('data')
 subdir('po')
 subdir('protocol')
 subdir('src')
 subdir('plugins')
-
-run_data = configuration_data()
-run_data.set('ABS_BUILDDIR', meson.current_build_dir())
-run_data.set('ABS_SRCDIR', meson.current_source_dir())
-run_data.set('PLUGIN_SCHEMA_PATH', plugin_schema_path)
-configure_file(input: 'run.in', output: 'run', configuration: run_data)
-
 subdir('searchd')
 subdir('tests')
 subdir('tools')

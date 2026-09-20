@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Purism SPC
+ *               2026 Phosh.mobi e.V.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -12,7 +13,24 @@ G_BEGIN_DECLS
 
 #define PHOSH_TYPE_LAYER_SURFACE                 (phosh_layer_surface_get_type ())
 
-G_DECLARE_DERIVABLE_TYPE (PhoshLayerSurface, phosh_layer_surface, PHOSH, LAYER_SURFACE, GtkWindow)
+G_DECLARE_DERIVABLE_TYPE (PhoshLayerSurface, phosh_layer_surface, PHOSH, LAYER_SURFACE, GtkPlain)
+
+/* Must match the Waland protocol values */
+typedef enum {
+  PHOSH_LAYER_SURFACE_ANCHOR_NONE = 0,
+  PHOSH_LAYER_SURFACE_ANCHOR_TOP = (1 << 0),
+  PHOSH_LAYER_SURFACE_ANCHOR_BOTTOM = (1 << 1),
+  PHOSH_LAYER_SURFACE_ANCHOR_LEFT = (1 << 2),
+  PHOSH_LAYER_SURFACE_ANCHOR_RIGHT = (1 << 3),
+} PhoshLayerSurfaceAnchor;
+
+/* Must match the Wayland protocol values */
+typedef enum {
+  PHOSH_LAYER_SURFACE_LAYER_BACKGROUND = 0,
+  PHOSH_LAYER_SURFACE_LAYER_BOTTOM = 1,
+  PHOSH_LAYER_SURFACE_LAYER_TOP = 2,
+  PHOSH_LAYER_SURFACE_LAYER_OVERLAY = 3,
+} PhoshLayerSurfaceLayer;
 
 /**
  * PhoshLayerSurfaceClass
@@ -38,5 +56,8 @@ struct _PhoshLayerSurfaceClass
   void                 (*_phosh_reserved8) (void);
   void                 (*_phosh_reserved9) (void);
 };
+
+void
+phosh_layer_surface_set_child (PhoshLayerSurface *self, GtkWidget *child);
 
 G_END_DECLS

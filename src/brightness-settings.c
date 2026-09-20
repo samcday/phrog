@@ -23,7 +23,7 @@
  */
 
 struct _PhoshBrightnessSettings {
-  GtkBin           parent;
+  GtkWidget        parent;
 
   GtkSwitch       *auto_switch;
   GtkImage        *image;
@@ -34,7 +34,7 @@ struct _PhoshBrightnessSettings {
   GSettings       *settings;
 };
 
-G_DEFINE_TYPE (PhoshBrightnessSettings, phosh_brightness_settings, GTK_TYPE_BIN);
+G_DEFINE_TYPE (PhoshBrightnessSettings, phosh_brightness_settings, GTK_TYPE_WIDGET);
 
 
 static void
@@ -50,6 +50,8 @@ phosh_brightness_settings_dispose (GObject *object)
   PhoshBrightnessSettings *self = PHOSH_BRIGHTNESS_SETTINGS (object);
 
   g_clear_object (&self->settings);
+
+  gtk_widget_dispose_template (GTK_WIDGET (self), PHOSH_TYPE_BRIGHTNESS_SETTINGS);
 
   G_OBJECT_CLASS (phosh_brightness_settings_parent_class)->dispose (object);
 }
@@ -73,6 +75,8 @@ phosh_brightness_settings_class_init (PhoshBrightnessSettingsClass *klass)
   gtk_widget_class_bind_template_child (widget_class, PhoshBrightnessSettings, toggle_stack);
 
   gtk_widget_class_bind_template_callback (widget_class, on_auto_brightness_activated);
+
+  gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
 
   gtk_widget_class_set_css_name (widget_class, "phosh-brightness-settings");
 }

@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshHome" parent="PhoshDragSurface">
-    <signal name="key-press-event" handler="window_key_press_event_cb"/>
-    <child>
+    <property name="anchor">bottom|left|right</property>
+    <property name="layer">top</property>
+    <property name="namespace">phosh home</property>
+    <property name="child">
       <object class="GtkBox">
         <property name="visible">1</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkEventBox" id="evbox_home_bar">
+          <object class="AdwBin" id="evbox_home_bar">
             <style>
               <class name="phosh-home-bar"/>
             </style>
@@ -31,7 +33,7 @@
                     <property name="transition-duration">400</property>
                     <property name="transition-type">crossfade</property>
                     <child>
-                      <object class="GtkEventBox" id="powerbar">
+                      <object class="AdwBin" id="powerbar">
                         <property name="can-focus">1</property>
                         <property name="visible">1</property>
                         <!-- PHOSH_HOME_BAR_HEIGHT -->
@@ -40,12 +42,25 @@
                         <property name="name">powerbar</property>
                         <property name="halign">center</property>
                         <property name="valign">center</property>
+                        <child>
+                          <object class="GtkGestureLongPress" id="osk_toggle_long_press">
+                            <signal name="begin" handler="on_powerbar_action_started" swapped="true"/>
+                            <signal name="pressed" handler="on_powerbar_pressed" swapped="true"/>
+                            <signal name="end" handler="on_powerbar_action_ended" swapped="true"/>
+                            <signal name="cancelled" handler="on_powerbar_action_ended" swapped="true"/>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>
                 </child>
               </object>
               <!-- home_bar (holding powerbar) -->
+            </child>
+            <child>
+              <object class="GtkGestureClick" id="click_gesture">
+                <signal name="released" handler="on_home_released" swapped="true"/>
+              </object>
             </child>
           </object>
           <!-- home bar's event box -->
@@ -61,17 +76,11 @@
           </object>
         </child>
       </object>
+    </property>
+    <child>
+      <object class="GtkEventControllerKey" id="key_controller">
+        <signal name="key-pressed" handler="window_key_press_event_cb" swapped="true"/>
+      </object>
     </child>
   </template>
-  <object class="GtkGestureMultiPress" id="click_gesture">
-    <property name="widget">evbox_home_bar</property>
-    <signal name="released" handler="on_home_released" swapped="true"/>
-  </object>
-  <object class="GtkGestureLongPress" id="osk_toggle_long_press">
-    <property name="widget">powerbar</property>
-    <signal name="begin" handler="on_powerbar_action_started" swapped="true"/>
-    <signal name="pressed" handler="on_powerbar_pressed" swapped="true"/>
-    <signal name="end" handler="on_powerbar_action_ended" swapped="true"/>
-    <signal name="cancelled" handler="on_powerbar_action_ended" swapped="true"/>
-  </object>
 </interface>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
-  <template class="PhoshLauncherRow" parent="HdyActionRow">
+  <requires lib="gtk" version="4.0"/>
+  <template class="PhoshLauncherRow" parent="AdwActionRow">
     <child>
       <object class="GtkBox" id="box_data">
+        <property name="visible">0</property>
         <property name="spacing">6</property>
         <property name="margin-top">6</property>
         <property name="margin-bottom">6</property>
@@ -15,6 +16,7 @@
         <property name="width-request">100</property>
         <child>
           <object class="GtkLabel" id="count_label">
+            <property name="visible">0</property>
             <property name="halign">center</property>
             <style>
               <class name="p-launcher-row-count"/>
@@ -25,7 +27,9 @@
           </object>
         </child>
         <child>
-          <object class="GtkLevelBar" id="progress_bar"/>
+          <object class="GtkLevelBar" id="progress_bar">
+            <property name="visible">0</property>
+          </object>
         </child>
       </object>
     </child>

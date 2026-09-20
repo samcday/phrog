@@ -18,8 +18,6 @@
 #include <sys/mman.h>
 #include <errno.h>
 
-#include <gdk/gdkwayland.h>
-
 /**
  * PhoshMonitor:
  *

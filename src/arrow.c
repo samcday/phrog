@@ -55,26 +55,22 @@ interpolate_progress (double t)
 /* GtkWidget */
 
 
-static gboolean
-phosh_arrow_draw (GtkWidget *widget,
-                  cairo_t   *cr)
+static void
+phosh_arrow_draw (GtkDrawingArea *drawing_area,
+                  cairo_t *cr, int width, int height, gpointer user_data)
 {
-  PhoshArrow *self = PHOSH_ARROW (widget);
+  PhoshArrow *self = PHOSH_ARROW (drawing_area);
   double progress, angle, center_x, center_y;
-  GtkStyleContext *context;
-  GtkStateFlags flags;
   GdkRGBA rgba;
 
   progress = interpolate_progress (self->progress);
 
   angle = (0.5 - progress) * G_PI / 2.5;
 
-  center_x = gtk_widget_get_allocated_width (widget) / 2.0;
-  center_y = (gtk_widget_get_allocated_height (widget) / 2.0 - 0.5) * (0.5 + progress);
+  center_x = width / 2.0;
+  center_y = (height / 2.0 - 0.5) * (0.5 + progress);
 
-  context = gtk_widget_get_style_context (widget);
-  flags = gtk_widget_get_state_flags (widget);
-  gtk_style_context_get_color (context, flags, &rgba);
+  gtk_widget_get_color (GTK_WIDGET (self), &rgba);
 
   cairo_set_line_width (cr, 3);
   cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
@@ -87,8 +83,6 @@ phosh_arrow_draw (GtkWidget *widget,
   cairo_move_to (cr, center_x, center_y);
   cairo_line_to (cr, center_x - LENGTH * cos (angle), center_y + LENGTH * sin (angle));
   cairo_stroke (cr);
-
-  return GDK_EVENT_PROPAGATE;
 }
 
 
@@ -132,11 +126,9 @@ static void
 phosh_arrow_class_init (PhoshArrowClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
   object_class->get_property = phosh_arrow_get_property;
   object_class->set_property = phosh_arrow_set_property;
-  widget_class->draw = phosh_arrow_draw;
 
   properties [PROP_PROGRESS] =
     g_param_spec_double ("progress",
@@ -153,9 +145,10 @@ static void
 phosh_arrow_init (PhoshArrow *self)
 {
   self->progress = 0;
+  gtk_drawing_area_set_draw_func (GTK_DRAWING_AREA (self), phosh_arrow_draw, NULL, NULL);
   g_object_set (self,
-                "width-request", WIDTH,
-                "height-request", HEIGHT,
+                "content-width", WIDTH,
+                "content-height", HEIGHT,
                 NULL);
 }
 

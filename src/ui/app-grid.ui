@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
-  <requires lib="libhandy" version="1.8"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshAppGrid" parent="GtkBox">
     <property name="visible">1</property>
     <property name="hexpand">1</property>
     <property name="vexpand">1</property>
     <child>
-      <object class="HdyDeck" id="deck">
+      <object class="AdwNavigationView" id="deck">
         <property name="visible">1</property>
-        <property name="transition-type">2</property>
-        <property name="can-swipe-back">1</property>
         <child>
+          <object class="AdwNavigationPage">
+            <property name="title">main_grid</property>
+            <property name="tag">main_grid</property>
+            <property name="child">
           <object class="GtkBox">
             <property name="visible">1</property>
             <property name="orientation">vertical</property>
@@ -26,13 +27,16 @@
                     <property name="placeholder-text" translatable="yes">Search apps…</property>
                     <property name="max-width-chars">48</property>
                     <signal name="search-changed" handler="on_search_changed" object="PhoshAppGrid" swapped="no"/>
-                    <signal name="preedit-changed" handler="on_search_preedit_changed" object="PhoshAppGrid" swapped="no"/>
                     <signal name="activate" handler="on_search_activated" object="PhoshAppGrid" swapped="no"/>
-                    <signal name="focus-in-event" handler="on_search_gained_focus" object="PhoshAppGrid" swapped="no"/>
-                    <signal name="focus-out-event" handler="on_search_lost_focus" object="PhoshAppGrid" swapped="no"/>
                     <style>
                       <class name="phosh-search-bar"/>
                     </style>
+                    <child>
+                      <object class="GtkEventControllerFocus">
+                        <signal name="enter" handler="on_search_gained_focus" object="PhoshAppGrid" swapped="no"/>
+                        <signal name="leave" handler="on_search_lost_focus" object="PhoshAppGrid" swapped="no"/>
+                      </object>
+                    </child>
                   </object>
                 </child>
                 <style>
@@ -45,7 +49,7 @@
                 <property name="visible">1</property>
                 <property name="hexpand">1</property>
                 <property name="vexpand">1</property>
-                <child>
+                <property name="child">
                   <object class="GtkBox">
                     <property name="visible">1</property>
                     <property name="valign">start</property>
@@ -55,7 +59,7 @@
                         <property name="visible">1</property>
                         <property name="valign">start</property>
                         <property name="reveal-child">1</property>
-                        <child>
+                        <property name="child">
                           <object class="GtkBox">
                             <property name="visible">1</property>
                             <property name="orientation">vertical</property>
@@ -82,7 +86,7 @@
                               </object>
                             </child>
                           </object>
-                        </child>
+                        </property>
                       </object>
                     </child>
                     <child>
@@ -138,15 +142,18 @@
                       </object>
                     </child>
                   </object>
-                </child>
+                </property>
               </object>
             </child>
           </object>
-          <packing>
-            <property name="name">main_grid</property>
-          </packing>
+            </property>
+          </object>
         </child>
         <child>
+          <object class="AdwNavigationPage">
+            <property name="title">folder_page</property>
+            <property name="tag">folder_page</property>
+            <property name="child">
           <object class="GtkBox">
             <property name="visible">1</property>
             <property name="orientation">vertical</property>
@@ -155,14 +162,13 @@
               <class name="phosh-app-grid-folder-page"/>
             </style>
             <child>
-              <object class="GtkBox">
+              <object class="GtkCenterBox">
                 <property name="visible">1</property>
                 <property name="hexpand">1</property>
-                <property name="spacing">6</property>
                 <style>
                   <class name="phosh-app-grid-folder-page-title-box"/>
                 </style>
-                <child>
+                <property name="start-widget">
                   <object class="GtkButton">
                     <property name="visible">1</property>
                     <property name="valign">center</property>
@@ -177,8 +183,8 @@
                       </object>
                     </child>
                   </object>
-                </child>
-                <child type="center">
+                </property>
+                <property name="center-widget">
                   <object class="GtkBox">
                     <property name="visible">1</property>
                     <property name="hexpand">1</property>
@@ -196,7 +202,7 @@
                     </child>
                     <child>
                       <object class="GtkEntry" id="folder_name_entry">
-                        <property name="visible" bind-source="folder_name_btn" bind-property="active" bind-flags="default"/>
+                        <property name="visible" bind-source="folder_name_btn" bind-property="active" bind-flags="default|sync-create"/>
                         <property name="hexpand">1</property>
                         <property name="max-width-chars">48</property>
                         <signal name="activate" handler="on_folder_entry_activated" object="PhoshAppGrid" swapped="yes"/>
@@ -206,8 +212,8 @@
                       </object>
                     </child>
                   </object>
-                </child>
-                <child>
+                </property>
+                <property name="end-widget">
                   <object class="GtkToggleButton" id="folder_name_btn">
                     <property name="visible">1</property>
                     <property name="valign">center</property>
@@ -223,21 +229,21 @@
                       </object>
                     </child>
                   </object>
-                  <packing>
-                    <property name="pack-type">end</property>
-                  </packing>
-                </child>
+                </property>
               </object>
             </child>
             <child>
               <object class="GtkStack" id="folder_stack">
                 <property name="visible">1</property>
                 <child>
+                  <object class="GtkStackPage">
+                    <property name="name">folder_grid</property>
+                    <property name="child">
                   <object class="GtkScrolledWindow">
                     <property name="visible">1</property>
                     <property name="hexpand">1</property>
                     <property name="vexpand">1</property>
-                    <child>
+                    <property name="child">
                       <object class="GtkFlowBox" id="folder_apps">
                         <property name="visible">1</property>
                         <property name="margin-top">12</property>
@@ -252,13 +258,15 @@
                         <property name="column-spacing">6</property>
                         <property name="row-spacing">6</property>
                       </object>
-                    </child>
+                    </property>
                   </object>
-                  <packing>
-                    <property name="name">folder_grid</property>
-                  </packing>
+                    </property>
+                  </object>
                 </child>
                 <child>
+                  <object class="GtkStackPage">
+                    <property name="name">empty_folder</property>
+                    <property name="child">
                   <object class="GtkBox">
                     <property name="visible">1</property>
                     <property name="orientation">vertical</property>
@@ -281,17 +289,20 @@
                       </object>
                     </child>
                   </object>
-                  <packing>
-                    <property name="name">empty_folder</property>
-                  </packing>
+                    </property>
+                  </object>
                 </child>
               </object>
             </child>
+            </object>
+          </property>
           </object>
-          <packing>
-            <property name="name">folder_page</property>
-          </packing>
         </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkEventControllerKey" id="key_controller">
+        <signal name="key-pressed" handler="on_key_pressed" swapped="true"/>
       </object>
     </child>
   </template>

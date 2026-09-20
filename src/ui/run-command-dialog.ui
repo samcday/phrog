@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshRunCommandDialog" parent="PhoshSystemModalDialog">
     <property name="title" translatable="yes">Run Command</property>
     <signal name="dialog-canceled" handler="on_run_command_dialog_canceled"/>
@@ -12,7 +12,7 @@
         <child>
           <object class="GtkEntry" id="entry_command">
             <property name="visible">1</property>
-            <property name="can-focus">1</property>
+            <property name="focusable">1</property>
             <property name="width-request">240</property>
             <signal name="activate" handler="on_activated" swapped="true"/>
           </object>

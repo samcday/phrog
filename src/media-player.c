@@ -22,8 +22,6 @@
 
 #include <glib/gi18n.h>
 
-#include <handy.h>
-
 #define ART_PIXEL_SIZE 48
 #define SEEK_SECOND 1000000
 #define SEEK_BACK (-10 * SEEK_SECOND)
@@ -160,15 +158,14 @@ update_position (PhoshMediaPlayer *self)
 {
   PhoshMediaPlayerPrivate *priv = phosh_media_player_get_instance_private (self);
   g_autofree char *position_text = NULL;
-  double level = 0.0;
+  double level;
 
   if (priv->track_position >= 0)
     position_text = cui_call_format_duration ((double) priv->track_position / G_USEC_PER_SEC);
 
   gtk_label_set_label (GTK_LABEL (priv->lbl_position), position_text ?: "-");
 
-  if (priv->track_position > 0 && priv->track_length > 0)
-    level = ((double) priv->track_position) / priv->track_length;
+  level = priv->track_position >= 0 ? ((double) priv->track_position) / priv->track_length : 0.0;
   gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (priv->prb_position), level);
 }
 
@@ -838,6 +835,8 @@ phosh_media_player_dispose (GObject *object)
   g_clear_object (&priv->player);
 
   g_clear_pointer (&priv->url, g_free);
+
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_MEDIA_PLAYER);
 
   G_OBJECT_CLASS (phosh_media_player_parent_class)->dispose (object);
 }

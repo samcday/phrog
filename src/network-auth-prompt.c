@@ -45,7 +45,7 @@ struct _PhoshNetworkAuthPrompt
 
   GtkWidget      *wpa_grid;
   GtkWidget      *wpa_password_entry;
-  GcrSecureEntryBuffer *password_buffer;
+  GtkPasswordEntryBuffer *password_buffer;
 
   GtkWidget      *vpn_grid;
 
@@ -165,12 +165,12 @@ network_connection_get_key_type (NMConnection *connection)
 static void
 network_prompt_set_grid (PhoshNetworkAuthPrompt *self, GtkWidget *grid)
 {
-  g_autoptr (GList) children = gtk_container_get_children (GTK_CONTAINER (self->main_box));
+  GtkWidget *child = gtk_widget_get_first_child (self->main_box);
 
-  if (children)
-    gtk_container_remove (GTK_CONTAINER (self->main_box), GTK_WIDGET (children->data));
+  if (child)
+    gtk_box_remove (GTK_BOX (self->main_box), child);
 
-  gtk_container_add (GTK_CONTAINER (self->main_box), grid);
+  gtk_box_append (GTK_BOX (self->main_box), grid);
 }
 
 
@@ -250,7 +250,7 @@ on_network_prompt_password_changed (PhoshNetworkAuthPrompt *self, GtkEntry *entr
   secret = g_object_get_data (G_OBJECT (entry), "secret");
   g_return_if_fail (secret);
   g_free (secret->value);
-  secret->value = g_strdup (gtk_entry_get_text (entry));
+  secret->value = g_strdup (gtk_editable_get_text (GTK_EDITABLE (entry)));
 
   if (!password || !*password)
     return
@@ -262,7 +262,7 @@ on_network_prompt_password_changed (PhoshNetworkAuthPrompt *self, GtkEntry *entr
 static GtkWidget *
 build_credentials_entry (PhoshNetworkAuthPrompt *self, PhoshNMSecret *secret)
 {
-  GtkEntryBuffer *buffer = gcr_secure_entry_buffer_new ();
+  GtkEntryBuffer *buffer = gtk_password_entry_buffer_new ();
   GtkWidget *entry = g_object_new (PHOSH_TYPE_PASSWORD_ENTRY,
                                    "valign", GTK_ALIGN_CENTER,
                                    "hexpand", TRUE,
@@ -282,16 +282,18 @@ build_credentials_entry (PhoshNetworkAuthPrompt *self, PhoshNMSecret *secret)
 static void
 network_prompt_setup_vpn_dialog (PhoshNetworkAuthPrompt *self)
 {
-  g_autoptr (GList) children = NULL;
+  GtkWidget *child;
   gboolean focus = FALSE;
 
   g_return_if_fail (PHOSH_IS_NETWORK_AUTH_PROMPT (self));
 
   network_prompt_set_grid (self, self->vpn_grid);
 
-  children = gtk_container_get_children (GTK_CONTAINER (self->vpn_grid));
-  for (GList *elem = children; elem; elem = elem->next)
-    gtk_container_remove (GTK_CONTAINER (self->vpn_grid), GTK_WIDGET (elem->data));
+  child = gtk_widget_get_first_child (self->vpn_grid);
+  while (child != NULL) {
+    gtk_grid_remove (GTK_GRID (self->vpn_grid), child);
+    child = gtk_widget_get_first_child (self->vpn_grid);
+  }
 
   for (int i = 0; i < self->secrets->len; i++) {
     g_autofree char *l = NULL;
@@ -378,6 +380,15 @@ network_prompt_connect_clicked_cb (PhoshNetworkAuthPrompt *self)
 
 
 static void
+phosh_network_auth_prompt_dispose (GObject *object)
+{
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_NETWORK_AUTH_PROMPT);
+
+  G_OBJECT_CLASS (phosh_network_auth_prompt_parent_class)->dispose (object);
+}
+
+
+static void
 phosh_network_auth_prompt_finalize (GObject *object)
 {
   PhoshNetworkAuthPrompt *self = PHOSH_NETWORK_AUTH_PROMPT (object);
@@ -423,6 +434,7 @@ phosh_network_auth_prompt_class_init (PhoshNetworkAuthPromptClass *klass)
   GObjectClass *object_class = (GObjectClass *)klass;
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
+  object_class->dispose = phosh_network_auth_prompt_dispose;
   object_class->finalize = phosh_network_auth_prompt_finalize;
 
  /**

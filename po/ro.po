@@ -1,14 +1,14 @@
 # Romanian translation for phosh.
 # Copyright (C) 2020 phosh's COPYRIGHT HOLDER
 # This file is distributed under the same license as the phosh package.
-# Antonio Marin <gnmer.6qxyg@slmail.me>, 2024-2026.
+# Antonio Marin <gnmer.6qxyg@slmail.me>, 2024-2025.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: phosh master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/World/Phosh/phosh/issues\n"
-"POT-Creation-Date: 2026-02-04 11:02+0000\n"
-"PO-Revision-Date: 2026-02-04 17:32+0100\n"
+"POT-Creation-Date: 2025-11-27 21:54+0000\n"
+"PO-Revision-Date: 2025-11-28 15:35+0100\n"
 "Last-Translator: Antonio Marin <gnmer.6qxyg@slmail.me>\n"
 "Language-Team: Romanian <gnomero-list@lists.sourceforge.net>\n"
 "Language: ro\n"
@@ -153,17 +153,13 @@ msgstr "Creează un dosar nou"
 msgid "Application"
 msgstr "Aplicație"
 
-#: src/app-grid.c:264
+#: src/app-grid.c:261
 msgid "Show All Apps"
 msgstr "Arată toate aplicațiile"
 
-#: src/app-grid.c:267
+#: src/app-grid.c:264
 msgid "Show Only Mobile Friendly Apps"
 msgstr "Arată numai aplicații pentru mobil"
-
-#: src/audio-manager.c:74
-msgid "Phone Shell Volume Control"
-msgstr "Controlul sunetului"
 
 #. Translators: a battery level in percent
 #: src/bt-device-row.c:81
@@ -246,9 +242,9 @@ msgstr "Oprește"
 #, c-format
 msgid "The system will power off automatically in %d second."
 msgid_plural "The system will power off automatically in %d seconds."
-msgstr[0] "Sistemul se va opri automat după %d secundă."
-msgstr[1] "Sistemul se va opri automat după %d secunde."
-msgstr[2] "Sistemul se va opri automat după %d de secunde."
+msgstr[0] "Sistemul se va opri automat în %d secundă."
+msgstr[1] "Sistemul se va opri automat în %d secunde."
+msgstr[2] "Sistemul se va opri automat în %d de secunde."
 
 #: src/end-session-dialog.c:189
 msgid "Restart"
@@ -258,9 +254,9 @@ msgstr "Repornește"
 #, c-format
 msgid "The system will restart automatically in %d second."
 msgid_plural "The system will restart automatically in %d seconds."
-msgstr[0] "Sistemul va reporni automat după %d secundă."
-msgstr[1] "Sistemul va reporni automat după %d secunde."
-msgstr[2] "Sistemul va reporni automat după %d de secunde."
+msgstr[0] "Sistemul va reporni automat în %d secundă."
+msgstr[1] "Sistemul va reporni automat în %d secunde."
+msgstr[2] "Sistemul va reporni automat în %d de secunde."
 
 #. Translators: quiet and silent are fbd profiles names:
 #. see https://source.puri.sm/Librem5/feedbackd#profiles
@@ -300,11 +296,11 @@ msgid "No"
 msgstr "Nu"
 
 #. give visual feedback on error
-#: src/lockscreen.c:396 src/ui/lockscreen.ui:282
+#: src/lockscreen.c:313 src/ui/lockscreen.ui:282
 msgid "Enter Passcode"
 msgstr "Introdu codul de acces"
 
-#: src/lockscreen.c:1036
+#: src/lockscreen.c:956
 msgid "Checking…"
 msgstr "Se verifică…"
 
@@ -316,16 +312,16 @@ msgstr "Instantaneu de ecran salvat ca „%s”"
 
 #: src/screenshot-manager.c:240
 msgid "Failed to save screenshot"
-msgstr "Nu s-a putut salva instantaneul de ecran"
+msgstr "Nu s-a putut salva instantaneul"
 
 #: src/screenshot-manager.c:244 src/ui/power-menu.ui:199
 msgid "Screenshot"
-msgstr "Instantaneu de ecran"
+msgstr "Instantaneu"
 
 #. Translators: name of the folder beneath ~/Pictures used to store screenshots
 #: src/screenshot-manager.c:554
 msgid "Screenshots"
-msgstr "Instantanee de ecran"
+msgstr "Instantanee"
 
 #. Translators: Name of a screenshot file. The first '%s' is a timestamp
 #. * like "2017-05-21 12-24-03" the 2nd '%s' is a possible suffix in case
@@ -333,30 +329,30 @@ msgstr "Instantanee de ecran"
 #: src/screenshot-manager.c:574
 #, c-format
 msgid "Screenshot from %s%s.png"
-msgstr "Imagine %s%s.png"
+msgstr "Instantaneu de ecran %s%s.png"
 
 #. Translators: Used when the title of a song is unknown
-#: src/media-player.c:691 src/ui/media-player.ui:208
+#: src/media-player.c:690 src/ui/media-player.ui:208
 msgid "Unknown Title"
 msgstr "Titlu necunoscut"
 
 #. Translators: Used when the artist of a song is unknown
-#: src/media-player.c:699 src/ui/media-player.ui:196
+#: src/media-player.c:698 src/ui/media-player.ui:196
 msgid "Unknown Artist"
 msgstr "Artist necunoscut"
 
-#: src/monitor-manager.c:129
+#: src/monitor-manager.c:128
 msgid "Built-in display"
 msgstr "Ecran integrat"
 
-#: src/monitor-manager.c:147
+#: src/monitor-manager.c:146
 #, c-format
 msgctxt ""
 "This is a monitor vendor name, followed by a size in inches, like 'Dell 15\"'"
 msgid "%s %s"
 msgstr "%s %s"
 
-#: src/monitor-manager.c:154
+#: src/monitor-manager.c:153
 #, c-format
 msgctxt ""
 "This is a monitor vendor name followed by product/model name where size in "
@@ -365,7 +361,7 @@ msgid "%s %s"
 msgstr "%s %s"
 
 #. Translators: An unknown monitor type
-#: src/monitor-manager.c:163
+#: src/monitor-manager.c:162
 msgid "Unknown"
 msgstr "Necunoscut"
 
@@ -501,17 +497,17 @@ msgstr[0] "Aproape %d an"
 msgstr[1] "Aproape %d ani"
 msgstr[2] "Aproape %d ani"
 
-#: src/polkit-auth-agent.c:275
+#: src/polkit-auth-agent.c:271
 msgid "Authentication dialog was dismissed by the user"
 msgstr "Fereastra de autentificare a fost închisă de utilizator"
 
-#: src/polkit-auth-prompt.c:382 src/ui/gtk-mount-prompt.ui:17
-#: src/ui/network-auth-prompt.ui:69 src/ui/polkit-auth-prompt.ui:44
+#: src/polkit-auth-prompt.c:275 src/ui/gtk-mount-prompt.ui:17
+#: src/ui/network-auth-prompt.ui:69 src/ui/polkit-auth-prompt.ui:45
 #: src/ui/system-prompt.ui:28
 msgid "Password:"
 msgstr "Parola:"
 
-#: src/polkit-auth-prompt.c:429
+#: src/polkit-auth-prompt.c:322
 msgid "Sorry, that didn’t work. Please try again."
 msgstr "Nu a funcționat. Încearcă din nou."
 
@@ -542,6 +538,10 @@ msgstr "Apasă ESC pentru a închide"
 msgid "Running '%s' failed"
 msgstr "Executarea „%s” a eșuat"
 
+#: src/settings/audio-settings.c:376
+msgid "Phone Shell Volume Control"
+msgstr "Controlul sunetului"
+
 #: src/system-prompt.c:376
 msgid "Passwords do not match."
 msgstr "Parolele nu se potrivesc."
@@ -550,7 +550,7 @@ msgstr "Parolele nu se potrivesc."
 msgid "Password cannot be blank"
 msgstr "Parola nu poate fi goală"
 
-#: src/torch-info.c:84
+#: src/torch-info.c:80
 msgid "Torch"
 msgstr "Lanternă"
 
@@ -656,7 +656,7 @@ msgstr "Reacții"
 msgid "Do not disturb"
 msgstr "Nu deranja"
 
-#: src/ui/feedback-status-page.ui:53
+#: src/ui/feedback-status-page.ui:52
 msgid "Feedback Settings"
 msgstr "Opțiuni pentru reacții"
 
@@ -698,7 +698,7 @@ msgstr "_Anulează"
 msgid "C_onnect"
 msgstr "C_onectează"
 
-#: src/ui/polkit-auth-prompt.ui:96
+#: src/ui/polkit-auth-prompt.ui:97
 msgid "Authenticate"
 msgstr "Autentificare"
 
@@ -755,7 +755,7 @@ msgid "Wi-Fi"
 msgstr "Wi-Fi"
 
 #: src/ui/wifi-status-page.ui:89
-#: plugins/wifi-hotspot-quick-setting/status-page.ui:85
+#: plugins/wifi-hotspot-quick-setting/status-page.ui:73
 msgid "Wi-Fi Settings"
 msgstr "Opțiuni Wi-Fi"
 
@@ -826,13 +826,9 @@ msgstr "Pornit"
 msgid "Caffeine timers"
 msgstr "Timpi Cafeină"
 
-#: plugins/caffeine-quick-setting/qs.ui:38
+#: plugins/caffeine-quick-setting/qs.ui:37
 msgid "No caffeine intervals"
 msgstr "Niciun interval Cafeină"
-
-#: plugins/caffeine-quick-setting/qs.ui:55
-msgid "Caffeine Settings"
-msgstr "Opțiuni Cafeină"
 
 #: plugins/caffeine-quick-setting/prefs/caffeine-quick-setting-prefs.c:253
 #: plugins/caffeine-quick-setting/prefs/prefs.ui:171
@@ -1195,7 +1191,7 @@ msgstr "Se termină"
 msgid "Untitled event"
 msgstr "Eveniment fără titlu"
 
-#: plugins/upcoming-events/upcoming-events.c:408
+#: plugins/upcoming-events/upcoming-events.c:372
 #, c-format
 msgid "No events for the next %d days"
 msgstr "Niciun eveniment pentru următoarele %d zile"
@@ -1236,14 +1232,14 @@ msgstr "%d%%"
 msgid "Wi-Fi Hotspot"
 msgstr "Punct de acces Wi-Fi"
 
-#: plugins/wifi-hotspot-quick-setting/status-page.ui:71
+#: plugins/wifi-hotspot-quick-setting/status-page.ui:59
 msgid "Turn On"
 msgstr "Pornește"
 
-#: plugins/wifi-hotspot-quick-setting/wifi-hotspot-quick-setting.c:80
+#: plugins/wifi-hotspot-quick-setting/wifi-hotspot-quick-setting.c:76
 msgid "Hotspot On"
 msgstr "Punct de acces Activ"
 
-#: plugins/wifi-hotspot-quick-setting/wifi-hotspot-quick-setting.c:82
+#: plugins/wifi-hotspot-quick-setting/wifi-hotspot-quick-setting.c:78
 msgid "Hotspot Off"
 msgstr "Punct de acces Oprit"

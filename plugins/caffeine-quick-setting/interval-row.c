@@ -26,14 +26,14 @@ enum {
 static GParamSpec *props[PROP_LAST_PROP];
 
 struct _PhoshIntervalRow {
-  HdyActionRow  parent;
+  AdwActionRow  parent;
 
   GtkRevealer  *revealer;
   uint          value;
   gboolean      selected;
 };
 
-G_DEFINE_TYPE (PhoshIntervalRow, phosh_interval_row, HDY_TYPE_ACTION_ROW);
+G_DEFINE_TYPE (PhoshIntervalRow, phosh_interval_row, ADW_TYPE_ACTION_ROW);
 
 static void
 phosh_interval_row_set_value (PhoshIntervalRow *self, uint value)
@@ -43,9 +43,9 @@ phosh_interval_row_set_value (PhoshIntervalRow *self, uint value)
   if (value < PHOSH_INTERVAL_ROW_INFINITY_VALUE) {
     g_autofree char *label = cui_call_format_duration ((double) value);
 
-    hdy_preferences_row_set_title (HDY_PREFERENCES_ROW (self), label);
+    adw_preferences_row_set_title (ADW_PREFERENCES_ROW (self), label);
   } else {
-    hdy_preferences_row_set_title (HDY_PREFERENCES_ROW (self), "∞");
+    adw_preferences_row_set_title (ADW_PREFERENCES_ROW (self), "∞");
   }
 
   g_object_bind_property (self,
