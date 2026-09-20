@@ -16,5 +16,4 @@ xmlstarlet ed -L \
 xmlstarlet ed -L \
 	-d '///_:include[@name="Gcr"]' \
 	-d '///_:include[@name="GnomeBluetooth"]' \
-	-d '///doc:format[@name="unknown"]' \
 	Phosh-0.gir
