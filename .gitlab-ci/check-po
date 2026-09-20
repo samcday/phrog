@@ -1,0 +1,25 @@
+#!/bin/bash
+#
+# Copyright (C) 2024 The Phosh developers
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Author: Guido Günther <agx@sigxcpu.org>
+
+cd po/ || exit 1
+# barf on untranslated C files. Seems intltool
+# can't be told to exit with non-zero exit status
+# in this case
+
+if intltool-update -m 2>&1 | grep -E -qs '/.*\.(c|ui|in)'; then
+  intltool-update -m
+  exit 1
+fi
+
+# Check for broken po files
+for file in *.po; do
+  echo -n "Checking ${file}: "
+  msgfmt -v -c "${file}"
+  # Check for errors, msgfmt returns 0 on errors too
+  if msgfmt -c "${file}" 2>&1 | grep -qs 'fatal error'; then
+    exit 1
+  fi
+done

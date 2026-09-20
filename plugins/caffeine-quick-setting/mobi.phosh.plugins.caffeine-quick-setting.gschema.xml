@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="mobi.phosh.plugins.caffeine-quick-setting"
+          path="/mobi/phosh/plugins/caffeine-quick-setting/">
+    <key name="intervals" type="au">
+      <default>[120, 300, 900, 4294967295]</default>
+      <summary>Time intervals for which caffeine can remain on</summary>
+      <description>
+        Various time interval options, during which caffeine will stay on, in seconds.
+      </description>
+    </key>
+
+    <key name="selected-index" type="u">
+      <default>3</default>
+      <summary>Index of selected interval</summary>
+      <description>
+        Corresponding index of the selected interval. If out of bounds,
+        default value of infinity is selected.
+      </description>
+    </key>
+  </schema>
+</schemalist>

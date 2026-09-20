@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# Make sure our binary only exportes the wanted symbols:
+
+BIN=${1:-"_build/src/phosh"}
+
+PHOSH_SYMBOL_PREFIXES='phosh_(shell|wifi|wwan|mpris_manager|media_player|monitor|notification|notify_manager|quick_setting|status_icon|status_page|status_page_placholder|session_manager|util)_'
+
+if objdump -T  $BIN | grep 'g    DF .text' \
+	| grep -v -E " (main$|${PHOSH_SYMBOL_PREFIXES}|gtk_(filter|sort)_list_model_)"; then
+    echo "Found symbols that shouldn't be exported"
+    exit 1
+fi
+
+exit 0

@@ -1,0 +1,11 @@
+[Unit]
+Description=Phosh On Screen Keyboard
+CollectMode=inactive-or-failed
+
+# Pull in the service
+Wants=mobi.phosh.OSK.service
+
+# Require GNOME session and specify startup ordering
+Requisite=gnome-session-initialized.target
+After=mobi.phosh.Shell.target
+After=mobi.phosh.Phrog.target
