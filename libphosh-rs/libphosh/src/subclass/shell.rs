@@ -1,7 +1,8 @@
 use crate::Shell;
 use glib::ffi::GType;
+use glib::object::Cast;
 use glib::translate::*;
-use glib::{prelude::*, subclass::prelude::*, Class, Type};
+use glib::{subclass::prelude::*, Class, Type};
 
 pub trait ShellImpl: ShellImplExt + ObjectImpl {
     fn get_lockscreen_type(&self) -> Type {

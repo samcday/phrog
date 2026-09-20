@@ -12,7 +12,7 @@ macro_rules! skip_assert_initialized {
 
 pub use auto::*;
 pub use ffi;
-// Preserve the generated GTK3 builder API and formatting.
+// Preserve the generated builder API and formatting.
 #[allow(
     unused_imports,
     clippy::empty_line_after_outer_attr,
