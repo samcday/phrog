@@ -50,11 +50,18 @@ fn main() -> anyhow::Result<()> {
         info!("Shell is ready");
     });
 
-    unix_signal_add_local_once(SIGTERM, || {
-        gtk::main_quit();
+    let mut signals = signal_hook::iterator::Signals::new([SIGTERM])?;
+    std::thread::spawn(move || {
+        if signals.into_iter().next().is_none() {
+            return;
+        }
+        // Shuttle the quit over to the main loop thread.
+        glib::MainContext::default().invoke(|| {
+            phrog::quit();
+        });
     });
 
-    gtk::main();
+    phrog::run();
 
     Ok(())
 }

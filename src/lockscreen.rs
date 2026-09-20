@@ -10,7 +10,7 @@ static G_LOG_DOMAIN: &str = "phrog-lockscreen";
 
 glib::wrapper! {
     pub struct Lockscreen(ObjectSubclass<imp::Lockscreen>)
-        @extends libphosh::Lockscreen, gtk::Widget, gtk::Window, gtk::Bin;
+        @extends libphosh::Lockscreen, gtk::Widget, gtk::Accessible, gtk::Buildable, gtk::ConstraintTarget;
 }
 
 impl Lockscreen {
@@ -37,7 +37,7 @@ mod imp {
     use greetd_ipc::codec::SyncCodec;
     use greetd_ipc::{AuthMessageType, ErrorType, Request, Response};
     use gtk::gio::Settings;
-    use gtk::glib::{clone, closure_local, timeout_add_once, ObjectExt, Properties};
+    use gtk::glib::{clone, closure_local, timeout_add_once, Properties};
     use gtk::prelude::SettingsExtManual;
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
@@ -116,49 +116,86 @@ mod imp {
             self_obj.add_extra_page(&usp);
             self_obj.set_default_page(LockscreenPage::Extra);
 
+            // GTK4 removed GtkWidget's "show" signal, which the GTK4 phosh still uses to apply
+            // the default page when the lockscreen appears, and GtkPlain-based layer surfaces
+            // never fire realize/map. The LayerSurface's "configured" signal is the closest
+            // "we are on screen" moment, so use it to land on our extra page.
+            {
+                let weak = self_obj.downgrade();
+                self_obj.connect_closure(
+                    "configured",
+                    false,
+                    glib::RustClosure::new_local(move |_| {
+                        let obj = weak.upgrade()?;
+                        // Only bounce back to the extra page if we're still sitting on the
+                        // info page (i.e. we just appeared, the user hasn't navigated yet).
+                        if obj.page() == LockscreenPage::Info {
+                            obj.set_page(LockscreenPage::Extra);
+                        }
+                        None
+                    }),
+                );
+            }
+
             // Add a signal handler for when Phosh.Lockscreen active page changes.
             // We hook up greetd session initiation/cancellation to this.
-            self_obj.connect_page_notify(clone!(@weak self as this => move |ls| {
-                glib::spawn_future_local(clone!(@weak ls => async move {
-                    // Page is lockscreen, begin greetd conversation.
-                    if ls.page() == LockscreenPage::Unlock {
-                        this.obj().set_default_page(LockscreenPage::Unlock);
-                        this.create_session().await;
-                    } else {
-                        // No longer on unlock, cancel session.
-                        this.obj().set_default_page(LockscreenPage::Extra);
-                        this.cancel_session().await;
-                        this.session.replace(None);
-                        // Make absolutely sure that lockscreen is sensitive again.
-                        // This should already be taken care of elsewhere, but if we somehow hit
-                        // an edge case in the convoluted dance with greetd, we really don't want
-                        // the user to end up with a lockscreen that cannot be interacted with, as
-                        // that deadlocks the whole UI, basically.
-                        this.obj().set_sensitive(true);
-                    }
-                }));
-            }));
+            self_obj.connect_page_notify(clone!(
+                #[weak(rename_to = this)]
+                self,
+                move |ls| {
+                    glib::spawn_future_local(clone!(
+                        #[weak]
+                        ls,
+                        async move {
+                            // Page is lockscreen, begin greetd conversation.
+                            if ls.page() == LockscreenPage::Unlock {
+                                this.obj().set_default_page(LockscreenPage::Unlock);
+                                this.create_session().await;
+                            } else {
+                                // No longer on unlock, cancel session.
+                                this.obj().set_default_page(LockscreenPage::Extra);
+                                this.cancel_session().await;
+                                this.session.replace(None);
+                                // Make absolutely sure that lockscreen is sensitive again.
+                                // This should already be taken care of elsewhere, but if we somehow hit
+                                // an edge case in the convoluted dance with greetd, we really don't want
+                                // the user to end up with a lockscreen that cannot be interacted with, as
+                                // that deadlocks the whole UI, basically.
+                                this.obj().set_sensitive(true);
+                            }
+                        }
+                    ));
+                }
+            ));
 
             // Add a handler for the UserSessionPage notifying of readiness, which happens when
             // all user+sessions on the system have been loaded. At this point we can decide if
             // the "trivial flow" is suitable (jump straight to keypad if there's only one user and
             // session choice available).
-            usp.connect_ready_notify(clone!(@weak self_obj => move |usp| {
-                let shell = Shell::default();
-                let user_count = usp.imp().box_users.children().len();
-                let session_count = shell.sessions().map_or(0, |s| s.n_items());
-                // If there's only one user and one session, set the default + active page to the keypad.
-                if session_count == 1 && user_count == 1 {
-                    self_obj.set_page(LockscreenPage::Unlock);
+            usp.connect_ready_notify(clone!(
+                #[weak]
+                self_obj,
+                move |usp| {
+                    let shell = Shell::default();
+                    let user_count = usp.imp().box_users.observe_children().n_items() as usize;
+                    let session_count = shell.sessions().map_or(0, |s| s.n_items());
+                    // If there's only one user and one session, set the default + active page to the keypad.
+                    if session_count == 1 && user_count == 1 {
+                        self_obj.set_page(LockscreenPage::Unlock);
+                    }
                 }
-            }));
+            ));
 
             usp.connect_closure(
                 "login",
                 false,
-                closure_local!(@watch self_obj => move |_: UserSessionPage| {
-                    self_obj.set_page(LockscreenPage::Unlock);
-                }),
+                closure_local!(
+                    #[watch]
+                    self_obj,
+                    move |_: UserSessionPage| {
+                        self_obj.set_page(LockscreenPage::Unlock);
+                    }
+                ),
             );
 
             self.user_session_page.set(usp).unwrap();
@@ -232,7 +269,7 @@ mod imp {
                 return fake_greetd_interaction(req);
             }
             if self.greetd.borrow().is_none() {
-                self.greetd.set(Some(run_greetd()));
+                self.greetd.replace(Some(run_greetd()));
             }
             let (sender, receiver) = self.greetd.clone().take().unwrap();
             sender.send(req).await.context("send greetd request")?;
@@ -294,7 +331,7 @@ mod imp {
                     Shell::default().fade_out(0);
                     // Keep this timeout in sync with fadeout animation duration in phrog.css
                     timeout_add_once(Duration::from_millis(QUIT_DELAY), || {
-                        gtk::main_quit();
+                        crate::quit();
                     });
                 }
                 Response::Error {
@@ -326,22 +363,23 @@ mod imp {
     }
 
     impl WidgetImpl for Lockscreen {}
-    impl ContainerImpl for Lockscreen {}
-    impl BinImpl for Lockscreen {}
-    impl WindowImpl for Lockscreen {}
     impl LockscreenImpl for Lockscreen {
         fn unlock_submit(&self) {
-            glib::spawn_future_local(clone!(@weak self as this => async move {
-                this.obj().set_unlock_status("Please wait…");
-                this.obj().set_sensitive(false);
-                let mut req = Some(Request::PostAuthMessageResponse {
-                    response: Some(this.obj().pin_entry().to_string())
-                });
-                while let Some(next_req) = req.take() {
-                    req = this.greetd_interaction(next_req).await;
+            glib::spawn_future_local(clone!(
+                #[weak(rename_to = this)]
+                self,
+                async move {
+                    this.obj().set_unlock_status("Please wait…");
+                    this.obj().set_sensitive(false);
+                    let mut req = Some(Request::PostAuthMessageResponse {
+                        response: Some(this.obj().pin_entry().to_string()),
+                    });
+                    while let Some(next_req) = req.take() {
+                        req = this.greetd_interaction(next_req).await;
+                    }
+                    this.obj().clear_pin_entry();
                 }
-                this.obj().clear_pin_entry();
-            }));
+            ));
         }
     }
 }
