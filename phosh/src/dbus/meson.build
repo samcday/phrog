@@ -22,20 +22,6 @@ dbus_client_protos = [
     false,
   ],
   [
-    'accounts-user-dbus',
-    'org.freedesktop.Accounts.User.xml',
-    'org.freedesktop',
-    false,
-    false,
-  ],
-  [
-    'accounts-dbus',
-    'org.freedesktop.Accounts.xml',
-    'org.freedesktop',
-    false,
-    false,
-  ],
-  [
     'geoclue-manager-dbus',
     'org.freedesktop.GeoClue2.Manager.xml',
     'org.freedesktop',

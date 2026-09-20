@@ -13,7 +13,7 @@
 #include "plugin-loader.h"
 #include "widget-box.h"
 
-#include <handy.h>
+#include <adwaita.h>
 #include <glib/gi18n-lib.h>
 
 /**
@@ -48,14 +48,14 @@ G_DEFINE_TYPE (PhoshWidgetBox, phosh_widget_box, GTK_TYPE_BOX)
 static GtkWidget *
 missing_plugin_widget_new (const char *plugin)
 {
-  GtkWidget *widget = hdy_status_page_new ();
+  GtkWidget *widget = adw_status_page_new ();
   g_autofree char *msg = NULL;
 
-  hdy_status_page_set_title (HDY_STATUS_PAGE (widget), _("Plugin not found"));
+  adw_status_page_set_title (ADW_STATUS_PAGE (widget), _("Plugin not found"));
 
-  hdy_status_page_set_icon_name (HDY_STATUS_PAGE (widget), "dialog-error-symbolic");
+  adw_status_page_set_icon_name (ADW_STATUS_PAGE (widget), "dialog-error-symbolic");
   msg = g_strdup_printf (_("The plugin '%s' could not be loaded."), plugin);
-  hdy_status_page_set_description (HDY_STATUS_PAGE (widget), msg);
+  adw_status_page_set_description (ADW_STATUS_PAGE (widget), msg);
 
   return widget;
 }
@@ -64,14 +64,17 @@ missing_plugin_widget_new (const char *plugin)
 static void
 phosh_widget_box_load_widgets (PhoshWidgetBox *self)
 {
-  g_autoptr (GList) children = NULL;
+  int n;
 
   if (self->plugin_loader == NULL)
     return;
 
-  children = gtk_container_get_children (GTK_CONTAINER (self->carousel));
-  for (GList *elem = children; elem; elem = elem->next)
-    gtk_container_remove (GTK_CONTAINER (self->carousel), GTK_WIDGET (elem->data));
+  n = adw_carousel_get_n_pages (ADW_CAROUSEL (self->carousel)) - 1;
+  while (n >= 0) {
+    GtkWidget *child = adw_carousel_get_nth_page (ADW_CAROUSEL (self->carousel), n);
+    adw_carousel_remove (ADW_CAROUSEL (self->carousel), child);
+    n -= 1;
+  }
 
   for (int i = 0; i < g_strv_length (self->plugins); i++) {
     GtkWidget *widget = phosh_plugin_loader_load_plugin (self->plugin_loader, self->plugins[i]);
@@ -83,7 +86,7 @@ phosh_widget_box_load_widgets (PhoshWidgetBox *self)
 
     gtk_widget_set_visible (widget, TRUE);
     gtk_widget_set_hexpand (widget, TRUE);
-    hdy_carousel_insert (HDY_CAROUSEL (self->carousel), widget, -1);
+    adw_carousel_insert (ADW_CAROUSEL (self->carousel), widget, -1);
   }
 }
 
@@ -151,6 +154,15 @@ phosh_widget_box_constructed (GObject *object)
 
 
 static void
+phosh_widget_box_dispose (GObject *object)
+{
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_WIDGET_BOX);
+
+  G_OBJECT_CLASS (phosh_widget_box_parent_class)->dispose (object);
+}
+
+
+static void
 phosh_widget_box_finalize (GObject *object)
 {
   PhoshWidgetBox *self = PHOSH_WIDGET_BOX(object);
@@ -172,6 +184,7 @@ phosh_widget_box_class_init (PhoshWidgetBoxClass *klass)
   object_class->get_property = phosh_widget_box_get_property;
   object_class->set_property = phosh_widget_box_set_property;
   object_class->constructed = phosh_widget_box_constructed;
+  object_class->dispose = phosh_widget_box_dispose;
   object_class->finalize = phosh_widget_box_finalize;
 
   props[PROP_PLUGIN_DIRS] =

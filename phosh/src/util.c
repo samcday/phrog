@@ -46,7 +46,8 @@ static gboolean have_gnome_software = -1;
 void
 phosh_cp_widget_destroy (void *widget)
 {
-  gtk_widget_destroy (GTK_WIDGET (widget));
+  g_return_if_fail (GTK_IS_WINDOW (widget));
+  gtk_window_destroy (GTK_WINDOW (widget));
 }
 
 
@@ -83,12 +84,8 @@ phosh_get_desktop_app_info_for_app_id (const char *app_id)
   if (app_info)
     return g_object_ref (app_info);
 
-  app_info = phosh_app_list_model_lookup_by_exec (model, app_id);
-  if (app_info)
-    return g_object_ref (app_info);
-
   /* try to handle the case where app-id is rev-DNS, but desktop file is not */
-  last_component = strrchr (app_id, '.');
+  last_component = strrchr(app_id, '.');
   if (last_component) {
     /* Skip past '.' */
     last_component++;
@@ -105,10 +102,6 @@ phosh_get_desktop_app_info_for_app_id (const char *app_id)
   g_clear_pointer (&desktop_id, g_free);
 
   app_info = phosh_app_list_model_lookup_by_startup_wm_class (model, lowercase);
-  if (app_info)
-    return g_object_ref (app_info);
-
-  app_info = phosh_app_list_model_lookup_by_exec (model, lowercase);
   if (app_info)
     return g_object_ref (app_info);
 
@@ -459,8 +452,6 @@ phosh_util_gesture_is_touch (GtkGestureSingle *gesture)
   GdkDevice *device;
 
 #define PHOSH_BUTTON_MASK (GDK_BUTTON_PRESS  |   \
-                           GDK_2BUTTON_PRESS |   \
-                           GDK_3BUTTON_PRESS |   \
                            GDK_BUTTON_RELEASE)
 
   g_return_val_if_fail (GTK_IS_GESTURE_SINGLE (gesture), FALSE);
@@ -471,11 +462,10 @@ phosh_util_gesture_is_touch (GtkGestureSingle *gesture)
   if (event == NULL)
     return FALSE;
 
-  if ((event->type & PHOSH_BUTTON_MASK) == 0)
+  if ((gdk_event_get_event_type ((GdkEvent *) event) & PHOSH_BUTTON_MASK) == 0)
     return FALSE;
 
-  device = gdk_event_get_source_device (event);
-
+  device = gtk_gesture_get_device (GTK_GESTURE (gesture));
   if (device == NULL)
     return FALSE;
 
@@ -517,12 +507,10 @@ phosh_util_have_gnome_software (gboolean scan)
 void
 phosh_util_toggle_style_class (GtkWidget *widget, const char *style_class, gboolean toggle)
 {
-  GtkStyleContext *context = gtk_widget_get_style_context (widget);
-
   if (toggle)
-    gtk_style_context_add_class (context, style_class);
+    gtk_widget_add_css_class (widget, style_class);
   else
-    gtk_style_context_remove_class (context, style_class);
+    gtk_widget_remove_css_class (widget, style_class);
 }
 
 
@@ -801,7 +789,6 @@ on_activate_action_dbus_proxy_ready (GObject *source_object, GAsyncResult *res, 
   g_autoptr (GError) err = NULL;
   GCancellable *cancel;
   GVariant *params;
-  gboolean has_actions = FALSE;
 
   proxy = g_dbus_proxy_new_for_bus_finish (res, &err);
   if (proxy == NULL) {
@@ -810,12 +797,9 @@ on_activate_action_dbus_proxy_ready (GObject *source_object, GAsyncResult *res, 
   }
 
   params = g_task_get_task_data (task);
-  if (g_variant_is_of_type (params,  G_VARIANT_TYPE ("(sava{sv})")))
-    has_actions = TRUE;
-
   cancel = g_task_get_cancellable (task);
   g_dbus_proxy_call (proxy,
-                     has_actions ? "ActivateAction" : "Activate",
+                     "ActivateAction",
                      params,
                      G_DBUS_CALL_FLAGS_NONE,
                      -1,
@@ -824,52 +808,33 @@ on_activate_action_dbus_proxy_ready (GObject *source_object, GAsyncResult *res, 
                      g_steal_pointer (&task));
 }
 
-
-
-static char *
-app_path_for_id (const char *app_id)
-{
-  char *path;
-  int i;
-
-  path = g_strconcat ("/", app_id, NULL);
-  for (i = 0; path[i]; i++) {
-    if (path[i] == '.')
-      path[i] = '/';
-    if (path[i] == '-')
-      path[i] = '_';
-  }
-
-  return path;
-}
-
 /**
  * phosh_util_activate_action:
  * @info: The app info
- * @action:(nullable): The action name
+ * @action: The action name
  * @params:(nullable): The action parameters
  * @cancel:(nullable): A cancellable
  * @callback:(scope async): The callback to invoked
  * @user_data:(nullable): user data
  *
- * Asynchronously activate the given app corresponding to `info` and
- * invoke the given action on it. If `action` is `NULL` the app is merely
- * activated.
+ * Asynchronously invoke the given action on the app corresponding to
+ * `info`.
  */
-void
+static void
 phosh_util_activate_action (GAppInfo           *info,
                             const char         *action,
                             GVariant           *params,
+                            const char         *object_path,
                             GCancellable       *cancellable,
                             GAsyncReadyCallback callback,
                             gpointer            user_data)
 {
   g_autoptr (GTask) task = NULL;
   g_autoptr (GVariant) args = NULL;
-  g_autofree char *app_id = NULL, *object_path = NULL;
+  g_autofree char *app_id = NULL;
 
   g_return_if_fail (G_IS_APP_INFO (info) || info == NULL);
-  g_return_if_fail (!action || !gm_str_is_null_or_empty (action));
+  g_return_if_fail (!gm_str_is_null_or_empty (action));
   g_return_if_fail (params == NULL || g_variant_is_of_type (params,  G_VARIANT_TYPE ("av")));
 
   app_id = phosh_strip_suffix_from_app_id (g_app_info_get_id (info));
@@ -878,21 +843,16 @@ phosh_util_activate_action (GAppInfo           *info,
   task = g_task_new (NULL, cancellable, callback, user_data);
   g_task_set_source_tag (task, phosh_util_activate_action);
 
-  if (action) {
-    if (!params)
-      params = g_variant_new ("av", NULL);
+  if (!params)
+    params = g_variant_new("av", NULL);
 
-    /* Sink ref so we can use `g_variant_unref` for the task's `destroy_notify` */
-    args = g_variant_ref_sink (g_variant_new ("(s@av@a{sv})",
-                                              action,
-                                              params,
-                                              phosh_util_get_platform_data (info)));
-  } else {
-    args = g_variant_ref_sink (g_variant_new ("(@a{sv})", phosh_util_get_platform_data (info)));
-  }
+  /* Sink ref so we can use `g_variant_unref` for the task's `destroy_notify` */
+  args = g_variant_ref_sink (g_variant_new ("(s@av@a{sv})",
+                                            action,
+                                            params,
+                                            phosh_util_get_platform_data (info)));
   g_task_set_task_data (task, g_steal_pointer (&args), (GDestroyNotify) g_variant_unref);
 
-  object_path = app_path_for_id (app_id);
   g_dbus_proxy_new_for_bus (G_BUS_TYPE_SESSION,
                             G_DBUS_PROXY_FLAGS_NONE,
                             NULL,
@@ -915,7 +875,7 @@ phosh_util_activate_action (GAppInfo           *info,
  *
  * Completes the async operation started with `phosh_util_activate_action`.
  */
-gboolean
+static gboolean
 phosh_util_activate_action_finish (GAsyncResult *res, GError **err)
 {
   g_return_val_if_fail (G_IS_ASYNC_RESULT (res), FALSE);
@@ -927,7 +887,6 @@ phosh_util_activate_action_finish (GAsyncResult *res, GError **err)
 /**
  * phosh_util_open_settings_panel:
  * @panel: A settings panel name
- * @params: Panel specific parameters, can be empty but not null
  * @mobile: panel is in mobile settings app
  * @cancellable:(nullable): A cancellable
  * @callback:(scope async): The callback to invoke when the async operation finished
@@ -936,32 +895,31 @@ phosh_util_activate_action_finish (GAsyncResult *res, GError **err)
  */
 void
 phosh_util_open_settings_panel (const char         *panel,
-                                GVariant           *params,
                                 gboolean            mobile,
                                 GCancellable       *cancellable,
                                 GAsyncReadyCallback callback,
                                 gpointer            user_data)
 {
   g_autoptr (GDesktopAppInfo) info = NULL;
-  const char *action;
+  const char *object_path, *action;
   GVariantBuilder builder;
-
-  g_return_if_fail (params != NULL);
 
   if (mobile) {
     info = g_desktop_app_info_new ("mobi.phosh.MobileSettings.desktop");
+    object_path = "/mobi/phosh/MobileSettings";
     action = "set-panel";
   } else {
     info = g_desktop_app_info_new ("org.gnome.Settings.desktop");
+    object_path = "/org/gnome/Settings";
     action = "launch-panel";
   }
 
   g_variant_builder_init_static (&builder, G_VARIANT_TYPE ("av"));
-  g_variant_builder_add (&builder, "v", g_variant_new ("(s@av)", panel, params));
-
+  g_variant_builder_add (&builder, "v", g_variant_new ("(sav)", panel, NULL));
   phosh_util_activate_action (G_APP_INFO (info),
                               action,
                               g_variant_builder_end (&builder),
+                              object_path,
                               cancellable,
                               callback,
                               user_data);

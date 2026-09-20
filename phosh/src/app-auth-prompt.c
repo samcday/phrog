@@ -13,7 +13,7 @@
 #include "app-auth-prompt.h"
 #include "auth-prompt-option.h"
 
-#include <handy.h>
+#include <adwaita.h>
 #include <glib/gi18n.h>
 
 /**
@@ -181,7 +181,7 @@ add_switch_option ( PhoshAppAuthPrompt *self,
   GtkWidget *action_row_choice;
   GtkWidget *switch_choice;
 
-  action_row_choice = g_object_new (HDY_TYPE_ACTION_ROW,
+  action_row_choice = g_object_new (ADW_TYPE_ACTION_ROW,
                                     "visible", TRUE,
                                     "title", choice_label,
                                     "activatable", TRUE,
@@ -189,23 +189,17 @@ add_switch_option ( PhoshAppAuthPrompt *self,
                                     NULL);
   g_object_set_data_full (G_OBJECT (action_row_choice), "choice-id", g_strdup (choice_id), g_free);
   gtk_widget_set_visible (action_row_choice, TRUE);
-  hdy_preferences_row_set_title (HDY_PREFERENCES_ROW (action_row_choice), choice_label);
+  adw_preferences_row_set_title (ADW_PREFERENCES_ROW (action_row_choice), choice_label);
 
   switch_choice = g_object_new (GTK_TYPE_SWITCH,
                                 "visible", TRUE,
                                 "halign", GTK_ALIGN_CENTER,
                                 "valign", GTK_ALIGN_CENTER,
                                 NULL);
-  hdy_action_row_set_activatable_widget (HDY_ACTION_ROW (action_row_choice), switch_choice);
-  gtk_container_add (GTK_CONTAINER (action_row_choice), switch_choice);
+  adw_action_row_set_activatable_widget (ADW_ACTION_ROW (action_row_choice), switch_choice);
+  adw_action_row_add_suffix (ADW_ACTION_ROW (action_row_choice), switch_choice);
 
-  gtk_container_add (GTK_CONTAINER (self->list_box_choices), action_row_choice);
-}
-
-static char *
-get_choice_option_name (gpointer item, gpointer unused) {
-  PhoshAuthPromptOption *option = PHOSH_AUTH_PROMPT_OPTION (item);
-  return g_strdup (phosh_auth_prompt_option_get_label (option));
+  gtk_list_box_append (GTK_LIST_BOX (self->list_box_choices), action_row_choice);
 }
 
 static void
@@ -221,11 +215,12 @@ add_combo_option (PhoshAppAuthPrompt *self,
   char *option_label;
   GListStore *store;
   GtkWidget *combo_row_options;
+  g_autoptr (GtkExpression) expr = NULL;
 
-  combo_row_options = hdy_combo_row_new ();
+  combo_row_options = adw_combo_row_new ();
   g_object_set_data_full (G_OBJECT (combo_row_options), "choice-id", g_strdup (choice_id), g_free);
   gtk_widget_set_visible (combo_row_options, TRUE);
-  hdy_preferences_row_set_title (HDY_PREFERENCES_ROW (combo_row_options), choice_label);
+  adw_preferences_row_set_title (ADW_PREFERENCES_ROW (combo_row_options), choice_label);
   gtk_list_box_row_set_activatable (GTK_LIST_BOX_ROW (combo_row_options), TRUE);
   gtk_list_box_row_set_selectable (GTK_LIST_BOX_ROW (combo_row_options), FALSE);
 
@@ -243,13 +238,12 @@ add_combo_option (PhoshAppAuthPrompt *self,
     g_object_unref (option);
     index += 1;
   }
-  hdy_combo_row_bind_name_model (HDY_COMBO_ROW (combo_row_options),
-                                 G_LIST_MODEL (store),
-                                 get_choice_option_name,
-                                 NULL,
-                                 NULL);
-  hdy_combo_row_set_selected_index (HDY_COMBO_ROW (combo_row_options), selected_index);
-  gtk_container_add (GTK_CONTAINER (self->list_box_choices), combo_row_options);
+  expr = gtk_property_expression_new (G_TYPE_STRING, NULL, "label");
+  adw_combo_row_set_expression (ADW_COMBO_ROW (combo_row_options), expr);
+  adw_combo_row_set_model (ADW_COMBO_ROW (combo_row_options),
+                           G_LIST_MODEL (store));
+  adw_combo_row_set_selected (ADW_COMBO_ROW (combo_row_options), selected_index);
+  gtk_list_box_append (GTK_LIST_BOX (self->list_box_choices), combo_row_options);
 }
 
 
@@ -259,22 +253,31 @@ add_choice_to_gvariant (GtkWidget *child, gpointer builder)
   GVariant *choice[2];
 
   choice[0] = g_variant_new_string (g_object_get_data (G_OBJECT (child), "choice-id"));
-  if (HDY_IS_COMBO_ROW (child)) {
-    HdyComboRow *row = HDY_COMBO_ROW (child);
-    GListModel *model = hdy_combo_row_get_model (row);
-    gint selected_index = hdy_combo_row_get_selected_index (row);
+  if (ADW_IS_COMBO_ROW (child)) {
+    AdwComboRow *row = ADW_COMBO_ROW (child);
+    GListModel *model = adw_combo_row_get_model (row);
+    gint selected_index = adw_combo_row_get_selected (row);
     PhoshAuthPromptOption *option = (PhoshAuthPromptOption*) g_list_model_get_item (model, selected_index);
 
     if (option != NULL) {
       choice[1] = g_variant_new_string (phosh_auth_prompt_option_get_id (option));
     }
   } else {
-    HdyActionRow *row = HDY_ACTION_ROW (child);
-    GtkSwitch *gtk_switch = GTK_SWITCH (hdy_action_row_get_activatable_widget (row));
+    AdwActionRow *row = ADW_ACTION_ROW (child);
+    GtkSwitch *gtk_switch = GTK_SWITCH (adw_action_row_get_activatable_widget (row));
 
     choice[1] = g_variant_new_string (gtk_switch_get_state(gtk_switch) ? "true" : "false");
   }
   g_variant_builder_add_value ((GVariantBuilder*) builder, g_variant_new_tuple (choice, 2));
+}
+
+
+static void
+phosh_app_auth_prompt_dispose (GObject *obj)
+{
+  gtk_widget_dispose_template (GTK_WIDGET (obj), PHOSH_TYPE_APP_AUTH_PROMPT);
+
+  G_OBJECT_CLASS (phosh_app_auth_prompt_parent_class)->dispose (obj);
 }
 
 
@@ -299,8 +302,6 @@ phosh_app_auth_prompt_constructed (GObject *object)
   PhoshAppAuthPrompt *self = PHOSH_APP_AUTH_PROMPT (object);
 
   G_OBJECT_CLASS (phosh_app_auth_prompt_parent_class)->constructed (object);
-
-  gtk_widget_grab_default (self->btn_grant);
 
   if (self->choices != NULL) {
     GVariantIter iter_choices;
@@ -339,6 +340,7 @@ phosh_app_auth_prompt_class_init (PhoshAppAuthPromptClass *klass)
   object_class->get_property = phosh_app_auth_prompt_get_property;
   object_class->set_property = phosh_app_auth_prompt_set_property;
   object_class->constructed = phosh_app_auth_prompt_constructed;
+  object_class->dispose = phosh_app_auth_prompt_dispose;
   object_class->finalize = phosh_app_auth_prompt_finalize;
 
   props[PROP_ICON] =
@@ -466,13 +468,21 @@ phosh_app_auth_prompt_get_grant_access (GtkWidget *self)
 GVariant* phosh_app_auth_prompt_get_selected_choices (GtkWidget *self)
 {
   GVariantBuilder builder;
+  guint i;
+  GtkListBoxRow *row;
+  GtkWidget *child;
 
   g_return_val_if_fail (PHOSH_IS_APP_AUTH_PROMPT (self), NULL);
   g_variant_builder_init (&builder, G_VARIANT_TYPE ("a(ss)"));
-  gtk_container_foreach (
-    GTK_CONTAINER ( PHOSH_APP_AUTH_PROMPT (self)->list_box_choices),
-    add_choice_to_gvariant,
-    &builder
-  );
+
+  i = 0;
+  row = gtk_list_box_get_row_at_index (GTK_LIST_BOX (PHOSH_APP_AUTH_PROMPT (self)->list_box_choices), i);
+  while (row != NULL) {
+    child = gtk_list_box_row_get_child (row);
+    add_choice_to_gvariant (child, &builder);
+    i += 1;
+    row = gtk_list_box_get_row_at_index (GTK_LIST_BOX (PHOSH_APP_AUTH_PROMPT (self)->list_box_choices), i);
+  }
+
   return g_variant_builder_end (&builder);
 }

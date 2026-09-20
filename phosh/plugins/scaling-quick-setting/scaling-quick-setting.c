@@ -53,14 +53,11 @@ static void
 fill_scales (PhoshScalingQuickSetting *self, guint32 width, guint32 height)
 {
   int n_scales;
-  g_autoptr (GList) children = NULL;
   g_autofree float *scales = NULL;
 
   scales = phosh_util_calculate_supported_mode_scales (width, height, &n_scales, TRUE);
 
-  children = gtk_container_get_children (GTK_CONTAINER (self->list_box));
-  for (GList *child = children; child; child = child->next)
-    gtk_container_remove (GTK_CONTAINER (self->list_box), child->data);
+  gtk_list_box_remove_all (self->list_box);
 
   for (int i = 0; i < n_scales; i++) {
     gboolean selected = G_APPROX_VALUE (self->scale, scales[i], FLT_EPSILON);
@@ -180,7 +177,7 @@ phosh_scaling_quick_setting_class_init (PhoshScalingQuickSettingClass *klass)
 {
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
-  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_default (),
+  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_for_display (gdk_display_get_default ()),
                                     "/mobi/phosh/plugins/scaling-quick-setting/icons");
 
   gtk_widget_class_set_template_from_resource (widget_class,

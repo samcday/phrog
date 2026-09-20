@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshUpcomingEvents" parent="GtkBox">
     <property name="orientation">vertical</property>
     <property name="margin-start">12</property>
@@ -23,32 +23,36 @@
           <object class="GtkStack" id="stack">
             <property name="visible">1</property>
             <child>
-              <object class="HdyStatusPage">
+              <object class="GtkStackPage">
+                <property name="name">no-events</property>
+                <property name="child">
+              <object class="AdwStatusPage">
                 <property name="visible">1</property>
                 <property name="title" translatable="yes">No upcoming events</property>
                 <property name="icon-name">x-office-calendar-symbolic</property>
                 <property name="vexpand">1</property>
                 <property name="valign">center</property>
               </object>
-              <packing>
-                <property name="name">no-events</property>
-              </packing>
+                </property>
+              </object>
             </child>
             <child>
+              <object class="GtkStackPage">
+                <property name="name">events-window</property>
+                <property name="child">
               <object class="GtkScrolledWindow">
                 <property name="visible">1</property>
                 <property name="hscrollbar-policy">never</property>
                 <property name="propagate-natural-height">1</property>
-                <child>
+                <property name="child">
                   <object class="GtkListBox" id="events_box">
                     <property name="visible">1</property>
                     <property name="selection-mode">none</property>
                   </object>
-                </child>
+                </property>
               </object>
-              <packing>
-                <property name="name">events-window</property>
-              </packing>
+                </property>
+              </object>
             </child>
           </object>
         </child>

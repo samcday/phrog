@@ -11,7 +11,7 @@
 #include "ticket-row.h"
 
 #include <glib/gi18n.h>
-#include <handy.h>
+#include <adwaita.h>
 
 enum {
   PROP_0,
@@ -22,11 +22,11 @@ static GParamSpec *props[PROP_LAST_PROP];
 
 
 struct _PhoshTicketRow {
-  HdyActionRow parent;
+  AdwActionRow parent;
 
   PhoshTicket *ticket;
 };
-G_DEFINE_TYPE (PhoshTicketRow, phosh_ticket_row, HDY_TYPE_ACTION_ROW)
+G_DEFINE_TYPE (PhoshTicketRow, phosh_ticket_row, ADW_TYPE_ACTION_ROW)
 
 
 static void
@@ -40,10 +40,11 @@ phosh_ticket_row_set_property (GObject      *object,
   switch (property_id) {
   case PROP_TICKET:
     self->ticket = g_value_dup_object (value);
-    hdy_preferences_row_set_title (HDY_PREFERENCES_ROW (self),
+    adw_preferences_row_set_title (ADW_PREFERENCES_ROW (self),
                                    phosh_ticket_get_display_name (self->ticket));
 /* TODO: by document type */
-    hdy_action_row_set_icon_name (HDY_ACTION_ROW (self), "x-office-document-symbolic");
+    adw_action_row_add_prefix (ADW_ACTION_ROW (self),
+                               gtk_image_new_from_icon_name ("x-office-document-symbolic"));
     break;
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);

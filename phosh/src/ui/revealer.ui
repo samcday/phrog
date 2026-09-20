@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
-  <template class="PhoshRevealer" parent="GtkBin">
+  <requires lib="gtk" version="4.0"/>
+  <template class="PhoshRevealer" parent="GtkWidget">
     <property name="visible">1</property>
     <child>
       <object class="GtkRevealer" id="revealer">

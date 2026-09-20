@@ -106,13 +106,13 @@ build_2x2_grid_icon (PhoshAppGridFolderButton *self)
     icon = g_app_info_get_icon (app_info);
 
     if (icon == NULL) {
-      image = gtk_image_new_from_icon_name (PHOSH_APP_UNKNOWN_ICON, -1);
+      image = gtk_image_new_from_icon_name (PHOSH_APP_UNKNOWN_ICON);
     } else {
       if (G_IS_THEMED_ICON (icon)) {
         g_themed_icon_append_name (G_THEMED_ICON (icon),
                                    PHOSH_APP_UNKNOWN_ICON);
       }
-      image = gtk_image_new_from_gicon (icon, -1);
+      image = gtk_image_new_from_gicon (icon);
     }
 
     /* app-grid-button uses 64px for its icon.
@@ -132,6 +132,8 @@ phosh_app_grid_folder_button_dispose (GObject *object)
   PhoshAppGridFolderButton *self = PHOSH_APP_GRID_FOLDER_BUTTON (object);
 
   g_clear_object (&self->folder_info);
+
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_APP_GRID_FOLDER_BUTTON);
 
   G_OBJECT_CLASS (phosh_app_grid_folder_button_parent_class)->dispose (object);
 }

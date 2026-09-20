@@ -10,7 +10,7 @@
 
 #include "phosh-config.h"
 
-#include "audio/audio-device.h"
+#include "audio-device.h"
 #include "audio-device-row.h"
 
 /**
@@ -122,6 +122,8 @@ phosh_audio_device_row_dispose (GObject *object)
   PhoshAudioDeviceRow *self = PHOSH_AUDIO_DEVICE_ROW(object);
 
   g_clear_object (&self->audio_device);
+
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_AUDIO_DEVICE_ROW);
 
   G_OBJECT_CLASS (phosh_audio_device_row_parent_class)->dispose (object);
 }

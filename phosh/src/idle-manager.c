@@ -13,7 +13,6 @@
 #include "idle-manager.h"
 #include "shell-priv.h"
 
-#include <gdk/gdkwayland.h>
 
 /**
  * PhoshIdleManager:

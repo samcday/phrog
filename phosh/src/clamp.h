@@ -12,7 +12,7 @@ G_BEGIN_DECLS
 
 #define PHOSH_TYPE_CLAMP (phosh_clamp_get_type())
 
-G_DECLARE_FINAL_TYPE (PhoshClamp, phosh_clamp, PHOSH, CLAMP, GtkBin)
+G_DECLARE_FINAL_TYPE (PhoshClamp, phosh_clamp, PHOSH, CLAMP, GtkWidget)
 
 GtkWidget *phosh_clamp_new (void);
 gint phosh_clamp_get_natural_size (PhoshClamp *self);

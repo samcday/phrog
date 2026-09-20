@@ -184,9 +184,7 @@ static void
 launch_action_else_emit (PhoshQuickSetting *self)
 {
   PhoshQuickSettingPrivate *priv = phosh_quick_setting_get_instance_private (self);
-  GActionGroup *group;
   GVariant *param = NULL;
-  g_auto (GStrv) str_array = NULL;
 
   if (priv->long_press_action_name == NULL) {
     g_signal_emit (self, signals[LONG_PRESSED], 0);
@@ -196,15 +194,7 @@ launch_action_else_emit (PhoshQuickSetting *self)
   if (priv->long_press_action_target != NULL)
     param = g_variant_new_parsed (priv->long_press_action_target, NULL);
 
-  str_array = g_strsplit (priv->long_press_action_name, ".", 2);
-  if (g_strv_length (str_array) != 2) {
-    g_warning ("Malformed action-name %s", priv->long_press_action_name);
-    return;
-  }
-
-  group = gtk_widget_get_action_group (GTK_WIDGET (self), str_array[0]);
-  g_return_if_fail (group);
-  g_action_group_activate_action (group, str_array[1], param);
+  gtk_widget_activate_action_variant (GTK_WIDGET (self), priv->long_press_action_name, param);
 }
 
 
@@ -260,6 +250,19 @@ on_status_page_done (PhoshQuickSetting *self)
 
 
 static void
+phosh_quick_setting_dispose (GObject *object)
+{
+  PhoshQuickSetting *self = PHOSH_QUICK_SETTING (object);
+
+  phosh_quick_setting_set_status_icon (self, NULL);
+
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_QUICK_SETTING);
+
+  G_OBJECT_CLASS (phosh_quick_setting_parent_class)->dispose (object);
+}
+
+
+static void
 phosh_quick_setting_finalize (GObject *object)
 {
   PhoshQuickSetting *self = PHOSH_QUICK_SETTING (object);
@@ -274,17 +277,6 @@ phosh_quick_setting_finalize (GObject *object)
 
 
 static void
-phosh_quick_setting_destroy (GtkWidget *widget)
-{
-  PhoshQuickSetting *self = PHOSH_QUICK_SETTING (widget);
-
-  phosh_quick_setting_set_status_icon (self, NULL);
-
-  GTK_WIDGET_CLASS (phosh_quick_setting_parent_class)->destroy (widget);
-}
-
-
-static void
 phosh_quick_setting_class_init (PhoshQuickSettingClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
@@ -292,9 +284,8 @@ phosh_quick_setting_class_init (PhoshQuickSettingClass *klass)
 
   object_class->set_property = phosh_quick_setting_set_property;
   object_class->get_property = phosh_quick_setting_get_property;
+  object_class->dispose = phosh_quick_setting_dispose;
   object_class->finalize = phosh_quick_setting_finalize;
-
-  widget_class->destroy = phosh_quick_setting_destroy;
 
   /**
    * PhoshQuickSetting:active:
@@ -466,7 +457,7 @@ phosh_quick_setting_set_showing_status (PhoshQuickSetting *self, gboolean showin
   else
     icon_name = "go-next-symbolic";
 
-  gtk_image_set_from_icon_name (priv->arrow, icon_name, -1);
+  gtk_image_set_from_icon_name (priv->arrow, icon_name);
 
   g_object_notify_by_pspec (G_OBJECT (self), props[PROP_SHOWING_STATUS]);
 }
@@ -540,7 +531,7 @@ phosh_quick_setting_set_status_icon (PhoshQuickSetting *self, PhoshStatusIcon *s
   if (priv->status_icon) {
     g_clear_pointer (&priv->label_binding, g_binding_unbind);
     g_clear_pointer (&priv->active_binding, g_binding_unbind);
-    gtk_container_remove (GTK_CONTAINER (priv->box), GTK_WIDGET (priv->status_icon));
+    gtk_box_remove (priv->box, GTK_WIDGET (priv->status_icon));
   }
 
   priv->status_icon = status_icon;
@@ -559,8 +550,7 @@ phosh_quick_setting_set_status_icon (PhoshQuickSetting *self, PhoshStatusIcon *s
     g_signal_connect_object (status_icon, "destroy", G_CALLBACK (on_status_icon_destroy), self,
                              G_CONNECT_SWAPPED);
 
-    gtk_box_pack_start (priv->box, GTK_WIDGET (priv->status_icon), 0, 0, 0);
-    gtk_box_reorder_child (priv->box, GTK_WIDGET (priv->status_icon), 0);
+    gtk_box_prepend (priv->box, GTK_WIDGET (priv->status_icon));
   }
 
   g_object_notify_by_pspec (G_OBJECT (self), props[PROP_STATUS_PAGE]);

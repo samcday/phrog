@@ -12,7 +12,7 @@
 G_BEGIN_DECLS
 
 #define PHOSH_TYPE_QUICK_SETTINGS_BOX phosh_quick_settings_box_get_type ()
-G_DECLARE_FINAL_TYPE (PhoshQuickSettingsBox, phosh_quick_settings_box, PHOSH, QUICK_SETTINGS_BOX, GtkContainer)
+G_DECLARE_FINAL_TYPE (PhoshQuickSettingsBox, phosh_quick_settings_box, PHOSH, QUICK_SETTINGS_BOX, GtkWidget)
 
 GtkWidget *phosh_quick_settings_box_new (guint max_columns, guint spacing);
 void       phosh_quick_settings_box_set_max_columns (PhoshQuickSettingsBox *self, guint max_columns);

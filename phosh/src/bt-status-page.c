@@ -14,8 +14,6 @@
 
 #include "bluetooth-device.h"
 
-#include <handy.h>
-
 /**
  * PhoshBtStatusPage:
  *
@@ -84,6 +82,8 @@ phosh_bt_status_page_dispose (GObject *object)
   PhoshBtStatusPage *self = PHOSH_BT_STATUS_PAGE (object);
 
   g_clear_object (&self->bt_manager);
+
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_BT_STATUS_PAGE);
 
   G_OBJECT_CLASS (phosh_bt_status_page_parent_class)->dispose (object);
 }

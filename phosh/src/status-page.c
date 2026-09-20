@@ -55,7 +55,7 @@ typedef struct {
   GtkWidget    *footer_widget;
 } PhoshStatusPagePrivate;
 
-G_DEFINE_TYPE_WITH_PRIVATE (PhoshStatusPage, phosh_status_page, GTK_TYPE_BIN);
+G_DEFINE_TYPE_WITH_PRIVATE (PhoshStatusPage, phosh_status_page, GTK_TYPE_WIDGET);
 
 
 static void
@@ -113,15 +113,17 @@ phosh_status_page_get_property (GObject    *object,
 
 
 static void
-phosh_status_page_destroy (GtkWidget *widget)
+phosh_status_page_dispose (GObject *object)
 {
-  PhoshStatusPage *self = PHOSH_STATUS_PAGE (widget);
+  PhoshStatusPage *self = PHOSH_STATUS_PAGE (object);
 
   phosh_status_page_set_header (self, NULL);
   phosh_status_page_set_content (self, NULL);
   phosh_status_page_set_footer (self, NULL);
 
-  GTK_WIDGET_CLASS (phosh_status_page_parent_class)->destroy (widget);
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_STATUS_PAGE);
+
+  G_OBJECT_CLASS (phosh_status_page_parent_class)->dispose (object);
 }
 
 
@@ -133,8 +135,7 @@ phosh_status_page_class_init (PhoshStatusPageClass *klass)
 
   object_class->set_property = phosh_status_page_set_property;
   object_class->get_property = phosh_status_page_get_property;
-
-  widget_class->destroy = phosh_status_page_destroy;
+  object_class->dispose = phosh_status_page_dispose;
 
   /**
    * PhoshStatusPage:title:
@@ -198,6 +199,8 @@ phosh_status_page_class_init (PhoshStatusPageClass *klass)
   gtk_widget_class_bind_template_child_private (widget_class, PhoshStatusPage, toplevel_box);
 
   gtk_widget_class_set_css_name (widget_class, "phosh-status-page");
+
+  gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
 }
 
 
@@ -266,12 +269,12 @@ phosh_status_page_set_header (PhoshStatusPage *self, GtkWidget *header_widget)
     return;
 
   if (priv->header_widget)
-    gtk_container_remove (GTK_CONTAINER (priv->header_bin), priv->header_widget);
+    gtk_box_remove (priv->header_bin, priv->header_widget);
 
   priv->header_widget = header_widget;
 
   if (priv->header_widget)
-    gtk_container_add (GTK_CONTAINER (priv->header_bin), priv->header_widget);
+    gtk_box_append (priv->header_bin, priv->header_widget);
 
   gtk_widget_set_visible (GTK_WIDGET (priv->header_bin), !!header_widget);
 
@@ -319,12 +322,12 @@ phosh_status_page_set_content (PhoshStatusPage *self, GtkWidget *content_widget)
     return;
 
   if (priv->content_widget)
-    gtk_container_remove (GTK_CONTAINER (priv->content_bin), priv->content_widget);
+    gtk_box_remove (priv->content_bin, priv->content_widget);
 
   priv->content_widget = content_widget;
 
   if (priv->content_widget)
-    gtk_container_add (GTK_CONTAINER (priv->content_bin), priv->content_widget);
+    gtk_box_append (priv->content_bin, priv->content_widget);
 
   g_object_notify_by_pspec (G_OBJECT (self), props[PROP_CONTENT]);
 }
@@ -369,12 +372,12 @@ phosh_status_page_set_footer (PhoshStatusPage *self, GtkWidget *footer_widget)
     return;
 
   if (priv->footer_widget)
-    gtk_container_remove (GTK_CONTAINER (priv->footer_bin), priv->footer_widget);
+    gtk_box_remove (priv->footer_bin, priv->footer_widget);
 
   priv->footer_widget = footer_widget;
 
   if (priv->footer_widget)
-    gtk_container_add (GTK_CONTAINER (priv->footer_bin), priv->footer_widget);
+    gtk_box_append (priv->footer_bin, priv->footer_widget);
 
   gtk_widget_set_visible (GTK_WIDGET (priv->footer_separator), !!footer_widget);
   gtk_widget_set_visible (GTK_WIDGET (priv->footer_bin), !!footer_widget);

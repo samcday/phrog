@@ -13,6 +13,7 @@
 #include "phosh-enums.h"
 #include "drag-surface.h"
 #include "layersurface-priv.h"
+#include "phosh-wayland.h"
 
 /**
  * PhoshDragSurface:
@@ -28,7 +29,6 @@
 
 enum {
   PROP_0,
-  PROP_LAYER_SHELL_EFFECTS,
   PROP_MARGIN_FOLDED,
   PROP_MARGIN_UNFOLDED,
   PROP_THRESHOLD,
@@ -49,7 +49,6 @@ static guint signals[N_SIGNALS] = { 0 };
 
 
 typedef struct _PhoshDragSurfacePrivate {
-  struct zphoc_layer_shell_effects_v1     *layer_shell_effects;
   struct zphoc_draggable_layer_surface_v1 *drag_surface;
 
   int                                      margin_folded;
@@ -74,9 +73,6 @@ phosh_drag_surface_set_property (GObject      *object,
   PhoshDragSurfacePrivate *priv = phosh_drag_surface_get_instance_private (self);
 
   switch (property_id) {
-  case PROP_LAYER_SHELL_EFFECTS:
-    priv->layer_shell_effects = g_value_get_pointer (value);
-    break;
   case PROP_MARGIN_FOLDED:
     phosh_drag_surface_set_margin (self, g_value_get_int (value), priv->margin_unfolded);
     break;
@@ -112,9 +108,6 @@ phosh_drag_surface_get_property (GObject    *object,
   PhoshDragSurfacePrivate *priv = phosh_drag_surface_get_instance_private (self);
 
   switch (property_id) {
-  case PROP_LAYER_SHELL_EFFECTS:
-    g_value_set_pointer (value, priv->layer_shell_effects);
-    break;
   case PROP_MARGIN_FOLDED:
     g_value_set_int (value, priv->margin_folded);
     break;
@@ -197,6 +190,7 @@ phosh_drag_surface_configured (PhoshLayerSurface *layer_surface)
   PhoshLayerSurfaceClass *parent_class = PHOSH_LAYER_SURFACE_CLASS (phosh_drag_surface_parent_class);
   PhoshDragSurfacePrivate *priv = phosh_drag_surface_get_instance_private (self);
   struct zwlr_layer_surface_v1 *wl_layer_surface = phosh_layer_surface_get_layer_surface (layer_surface);
+  struct zphoc_layer_shell_effects_v1 *layer_shell_effects;
 
   if (parent_class->configured)
     parent_class->configured (layer_surface);
@@ -204,8 +198,9 @@ phosh_drag_surface_configured (PhoshLayerSurface *layer_surface)
   if (priv->drag_surface)
     return;
 
+  layer_shell_effects = phosh_wayland_get_zphoc_layer_shell_effects_v1 (phosh_wayland_get_default ());
   /* Configure drag surface if not done yet */
-  priv->drag_surface = zphoc_layer_shell_effects_v1_get_draggable_layer_surface (priv->layer_shell_effects,
+  priv->drag_surface = zphoc_layer_shell_effects_v1_get_draggable_layer_surface (layer_shell_effects,
                                                                                  wl_layer_surface);
   zphoc_draggable_layer_surface_v1_add_listener (priv->drag_surface, &drag_surface_listener, self);
 }
@@ -289,13 +284,6 @@ phosh_drag_surface_class_init (PhoshDragSurfaceClass *klass)
   object_class->dispose = phosh_drag_surface_dispose;
 
   layer_surface_class->configured = phosh_drag_surface_configured;
-
-  props[PROP_LAYER_SHELL_EFFECTS] = g_param_spec_pointer ("layer-shell-effects",
-                                                          "",
-                                                          "",
-                                                          G_PARAM_READWRITE |
-                                                          G_PARAM_CONSTRUCT_ONLY |
-                                                          G_PARAM_STATIC_STRINGS);
 
   props[PROP_MARGIN_FOLDED] = g_param_spec_int ("margin-folded",
                                                 "",

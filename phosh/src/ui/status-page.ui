@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
-  <template class="PhoshStatusPage" parent="GtkBin">
+  <requires lib="gtk" version="4.0"/>
+  <template class="PhoshStatusPage" parent="GtkWidget">
     <property name="valign">start</property>
     <child>
       <object class="GtkBox" id="toplevel_box">
@@ -13,11 +13,10 @@
           <class name="phosh-status-page"/>
         </style>
         <child>
-          <object class="GtkBox" id="header_box">
+          <object class="GtkCenterBox" id="header_box">
             <property name="visible">1</property>
             <property name="hexpand">1</property>
-            <property name="spacing">6</property>
-            <child type="center">
+            <property name="center-widget">
               <object class="GtkLabel" id="title_label">
                 <property name="visible">1</property>
                 <property name="hexpand">1</property>
@@ -27,13 +26,12 @@
                   <class name="heading"/>
                 </style>
               </object>
-            </child>
-            <child>
-              <object class="GtkBox" id="header_bin"/>
-              <packing>
-                <property name="pack-type">end</property>
-              </packing>
-            </child>
+            </property>
+            <property name="end-widget">
+              <object class="GtkBox" id="header_bin">
+                <property name="visible">0</property>
+              </object>
+            </property>
           </object>
         </child>
         <child>
@@ -42,10 +40,14 @@
           </object>
         </child>
         <child>
-          <object class="GtkSeparator" id="footer_separator"/>
+          <object class="GtkSeparator" id="footer_separator">
+            <property name="visible">0</property>
+          </object>
         </child>
         <child>
-          <object class="GtkBox" id="footer_bin"/>
+          <object class="GtkBox" id="footer_bin">
+            <property name="visible">0</property>
+          </object>
         </child>
       </object>
     </child>

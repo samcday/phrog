@@ -11,7 +11,6 @@
 #include "testlib-head-stub.h"
 
 #include "layersurface.h"
-#include <gdk/gdkwayland.h>
 
 #include <glib.h>
 #include <glib/gstdio.h>

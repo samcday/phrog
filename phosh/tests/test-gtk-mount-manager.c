@@ -11,8 +11,6 @@
 
 #include "testlib-full-shell.h"
 
-#include <handy.h>
-
 #define BUS_NAME "org.gtk.MountOperationHandler"
 #define OBJECT_PATH "/org/gtk/MountOperationHandler"
 

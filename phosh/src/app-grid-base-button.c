@@ -82,30 +82,33 @@ phosh_app_grid_base_button_get_property (GObject    *object,
 
 
 static void
+phosh_app_grid_base_button_dispose (GObject *object)
+{
+  PhoshAppGridBaseButton *self = PHOSH_APP_GRID_BASE_BUTTON (object);
+
+  phosh_app_grid_base_button_set_child (self, NULL);
+
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_APP_GRID_BASE_BUTTON);
+
+  G_OBJECT_CLASS (phosh_app_grid_base_button_parent_class)->dispose (object);
+}
+
+
+static void
 on_clicked_cb (PhoshAppGridBaseButton *self)
 {
   g_signal_emit_by_name (self, "activate", NULL);
 }
 
 
-static void
-phosh_app_grid_base_button_destroy (GtkWidget *widget)
-{
-  PhoshAppGridBaseButton *self = PHOSH_APP_GRID_BASE_BUTTON (widget);
-
-  phosh_app_grid_base_button_set_child (self, NULL);
-
-  GTK_WIDGET_CLASS (phosh_app_grid_base_button_parent_class)->destroy (widget);
-}
-
-
-static void
+static gboolean
 phosh_app_grid_base_button_grab_focus (GtkWidget *widget)
 {
   PhoshAppGridBaseButton *self = PHOSH_APP_GRID_BASE_BUTTON (widget);
   PhoshAppGridBaseButtonPrivate *priv = phosh_app_grid_base_button_get_instance_private (self);
 
   gtk_widget_grab_focus (priv->button);
+  return TRUE;
 }
 
 
@@ -117,8 +120,8 @@ phosh_app_grid_base_button_class_init (PhoshAppGridBaseButtonClass *klass)
 
   object_class->set_property = phosh_app_grid_base_button_set_property;
   object_class->get_property = phosh_app_grid_base_button_get_property;
+  object_class->dispose = phosh_app_grid_base_button_dispose;
 
-  widget_class->destroy = phosh_app_grid_base_button_destroy;
   widget_class->grab_focus = phosh_app_grid_base_button_grab_focus;
 
   /**
@@ -216,14 +219,12 @@ phosh_app_grid_base_button_set_child (PhoshAppGridBaseButton *self, GtkWidget *c
     return;
 
   if (priv->child)
-    gtk_container_remove (GTK_CONTAINER (priv->box), priv->child);
+    gtk_box_remove (priv->box, priv->child);
 
   priv->child = child;
 
-  if (priv->child) {
-    gtk_box_pack_start (priv->box, priv->child, FALSE, FALSE, 0);
-    gtk_box_reorder_child (priv->box, priv->child, 0);
-  }
+  if (priv->child)
+    gtk_box_prepend (priv->box, priv->child);
 
   g_object_notify_by_pspec (G_OBJECT (self), props[PROP_CHILD]);
 }

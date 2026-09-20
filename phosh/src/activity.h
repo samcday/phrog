@@ -5,15 +5,12 @@
  */
 #pragma once
 
+#include <gtk/gtk.h>
 #include "thumbnail.h"
 
-#include <gio/gdesktopappinfo.h>
+#define PHOSH_TYPE_ACTIVITY (phosh_activity_get_type())
 
-#include <gtk/gtk.h>
-
-#define PHOSH_TYPE_ACTIVITY (phosh_activity_get_type ())
-
-G_DECLARE_FINAL_TYPE (PhoshActivity, phosh_activity, PHOSH, ACTIVITY, GtkEventBox)
+G_DECLARE_FINAL_TYPE (PhoshActivity, phosh_activity, PHOSH, ACTIVITY, GtkWidget)
 
 GtkWidget  *phosh_activity_new        (const char *app_id);
 const char *phosh_activity_get_app_id (PhoshActivity   *self);
@@ -21,5 +18,3 @@ void        phosh_activity_set_thumbnail (PhoshActivity *self,
                                           PhoshThumbnail *thumbnail);
 void        phosh_activity_get_thumbnail_allocation (PhoshActivity *self,
                                                      GtkAllocation *allocation);
-gboolean    phosh_activity_get_has_thumbnail (PhoshActivity *self);
-GAppInfo *  phosh_activity_get_app_info (PhoshActivity *self);

@@ -16,8 +16,6 @@
 #include "shell-priv.h"
 #include "util.h"
 
-#include <handy.h>
-
 #define BANNER_MIN_WIDTH 360
 
 /**
@@ -64,7 +62,7 @@ phosh_notification_banner_slide (double value, gpointer user_data)
   PhoshNotificationBanner *self = PHOSH_NOTIFICATION_BANNER (user_data);
   int margin, height;
 
-  gtk_window_get_size (GTK_WINDOW (self), NULL, &height);
+  height = gtk_widget_get_height (GTK_WIDGET (self));
   margin = -(height * 0.9) * (self->slide_up ? value : (1.0 - value));
 
   phosh_layer_surface_set_margins (PHOSH_LAYER_SURFACE (self), margin, 0, 0, 0);
@@ -80,7 +78,7 @@ phosh_notification_banner_slide_done (gpointer user_data)
 
   g_clear_pointer (&self->animation, phosh_animation_unref);
   if (self->slide_up)
-    gtk_widget_destroy (GTK_WIDGET (self));
+    gtk_window_destroy (GTK_WINDOW (self));
 }
 
 
@@ -105,7 +103,7 @@ expired (PhoshNotification       *notification,
                                            self);
     phosh_animation_start (self->animation);
   } else {
-    gtk_widget_destroy (GTK_WIDGET (self));
+    gtk_window_destroy (GTK_WINDOW (self));
   }
 }
 
@@ -121,7 +119,7 @@ closed (PhoshNotification       *notification,
   clear_handler (self);
 
   /* Close the banner */
-  gtk_widget_destroy (GTK_WIDGET (self));
+  gtk_window_destroy (GTK_WINDOW (self));
 }
 
 
@@ -136,7 +134,7 @@ phosh_notification_banner_set_notification (PhoshNotificationBanner *self,
   content = phosh_notification_frame_new (TRUE, NULL);
   phosh_notification_frame_bind_notification (PHOSH_NOTIFICATION_FRAME (content),
                                               self->notification);
-  gtk_container_add (GTK_CONTAINER (self), content);
+  gtk_window_set_child (GTK_WINDOW (self), content);
 
   self->handler_expired = g_signal_connect (self->notification, "expired",
                                             G_CALLBACK (expired), self);
@@ -206,7 +204,7 @@ phosh_notification_banner_map (GtkWidget *widget)
 
   GTK_WIDGET_CLASS (phosh_notification_banner_parent_class)->map (widget);
 
-  height = gtk_widget_get_allocated_height (widget);
+  height = gtk_widget_get_height (widget);
   phosh_layer_surface_set_size (PHOSH_LAYER_SURFACE (widget), -1, height);
 
   phosh_animation_start (self->animation);
@@ -269,7 +267,6 @@ phosh_notification_banner_new (PhoshNotification *notification)
                        "width-request", BANNER_MIN_WIDTH,
                        "valign", GTK_ALIGN_CENTER,
                        /* layer surface */
-                       "layer-shell", phosh_wayland_get_zwlr_layer_shell_v1 (wl),
                        "wl-output", monitor ? monitor->wl_output : NULL,
                        "anchor", ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP,
                        "width", MIN (width, 450),

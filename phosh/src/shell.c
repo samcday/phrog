@@ -22,7 +22,6 @@
 #include <glib-unix.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
-#include <gdk/gdkwayland.h>
 
 #include "phosh-config.h"
 #include "ambient.h"
@@ -417,11 +416,7 @@ panels_create (PhoshShell *self)
   top_layer = priv->locked ? ZWLR_LAYER_SHELL_V1_LAYER_OVERLAY : ZWLR_LAYER_SHELL_V1_LAYER_TOP;
 
   /* Top panel */
-  priv->top_panel = PHOSH_DRAG_SURFACE (phosh_top_panel_new (
-                                          phosh_wayland_get_zwlr_layer_shell_v1 (wl),
-                                          phosh_wayland_get_zphoc_layer_shell_effects_v1 (wl),
-                                          monitor,
-                                          top_layer));
+  priv->top_panel = PHOSH_DRAG_SURFACE (phosh_top_panel_new (monitor, top_layer));
   gtk_widget_set_visible (GTK_WIDGET (priv->top_panel), TRUE);
 
   /* Home is created after the top-panel so it honors its exclusive zone */
@@ -701,6 +696,17 @@ on_toplevel_added (PhoshShell *self, PhoshToplevel *unused, PhoshToplevelManager
 
 
 static void
+on_notification_banner_destroy (PhoshShell *self)
+{
+  PhoshShellPrivate *priv;
+
+  priv = phosh_shell_get_instance_private (self);
+
+  priv->notification_banner = NULL;
+}
+
+
+static void
 on_new_notification (PhoshShell         *self,
                      PhoshNotification  *notification,
                      PhoshNotifyManager *manager)
@@ -719,11 +725,10 @@ on_new_notification (PhoshShell         *self,
       phosh_top_panel_get_state (PHOSH_TOP_PANEL (priv->top_panel)) == PHOSH_TOP_PANEL_STATE_FOLDED &&
       !priv->locked) {
     priv->notification_banner = phosh_notification_banner_new (notification);
-    g_signal_connect (priv->notification_banner,
-                      "destroy",
-                      G_CALLBACK (gtk_widget_destroyed),
-                      &priv->notification_banner);
-
+    g_signal_connect_swapped (priv->notification_banner,
+                              "destroy",
+                              G_CALLBACK (on_notification_banner_destroy),
+                              self);
     gtk_widget_set_visible (GTK_WIDGET (priv->notification_banner), TRUE);
   }
 }
@@ -780,7 +785,7 @@ on_osd_timeout (PhoshShell *self)
     g_debug ("Closing osd");
     priv->osd_timeoutid = 0;
     if (priv->osd)
-      gtk_widget_destroy (GTK_WIDGET (priv->osd));
+      gtk_window_destroy (GTK_WINDOW (priv->osd));
   }
   priv->osd_continue = FALSE;
   return ret;
@@ -835,8 +840,6 @@ setup_idle_cb (PhoshShell *self)
 
   priv->debug_control = phosh_debug_control_new ();
   priv->app_tracker = phosh_app_tracker_new ();
-  phosh_toplevel_manager_set_app_tracker (priv->toplevel_manager, priv->app_tracker);
-  priv->splash_manager = phosh_splash_manager_new (priv->app_tracker);
   priv->session_manager = phosh_session_manager_new ();
   priv->mode_manager = phosh_mode_manager_new ();
   priv->wifi_manager = phosh_wifi_manager_new ();
@@ -906,6 +909,7 @@ setup_idle_cb (PhoshShell *self)
 
   priv->gnome_shell_manager = phosh_gnome_shell_manager_get_default ();
   priv->screenshot_manager = phosh_screenshot_manager_new ();
+  priv->splash_manager = phosh_splash_manager_new (priv->app_tracker);
   priv->run_command_manager = phosh_run_command_manager_new ();
   priv->network_auth_manager = phosh_network_auth_manager_new ();
   priv->portal_access_manager = phosh_portal_access_manager_new ();
@@ -1159,7 +1163,7 @@ phosh_shell_constructed (GObject *object)
 
   priv->idle_manager = phosh_idle_manager_get_default ();
 
-  priv->faders = g_ptr_array_new_with_free_func ((GDestroyNotify) (gtk_widget_destroy));
+  priv->faders = g_ptr_array_new_with_free_func ((GDestroyNotify) (gtk_window_destroy));
 
   phosh_system_prompter_register ();
   priv->polkit_auth_agent = phosh_polkit_auth_agent_new ();
@@ -1456,7 +1460,9 @@ phosh_shell_init (PhoshShell *self)
   }
 
   cui_init (TRUE);
-  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_default (), "/mobi/phosh/icons");
+
+  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_for_display (gdk_display_get_default ()),
+                                    "/mobi/phosh/icons");
 
   priv->overview_visible = TRUE;
 
@@ -1959,26 +1965,6 @@ phosh_shell_get_session_manager (PhoshShell *self)
   g_return_val_if_fail (PHOSH_IS_SESSION_MANAGER (priv->session_manager), NULL);
 
   return priv->session_manager;
-}
-
-/**
- * phosh_shell_get_splash_manager:
- * @self: The shell singleton
- *
- * Get the splash manager
- *
- * Returns: (transfer none): The splash manager
- */
-PhoshSplashManager *
-phosh_shell_get_splash_manager (PhoshShell *self)
-{
-  PhoshShellPrivate *priv;
-
-  g_return_val_if_fail (PHOSH_IS_SHELL (self), NULL);
-  priv = phosh_shell_get_instance_private (self);
-  g_return_val_if_fail (PHOSH_IS_SPLASH_MANAGER (priv->splash_manager), NULL);
-
-  return priv->splash_manager;
 }
 
 /**

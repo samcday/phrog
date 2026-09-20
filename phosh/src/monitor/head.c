@@ -10,8 +10,6 @@
 
 #include "head-priv.h"
 
-#include <gdk/gdkwayland.h>
-
 /**
  * PhoshHead:
  *
