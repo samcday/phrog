@@ -1,6 +1,4 @@
 #[cfg(not(docsrs))]
-mod build_support;
-#[cfg(not(docsrs))]
 mod native_source;
 
 #[cfg(not(docsrs))]
@@ -129,7 +127,24 @@ fn build_bundled() {
     let metadata_dir = build.join("meson-uninstalled");
     let metadata = std::fs::read_to_string(metadata_dir.join("libphosh-0.45-uninstalled.pc"))
         .expect("failed to read Meson's uninstalled libphosh metadata");
-    let shared_metadata = build_support::embedding_metadata(&metadata);
+    let mut shared_metadata = metadata.clone();
+    for field in ["Requires", "Libs"] {
+        let public = format!("{field}:");
+        let private = format!("{field}.private:");
+        let values: Vec<_> = metadata
+            .lines()
+            .filter_map(|line| {
+                line.strip_prefix(&public)
+                    .or_else(|| line.strip_prefix(&private))
+            })
+            .collect();
+        shared_metadata = shared_metadata
+            .lines()
+            .filter(|line| !line.starts_with(&public) && !line.starts_with(&private))
+            .map(|line| format!("{line}\n"))
+            .collect();
+        shared_metadata.push_str(&format!("{field}: {}\n", values.join(" ")));
+    }
     std::fs::write(metadata_dir.join("phrog-libphosh.pc"), shared_metadata)
         .expect("failed to write embedding metadata");
 

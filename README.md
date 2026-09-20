@@ -1,9 +1,8 @@
 ## 🐸 (phrog)
 
 > **GTK4 development branch.** GTK3 stable releases continue on `main`.
-> This branch requires unreleased GTK and Phosh snapshots; normal distro
-> packages below provide the stable GTK3 version. See [GTK4 development](docs/gtk4.md)
-> for the pinned dependencies, build commands, and known gaps.
+> This branch needs unreleased GTK and Phosh snapshots, not normal distro
+> packages. See [GTK4 development](docs/gtk4.md) for builds and known gaps.
 
 <img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/0.53.0/demo.webp">
 
@@ -76,15 +75,8 @@ cargo binstall phrog
 
 ## Development
 
-`libphosh` 0.45 is required to build this project.
-
-* Alpine (v3.21+): `sudo apk add libphosh`
-* Debian (trixie): `sudo apt install libphosh-0.45-dev`
-* Fedora: `sudo dnf install libphosh-devel`
-
-If `libphosh` is not packaged for your distro, you need to build Phosh+libphosh manually. See the [Phosh][] README for more info.
-
-Once `libphosh` is installed, building and running 🐸 should be quite simple:
+Both modes use local GTK4 Rust bindings. Install the pinned GTK4 stack from
+[the development notes](docs/gtk4.md) before running these commands:
 
 ```sh
 # To run phrog without greetd, pass --fake
@@ -92,22 +84,10 @@ Once `libphosh` is installed, building and running 🐸 should be quite simple:
 phoc -S -E "cargo run -- --fake"
 
 phoc -S -E "cargo test"
+
+# Embed the vendored libphosh (requires Phosh build dependencies):
+cargo vendored-phosh build # Also accepts run, test, fmt, tree, clippy, etc.
 ```
-
-### Experimental bundled libphosh
-
-On this branch, plain Cargo commands use the local GTK4 Rust bindings and an
-installed GTK4 libphosh. Embedding the pinned Phosh source is opt-in:
-
-```sh
-# Install the native build dependencies first.
-cargo vendored-phosh build
-phoc -S -E 'cargo vendored-phosh test -- --test-threads=1'
-```
-
-This embeds libphosh, not GTK or the rest of the native stack. See
-[the bundled-build notes](docs/bundled-libphosh.md) for dependencies, runtime data,
-local testing, and limitations.
 
 ## Getting help
 

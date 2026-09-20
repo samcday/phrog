@@ -51,12 +51,12 @@ Within an environment providing those dependencies and the Rust toolchain from
 ```sh
 # Dynamic GTK4 libphosh; local GTK4 Rust bindings are used in both modes.
 cargo build --locked --all-targets
-cargo clippy --locked --all-targets -- -D warnings
+cargo clippy --locked --all-targets --no-deps -- -D warnings
 phoc -S -E 'cargo test --locked -- --test-threads=1'
 
 # Embed the pinned Phosh source using the interface shared with #186.
 cargo vendored-phosh build --locked --all-targets
-cargo vendored-phosh clippy --locked --all-targets -- -D warnings
+cargo vendored-phosh clippy --locked --all-targets --no-deps -- -D warnings
 phoc -S -E 'cargo vendored-phosh test --locked -- --test-threads=1'
 ```
 
@@ -69,9 +69,11 @@ GTK3 and GTK4 libphosh currently share the `libphosh-0.45` pkg-config name.
 The build rejects metadata that selects GTK3, even if its version satisfies the
 minimum. Never mix the GTK4 bindings with the GTK3 shared library.
 
-See [bundled libphosh](bundled-libphosh.md) for source staging, offline builds,
-matching schemas, and the distinction between embedding and standalone binaries.
-Distribution recipes are retained as a baseline but are not yet GTK4-ready.
+The vendor command stages native sources and schemas under `target/vendor`;
+its runner selects the matching schemas. `PHROG_VENDOR_OFFLINE=1` disables
+native downloads once dependencies are prepared. Embedded libphosh still needs
+shared GTK and other native libraries plus schemas, translations, and services.
+Distribution recipes are not yet GTK4-ready.
 
 ## Local patches and migration gaps
 
@@ -96,5 +98,5 @@ Distribution recipes are retained as a baseline but are not yet GTK4-ready.
 Bindings were regenerated from the GTK4 Phosh GIR using the pinned gir tool.
 Build the generator outside this workspace, apply `fix.sh`, then use the existing
 `libphosh-rs/Makefile` generation targets. Preserve the local sys crate's
-`build.rs`, `build_support.rs`, and `native_source.rs`: generator output does not
+`build.rs` and `native_source.rs`: generator output does not
 replace the embedding implementation inherited from #186.

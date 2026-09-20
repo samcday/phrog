@@ -1,5 +1,3 @@
-#![rustfmt::skip]
-
 use gtk;
 use libphosh as phosh;
 use libphosh::prelude::*;
