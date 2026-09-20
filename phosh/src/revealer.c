@@ -36,7 +36,7 @@ enum {
 static GParamSpec *props[PROP_LAST_PROP];
 
 struct _PhoshRevealer {
-  GtkBin       parent;
+  GtkWidget    parent;
 
   GtkRevealer *revealer;
   GtkWidget   *child;
@@ -44,7 +44,7 @@ struct _PhoshRevealer {
   guint        transition_duration;
   GtkRevealerTransitionType transition_type;
 };
-G_DEFINE_TYPE (PhoshRevealer, phosh_revealer, GTK_TYPE_BIN)
+G_DEFINE_TYPE (PhoshRevealer, phosh_revealer, GTK_TYPE_WIDGET)
 
 
 static void
@@ -120,13 +120,15 @@ phosh_revealer_get_property (GObject    *object,
 
 
 static void
-phosh_revealer_destroy (GtkWidget *widget)
+phosh_revealer_dispose (GObject *object)
 {
-  PhoshRevealer *self = PHOSH_REVEALER (widget);
+  PhoshRevealer *self = PHOSH_REVEALER (object);
 
   phosh_revealer_set_child (self, NULL);
 
-  GTK_WIDGET_CLASS (phosh_revealer_parent_class)->destroy (widget);
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_REVEALER);
+
+  G_OBJECT_CLASS (phosh_revealer_parent_class)->dispose (object);
 }
 
 
@@ -138,7 +140,7 @@ phosh_revealer_class_init (PhoshRevealerClass *klass)
 
   object_class->set_property = phosh_revealer_set_property;
   object_class->get_property = phosh_revealer_get_property;
-  widget_class->destroy = phosh_revealer_destroy;
+  object_class->dispose = phosh_revealer_dispose;
 
   /**
    * PhoshRevealer:child:
@@ -186,6 +188,8 @@ phosh_revealer_class_init (PhoshRevealerClass *klass)
   gtk_widget_class_bind_template_child (widget_class, PhoshRevealer, revealer);
 
   gtk_widget_class_bind_template_callback (widget_class, on_child_revealed_changed);
+
+  gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
 }
 
 
@@ -238,12 +242,12 @@ phosh_revealer_set_child (PhoshRevealer *self, GtkWidget *child)
     return;
 
   if (self->child)
-    gtk_container_remove (GTK_CONTAINER (self->revealer), self->child);
+    gtk_revealer_set_child (self->revealer, self->child);
 
   self->child = child;
 
   if (self->child)
-    gtk_container_add (GTK_CONTAINER (self->revealer), self->child);
+    gtk_revealer_set_child (self->revealer, self->child);
 
   g_object_notify_by_pspec (G_OBJECT (self), props[PROP_CHILD]);
 }

@@ -150,8 +150,8 @@ test_phosh_notification_content_actions (void)
 
   actioned_called = FALSE;
 
-  g_action_group_activate_action (gtk_widget_get_action_group (content, "noti"),
-                                  "activate",
+  gtk_widget_activate_action_variant (content,
+                                  "noti.activate",
                                   g_variant_new_string ("demo-time"));
 
   g_assert_true (actioned_called);

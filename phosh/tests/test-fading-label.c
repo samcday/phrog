@@ -13,14 +13,14 @@ test_phosh_fading_label_new (void)
 {
   PhoshFadingLabel *fading_label;
 
-  fading_label = PHOSH_FADING_LABEL (phosh_fading_label_new ("label"));
+  fading_label = g_object_ref_sink (PHOSH_FADING_LABEL (phosh_fading_label_new ("label")));
 
   gtk_widget_set_visible (GTK_WIDGET (fading_label), TRUE);
   g_assert_cmpstr (phosh_fading_label_get_label (fading_label), ==, "label");
   phosh_fading_label_set_label (fading_label, "label2");
   g_assert_cmpstr (phosh_fading_label_get_label (fading_label), ==, "label2");
 
-  gtk_widget_destroy (GTK_WIDGET (fading_label));
+  g_object_unref (GTK_WIDGET (fading_label));
 }
 
 

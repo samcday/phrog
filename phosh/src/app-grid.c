@@ -17,9 +17,7 @@
 #include "shell-priv.h"
 #include "util.h"
 
-#include "gtk-list-models/gtksortlistmodel.h"
-#include "gtk-list-models/gtkfilterlistmodel.h"
-
+#include <adwaita.h>
 #include <gmobile.h>
 
 #define ACTIVE_SEARCH_CLASS "search-active"
@@ -42,6 +40,7 @@ static guint signals[N_SIGNALS] = { 0 };
 
 typedef struct _PhoshAppGridPrivate PhoshAppGridPrivate;
 struct _PhoshAppGridPrivate {
+  GtkFilter          *filter;
   GtkFilterListModel *model;
 
   GtkWidget *deck;
@@ -120,7 +119,7 @@ show_main_grid (PhoshAppGrid *self)
 {
   PhoshAppGridPrivate *priv = phosh_app_grid_get_instance_private (self);
   GtkFlowBoxChild *button = NULL;
-  hdy_deck_set_visible_child_name (HDY_DECK (priv->deck), "main_grid");
+  adw_navigation_view_pop (ADW_NAVIGATION_VIEW (priv->deck));
 
   if (priv->open_folder == NULL)
     return;
@@ -217,7 +216,7 @@ folder_launched_cb (GtkWidget       *widget,
   PhoshAppGridPrivate *priv = phosh_app_grid_get_instance_private (self);
   GListModel *model = phosh_folder_info_get_app_infos (info);
 
-  hdy_deck_set_visible_child_name (HDY_DECK (priv->deck), "folder_page");
+  adw_navigation_view_push_by_tag (ADW_NAVIGATION_VIEW (priv->deck), "folder_page");
   g_object_bind_property (info, "name", priv->folder_name_label, "label", G_BINDING_SYNC_CREATE);
   priv->folder_model = model;
   g_set_object (&priv->open_folder, info);
@@ -227,7 +226,7 @@ folder_launched_cb (GtkWidget       *widget,
                            G_CALLBACK (show_folder_page),
                            self,
                            G_CONNECT_SWAPPED);
-  gtk_entry_set_text (GTK_ENTRY (priv->folder_name_entry), "");
+  gtk_editable_set_text (GTK_EDITABLE (priv->folder_name_entry), "");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (priv->folder_name_btn), FALSE);
   show_folder_page (self);
 
@@ -269,7 +268,7 @@ update_filter_adaptive_button (PhoshAppGrid *self)
   }
 
   gtk_label_set_label (GTK_LABEL (priv->btn_adaptive_lbl), label);
-  gtk_image_set_from_icon_name (GTK_IMAGE (priv->btn_adaptive_img), icon_name, -1);
+  gtk_image_set_from_icon_name (GTK_IMAGE (priv->btn_adaptive_img), icon_name);
 }
 
 
@@ -292,7 +291,7 @@ on_filter_setting_changed (PhoshAppGrid *self,
   show = !!(priv->filter_mode & PHOSH_APP_FILTER_MODE_FLAGS_ADAPTIVE);
   gtk_widget_set_visible (priv->btn_adaptive, show);
 
-  gtk_filter_list_model_refilter (priv->model);
+  gtk_filter_changed (priv->filter, GTK_FILTER_CHANGE_DIFFERENT);
 }
 
 
@@ -396,7 +395,7 @@ favorites_changed (GListModel *list, guint pos, guint removed, guint added, Phos
   toggle_favorites_revealer (self);
 
   /* We don't show favorites in the main list, filter them out */
-  gtk_filter_list_model_refilter (priv->model);
+  gtk_filter_changed (priv->filter, GTK_FILTER_CHANGE_DIFFERENT);
 }
 
 
@@ -423,6 +422,7 @@ static void
 phosh_app_grid_init (PhoshAppGrid *self)
 {
   PhoshAppGridPrivate *priv = phosh_app_grid_get_instance_private (self);
+  GtkCustomSorter *sorter;
   GtkSortListModel *sorted;
   PhoshFavoriteListModel *favorites;
   g_autoptr (GAction) action = NULL;
@@ -442,15 +442,12 @@ phosh_app_grid_init (PhoshAppGrid *self)
                     self);
 
   /* fill the grid with apps */
+  sorter = gtk_custom_sorter_new (sort_apps, NULL, NULL);
   sorted = gtk_sort_list_model_new (G_LIST_MODEL (phosh_app_list_model_get_default ()),
-                                    sort_apps,
-                                    NULL,
-                                    NULL);
+                                    GTK_SORTER (sorter));
+  priv->filter = GTK_FILTER (gtk_custom_filter_new (search_apps, self, NULL));
   priv->model = gtk_filter_list_model_new (G_LIST_MODEL (sorted),
-                                           search_apps,
-                                           self,
-                                           NULL);
-  g_object_unref (sorted);
+                                           priv->filter);
   gtk_flow_box_bind_model (GTK_FLOW_BOX (priv->apps),
                            G_LIST_MODEL (priv->model),
                            create_launcher,
@@ -485,6 +482,8 @@ phosh_app_grid_dispose (GObject *object)
   g_clear_object (&priv->settings);
   g_clear_handle_id (&priv->debounce, g_source_remove);
 
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_APP_GRID);
+
   G_OBJECT_CLASS (phosh_app_grid_parent_class)->dispose (object);
 }
 
@@ -503,18 +502,19 @@ phosh_app_grid_finalize (GObject *object)
 
 
 static gboolean
-phosh_app_grid_key_press_event (GtkWidget   *widget,
-                              GdkEventKey *event)
+on_key_pressed (PhoshAppGrid          *self,
+                guint                  keyval,
+                guint                  keycode,
+                GdkModifierType        state,
+                GtkEventControllerKey *controller)
 {
-  PhoshAppGrid *self = PHOSH_APP_GRID (widget);
   PhoshAppGridPrivate *priv = phosh_app_grid_get_instance_private (self);
 
   /* Don't search when folder is open */
   if (priv->open_folder != NULL)
     return GDK_EVENT_PROPAGATE;
 
-  return gtk_search_entry_handle_event (GTK_SEARCH_ENTRY (priv->search),
-                                        (GdkEvent *) event);
+  return gtk_event_controller_key_forward (controller, priv->search);
 }
 
 
@@ -534,7 +534,7 @@ do_search (gpointer data)
 
   phosh_util_toggle_style_class (GTK_WIDGET (priv->apps), ACTIVE_SEARCH_CLASS, search_active);
   toggle_favorites_revealer (self);
-  gtk_filter_list_model_refilter (priv->model);
+  gtk_filter_changed (priv->filter, GTK_FILTER_CHANGE_DIFFERENT);
 
   priv->debounce = 0;
 }
@@ -548,16 +548,16 @@ on_folder_edit_toggled (PhoshAppGrid *self, GtkToggleButton *toggle_btn)
 
   if (active) {
     const char *folder_name = phosh_folder_info_get_name (priv->open_folder);
-    gtk_entry_set_text (GTK_ENTRY (priv->folder_name_entry), folder_name);
+    gtk_editable_set_text (GTK_EDITABLE (priv->folder_name_entry), folder_name);
     gtk_widget_grab_focus (priv->folder_name_entry);
-    gtk_image_set_from_icon_name (GTK_IMAGE (priv->folder_name_img), "checkmark-symbolic", -1);
+    gtk_image_set_from_icon_name (GTK_IMAGE (priv->folder_name_img), "emblem-ok-symbolic");
   } else {
-    const char *folder_name = gtk_entry_get_text (GTK_ENTRY (priv->folder_name_entry));
+    const char *folder_name = gtk_editable_get_text (GTK_EDITABLE (priv->folder_name_entry));
     if (gm_str_is_null_or_empty (folder_name))
       return;
     phosh_folder_info_set_name (priv->open_folder, folder_name);
-    gtk_entry_set_text (GTK_ENTRY (priv->folder_name_entry), "");
-    gtk_image_set_from_icon_name (GTK_IMAGE (priv->folder_name_img), "document-edit-symbolic", -1);
+    gtk_editable_set_text (GTK_EDITABLE (priv->folder_name_entry), "");
+    gtk_image_set_from_icon_name (GTK_IMAGE (priv->folder_name_img), "document-edit-symbolic");
   }
 }
 
@@ -576,7 +576,7 @@ on_search_changed (GtkSearchEntry *entry,
                    PhoshAppGrid   *self)
 {
   PhoshAppGridPrivate *priv = phosh_app_grid_get_instance_private (self);
-  const char *search = gtk_entry_get_text (GTK_ENTRY (entry));
+  const char *search = gtk_editable_get_text (GTK_EDITABLE (entry));
 
   g_clear_pointer (&priv->search_string, g_free);
 
@@ -593,25 +593,6 @@ on_search_changed (GtkSearchEntry *entry,
     /* don't add the delay when the entry got cleared */
     do_search (self);
   }
-}
-
-
-static void
-on_search_preedit_changed (GtkSearchEntry *entry,
-                           const char     *preedit,
-                           PhoshAppGrid   *self)
-{
-  PhoshAppGridPrivate *priv = phosh_app_grid_get_instance_private (self);
-
-  g_clear_pointer (&priv->search_string, g_free);
-
-  if (preedit && *preedit != '\0')
-    priv->search_string = g_utf8_casefold (preedit, -1);
-
-  g_clear_handle_id (&priv->debounce, g_source_remove);
-
-  priv->debounce = g_timeout_add_once (SEARCH_DEBOUNCE + DEFAULT_GTK_DEBOUNCE, do_search, self);
-  g_source_set_name_by_id (priv->debounce, "[phosh] debounce app grid search (preedit-changed)");
 }
 
 
@@ -645,9 +626,8 @@ on_search_activated (GtkSearchEntry *entry,
 
 
 static gboolean
-on_search_lost_focus (GtkWidget    *widget,
-                      GdkEvent     *event,
-                      PhoshAppGrid *self)
+on_search_lost_focus (GtkEventControllerFocus *focus,
+                      PhoshAppGrid            *self)
 {
   PhoshAppGridPrivate *priv = phosh_app_grid_get_instance_private (self);
 
@@ -658,9 +638,8 @@ on_search_lost_focus (GtkWidget    *widget,
 
 
 static gboolean
-on_search_gained_focus (GtkWidget    *widget,
-                        GdkEvent     *event,
-                        PhoshAppGrid *self)
+on_search_gained_focus (GtkEventControllerFocus *focus,
+                        PhoshAppGrid            *self)
 {
   PhoshAppGridPrivate *priv = phosh_app_grid_get_instance_private (self);
 
@@ -682,8 +661,6 @@ phosh_app_grid_class_init (PhoshAppGridClass *klass)
 
   object_class->set_property = phosh_app_grid_set_property;
   object_class->get_property = phosh_app_grid_get_property;
-
-  widget_class->key_press_event = phosh_app_grid_key_press_event;
 
   /**
    * PhoshAppGrid:filter-adaptive:
@@ -726,8 +703,8 @@ phosh_app_grid_class_init (PhoshAppGridClass *klass)
 
   gtk_widget_class_bind_template_callback (widget_class, on_folder_edit_toggled);
   gtk_widget_class_bind_template_callback (widget_class, on_folder_entry_activated);
+  gtk_widget_class_bind_template_callback (widget_class, on_key_pressed);
   gtk_widget_class_bind_template_callback (widget_class, on_search_changed);
-  gtk_widget_class_bind_template_callback (widget_class, on_search_preedit_changed);
   gtk_widget_class_bind_template_callback (widget_class, on_search_activated);
   gtk_widget_class_bind_template_callback (widget_class, on_search_gained_focus);
   gtk_widget_class_bind_template_callback (widget_class, on_search_lost_focus);
@@ -757,16 +734,16 @@ phosh_app_grid_reset (PhoshAppGrid *self)
   adjustment = gtk_scrolled_window_get_vadjustment (GTK_SCROLLED_WINDOW (priv->scrolled_window));
 
   gtk_adjustment_set_value (adjustment, 0);
-  gtk_entry_set_text (GTK_ENTRY (priv->search), "");
+  gtk_editable_set_text (GTK_EDITABLE (priv->search), "");
   g_clear_pointer (&priv->search_string, g_free);
 
   /* Do not focus last folder */
   priv->open_folder_idx = -1;
-  /* Set duration to 0 to avoid the simultaneous animation of grid sliding up and deck sliding
+  /* Disable transitions to avoid the simultaneous animation of grid sliding up and deck sliding
    * right. If not done, it feels like the deck is spiraling diagonally up. */
-  hdy_deck_set_transition_duration (HDY_DECK (priv->deck), 0);
+  adw_navigation_view_set_animate_transitions (ADW_NAVIGATION_VIEW (priv->deck), FALSE);
   show_main_grid (self);
-  hdy_deck_set_transition_duration (HDY_DECK (priv->deck), 200);
+  adw_navigation_view_set_animate_transitions (ADW_NAVIGATION_VIEW (priv->deck), TRUE);
 }
 
 
@@ -792,10 +769,12 @@ phosh_app_grid_handle_search (PhoshAppGrid *self, GdkEvent *event)
 
   /* Prevent stealing of focus when folder is open and it's name entry is active */
   if (priv->open_folder != NULL)
-    return GDK_EVENT_PROPAGATE;
+    return FALSE;
 
-  ret = gtk_search_entry_handle_event (GTK_SEARCH_ENTRY (priv->search), event);
-  if (ret == GDK_EVENT_STOP)
+  // FIXME Port to GTK 4
+  // gtk_search_entry_handle_event (GTK_SEARCH_ENTRY (priv->search), event);
+  ret = FALSE;
+  if (ret == TRUE)
     gtk_entry_grab_focus_without_selecting (GTK_ENTRY (priv->search));
 
   return ret;
@@ -818,6 +797,6 @@ phosh_app_grid_set_filter_adaptive (PhoshAppGrid *self, gboolean enable)
   priv->filter_adaptive = enable;
   update_filter_adaptive_button (self);
 
-  gtk_filter_list_model_refilter (priv->model);
+  gtk_filter_changed (priv->filter, GTK_FILTER_CHANGE_DIFFERENT);
   g_object_notify_by_pspec (G_OBJECT (self), props[PROP_FILTER_ADAPTIVE]);
 }

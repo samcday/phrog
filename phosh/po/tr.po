@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: phosh\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/World/Phosh/phosh/issues\n"
-"POT-Creation-Date: 2026-02-04 11:02+0000\n"
-"PO-Revision-Date: 2026-02-06 00:18+0300\n"
-"Last-Translator: Sabri Ünal <yakushabb@gmail.com>\n"
+"POT-Creation-Date: 2025-12-14 14:33+0000\n"
+"PO-Revision-Date: 2025-11-16 08:00+0300\n"
+"Last-Translator: Emin Tufan Çetin <etcetin@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -150,17 +150,13 @@ msgstr "Yeni klasör oluştur"
 msgid "Application"
 msgstr "Uygulama"
 
-#: src/app-grid.c:264
+#: src/app-grid.c:261
 msgid "Show All Apps"
 msgstr "Tüm Uygulamaları Göster"
 
-#: src/app-grid.c:267
+#: src/app-grid.c:264
 msgid "Show Only Mobile Friendly Apps"
 msgstr "Yalnızca Mobil Uyumluları Göster"
-
-#: src/audio-manager.c:74
-msgid "Phone Shell Volume Control"
-msgstr "Telefon Kabuğu Ses Denetimi"
 
 #. Translators: a battery level in percent
 #: src/bt-device-row.c:81
@@ -295,7 +291,7 @@ msgstr "Hayır"
 msgid "Enter Passcode"
 msgstr "Parolayı Gir"
 
-#: src/lockscreen.c:1036
+#: src/lockscreen.c:1040
 msgid "Checking…"
 msgstr "Denetleniyor…"
 
@@ -327,27 +323,27 @@ msgid "Screenshot from %s%s.png"
 msgstr "Ekran görüntüsü %s%s.png"
 
 #. Translators: Used when the title of a song is unknown
-#: src/media-player.c:691 src/ui/media-player.ui:208
+#: src/media-player.c:690 src/ui/media-player.ui:208
 msgid "Unknown Title"
 msgstr "Bilinmeyen Başlık"
 
 #. Translators: Used when the artist of a song is unknown
-#: src/media-player.c:699 src/ui/media-player.ui:196
+#: src/media-player.c:698 src/ui/media-player.ui:196
 msgid "Unknown Artist"
 msgstr "Bilinmeyen Sanatçı"
 
-#: src/monitor-manager.c:129
+#: src/monitor-manager.c:128
 msgid "Built-in display"
 msgstr "İç ekran"
 
-#: src/monitor-manager.c:147
+#: src/monitor-manager.c:146
 #, c-format
 msgctxt ""
 "This is a monitor vendor name, followed by a size in inches, like 'Dell 15\"'"
 msgid "%s %s"
 msgstr "%s %s"
 
-#: src/monitor-manager.c:154
+#: src/monitor-manager.c:153
 #, c-format
 msgctxt ""
 "This is a monitor vendor name followed by product/model name where size in "
@@ -356,7 +352,7 @@ msgid "%s %s"
 msgstr "%s %s"
 
 #. Translators: An unknown monitor type
-#: src/monitor-manager.c:163
+#: src/monitor-manager.c:162
 msgid "Unknown"
 msgstr "Bilinmeyen"
 
@@ -478,17 +474,17 @@ msgid "Almost %dy"
 msgid_plural "Almost %dy"
 msgstr[0] "Neredeyse %d yıl"
 
-#: src/polkit-auth-agent.c:275
+#: src/polkit-auth-agent.c:271
 msgid "Authentication dialog was dismissed by the user"
 msgstr "Kullanıcı, kimlik doğrulama kutusunu görmezden geldi"
 
-#: src/polkit-auth-prompt.c:382 src/ui/gtk-mount-prompt.ui:17
-#: src/ui/network-auth-prompt.ui:69 src/ui/polkit-auth-prompt.ui:44
+#: src/polkit-auth-prompt.c:275 src/ui/gtk-mount-prompt.ui:17
+#: src/ui/network-auth-prompt.ui:69 src/ui/polkit-auth-prompt.ui:45
 #: src/ui/system-prompt.ui:28
 msgid "Password:"
 msgstr "Parola:"
 
-#: src/polkit-auth-prompt.c:429
+#: src/polkit-auth-prompt.c:322
 msgid "Sorry, that didn’t work. Please try again."
 msgstr "Üzgünüz, işe yaramadı. Lütfen yeniden deneyin."
 
@@ -519,6 +515,10 @@ msgstr "ESC’ye basarak kapat"
 msgid "Running '%s' failed"
 msgstr "'%s' çalıştırılamadı"
 
+#: src/settings/audio-settings.c:376
+msgid "Phone Shell Volume Control"
+msgstr "Telefon Kabuğu Ses Denetimi"
+
 #: src/system-prompt.c:376
 msgid "Passwords do not match."
 msgstr "Parolalar eşleşmiyor."
@@ -527,7 +527,7 @@ msgstr "Parolalar eşleşmiyor."
 msgid "Password cannot be blank"
 msgstr "Parola boş olamaz"
 
-#: src/torch-info.c:84
+#: src/torch-info.c:80
 msgid "Torch"
 msgstr "Fener"
 
@@ -633,7 +633,7 @@ msgstr "Geri Bildirim"
 msgid "Do not disturb"
 msgstr "Rahatsız etme"
 
-#: src/ui/feedback-status-page.ui:53
+#: src/ui/feedback-status-page.ui:52
 msgid "Feedback Settings"
 msgstr "Geri Bildirim Ayarları"
 
@@ -675,7 +675,7 @@ msgstr "İ_ptal"
 msgid "C_onnect"
 msgstr "_Bağlan"
 
-#: src/ui/polkit-auth-prompt.ui:96
+#: src/ui/polkit-auth-prompt.ui:97
 msgid "Authenticate"
 msgstr "Kimlik Doğrula"
 
@@ -803,13 +803,9 @@ msgstr "Açık"
 msgid "Caffeine timers"
 msgstr "Kafein zamanlayıcıları"
 
-#: plugins/caffeine-quick-setting/qs.ui:38
+#: plugins/caffeine-quick-setting/qs.ui:37
 msgid "No caffeine intervals"
 msgstr "Kafein aralıkları yok"
-
-#: plugins/caffeine-quick-setting/qs.ui:55
-msgid "Caffeine Settings"
-msgstr "Kafein Ayarları"
 
 #: plugins/caffeine-quick-setting/prefs/caffeine-quick-setting-prefs.c:253
 #: plugins/caffeine-quick-setting/prefs/prefs.ui:171

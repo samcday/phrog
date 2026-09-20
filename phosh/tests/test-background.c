@@ -48,11 +48,11 @@ test_background_new (Fixture *fixture, gconstpointer unused)
   gboolean primary;
   GtkWidget *background;
 
-  background = phosh_background_new (phosh_wayland_get_zwlr_layer_shell_v1(
+  background = g_object_ref_sink (phosh_background_new (phosh_wayland_get_zwlr_layer_shell_v1(
                                        fixture->base.state->wl),
                                      phosh_test_get_monitor (fixture->base.state),
                                      TRUE,
-                                     ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND);
+                                     ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND));
 
   gtk_widget_set_visible (background, TRUE);
 
@@ -64,7 +64,7 @@ test_background_new (Fixture *fixture, gconstpointer unused)
   g_object_get (background, "primary", &primary, NULL);
   g_assert_false (primary);
 
-  gtk_widget_destroy (background);
+  g_object_unref (background);
 }
 
 int

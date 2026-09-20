@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "audio/audio-device.h"
+#include "audio-device.h"
 
 #include <gtk/gtk.h>
 

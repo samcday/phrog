@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
-  <requires lib="libhandy" version="1.8"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshOverview" parent="GtkBox">
     <property name="visible">1</property>
     <property name="orientation">vertical</property>
     <child>
-      <object class="HdyCarousel" id="carousel_running_activities">
+      <object class="AdwCarousel" id="carousel_running_activities">
         <signal name="notify::n-pages" handler="on_n_pages_changed" object="PhoshOverview" swapped="yes"/>
         <signal name="page-changed" handler="on_page_changed" object="PhoshOverview" swapped="yes"/>
+        <property name="visible">0</property>
         <property name="spacing">18</property>
         <property name="margin-bottom">6</property>
         <property name="hexpand">1</property>
@@ -18,7 +18,7 @@
       </object>
     </child>
     <child>
-      <object class="GtkEventBox" id="evbox_app_grid">
+      <object class="GtkBox" id="evbox_app_grid">
         <property name="visible">1</property>
         <child>
           <object class="PhoshAppGrid" id="app_grid">

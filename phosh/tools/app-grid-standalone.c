@@ -9,55 +9,56 @@
  */
 
 #include <app-grid.h>
+#include <adwaita.h>
+
 
 static void
 css_setup (void)
 {
   GtkCssProvider *provider;
   GFile *file;
-  GError *error = NULL;
 
   provider = gtk_css_provider_new ();
   file = g_file_new_for_uri ("resource:///mobi/phosh/stylesheet/adwaita-dark.css");
 
-  if (!gtk_css_provider_load_from_file (provider, file, &error)) {
-    g_warning ("Failed to load CSS file: %s", error->message);
-    g_clear_error (&error);
-    g_object_unref (file);
-    return;
-  }
-  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
-                                             GTK_STYLE_PROVIDER (provider),
-                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  gtk_css_provider_load_from_file (provider, file);
+  gtk_style_context_add_provider_for_display (gdk_display_get_default (),
+                                              GTK_STYLE_PROVIDER (provider),
+                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   g_object_unref (file);
+
+  g_object_set (adw_style_manager_get_default (),
+                "color-scheme", ADW_COLOR_SCHEME_FORCE_DARK,
+                NULL);
 }
+
+
+static void
+on_activate (AdwApplication *app)
+{
+  GtkWindow *window;
+  GtkWidget *grid;
+
+  css_setup ();
+
+  window = g_object_new (GTK_TYPE_APPLICATION_WINDOW,
+                         "application", app,
+                         "title", "AppGridStandalone",
+                         NULL);
+  grid = g_object_new (PHOSH_TYPE_APP_GRID, NULL);
+  gtk_window_set_child (window, grid);
+
+  gtk_window_present (window);
+}
+
 
 int
 main (int argc, char *argv[])
 {
-  GtkWidget *win;
-  GtkWidget *widget;
+  g_autoptr (AdwApplication) app = NULL;
 
-  gtk_init (&argc, &argv);
-
-  css_setup ();
-
-  g_object_set (gtk_settings_get_default (),
-                "gtk-application-prefer-dark-theme", TRUE,
-                NULL);
-
-  win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  g_signal_connect (win, "delete-event", G_CALLBACK (gtk_main_quit), NULL);
-
-  gtk_widget_set_visible (win, TRUE);
-
-  widget = g_object_new (PHOSH_TYPE_APP_GRID, NULL);
-
-  gtk_widget_set_visible (widget, TRUE);
-
-  gtk_container_add (GTK_CONTAINER (win), widget);
-
-  gtk_main ();
-
-  return 0;
+  app = adw_application_new ("mobi.phosh.tools.AppGridStandalone",
+                             G_APPLICATION_DEFAULT_FLAGS);
+  g_signal_connect (app, "activate", G_CALLBACK (on_activate), NULL);
+  return g_application_run (G_APPLICATION (app), argc, argv);
 }

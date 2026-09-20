@@ -119,7 +119,7 @@ phosh_osd_window_set_property (GObject      *obj,
   case PROP_ICON_NAME:
     g_free (self->icon_name);
     self->icon_name = g_value_dup_string (value);
-    gtk_image_set_from_icon_name (GTK_IMAGE (self->icon), self->icon_name, GTK_ICON_SIZE_INVALID);
+    gtk_image_set_from_icon_name (GTK_IMAGE (self->icon), self->icon_name);
     break;
   case PROP_LEVEL:
     set_level (self, g_value_get_double (value));
@@ -169,7 +169,7 @@ phosh_osd_window_get_property (GObject    *obj,
 static void
 on_button_released (PhoshOsdWindow *self)
 {
-  gtk_widget_destroy (GTK_WIDGET (self));
+  gtk_window_destroy (GTK_WINDOW (self));
 }
 
 
@@ -181,10 +181,18 @@ phosh_osd_window_map (GtkWidget *widget)
 
   GTK_WIDGET_CLASS (phosh_osd_window_parent_class)->map (widget);
 
-  width = gtk_widget_get_allocated_width (widget);
+  width = gtk_widget_get_width (widget);
   phosh_layer_surface_set_size (PHOSH_LAYER_SURFACE (self), width, -1);
 }
 
+
+static void
+phosh_osd_window_dispose (GObject *obj)
+{
+  gtk_widget_dispose_template (GTK_WIDGET (obj), PHOSH_TYPE_OSD_WINDOW);
+
+  G_OBJECT_CLASS (phosh_osd_window_parent_class)->dispose (obj);
+}
 
 static void
 phosh_osd_window_finalize (GObject *obj)
@@ -207,6 +215,7 @@ phosh_osd_window_class_init (PhoshOsdWindowClass *klass)
 
   object_class->get_property = phosh_osd_window_get_property;
   object_class->set_property = phosh_osd_window_set_property;
+  object_class->dispose = phosh_osd_window_dispose;
   object_class->finalize = phosh_osd_window_finalize;
 
   widget_class->map = phosh_osd_window_map;
@@ -270,8 +279,6 @@ static void
 phosh_osd_window_init (PhoshOsdWindow *self)
 {
   gtk_widget_init_template (GTK_WIDGET (self));
-
-  gtk_widget_add_events (GTK_WIDGET (self), GDK_BUTTON_RELEASE_MASK);
 }
 
 

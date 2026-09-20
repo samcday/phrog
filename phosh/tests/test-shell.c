@@ -14,8 +14,9 @@
 #include "wall-clock.h"
 
 #include <glib.h>
-#include <handy.h>
+#include <adwaita.h>
 
+GMainLoop *global_loop;
 
 static void
 compositor_setup (PhoshTestCompositorFixture *fixture, gconstpointer unused)
@@ -46,7 +47,7 @@ compositor_teardown (PhoshTestCompositorFixture *fixture, gconstpointer unused)
 static gboolean
 on_idle (gpointer data)
 {
-  gtk_main_quit ();
+  g_main_loop_quit (global_loop);
 
   *(gboolean*)data = TRUE;
 
@@ -66,8 +67,8 @@ phosh_test_get_shell (GLogLevelFlags *saved_flags)
   PhoshShell *shell;
   GLogLevelFlags flags;
 
-  gtk_init (NULL, NULL);
-  hdy_init ();
+  gtk_init ();
+  adw_init ();
 
   g_log_writer_default_set_debug_domains ((const char * const[]){ "all", NULL });
 
@@ -134,7 +135,8 @@ test_shell_new (PhoshTestCompositorFixture *fixture, gconstpointer unused)
   g_assert_cmpint (phosh_monitor_manager_get_num_monitors (mm), ==, 1);
 
   g_idle_add (on_idle, &success);
-  gtk_main ();
+  global_loop = g_main_loop_new (NULL, FALSE);
+  g_main_loop_run (global_loop);
 
   /* No warnings allowed from here on */
   g_log_set_always_fatal (flags);
@@ -170,7 +172,8 @@ test_shell_new_two_outputs (PhoshTestCompositorFixture *fixture, gconstpointer u
     g_main_context_iteration (NULL, FALSE);
 
   g_idle_add (on_idle, &success);
-  gtk_main ();
+  global_loop = g_main_loop_new (NULL, FALSE);
+  g_main_loop_run (global_loop);
 
   g_log_set_always_fatal (flags);
   g_assert_true (success);

@@ -12,7 +12,7 @@ G_BEGIN_DECLS
 
 #define PHOSH_TYPE_STATUS_PAGE_PLACEHOLDER (phosh_status_page_placeholder_get_type ())
 
-G_DECLARE_FINAL_TYPE (PhoshStatusPagePlaceholder, phosh_status_page_placeholder, PHOSH, STATUS_PAGE_PLACEHOLDER, GtkBin)
+G_DECLARE_FINAL_TYPE (PhoshStatusPagePlaceholder, phosh_status_page_placeholder, PHOSH, STATUS_PAGE_PLACEHOLDER, GtkWidget)
 
 PhoshStatusPagePlaceholder *phosh_status_page_placeholder_new           (void);
 void                        phosh_status_page_placeholder_set_title     (PhoshStatusPagePlaceholder *self,

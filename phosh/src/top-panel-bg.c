@@ -81,13 +81,9 @@ phosh_top_panel_bg_init (PhoshTopPanelBg *self)
 
 
 PhoshTopPanelBg *
-phosh_top_panel_bg_new (struct zwlr_layer_shell_v1 *layer_shell,
-                        PhoshMonitor               *monitor,
-                        guint32                     layer)
-
+phosh_top_panel_bg_new (PhoshMonitor *monitor, guint32 layer)
 {
   return g_object_new (PHOSH_TYPE_TOP_PANEL_BG,
-                       "layer-shell", layer_shell,
                        "wl-output", monitor->wl_output,
                        "anchor", (ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP |
                                   ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM |

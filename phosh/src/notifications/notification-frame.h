@@ -18,7 +18,7 @@ G_BEGIN_DECLS
 #define PHOSH_TYPE_NOTIFICATION_FRAME (phosh_notification_frame_get_type ())
 
 
-G_DECLARE_FINAL_TYPE (PhoshNotificationFrame, phosh_notification_frame, PHOSH, NOTIFICATION_FRAME, GtkEventBox)
+G_DECLARE_FINAL_TYPE (PhoshNotificationFrame, phosh_notification_frame, PHOSH, NOTIFICATION_FRAME, GtkBox)
 
 
 GtkWidget         *phosh_notification_frame_new               (gboolean show_body,

@@ -4,7 +4,6 @@ subdir('notifications')
 subdir('wwan')
 subdir('search')
 subdir('settings')
-subdir('gtk-list-models')
 
 phosh_enums_header_subdir = 'phosh'
 
@@ -66,6 +65,7 @@ phosh_enum_headers = files(
   'monitor/monitor.h',
   'notifications/notification.h',
   'notifications/notify-manager.h',
+  'layersurface.h',
   'phosh-wayland.h',
   'rotation-manager.h',
   'shell-priv.h',
@@ -124,7 +124,6 @@ phosh_tool_headers = files(
   'app-grid-folder-button.h',
   'app-grid.h',
   'app-list-model.h',
-  'audio-manager.h',
   'auth-prompt-option.h',
   'auto-brightness-bucket.h',
   'auto-brightness.h',
@@ -203,9 +202,6 @@ phosh_tool_sources = files(
   'app-grid-folder-button.c',
   'app-grid.c',
   'app-list-model.c',
-  'audio-manager.c',
-  'audio/audio-device.c',
-  'audio/audio-devices.c',
   'auth-prompt-option.c',
   'auto-brightness-bucket.c',
   'auto-brightness.c',
@@ -312,8 +308,6 @@ libphosh_headers = files(
 phosh_headers = files(
   'app-tracker.h',
   'arrow.h',
-  'audio/audio-device.h',
-  'audio/audio-devices.h',
   'auth.h',
   'background-manager.h',
   'backlight-sysfs.h',
@@ -467,18 +461,18 @@ phosh_deps = [
   glib_dep,
   gmodule_dep,
   gmobile_dep,
+  gnome_bg_dep,
   gnome_bluetooth_custom_dep,
   gnome_bluetooth_headers_dep,
   gnome_desktop_dep,
   gobject_dep,
   gsettings_desktop_schemas_dep,
   gtk_dep,
-  gtk_wayland_dep,
+  libadwaita_dep,
   libcall_ui_dep,
   gudev_dep,
   libfeedback_dep,
   libgvc_dep,
-  libhandy_dep,
   libnm_dep,
   libpolkit_agent_dep,
   libsystemd_dep,
@@ -500,7 +494,6 @@ phosh_lib_inc = [
   phosh_wwan_inc,
   proto_inc,
   dbus_inc,
-  phosh_gtk_list_models_inc,
 ]
 
 # A static library used by tests and tools
@@ -511,7 +504,6 @@ phosh_tool_lib = static_library(
     phosh_tool_headers,
     phosh_generated_headers,
     phosh_generated_sources,
-    phosh_gtk_list_models_sources,
   ],
   include_directories: phosh_lib_inc,
   dependencies: phosh_deps,
@@ -627,9 +619,9 @@ if enable_introspection or bindings_lib
     includes: [
       'Gcr-3',
       'Gio-2.0',
-      'Gtk-3.0',
-      'GnomeDesktop-3.0',
-      'Handy-1',
+      'Gtk-4.0',
+      'GnomeDesktop-4.0',
+      'Adw-1',
       'NM-1.0',
       'GnomeBluetooth-3.0',
     ],

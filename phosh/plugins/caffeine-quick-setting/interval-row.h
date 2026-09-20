@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <handy.h>
+#include <adwaita.h>
 
 #define PHOSH_INTERVAL_ROW_INFINITY_VALUE G_MAXUINT32
 
@@ -14,7 +14,7 @@ G_BEGIN_DECLS
 
 #define PHOSH_TYPE_INTERVAL_ROW (phosh_interval_row_get_type ())
 
-G_DECLARE_FINAL_TYPE (PhoshIntervalRow, phosh_interval_row, PHOSH, INTERVAL_ROW, HdyActionRow)
+G_DECLARE_FINAL_TYPE (PhoshIntervalRow, phosh_interval_row, PHOSH, INTERVAL_ROW, AdwActionRow)
 
 PhoshIntervalRow *phosh_interval_row_new (uint value, gboolean selected);
 uint              phosh_interval_row_get_value (PhoshIntervalRow *self);

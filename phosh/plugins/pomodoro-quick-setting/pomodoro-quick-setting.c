@@ -359,7 +359,7 @@ phosh_pomodoro_quick_setting_init (PhoshPomodoroQuickSetting *self)
 {
   gtk_widget_init_template (GTK_WIDGET (self));
 
-  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_default (),
+  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_for_display (gdk_display_get_default ()),
                                     "/mobi/phosh/plugins/pomodoro-quick-setting/icons");
 
   self->settings = g_settings_new ("mobi.phosh.plugins.pomodoro");

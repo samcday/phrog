@@ -14,7 +14,7 @@
 #include "layersurface-priv.h"
 #include "shell-priv.h"
 
-#include <handy.h>
+#include <adwaita.h>
 
 /**
  * PhoshFader:
@@ -60,7 +60,7 @@ fadeout_value_cb (double value, PhoshFader *self)
 static void
 fadeout_done_cb (GtkWidget *self)
 {
-  gtk_widget_destroy (self);
+  gtk_window_destroy (GTK_WINDOW (self));
 }
 
 
@@ -126,16 +126,14 @@ phosh_fader_show (GtkWidget *widget)
 {
   PhoshFader *self = PHOSH_FADER (widget);
   gboolean enable_animations;
-  GtkStyleContext *context;
 
-  enable_animations = hdy_get_enable_animations (widget);
+  enable_animations = adw_get_enable_animations (widget);
 
   if (enable_animations) {
     const char *style_class;
 
     style_class = self->style_class ?: PHOSH_FADER_DEFAULT_STYLE_CLASS;
-    context = gtk_widget_get_style_context (widget);
-    gtk_style_context_add_class (context, style_class);
+    gtk_widget_add_css_class (widget, style_class);
   }
 
   GTK_WIDGET_CLASS (phosh_fader_parent_class)->show (widget);
@@ -165,7 +163,6 @@ phosh_fader_constructed (GObject *object)
     self->monitor = g_object_ref (phosh_shell_get_primary_monitor (phosh_shell_get_default ()));
 
   g_object_set (PHOSH_LAYER_SURFACE (self),
-                "layer-shell", phosh_wayland_get_zwlr_layer_shell_v1 (wl),
                 "wl-output", phosh_monitor_get_wl_output (self->monitor),
                 "anchor", ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP |
                 ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM |
@@ -251,7 +248,7 @@ phosh_fader_hide (PhoshFader *self)
   g_return_if_fail (PHOSH_IS_FADER (self));
 
   if (self->fade_out_time == 0) {
-    gtk_widget_destroy (GTK_WIDGET (self));
+    gtk_window_destroy (GTK_WINDOW (self));
     return;
   }
 

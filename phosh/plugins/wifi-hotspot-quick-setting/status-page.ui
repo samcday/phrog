@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshWifiHotspotStatusPage" parent="PhoshStatusPage">
     <property name="visible">1</property>
     <property name="title" translatable="yes">Wi-Fi Hotspot</property>
@@ -12,15 +12,20 @@
     <property name="transition-type">crossfade</property>
     <property name="vhomogeneous">0</property>
     <child>
+      <object class="GtkStackPage">
+        <property name="name">empty_state</property>
+        <property name="child">
       <object class="PhoshStatusPagePlaceholder" id="placeholder">
         <property name="visible">1</property>
         <property name="extra-widget">turn_on_btn</property>
       </object>
-      <packing>
-        <property name="name">empty_state</property>
-      </packing>
+        </property>
+      </object>
     </child>
     <child>
+      <object class="GtkStackPage">
+        <property name="name">hotspot_enabled</property>
+        <property name="child">
       <object class="GtkBox">
         <property name="visible">1</property>
         <property name="orientation">vertical</property>
@@ -60,9 +65,8 @@
           </object>
         </child>
       </object>
-      <packing>
-        <property name="name">hotspot_enabled</property>
-      </packing>
+        </property>
+      </object>
     </child>
   </object>
   <object class="GtkButton" id="turn_on_btn">
@@ -77,7 +81,7 @@
     <property name="hexpand">1</property>
     <property name="focus-on-click">0</property>
     <property name="action-name">panel.launch-panel</property>
-    <property name="action-target">(&quot;wifi&quot;, [&lt;&quot;&quot;&gt;])</property>
+    <property name="action-target">&quot;wifi&quot;</property>
     <child>
       <object class="GtkLabel">
         <property name="visible">1</property>

@@ -9,7 +9,6 @@
 #include "testlib-compositor.h"
 
 #include "layersurface-priv.h"
-#include <gdk/gdkwayland.h>
 
 #include <glib.h>
 
@@ -31,7 +30,7 @@ test_layer_surface_new (PhoshTestCompositorFixture *fixture, gconstpointer unuse
                                                 monitor->wl_output);
 
   g_assert_true (PHOSH_IS_LAYER_SURFACE (surface));
-  gtk_widget_destroy (surface);
+  g_object_unref (surface);
 }
 
 
@@ -60,7 +59,7 @@ test_layer_surface_g_object_new (PhoshTestCompositorFixture *fixture, gconstpoin
   gtk_widget_set_visible (surface, FALSE);
   g_assert_false (gtk_widget_get_visible (surface));
   g_assert_false (gtk_widget_get_mapped (surface));
-  gtk_widget_destroy (surface);
+  g_object_unref (surface);
 }
 
 
@@ -118,7 +117,7 @@ test_layer_surface_set_size (PhoshTestCompositorFixture *fixture, gconstpointer 
   g_assert_cmpint (height_count, ==, 3);
   gtk_widget_set_visible (surface, TRUE);
   gtk_widget_set_visible (surface, FALSE);
-  gtk_widget_destroy (surface);
+  g_object_unref (surface);
 }
 
 
