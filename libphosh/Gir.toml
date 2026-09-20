@@ -1,0 +1,54 @@
+[external_libraries]
+Gio = {min_version = "2.66"}
+[options]
+girs_directories = ["../gir-files", "../"]
+library = "Phosh"
+version = "0"
+min_cfg_version = "1"
+target_path = "."
+use_gi_docgen = true
+work_mode = "normal"
+generate_safety_asserts = true
+deprecate_by_min_version = true
+# with this option enabled, versions for gir and gir-files saved only to one file to minimize noise
+single_version_file = true
+generate_builder = true
+trust_return_value_nullability = true
+
+external_libraries = [
+  "Gdk",
+  "Gio",
+  "GLib",
+  "GObject",
+]
+
+generate = [
+  "Phosh.Lockscreen",
+  "Phosh.LockscreenManager",
+  "Phosh.LockscreenPage",
+  "Phosh.QuickSetting",
+  "Phosh.ScreenshotManager",
+  "Phosh.Shell",
+  "Phosh.StatusIcon",
+  "Phosh.StatusPage",
+  "Phosh.WallClock",
+]
+
+manual = [
+  "Gdk.Rectangle",
+  "Gio.AsyncReadyCallback",
+  "Gio.AsyncResult",
+  "Gio.Cancellable",
+  "GLib.Error",
+  "Gtk.Bin",
+  "Gtk.Button",
+  "Gtk.Container",
+  "Gtk.Widget",
+  "Gtk.Window",
+]
+
+ignore = [
+    "Phosh.DBusScreenshotProxy",
+    "Phosh.DBusScreenshotSkeleton",
+]
+
