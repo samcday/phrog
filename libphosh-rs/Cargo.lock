@@ -460,6 +460,7 @@ dependencies = [
  "libc",
  "libhandy-sys",
  "pango-sys",
+ "pkg-config",
  "shell-words",
  "system-deps 7.0.5",
  "tempfile",
