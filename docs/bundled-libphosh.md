@@ -1,11 +1,12 @@
 # Experimental bundled libphosh
 
-The default build uses the published Rust bindings and the installed
-`libphosh-0.45` ABI through pkg-config. `cargo vendored-phosh build` instead selects our
-vendored Rust bindings, compiles the bundled GTK3 Phosh source, and statically
-links libphosh and its internal helper libraries. GTK3, libhandy,
-and other native dependencies remain shared. This is not a standalone binary.
-Distro packages continue using system libphosh.
+On this GTK4 development branch, both modes use the local regenerated GTK4
+Rust bindings. The default build dynamically links an installed GTK4
+`libphosh-0.45`; `cargo vendored-phosh build` instead compiles the bundled GTK4
+Phosh source and statically links libphosh and its internal helper libraries.
+GTK4, libadwaita, and other native dependencies remain shared. See
+[GTK4 development](gtk4.md) for the required custom GTK and supported environment.
+This is not a standalone binary and no GTK4 distro packages are published.
 
 Vendoring and linking are separate choices: the repository records an exact
 Phosh source snapshot, while the Cargo configuration selects how that snapshot is
@@ -61,15 +62,11 @@ an interrupted build does not discard prepared downloads.
 Meson setup uses `--wrap-mode=nodownload`, so other native dependencies must be
 installed rather than implicitly fetched.
 
-Switching between registry and local crates changes `Cargo.lock`. Run the first
-build after a switch without `--locked`; subsequent builds/tests in that mode
-can use `--locked`. The committed lockfile describes the default registry build.
-CI starts from that lockfile, builds through `cargo vendored-phosh build`, then runs
-`cargo vendored-phosh test --locked` and lint with the same vendor configuration.
-Fork PRs retain test-recording artifacts, but hosted demo publication is limited
-to same-repository runs because forks cannot access the publication credentials.
-Returning to `cargo build` restores registry resolution. Do not commit the
-vendor-mode lockfile as the default lockfile.
+Unlike the GTK3 branch, switching modes here does not switch between registry
+and local bindings: both use the same local GTK4 crates. The root lockfile
+therefore works with `--locked` in either mode. The wrapper still selects an
+isolated target directory and matching schemas. Fork PRs retain recording
+artifacts, while hosted demo publication is limited to same-repository runs.
 
 For a fully offline rebuild after preparing both Cargo and native dependencies:
 
@@ -88,12 +85,11 @@ build input.
 to the bindings crate. The internal selector accepts `always` or `never`; it
 rejects implicit fallback (`auto`) and unknown values. The vendor configuration
 forces `always`, even if the shell has selected `never`. Ordinary builds do not
-load this configuration and use the public bindings.
+load this configuration and dynamically link using the local GTK4 bindings.
 
-This configuration-based interface avoids forwarding an unpublished Cargo
-feature. The published phrog archive excludes both native subtrees and the
-checkout-only dispatcher, configuration, and runner. No patched binding release or
-publication-time manifest rewrite is needed.
+This configuration-based interface is shared with #186 and does not require an
+unpublished Cargo feature. GTK4 uses local bindings even in dynamic mode because
+the registry bindings target GTK3. Crate publication is disabled on this branch.
 
 Only native builds are currently supported for embedding. Cross builds should
 use system libphosh in a properly configured target sysroot. Meson cross-file
@@ -126,22 +122,11 @@ schema and translation data and arrange schema discovery explicitly. This PR
 does not switch any distro package to that model. Packaged static embedding and
 its data upgrade policy remain separate follow-up work.
 
-The embedding interface requires a repository checkout with these patched Rust
-bindings. Published crates use the registry bindings and the system-library
-build; the native and bindings subtrees are excluded from phrog's crate archive.
-Git source archives retain them. Coordinating an embedding interface with the
-upstream bindings is future work.
+Both GTK4 modes require a repository checkout or source archive containing the
+local bindings. The native Phosh subtree is needed only for embedding.
 
-## Upstream tracking and GTK4 reconciliation
+## Upstream tracking
 
-- Phosh subtree: `62fde093044d90b82154e68a39feb8e6ea967ef5` (Phosh 0.53.0).
-- Rust bindings subtree: `5a356759a8f087263c0656d6a11dce2e76cab551`.
-- gvc: `d2442f455844e5292cb4a74ffc66ecc8d7595a9f`.
-- libcall-ui: `7389b4ae90e101620ef8e790e76a98e434bd920c` (v0.1.5).
-
-Keep subtree updates separate from local embedding patches. The GTK4 branch
-already includes the original static-build prototype. When reconciling this
-work, preserve its GTK4 sources and regenerated bindings, adopt the vendor
-dispatcher/configuration, and adapt its native targets and schema setup.
-Do not replace its Phosh subtree with this GTK3 snapshot. Static embedding does
-not settle the GTK4 migration or its release schedule.
+See [GTK4 development](gtk4.md) for source pins and local patches. Keep upstream
+snapshot updates separate from changes to the embedding interface inherited
+from #186. Static embedding does not settle the GTK4 release schedule.

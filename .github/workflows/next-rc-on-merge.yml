@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   tag-release-pr:
-    if: github.event.pull_request.merged == true && github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.event.pull_request.head.ref, 'release/v')
+    if: github.event.pull_request.base.ref == 'main' && github.event.pull_request.merged == true && github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.event.pull_request.head.ref, 'release/v')
     runs-on: ubuntu-latest
     steps:
       - name: Require release automation token
@@ -66,7 +66,7 @@ jobs:
             -f sha="$MERGE_SHA" >/dev/null
 
   next-rc:
-    if: github.event.pull_request.merged == true && github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.event.pull_request.head.ref, 'release/v')
+    if: github.event.pull_request.base.ref == 'main' && github.event.pull_request.merged == true && github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.event.pull_request.head.ref, 'release/v')
     runs-on: ubuntu-latest
     steps:
       - name: Parse next rc version from merged release branch

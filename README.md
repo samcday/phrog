@@ -1,5 +1,10 @@
 ## 🐸 (phrog)
 
+> **GTK4 development branch.** GTK3 stable releases continue on `main`.
+> This branch requires unreleased GTK and Phosh snapshots; normal distro
+> packages below provide the stable GTK3 version. See [GTK4 development](docs/gtk4.md)
+> for the pinned dependencies, build commands, and known gaps.
+
 <img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/0.53.0/demo.webp">
 
 <br />
@@ -91,8 +96,8 @@ phoc -S -E "cargo test"
 
 ### Experimental bundled libphosh
 
-System libphosh remains the default, including for distro packages. This checkout
-also carries Phosh and its Rust bindings for opt-in static embedding:
+On this branch, plain Cargo commands use the local GTK4 Rust bindings and an
+installed GTK4 libphosh. Embedding the pinned Phosh source is opt-in:
 
 ```sh
 # Install the native build dependencies first.
@@ -102,7 +107,7 @@ phoc -S -E 'cargo vendored-phosh test -- --test-threads=1'
 
 This embeds libphosh, not GTK or the rest of the native stack. See
 [the bundled-build notes](docs/bundled-libphosh.md) for dependencies, runtime data,
-local testing, and limitations. GTK4 is developed separately.
+local testing, and limitations.
 
 ## Getting help
 

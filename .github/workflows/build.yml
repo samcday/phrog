@@ -9,9 +9,9 @@ on:
         type: boolean
         default: false
   push:
-    branches: [main]
+    branches: [gtk4]
   pull_request:
-    branches: [main, vendor-base]
+    branches: [gtk4, main, vendor-base]
     types: [labeled, opened, reopened, synchronize]
   workflow_dispatch: {}
 
@@ -103,9 +103,6 @@ jobs:
       - name: Test embedding build support
         if: matrix.libphosh == 'bundled'
         run: cargo vendored-phosh test --locked --manifest-path libphosh-rs/Cargo.toml -p libphosh-sys --test build_metadata --test native_source
-      - name: Verify registry package
-        if: matrix.libphosh == 'system'
-        run: cargo package --locked --no-verify
       - name: Lint (fmt)
         run: |
           ${{ matrix.cargo }} fmt --all --check
