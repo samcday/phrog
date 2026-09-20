@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="3.24"/>
+  <template class="PhoshUpcomingEvent" parent="GtkBox">
+    <property name="visible">1</property>
+    <property name="spacing">6</property>
+    <child>
+      <object class="GtkBox" id="color_bar">
+        <property name="visible">1</property>
+        <property name="width-request">4</property>
+        <style>
+          <class name="color-bar"/>
+        </style>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel" id="lbl_summary">
+        <property name="visible">1</property>
+        <property name="hexpand">1</property>
+        <property name="halign">start</property>
+        <property name="valign">center</property>
+        <property name="ellipsize">end</property>
+        <property name="margin-top">3</property>
+        <property name="margin-bottom">3</property>
+        <property name="single-line-mode">1</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel" id="lbl_begin">
+        <property name="visible">1</property>
+        <property name="justify">right</property>
+        <property name="halign">end</property>
+        <property name="lines">2</property>
+        <property name="margin-top">3</property>
+        <property name="margin-bottom">3</property>
+        <style>
+          <class name="dim-label"/>
+          <class name="caption"/>
+        </style>
+      </object>
+    </child>
+  </template>
+</interface>

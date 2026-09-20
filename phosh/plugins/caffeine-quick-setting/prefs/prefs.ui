@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface domain="phosh">
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.6"/>
+  <template class="PhoshCaffeineQuickSettingPrefs" parent="AdwPreferencesDialog">
+    <property name="follows-content-size">True</property>
+    <property name="title" translatable="1">Caffeine Quick Setting Preferences</property>
+    <child>
+      <object class="AdwPreferencesPage">
+        <property name="icon-name">preferences-window-layout-symbolic</property>
+        <property name="title" translatable="1">Caffeine Duration</property>
+        <property name="use-underline">1</property>
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="1">Manage Caffeine Duration</property>
+            <property name="description" translatable="1">Add or remove custom caffeine intervals</property>
+            <property name="header-suffix">
+              <object class="GtkButton">
+                <property name="child">
+                  <object class="AdwButtonContent">
+                    <property name="icon-name">list-add-symbolic</property>
+                    <property name="label" translatable="1">Add interval</property>
+                  </object>
+                </property>
+                <signal name="clicked" handler="on_add_interval_clicked" swapped="yes"/>
+              </object>
+            </property>
+            <child>
+              <object class="GtkStack" id="stack">
+                <property name="vhomogeneous">0</property>
+                <child>
+                  <object class="GtkStackPage">
+                    <property name="name">empty-state</property>
+                    <property name="child">
+                      <object class="AdwStatusPage">
+                        <property name="title">No caffeine intervals</property>
+                        <property name="icon-name">caffeine-quick-setting-symbolic</property>
+                        <style>
+                          <class name="compact"/>
+                        </style>
+                      </object>
+                    </property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkStackPage">
+                    <property name="name">listbox</property>
+                    <property name="child">
+                      <object class="GtkListBox" id="listbox">
+                        <property name="selection-mode">none</property>
+                        <style>
+                          <class name="boxed-list"/>
+                        </style>
+                      </object>
+                    </property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+  <object class="AdwDialog" id="add_interval_dialog">
+    <property name="title" translatable="1">Add New Interval</property>
+    <property name="child">
+      <object class="AdwToolbarView">
+        <child type="top">
+          <object class="AdwHeaderBar">
+            <property name="show-start-title-buttons">0</property>
+            <property name="show-end-title-buttons">0</property>
+            <child>
+              <object class="GtkButton" id="cancel_button">
+                <property name="label" translatable="1">_Cancel</property>
+                <property name="use-underline">1</property>
+                <property name="valign">center</property>
+                <signal name="clicked" handler="on_add_interval_cancelled" swapped="yes"/>
+              </object>
+            </child>
+            <child type="end">
+              <object class="GtkButton" id="add_button">
+                <property name="label" translatable="1">_Add</property>
+                <property name="use-underline">1</property>
+                <property name="valign">center</property>
+                <signal name="clicked" handler="on_add_interval_added" swapped="yes"/>
+                <style>
+                  <class name="suggested-action"/>
+                </style>
+              </object>
+            </child>
+          </object>
+        </child>
+        <property name="content">
+          <object class="AdwClamp">
+            <property name="maximum-size">300</property>
+            <property name="hexpand">true</property>
+            <property name="vexpand">true</property>
+            <property name="valign">center</property>
+            <child>
+              <object class="GtkBox">
+                <property name="margin-top">20</property>
+                <property name="margin-bottom">20</property>
+                <property name="margin-start">20</property>
+                <property name="margin-end">20</property>
+                <property name="halign">center</property>
+                <property name="valign">center</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">6</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="margin-top">10</property>
+                    <property name="margin-bottom">10</property>
+                    <property name="halign">center</property>
+                    <property name="label" translatable="1">Quickstart Intervals</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkGrid">
+                    <property name="margin-bottom">20</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="row-spacing">14</property>
+                    <property name="column-spacing">14</property>
+                    <child>
+                      <object class="GtkButton">
+                        <property name="label" translatable="1">5 m</property>
+                        <property name="action-name">interval.update-value</property>
+                        <property name="action-target">uint32 300</property>
+                        <layout>
+                          <property name="row">0</property>
+                          <property name="column">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton">
+                        <property name="label" translatable="1">15 m</property>
+                        <property name="action-name">interval.update-value</property>
+                        <property name="action-target">uint32 900</property>
+                        <layout>
+                          <property name="row">0</property>
+                          <property name="column">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton">
+                        <property name="label" translatable="1">30 m</property>
+                        <property name="action-name">interval.update-value</property>
+                        <property name="action-target">uint32 1800</property>
+                        <layout>
+                          <property name="row">0</property>
+                          <property name="column">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton">
+                        <property name="label" translatable="1">1 h</property>
+                        <property name="action-name">interval.update-value</property>
+                        <property name="action-target">uint32 3600</property>
+                        <layout>
+                          <property name="row">0</property>
+                          <property name="column">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton">
+                        <property name="label" translatable="1">No timeout (∞)</property>
+                        <property name="action-name">interval.update-value</property>
+                        <property name="action-target">uint32 4294967295</property>
+                        <layout>
+                          <property name="row">1</property>
+                          <property name="column">0</property>
+                          <property name="column-span">4</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="margin-top">10</property>
+                    <property name="margin-bottom">10</property>
+                    <property name="halign">center</property>
+                    <property name="label" translatable="1">Choose Interval</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkGrid">
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="column-spacing">6</property>
+                    <child>
+                      <object class="GtkSpinButton" id="hours_btn">
+                        <property name="orientation">vertical</property>
+                        <property name="width-chars">3</property>
+                        <property name="wrap">1</property>
+                        <property name="numeric">1</property>
+                        <property name="adjustment">
+                          <object class="GtkAdjustment">
+                            <property name="upper">4294967295</property>
+                            <property name="step-increment">1</property>
+                          </object>
+                        </property>
+                        <style>
+                          <class name="caffeine-spinbutton"/>
+                        </style>
+                        <layout>
+                          <property name="row">0</property>
+                          <property name="column">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="label">:</property>
+                        <style>
+                          <class name="caffeine-spinbutton-separator"/>
+                        </style>
+                        <layout>
+                          <property name="row">0</property>
+                          <property name="column">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSpinButton" id="minutes_btn">
+                        <property name="orientation">vertical</property>
+                        <property name="width-chars">3</property>
+                        <property name="wrap">1</property>
+                        <property name="numeric">1</property>
+                        <property name="adjustment">
+                          <object class="GtkAdjustment">
+                            <property name="upper">59</property>
+                            <property name="step-increment">1</property>
+                          </object>
+                        </property>
+                        <style>
+                          <class name="caffeine-spinbutton"/>
+                        </style>
+                        <layout>
+                          <property name="row">0</property>
+                          <property name="column">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="label">:</property>
+                        <style>
+                          <class name="caffeine-spinbutton-separator"/>
+                        </style>
+                        <layout>
+                          <property name="row">0</property>
+                          <property name="column">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSpinButton" id="seconds_btn">
+                        <property name="orientation">vertical</property>
+                        <property name="width-chars">3</property>
+                        <property name="wrap">1</property>
+                        <property name="numeric">1</property>
+                        <property name="adjustment">
+                          <object class="GtkAdjustment">
+                            <property name="upper">59</property>
+                            <property name="step-increment">1</property>
+                          </object>
+                        </property>
+                        <style>
+                          <class name="caffeine-spinbutton"/>
+                        </style>
+                        <layout>
+                          <property name="row">0</property>
+                          <property name="column">4</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </property>
+  </object>
+</interface>

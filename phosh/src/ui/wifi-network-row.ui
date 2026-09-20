@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<interface>
+  <requires lib="gtk+" version="3.24"/>
+  <requires lib="libhandy" version="1.8"/>
+  <template class="PhoshWifiNetworkRow" parent="HdyActionRow">
+    <property name="visible">1</property>
+    <property name="activatable">1</property>
+    <child type="prefix">
+      <object class="GtkBox">
+        <property name="visible">1</property>
+        <property name="valign">center</property>
+        <child>
+          <object class="GtkImage" id="wifi_icon">
+            <property name="visible">1</property>
+            <property name="icon-name">network-wireless-signal-none</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkImage" id="encrypted_icon">
+            <property name="visible">1</property>
+            <property name="valign">end</property>
+            <property name="pixel-size">8</property>
+            <property name="icon-name">network-wireless-encrypted</property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImage" id="active_indicator">
+        <property name="icon-name">object-select</property>
+      </object>
+    </child>
+  </template>
+</interface>

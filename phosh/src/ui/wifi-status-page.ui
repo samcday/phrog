@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<interface>
+  <requires lib="gtk+" version="3.24"/>
+  <template class="PhoshWifiStatusPage" parent="PhoshStatusPage">
+    <property name="visible">1</property>
+    <property name="title" translatable="yes">Wi-Fi</property>
+    <property name="header">wifi_scan</property>
+    <property name="content">stack</property>
+    <property name="footer">footer</property>
+  </template>
+  <object class="GtkStack" id="wifi_scan">
+    <child>
+      <object class="GtkButton">
+        <property name="visible">1</property>
+        <property name="valign">center</property>
+        <property name="focus-on-click">0</property>
+        <signal name="clicked" handler="on_wifi_scan_clicked" object="PhoshWifiStatusPage" swapped="yes"/>
+        <style>
+          <class name="flat"/>
+        </style>
+        <child>
+          <object class="GtkImage">
+            <property name="visible">1</property>
+            <property name="icon-name">view-refresh-symbolic</property>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="name">button</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkSpinner" id="wifi_scan_spinner">
+        <property name="visible">1</property>
+        <property name="margin-start">4</property>
+        <property name="margin-top">4</property>
+        <property name="margin-end">4</property>
+        <property name="margin-bottom">4</property>
+      </object>
+      <packing>
+        <property name="name">spinner</property>
+      </packing>
+    </child>
+  </object>
+  <object class="GtkStack" id="stack">
+    <property name="visible">1</property>
+    <property name="transition-type">crossfade</property>
+    <property name="vhomogeneous">0</property>
+    <child>
+      <object class="PhoshStatusPagePlaceholder" id="empty_state">
+        <property name="visible">1</property>
+        <property name="extra-widget">empty_state_btn</property>
+      </object>
+      <packing>
+        <property name="name">empty-state</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkListBox" id="networks">
+        <property name="visible">1</property>
+        <property name="selection-mode">none</property>
+        <property name="hexpand">1</property>
+        <style>
+          <class name="content"/>
+        </style>
+        <signal name="row-activated" handler="on_network_activated" object="PhoshWifiStatusPage" swapped="yes"/>
+      </object>
+      <packing>
+        <property name="name">list_box</property>
+      </packing>
+    </child>
+  </object>
+  <object class="GtkButton" id="empty_state_btn">
+    <property name="visible">1</property>
+    <property name="halign">center</property>
+    <property name="focus-on-click">0</property>
+    <signal name="clicked" handler="on_placeholder_clicked" object="PhoshWifiStatusPage" swapped="yes"/>
+  </object>
+  <object class="GtkButton" id="footer">
+    <property name="visible">1</property>
+    <property name="hexpand">1</property>
+    <property name="focus-on-click">0</property>
+    <property name="action-name">panel.launch-panel</property>
+    <property name="action-target">(&quot;wifi&quot;, [&lt;&quot;&quot;&gt;])</property>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">1</property>
+        <property name="ellipsize">end</property>
+        <property name="label" translatable="yes">Wi-Fi Settings</property>
+      </object>
+    </child>
+  </object>
+</interface>
