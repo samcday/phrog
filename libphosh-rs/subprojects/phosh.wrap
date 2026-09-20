@@ -1,0 +1,5 @@
+[wrap-git]
+directory=phosh
+url=https://gitlab.gnome.org/World/Phosh/phosh.git
+revision=v0.49.0
+depth=1

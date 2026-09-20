@@ -1,0 +1,6 @@
+[Plugin]
+Id=@name@
+Name=Media Players
+Types=lockscreen;
+Comment=Track currently running media players
+Plugin=@plugins_dir@/libphosh-plugin-@name@.so
