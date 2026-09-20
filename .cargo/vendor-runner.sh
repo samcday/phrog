@@ -2,6 +2,11 @@
 # Cargo invokes this for vendored test binaries and `cargo run --config ...`.
 set -euo pipefail
 
+# The dispatcher must start before libphosh (and its schemas) has been built.
+if [[ $(basename "$1") == xtask ]]; then
+    exec "$@"
+fi
+
 profile_dir=$(dirname "$1")
 if [[ $(basename "$profile_dir") == deps ]]; then
     profile_dir=$(dirname "$profile_dir")

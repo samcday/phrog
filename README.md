@@ -87,22 +87,10 @@ Once `libphosh` is installed, building and running 🐸 should be quite simple:
 phoc -S -E "cargo run -- --fake"
 
 phoc -S -E "cargo test"
+
+# Embed the vendored libphosh (requires Phosh build dependencies):
+cargo vendored-phosh build # Also accepts run, test, fmt, tree, clippy, etc.
 ```
-
-### Experimental bundled libphosh
-
-System libphosh remains the default, including for distro packages. This checkout
-also carries Phosh and its Rust bindings for opt-in static embedding:
-
-```sh
-# Install the native build dependencies first.
-cargo vendored-phosh build
-phoc -S -E 'cargo vendored-phosh test -- --test-threads=1'
-```
-
-This embeds libphosh, not GTK or the rest of the native stack. See
-[the bundled-build notes](docs/bundled-libphosh.md) for dependencies, runtime data,
-local testing, and limitations. GTK4 is developed separately.
 
 ## Getting help
 

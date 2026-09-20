@@ -4,7 +4,7 @@ description = "Mobile-friendly greeter for greetd"
 version = "0.53.0"
 edition = "2021"
 license = "GPL-3.0-only"
-exclude = ["/demo-video", "/phosh", "/libphosh-rs", "/.cargo/vendored-phosh", "/.cargo/vendor.toml", "/.cargo/vendor-runner.sh"]
+exclude = ["/demo-video", "/phosh", "/libphosh-rs", "/.cargo/vendor.toml", "/.cargo/vendor-runner.sh"]
 repository = "https://github.com/samcday/phrog"
 
 [workspace]

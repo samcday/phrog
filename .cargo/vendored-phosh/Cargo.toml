@@ -1,8 +1,0 @@
-[package]
-name = "phrog-vendored-cargo"
-version = "0.0.0"
-edition = "2021"
-publish = false
-
-# Resolving this dispatcher must not switch the application's Cargo.lock mode.
-[workspace]

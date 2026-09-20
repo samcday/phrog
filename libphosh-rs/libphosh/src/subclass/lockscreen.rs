@@ -1,7 +1,7 @@
-use crate::Lockscreen;
+use glib::{Cast, Class, subclass::prelude::*};
 use glib::translate::ToGlibPtr;
-use glib::{subclass::prelude::*, Cast, Class};
 use gtk::subclass::prelude::*;
+use crate::Lockscreen;
 
 pub trait LockscreenImpl: LockscreenImplExt + ObjectImpl + WindowImpl {
     fn unlock_submit(&self) {

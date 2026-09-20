@@ -32,3 +32,6 @@
 ## Configuration & Runtime Notes
 - `phrog` is a greetd greeter; packaging in `debian/`, `copr/`, and `APKBUILD` shows how it is wired into services.
 - Local testing without greetd uses `--fake` and the default login password `0`.
+
+## Vendored Sources
+- Keep patches to `phosh/` and `libphosh-rs/` minimal and limited to changes required for embedding. Do not reformat generated/imported code, add formatting exclusions, or change upstream dependency pins incidentally. Keep phrog-specific tooling outside those trees where practical.

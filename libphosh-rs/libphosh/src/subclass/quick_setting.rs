@@ -1,8 +1,9 @@
-use crate::QuickSetting;
-use glib::{subclass::prelude::*, Class};
+use glib::{Class, subclass::prelude::*};
 use gtk::subclass::prelude::ButtonImpl;
+use crate::QuickSetting;
 
-pub trait QuickSettingImpl: QuickSettingImplExt + ObjectImpl + ButtonImpl {}
+pub trait QuickSettingImpl: QuickSettingImplExt + ObjectImpl + ButtonImpl {
+}
 
 mod sealed {
     pub trait Sealed {}

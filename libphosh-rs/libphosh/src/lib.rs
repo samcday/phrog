@@ -10,15 +10,9 @@ macro_rules! skip_assert_initialized {
     () => {};
 }
 
-pub use auto::*;
 pub use ffi;
-// Preserve the generated GTK3 builder API and formatting.
-#[allow(
-    unused_imports,
-    clippy::empty_line_after_outer_attr,
-    clippy::wrong_self_convention
-)]
-#[rustfmt::skip]
+pub use auto::*;
+#[allow(unused_imports)]
 mod auto;
 pub mod subclass;
 
