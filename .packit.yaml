@@ -16,35 +16,6 @@ actions:
     - cargo vendor --locked --versioned-dirs vendor
     - tar -H pax --create --gzip --sort=name --owner=0 --group=0 --numeric-owner --file phrog-vendor.tar.gz vendor
 
-jobs:
-  # Build PRs against the non-vendor path, leaning on the gtk3-rs RPMs
-  # resurrected in samcday/phrog-nightly.
-  - job: copr_build
-    manual_trigger: true
-    trigger: pull_request
-    additional_repos:
-      - copr://samcday/phosh-nightly
-      - copr://samcday/phrog-nightly
-    targets:
-      fedora-41-aarch64: &opts
-        without_opts:
-          - vendor
-      fedora-41-x86_64: *opts
-      fedora-rawhide-aarch64: *opts
-      fedora-rawhide-x86_64: *opts
-
-  # Build main commits in samcday/phrog-nightly COPR via the vendor path,
-  # mirroring what ships in Fedora dist-git.
-  - job: copr_build
-    trigger: commit
-    branch: main
-    owner: samcday
-    project: phrog-nightly
-    additional_repos:
-      - copr://samcday/phosh-nightly
-
-  # Build tagged releases in samcday/phrog COPR via the vendor path.
-  - job: copr_build
-    trigger: release
-    owner: samcday
-    project: phrog
+# GTK4 depends on unreleased GTK/Phosh. Existing stable and nightly COPRs
+# remain GTK3 channels managed from main; GTK4 currently produces CI artifacts.
+jobs: []

@@ -1,49 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface domain="phrog">
-    <requires lib="gtk+" version="3.20"/>
+    <requires lib="gtk" version="4.8"/>
+    <requires lib="Adw" version="1.0"/>
     <template class="PhrogUserSessionPage" parent="GtkBox">
-        <property name="visible">True</property>
         <property name="orientation">vertical</property>
-        <property name="can_focus">False</property>
-        <property name="expand">True</property>
+        <property name="vexpand">1</property>
         <property name="margin-top">48</property>
         <property name="margin-bottom">16</property>
-        <child type="center">
-            <object class="HdyClamp">
-                <property name="visible">True</property>
+        <child>
+            <object class="AdwClamp">
                 <property name="maximum-size">240</property>
-                <property name="expand">True</property>
-                <child>
+                <property name="vexpand">1</property>
+                <property name="valign">center</property>
+                <property name="child">
                     <object class="GtkBox">
-                        <property name="visible">True</property>
                         <property name="orientation">vertical</property>
-                        <property name="can_focus">False</property>
-                        <property name="expand">True</property>
+                        <property name="vexpand">1</property>
                         <child>
                             <object class="GtkListBox" id="box_users">
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="expand">True</property>
+                                <property name="focusable">1</property>
+                                <property name="vexpand">1</property>
                                 <style>
                                     <class name="users"/>
                                 </style>
                             </object>
-                            <packing>
-                                <property name="expand">True</property>
-                                <property name="fill">False</property>
-                            </packing>
                         </child>
                         <child>
                             <object class="GtkListBox">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="hexpand">True</property>
-                                <property name="vexpand">False</property>
+                                <property name="hexpand">1</property>
+                                <property name="margin-top">16</property>
+                                <property name="margin-bottom">16</property>
                                 <child>
-                                    <object class="HdyComboRow" id="row_sessions">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="expand">True</property>
+                                    <object class="AdwComboRow" id="row_sessions">
+                                        <property name="focusable">1</property>
+                                        <property name="hexpand">1</property>
                                         <property name="title" translatable="yes">Session</property>
                                         <style>
                                             <class name="sessions"/>
@@ -51,30 +41,13 @@
                                     </object>
                                 </child>
                             </object>
-                            <packing>
-                                <property name="padding">16</property>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                            </packing>
                         </child>
                         <child>
-                            <object class="GtkImage" id="logo">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="expand">False</property>
-                            </object>
-                            <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                            </packing>
+                            <object class="GtkImage" id="logo"/>
                         </child>
                     </object>
-                </child>
+                </property>
             </object>
-            <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-            </packing>
         </child>
     </template>
 </interface>

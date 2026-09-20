@@ -1,4 +1,5 @@
-use glib::{Cast, Object};
+use glib::object::Cast;
+use glib::Object;
 use gtk::glib;
 
 static G_LOG_DOMAIN: &str = "phrog";
@@ -36,7 +37,7 @@ mod imp {
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
     use gtk::subclass::prelude::{ObjectImpl, ObjectSubclass};
-    use gtk::{gdk, glib, CssProvider, StyleContext};
+    use gtk::{gdk, glib, CssProvider};
     use libphosh::prelude::ShellExt;
     use libphosh::subclass::shell::ShellImpl;
     use std::cell::RefCell;
@@ -103,8 +104,8 @@ mod imp {
 
             let provider = CssProvider::new();
             provider.load_from_resource("/mobi/phosh/phrog/phrog.css");
-            StyleContext::add_provider_for_screen(
-                &gdk::Screen::default().unwrap(),
+            gtk::style_context_add_provider_for_display(
+                &gdk::Display::default().unwrap(),
                 &provider,
                 // Slightly hacky, we want to be above phosh to override some stuff
                 gtk::STYLE_PROVIDER_PRIORITY_APPLICATION + 5,
@@ -117,15 +118,22 @@ mod imp {
             glib::idle_add_local_once(move || {
                 let first_run = settings.string("first-run");
                 if !first_run.is_empty() {
-                    spawn_future_local(clone!(@weak shell as this => async move {
-                        if let Err(err) = spawn_blocking(|| {
-                                Command::new(first_run).spawn().and_then(|mut child| child.wait())
-                            }).await
-                        {
-                            warn!("Failed to execute first-run app: {:?}", err);
+                    spawn_future_local(clone!(
+                        #[weak(rename_to = this)]
+                        shell,
+                        async move {
+                            if let Err(err) = spawn_blocking(|| {
+                                Command::new(first_run)
+                                    .spawn()
+                                    .and_then(|mut child| child.wait())
+                            })
+                            .await
+                            {
+                                warn!("Failed to execute first-run app: {:?}", err);
+                            }
+                            this.obj().set_locked(true);
                         }
-                        this.obj().set_locked(true);
-                    }));
+                    ));
                 } else {
                     shell.obj().set_locked(true);
                 }
