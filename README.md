@@ -87,6 +87,9 @@ Once `libphosh` is installed, building and running 🐸 should be quite simple:
 phoc -S -E "cargo run -- --fake"
 
 phoc -S -E "cargo test"
+
+# Embed the vendored libphosh (requires Phosh build dependencies):
+cargo vendored-phosh build # Also accepts run, test, fmt, tree, clippy, etc.
 ```
 
 ## Getting help

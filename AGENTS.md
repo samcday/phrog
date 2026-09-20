@@ -32,3 +32,13 @@
 ## Configuration & Runtime Notes
 - `phrog` is a greetd greeter; packaging in `debian/`, `copr/`, and `APKBUILD` shows how it is wired into services.
 - Local testing without greetd uses `--fake` and the default login password `0`.
+
+## Vendored Sources
+- Keep patches to `phosh/` and `libphosh-rs/` minimal and limited to changes required for embedding. Do not reformat generated/imported code, add formatting exclusions, or change upstream dependency pins incidentally. Keep phrog-specific tooling outside those trees where practical.
+- Import and update these directories with `git subtree add` / `git subtree pull --squash`, keeping local fixes in separate commits scoped to one subtree.
+- Preserve the subtree merge commits and `git-subtree-*` trailers when landing or restacking: use merge commits, not GitHub squash/rebase merging.
+- Update to an explicit upstream commit, then review conflicts and run the relevant build checks:
+  - GTK3 Phosh: `git subtree pull --prefix=phosh --squash https://gitlab.gnome.org/World/Phosh/phosh.git <commit>`
+  - GTK4 Phosh: use `https://gitlab.gnome.org/guidog/phosh.git` with the same command.
+  - Bindings: `git subtree pull --prefix=libphosh-rs --squash https://gitlab.gnome.org/World/Phosh/libphosh-rs.git <commit>`
+- Export downstream fixes with `git format-patch --stdout --relative=<prefix> <import-merge>..HEAD -- <prefix>`. Plain `git subtree split` traverses obsolete imports in phrog's old history and can fail on unavailable fork commits.

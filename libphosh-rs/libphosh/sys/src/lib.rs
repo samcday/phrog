@@ -12,9 +12,6 @@ use gobject_sys as gobject;
 use gio_sys as gio;
 use gtk_sys as gtk;
 use gdk_sys as gdk;
-use gdk_pixbuf_sys as gdk_pixbuf;
-use pango_sys as pango;
-use handy_sys as handy;
 
 #[allow(unused_imports)]
 use std::ffi::{c_int, c_char, c_uchar, c_float, c_uint, c_double,

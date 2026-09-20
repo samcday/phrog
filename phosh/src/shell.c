@@ -106,6 +106,7 @@
 #include "wall-clock.h"
 
 #include "phosh-settings-enums.h"
+#include "phosh-resources.h"
 
 #define WWAN_BACKEND_KEY "wwan-backend"
 #define OSD_HIDE_TIMEOUT 1 /* seconds */
@@ -1441,12 +1442,18 @@ static GDebugKey debug_keys[] =
 static void
 phosh_shell_init (PhoshShell *self)
 {
+  static gsize resources_initialized = FALSE;
   const char *messages_debug;
   PhoshShellPrivate *priv = phosh_shell_get_instance_private (self);
 
   messages_debug = g_getenv ("G_MESSAGES_DEBUG");
   if (messages_debug)
     priv->log_domains = g_strsplit (messages_debug, " ", -1);
+
+  if (g_once_init_enter (&resources_initialized)) {
+    phosh_register_resource ();
+    g_once_init_leave (&resources_initialized, TRUE);
+  }
 
   cui_init (TRUE);
   gtk_icon_theme_add_resource_path (gtk_icon_theme_get_default (), "/mobi/phosh/icons");

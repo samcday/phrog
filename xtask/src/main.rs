@@ -29,6 +29,12 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Run Cargo with the vendored libphosh configuration.
+    #[command(disable_help_flag = true)]
+    VendoredPhosh {
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<std::ffi::OsString>,
+    },
     /// Bump version across all packaging files.
     Bump {
         /// Version to bump to (X.Y.Z or X.Y.Z-rc.N).
@@ -66,6 +72,7 @@ fn main() {
 
 fn run() -> Result<()> {
     match Cli::parse().command {
+        Commands::VendoredPhosh { args } => vendored_phosh(args),
         Commands::Bump { version } => bump(&version),
         Commands::DistData {
             file_name,
@@ -75,6 +82,27 @@ fn run() -> Result<()> {
         } => dist_data(&file_name, greetd_vt, &greetd_user, &greetd_general_service),
         Commands::ReleaseNotes { version, rc } => release_notes(&version, rc),
     }
+}
+
+fn vendored_phosh(args: Vec<std::ffi::OsString>) -> Result<()> {
+    use std::os::unix::process::CommandExt;
+    let config = project_root()?.join(".cargo/vendor.toml");
+    let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
+    let mut command = Command::new(cargo);
+    let mut args = args.into_iter();
+    match args.next() {
+        // cargo-fmt rejects --config; cargo-clippy must receive and forward it.
+        Some(subcommand) if subcommand == "fmt" => {
+            command.arg("--config").arg(&config).arg(subcommand);
+        }
+        Some(subcommand) => {
+            command.arg(subcommand).arg("--config").arg(&config);
+        }
+        None => {
+            command.arg("--config").arg(&config).arg("--help");
+        }
+    }
+    Err(command.args(args).exec().into())
 }
 
 fn bump(version: &str) -> Result<()> {
@@ -142,7 +170,7 @@ fn dist_data(
         .parent()
         .ok_or_else(|| format!("output path '{}' has no parent", out_path.display()))?;
 
-    fs::create_dir_all(&out_dir)?;
+    fs::create_dir_all(out_dir)?;
     fs::write(
         &out_path,
         render_greetd_config(greetd_vt, greetd_user, greetd_general_service),
