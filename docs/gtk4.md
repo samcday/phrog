@@ -7,7 +7,14 @@ and the migration's functional and packaging gaps are resolved.
 
 ## Branch maintenance
 
-- Target small GTK4 changes at `gtk4`; PR #209 tracks the aggregate migration.
+- The GTK4 series has two layers above #186: PR #213 (`codex/gtk4-phosh`)
+  imports Guido's Phosh GTK4 subtree and native dependency pins; PR #209 (`gtk4`)
+  carries the regenerated bindings, phrog migration, and build/CI integration.
+- Target Phosh dependency updates at `codex/gtk4-phosh`, then merge that branch
+  into `gtk4`. Target application and binding changes at `gtk4`.
+- Both GTK4 layers remain draft while `main` continues GTK3 stable releases.
+  The Phosh import layer alone still has GTK3 Rust bindings; build and test the
+  complete GTK4 application at `gtk4`.
 - Land shared fixes on `main` first, then merge `main` into `gtk4` regularly.
 - Keep upstream source updates, local native patches, and application changes in
   separate commits. Avoid routine rebases of the shared integration branch.
