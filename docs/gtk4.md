@@ -82,6 +82,36 @@ native downloads once dependencies are prepared. Embedded libphosh still needs
 shared GTK and other native libraries plus schemas, translations, and services.
 Distribution recipes are not yet GTK4-ready.
 
+## Local desktop with Toolbox
+
+Create a Toolbox from the same patched GTK/Phosh environment used by CI:
+
+```sh
+podman build -t localhost/phrog-gtk4-ci -f .github/Dockerfile .github
+podman build -t localhost/phrog-gtk4-toolbox -f tools/toolbox/Containerfile tools/toolbox
+toolbox create --image localhost/phrog-gtk4-toolbox phrog-gtk4
+```
+
+Then, from this checkout in a desktop terminal:
+
+```sh
+toolbox run -c phrog-gtk4 ./tools/toolbox/run
+```
+
+The launcher builds into `target/toolbox` and opens phrog in a nested Phoc window.
+It uses the host's Rust installation in `~/.cargo`, the container's patched native
+libraries, software rendering, a private session bus, and in-memory settings.
+It prefers the nested X11 backend when `$DISPLAY` is available, with Wayland as
+a fallback. Upstream GTK4 diagnostics are saved to `target/toolbox/phrog.log`.
+Authentication uses `--fake`; the test password is `0`. Close the nested window
+or press Ctrl+C in the launching terminal to stop it. The first build takes
+longer; subsequent launches reuse the Cargo build cache.
+
+For an interactive development shell, use `toolbox enter phrog-gtk4` and change
+to this checkout. Native Phosh/GTK dependency changes require rebuilding the
+images and recreating the Toolbox; ordinary phrog edits only need another run
+of the launcher.
+
 ## Local patches and migration gaps
 
 - Static Phosh resources are registered explicitly in `phosh_shell_init`,

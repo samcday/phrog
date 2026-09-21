@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Run inside the GTK4 Toolbox: toolbox run -c phrog-gtk4 ./tools/toolbox/run
+set -euo pipefail
+
+if [[ ! -e /run/.toolboxenv && ! -e /run/.toolbxenv ]]; then
+    echo 'Run with: toolbox run -c phrog-gtk4 ./tools/toolbox/run' >&2
+    exit 1
+fi
+
+cd "$(dirname "${BASH_SOURCE[0]}")/../.."
+export PATH="$HOME/.cargo/bin:$PATH"
+export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+export LD_LIBRARY_PATH="/usr/local/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export CARGO_TARGET_DIR="$PWD/target/toolbox"
+export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-8}"
+cargo build --locked
+
+# Also works with cached builds whose build.rs did not run in this environment.
+mkdir -p "$CARGO_TARGET_DIR/schemas"
+cp data/mobi.phosh.phrog.gschema.xml "$CARGO_TARGET_DIR/schemas/"
+glib-compile-schemas "$CARGO_TARGET_DIR/schemas"
+export GSETTINGS_SCHEMA_DIR="$CARGO_TARGET_DIR/schemas"
+export GSETTINGS_BACKEND=memory
+
+# A nested software-rendered compositor works without matching host GPU drivers.
+if [[ -n ${DISPLAY:-} ]]; then
+    export WLR_BACKENDS=x11
+elif [[ -n ${WAYLAND_DISPLAY:-} ]]; then
+    export WLR_BACKENDS=wayland
+else
+    echo 'Run this from a terminal in your graphical desktop session.' >&2
+    exit 1
+fi
+export WLR_RENDERER=pixman
+export GSK_RENDERER=cairo
+export G_MESSAGES_DEBUG=phrog
+export PHROG_TOOLBOX_BINARY="$CARGO_TARGET_DIR/debug/phrog"
+echo "Opening phrog (fake password: 0). Close the window or press Ctrl+C to stop."
+echo "Diagnostics: $CARGO_TARGET_DIR/phrog.log"
+exec dbus-run-session -- phoc -C tools/toolbox/phoc.ini -S --no-xwayland \
+    -E 'sh -c "exec \"$PHROG_TOOLBOX_BINARY\" --fake"' \
+    > "$CARGO_TARGET_DIR/phrog.log" 2>&1
