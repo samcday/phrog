@@ -8,7 +8,7 @@
 
 
 #include <gtk/gtk.h>
-#include <handy.h>
+#include <adwaita.h>
 
 #pragma once
 

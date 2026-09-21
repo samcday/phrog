@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
-  <template class="PhoshChannelBar" parent="GtkBox">
+  <requires lib="gtk" version="4.0"/>
+  <template class="GvcChannelBar" parent="GtkBox">
     <property name="visible">1</property>
     <child>
       <object class="GtkBox" id="scale_box">
@@ -20,8 +20,12 @@
             <property name="hexpand">1</property>
             <property name="draw-value">0</property>
             <property name="adjustment">adjustment</property>
-            <signal name="button-press-event" handler="on_scale_button_press_event" swapped="false"/>
-            <signal name="button-release-event" handler="on_scale_button_release_event" swapped="false"/>
+            <child>
+              <object class="GtkGestureClick" id="click_gesture">
+                <signal name="pressed" handler="on_scale_button_press_event" swapped="false"/>
+                <signal name="released" handler="on_scale_button_release_event" swapped="false"/>
+              </object>
+            </child>
           </object>
         </child>
       </object>

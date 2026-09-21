@@ -10,7 +10,7 @@
 
 #include "animation.h"
 #include "swipe-away-bin.h"
-#include <handy.h>
+#include <adwaita.h>
 
 enum {
   REMOVED,
@@ -21,7 +21,6 @@ static guint signals[N_SIGNALS] = { 0 };
 
 enum {
   PROP_0,
-  PROP_ENABLED,
   PROP_ALLOW_NEGATIVE,
   PROP_RESERVE_SIZE,
   PROP_ORIENTATION,
@@ -32,7 +31,7 @@ static GParamSpec *props[LAST_PROP];
 
 
 struct _PhoshSwipeAwayBin {
-  GtkEventBox      parent_instance;
+  GtkWidget        parent_instance;
 
   GtkOrientation   orientation;
   gboolean         allow_negative;
@@ -40,17 +39,15 @@ struct _PhoshSwipeAwayBin {
 
   double           progress;
   int distance;
-  HdySwipeTracker *tracker;
+  AdwSwipeTracker *tracker;
   PhoshAnimation  *animation;
-
-  gboolean         enabled;
 };
 
-static void phosh_swipe_away_bin_swipeable_init (HdySwipeableInterface *iface);
+static void phosh_swipe_away_bin_swipeable_init (AdwSwipeableInterface *iface);
 
-G_DEFINE_TYPE_WITH_CODE (PhoshSwipeAwayBin, phosh_swipe_away_bin, GTK_TYPE_EVENT_BOX,
+G_DEFINE_TYPE_WITH_CODE (PhoshSwipeAwayBin, phosh_swipe_away_bin, GTK_TYPE_WIDGET,
                          G_IMPLEMENT_INTERFACE (GTK_TYPE_ORIENTABLE, NULL)
-                         G_IMPLEMENT_INTERFACE (HDY_TYPE_SWIPEABLE, phosh_swipe_away_bin_swipeable_init))
+                         G_IMPLEMENT_INTERFACE (ADW_TYPE_SWIPEABLE, phosh_swipe_away_bin_swipeable_init))
 
 
 static void
@@ -59,7 +56,7 @@ set_progress (PhoshSwipeAwayBin *self,
 {
   self->progress = progress;
 
-  gtk_widget_set_opacity (GTK_WIDGET (self), hdy_ease_out_cubic (1 - ABS (self->progress)));
+  gtk_widget_set_opacity (GTK_WIDGET (self), adw_easing_ease (ADW_EASE_OUT_CUBIC, 1 - ABS (self->progress)));
   gtk_widget_queue_allocate (GTK_WIDGET (self));
 }
 
@@ -119,9 +116,6 @@ animate (PhoshSwipeAwayBin *self,
 static void
 begin_swipe_cb (PhoshSwipeAwayBin *self)
 {
-  if (!self->enabled)
-    return;
-
   if (self->animation)
     phosh_animation_stop (self->animation);
 }
@@ -131,21 +125,16 @@ static void
 update_swipe_cb (PhoshSwipeAwayBin *self,
                  double             progress)
 {
-  if (!self->enabled)
-    return;
-
   set_progress (self, progress);
 }
 
 
 static void
 end_swipe_cb (PhoshSwipeAwayBin *self,
-              gint64             duration,
+              double             velocity,
               double             to)
 {
-  if (!self->enabled)
-    return;
-
+  gint64 duration = self->distance / velocity;
   animate (self, duration, to, PHOSH_ANIMATION_TYPE_EASE_OUT_CUBIC);
 }
 
@@ -157,9 +146,23 @@ update_orientation (PhoshSwipeAwayBin *self)
     self->orientation == GTK_ORIENTATION_HORIZONTAL &&
     gtk_widget_get_direction (GTK_WIDGET (self)) == GTK_TEXT_DIR_RTL;
 
-  hdy_swipe_tracker_set_reversed (self->tracker, reversed);
+  adw_swipe_tracker_set_reversed (self->tracker, reversed);
 
   gtk_widget_queue_allocate (GTK_WIDGET (self));
+}
+
+
+static void
+phosh_swipe_away_bin_dispose (GObject *object)
+{
+  PhoshSwipeAwayBin *self = PHOSH_SWIPE_AWAY_BIN (object);
+  GtkWidget *child;
+
+  child = gtk_widget_get_first_child (GTK_WIDGET (self));
+  if (child)
+    gtk_widget_unparent (child);
+
+  G_OBJECT_CLASS (phosh_swipe_away_bin_parent_class)->dispose (object);
 }
 
 
@@ -184,10 +187,6 @@ phosh_swipe_away_bin_get_property (GObject    *object,
   PhoshSwipeAwayBin *self = PHOSH_SWIPE_AWAY_BIN (object);
 
   switch (prop_id) {
-  case PROP_ENABLED:
-    g_value_set_boolean (value, phosh_swipe_away_bin_get_enabled (self));
-    break;
-
   case PROP_ALLOW_NEGATIVE:
     g_value_set_boolean (value, phosh_swipe_away_bin_get_allow_negative (self));
     break;
@@ -215,10 +214,6 @@ phosh_swipe_away_bin_set_property (GObject      *object,
   PhoshSwipeAwayBin *self = PHOSH_SWIPE_AWAY_BIN (object);
 
   switch (prop_id) {
-  case PROP_ENABLED:
-    phosh_swipe_away_bin_set_enabled (self, g_value_get_boolean (value));
-    break;
-
   case PROP_ALLOW_NEGATIVE:
     phosh_swipe_away_bin_set_allow_negative (self, g_value_get_boolean (value));
     break;
@@ -246,30 +241,28 @@ phosh_swipe_away_bin_set_property (GObject      *object,
 
 static void
 phosh_swipe_away_bin_size_allocate (GtkWidget     *widget,
-                                    GtkAllocation *alloc)
+                                    int width, int height, int baseline)
 {
   PhoshSwipeAwayBin *self = PHOSH_SWIPE_AWAY_BIN (widget);
-  GtkWidget *child = gtk_bin_get_child (GTK_BIN (widget));
+  GtkWidget *child = gtk_widget_get_first_child (widget);
   GtkAllocation child_alloc;
-
-  GTK_WIDGET_CLASS (phosh_swipe_away_bin_parent_class)->size_allocate (widget, alloc);
 
   if (!child || !gtk_widget_get_visible (child))
     return;
 
-  child_alloc.y = alloc->y;
-  child_alloc.x = alloc->x;
-  child_alloc.width = alloc->width;
-  child_alloc.height = alloc->height;
+  child_alloc.y = 0;
+  child_alloc.x = 0;
+  child_alloc.width = width;
+  child_alloc.height = height;
 
   if (self->orientation == GTK_ORIENTATION_HORIZONTAL) {
     if (self->reserve_size) {
-      self->distance = alloc->width / 3;
+      self->distance = width / 3;
 
       child_alloc.width = self->distance;
       child_alloc.x += self->distance;
     } else {
-      self->distance = alloc->width;
+      self->distance = width;
     }
 
     if (gtk_widget_get_direction (GTK_WIDGET (self)) == GTK_TEXT_DIR_RTL)
@@ -279,19 +272,19 @@ phosh_swipe_away_bin_size_allocate (GtkWidget     *widget,
 
   } else {
     if (self->reserve_size) {
-      self->distance = alloc->height / 3;
+      self->distance = height / 3;
 
       child_alloc.height = self->distance;
       child_alloc.y += self->distance;
     } else {
-      self->distance = alloc->height;
+      self->distance = height;
     }
 
     child_alloc.y -= (int) (self->progress * self->distance);
   }
 
 
-  gtk_widget_size_allocate (child, &child_alloc);
+  gtk_widget_size_allocate (child, &child_alloc, 0);
 }
 
 
@@ -301,8 +294,9 @@ phosh_swipe_away_bin_get_preferred_width (GtkWidget *widget,
                                           gint      *natural)
 {
   PhoshSwipeAwayBin *self = PHOSH_SWIPE_AWAY_BIN (widget);
+  GtkWidget *child = gtk_widget_get_first_child (widget);
 
-  GTK_WIDGET_CLASS (phosh_swipe_away_bin_parent_class)->get_preferred_width (widget, minimum, natural);
+  gtk_widget_measure (child, GTK_ORIENTATION_HORIZONTAL, -1, minimum, natural, NULL, NULL);
 
   if (self->reserve_size &&
       self->orientation == GTK_ORIENTATION_HORIZONTAL) {
@@ -321,8 +315,9 @@ phosh_swipe_away_bin_get_preferred_height (GtkWidget *widget,
                                            gint      *natural)
 {
   PhoshSwipeAwayBin *self = PHOSH_SWIPE_AWAY_BIN (widget);
+  GtkWidget *child = gtk_widget_get_first_child (widget);
 
-  GTK_WIDGET_CLASS (phosh_swipe_away_bin_parent_class)->get_preferred_height (widget, minimum, natural);
+  gtk_widget_measure (child, GTK_ORIENTATION_VERTICAL, -1, minimum, natural, NULL, NULL);
 
   if (self->reserve_size &&
       self->orientation == GTK_ORIENTATION_VERTICAL) {
@@ -331,6 +326,36 @@ phosh_swipe_away_bin_get_preferred_height (GtkWidget *widget,
 
     if (natural)
       *natural *= 3;
+  }
+}
+
+
+static void
+phosh_swipe_away_bin_measure (GtkWidget      *widget,
+                              GtkOrientation  orientation,
+                              int             for_size,
+                              int            *minimum,
+                              int            *natural,
+                              int            *minimum_baseline,
+                              int            *natural_baseline)
+{
+  GtkWidget *child = gtk_widget_get_first_child (widget);
+
+  if (!child)
+    return;
+
+  if (orientation == GTK_ORIENTATION_HORIZONTAL && for_size == -1) {
+    phosh_swipe_away_bin_get_preferred_width (widget, minimum, natural);
+  } else if (orientation == GTK_ORIENTATION_VERTICAL && for_size == -1) {
+    phosh_swipe_away_bin_get_preferred_height (widget, minimum, natural);
+  } else {
+    gtk_widget_measure (child,
+                        orientation,
+                        for_size,
+                        minimum,
+                        natural,
+                        minimum_baseline,
+                        natural_baseline);
   }
 }
 
@@ -351,23 +376,13 @@ phosh_swipe_away_bin_class_init (PhoshSwipeAwayBinClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
+  object_class->dispose = phosh_swipe_away_bin_dispose;
   object_class->finalize = phosh_swipe_away_bin_finalize;
   object_class->get_property = phosh_swipe_away_bin_get_property;
   object_class->set_property = phosh_swipe_away_bin_set_property;
   widget_class->size_allocate = phosh_swipe_away_bin_size_allocate;
-  widget_class->get_preferred_width = phosh_swipe_away_bin_get_preferred_width;
-  widget_class->get_preferred_height = phosh_swipe_away_bin_get_preferred_height;
+  widget_class->measure = phosh_swipe_away_bin_measure;
   widget_class->direction_changed = phosh_swipe_away_bin_direction_changed;
-
-  /**
-   * PhoshSwipeAwayBin:enabled:
-   *
-   * Whether the widget reacts to swipes
-   */
-  props[PROP_ENABLED] =
-    g_param_spec_boolean ("enabled", "", "",
-                          TRUE,
-                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
 
   props[PROP_ALLOW_NEGATIVE] =
     g_param_spec_boolean ("allow-negative",
@@ -405,13 +420,13 @@ phosh_swipe_away_bin_class_init (PhoshSwipeAwayBinClass *klass)
 static void
 phosh_swipe_away_bin_init (PhoshSwipeAwayBin *self)
 {
-  self->enabled = TRUE;
-  self->tracker = hdy_swipe_tracker_new (HDY_SWIPEABLE (self));
+  gtk_widget_set_hexpand (GTK_WIDGET (self), TRUE);
+  self->tracker = adw_swipe_tracker_new (ADW_SWIPEABLE (self));
 
   g_object_bind_property (self, "orientation",
                           self->tracker, "orientation",
                           G_BINDING_SYNC_CREATE);
-  hdy_swipe_tracker_set_allow_mouse_drag (self->tracker, TRUE);
+  adw_swipe_tracker_set_allow_mouse_drag (self->tracker, TRUE);
   update_orientation (self);
 
   g_signal_connect_object (self->tracker, "begin-swipe",
@@ -426,17 +441,8 @@ phosh_swipe_away_bin_init (PhoshSwipeAwayBin *self)
 }
 
 
-static HdySwipeTracker *
-phosh_swipe_away_bin_get_swipe_tracker (HdySwipeable *swipeable)
-{
-  PhoshSwipeAwayBin *self = PHOSH_SWIPE_AWAY_BIN (swipeable);
-
-  return self->tracker;
-}
-
-
 static double
-phosh_swipe_away_bin_get_distance (HdySwipeable *swipeable)
+phosh_swipe_away_bin_get_distance (AdwSwipeable *swipeable)
 {
   PhoshSwipeAwayBin *self = PHOSH_SWIPE_AWAY_BIN (swipeable);
 
@@ -445,14 +451,14 @@ phosh_swipe_away_bin_get_distance (HdySwipeable *swipeable)
 
 
 static double
-phosh_swipe_away_bin_get_cancel_progress (HdySwipeable *swipeable)
+phosh_swipe_away_bin_get_cancel_progress (AdwSwipeable *swipeable)
 {
   return 0;
 }
 
 
 static double
-phosh_swipe_away_bin_get_progress (HdySwipeable *swipeable)
+phosh_swipe_away_bin_get_progress (AdwSwipeable *swipeable)
 {
   PhoshSwipeAwayBin *self = PHOSH_SWIPE_AWAY_BIN (swipeable);
 
@@ -461,7 +467,7 @@ phosh_swipe_away_bin_get_progress (HdySwipeable *swipeable)
 
 
 static double *
-phosh_swipe_away_bin_get_snap_points (HdySwipeable *swipeable,
+phosh_swipe_away_bin_get_snap_points (AdwSwipeable *swipeable,
                                       int          *n_snap_points)
 {
   PhoshSwipeAwayBin *self = PHOSH_SWIPE_AWAY_BIN (swipeable);
@@ -485,46 +491,12 @@ phosh_swipe_away_bin_get_snap_points (HdySwipeable *swipeable,
 
 
 static void
-phosh_swipe_away_bin_switch_child (HdySwipeable *swipeable,
-                                   guint         index,
-                                   gint64        duration)
+phosh_swipe_away_bin_swipeable_init (AdwSwipeableInterface *iface)
 {
-}
-
-
-static void
-phosh_swipe_away_bin_swipeable_init (HdySwipeableInterface *iface)
-{
-  iface->get_swipe_tracker = phosh_swipe_away_bin_get_swipe_tracker;
   iface->get_distance = phosh_swipe_away_bin_get_distance;
   iface->get_cancel_progress = phosh_swipe_away_bin_get_cancel_progress;
   iface->get_progress = phosh_swipe_away_bin_get_progress;
   iface->get_snap_points = phosh_swipe_away_bin_get_snap_points;
-  iface->switch_child = phosh_swipe_away_bin_switch_child;
-}
-
-
-gboolean
-phosh_swipe_away_bin_get_enabled (PhoshSwipeAwayBin *self)
-{
-  g_return_val_if_fail (PHOSH_IS_SWIPE_AWAY_BIN (self), FALSE);
-
-  return self->enabled;
-}
-
-
-void
-phosh_swipe_away_bin_set_enabled (PhoshSwipeAwayBin *self,
-                                  gboolean           enabled)
-{
-  g_return_if_fail (PHOSH_IS_SWIPE_AWAY_BIN (self));
-
-  enabled = !!enabled;
-  if (enabled == self->enabled)
-    return;
-
-  self->enabled = enabled;
-  g_object_notify_by_pspec (G_OBJECT (self), props[PROP_ENABLED]);
 }
 
 

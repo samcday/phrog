@@ -11,7 +11,6 @@
 #include "launcher-row.h"
 
 #include <glib/gi18n.h>
-#include <handy.h>
 
 
 enum {
@@ -23,7 +22,7 @@ static GParamSpec *props[PROP_LAST_PROP];
 
 
 struct _PhoshLauncherRow {
-  HdyActionRow       parent;
+  AdwActionRow       parent;
 
   PhoshLauncherItem *item;
 
@@ -31,7 +30,7 @@ struct _PhoshLauncherRow {
   GtkWidget         *progress_bar;
   GtkWidget         *box_data;
 };
-G_DEFINE_TYPE (PhoshLauncherRow, phosh_launcher_row, HDY_TYPE_ACTION_ROW)
+G_DEFINE_TYPE (PhoshLauncherRow, phosh_launcher_row, ADW_TYPE_ACTION_ROW)
 
 
 static gboolean
@@ -60,16 +59,16 @@ set_item (PhoshLauncherRow *self, PhoshLauncherItem *item)
 
   self->item = g_object_ref (item);
   info = phosh_launcher_item_get_app_info (item);
-  hdy_preferences_row_set_title (HDY_PREFERENCES_ROW (self),
+  adw_preferences_row_set_title (ADW_PREFERENCES_ROW (self),
                                  g_app_info_get_display_name (G_APP_INFO (info)));
 
   icon_name = g_desktop_app_info_get_string (info, "Icon");
   if (icon_name)
-    hdy_action_row_set_icon_name (HDY_ACTION_ROW (self), icon_name);
+    adw_action_row_add_prefix (ADW_ACTION_ROW (self), gtk_image_new_from_icon_name (icon_name));
 
   desc = g_app_info_get_description (G_APP_INFO (info));
-  hdy_action_row_set_subtitle (HDY_ACTION_ROW (self), desc);
-  hdy_action_row_set_subtitle_lines (HDY_ACTION_ROW (self), 1);
+  adw_action_row_set_subtitle (ADW_ACTION_ROW (self), desc);
+  adw_action_row_set_subtitle_lines (ADW_ACTION_ROW (self), 1);
 
   g_object_bind_property (self->item, "progress-visible",
                           self->progress_bar, "visible",

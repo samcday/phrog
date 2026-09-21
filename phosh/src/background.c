@@ -24,8 +24,8 @@
 #include "util.h"
 
 #define GNOME_DESKTOP_USE_UNSTABLE_API
-#include <libgnome-desktop/gnome-bg.h>
-#include <libgnome-desktop/gnome-bg-slide-show.h>
+#include <gnome-bg/gnome-bg.h>
+#include <gnome-bg/gnome-bg-slide-show.h>
 
 #include <gio/gio.h>
 
@@ -198,16 +198,24 @@ image_background (PhoshBackgroundImage    *image,
 }
 
 
-static gboolean
-phosh_background_draw (GtkWidget *widget, cairo_t *cr)
+static void
+phosh_background_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
 {
   PhoshBackground *self = PHOSH_BACKGROUND (widget);
+  graphene_rect_t bounds;
   int x = 0, y = 0, width, height;
+  cairo_t *cr;
 
-  g_return_val_if_fail (PHOSH_IS_BACKGROUND (self), GDK_EVENT_PROPAGATE);
+  g_return_if_fail (PHOSH_IS_BACKGROUND (self));
 
   if (!self->configured)
-    return GDK_EVENT_PROPAGATE;
+    return;
+
+  bounds.origin.x = 0;
+  bounds.origin.y = 0;
+  bounds.size.width = gtk_widget_get_width (GTK_WIDGET (self));
+  bounds.size.height = gtk_widget_get_height (GTK_WIDGET (self));
+  cr = gtk_snapshot_append_cairo (snapshot, &bounds);
 
   if (self->primary)
     phosh_shell_get_usable_area (phosh_shell_get_default (), &x, &y, NULL, NULL);
@@ -215,11 +223,12 @@ phosh_background_draw (GtkWidget *widget, cairo_t *cr)
   cairo_save (cr);
   if (self->primary) {
     /* Primary background: use CSS color as it's the top- and home-bar's background */
-    GtkStyleContext *context = gtk_widget_get_style_context (GTK_WIDGET (self));
+    // FIXME Use GTK 4 replacement
+    // GtkStyleContext *context = gtk_widget_get_style_context (GTK_WIDGET (self));
 
-    width = gtk_widget_get_allocated_width (GTK_WIDGET (self));
-    height = gtk_widget_get_allocated_height (GTK_WIDGET (self));
-    gtk_render_background (context, cr, 0, 0, width, height);
+    // width = gtk_widget_get_width (GTK_WIDGET (self));
+    // height = gtk_widget_get_height (GTK_WIDGET (self));
+    // gtk_render_background (context, cr, 0, 0, width, height);
   } else {
     cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
     cairo_set_source_rgb (cr, self->color.red, self->color.green, self->color.blue);
@@ -232,8 +241,7 @@ phosh_background_draw (GtkWidget *widget, cairo_t *cr)
   }
 
   cairo_restore (cr);
-
-  return GDK_EVENT_PROPAGATE;
+  cairo_destroy (cr);
 }
 
 
@@ -356,7 +364,7 @@ phosh_background_class_init (PhoshBackgroundClass *klass)
   object_class->set_property = phosh_background_set_property;
   object_class->get_property = phosh_background_get_property;
 
-  widget_class->draw = phosh_background_draw;
+  widget_class->snapshot = phosh_background_snapshot;
 
   layer_surface_class->configured = phosh_background_configured;
 
@@ -388,13 +396,11 @@ phosh_background_init (PhoshBackground *self)
 
 
 GtkWidget *
-phosh_background_new (gpointer      layer_shell,
-                      PhoshMonitor *monitor,
+phosh_background_new (PhoshMonitor *monitor,
                       gboolean      primary,
                       guint         layer)
 {
   return g_object_new (PHOSH_TYPE_BACKGROUND,
-                       "layer-shell", layer_shell,
                        "wl-output", monitor->wl_output,
                        "anchor", (ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP |
                                   ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM |

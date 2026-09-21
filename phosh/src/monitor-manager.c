@@ -23,8 +23,6 @@
 
 #include "dbus/gsd-color-dbus.h"
 
-#include <gdk/gdkwayland.h>
-
 #define GSD_COLOR_BUS_NAME "org.gnome.SettingsDaemon.Color"
 #define GSD_COLOR_OBJECT_PATH "/org/gnome/SettingsDaemon/Color"
 
@@ -49,7 +47,6 @@ enum {
   PROP_0,
   PROP_SENSOR_PROXY_MANAGER,
   PROP_N_MONITORS,
-  PROP_NIGHT_LIGHT_TEMP,
   PROP_LAST_PROP
 };
 static GParamSpec *props[PROP_LAST_PROP];
@@ -1228,9 +1225,6 @@ phosh_monitor_manager_get_property (GObject    *object,
   case PROP_N_MONITORS:
     g_value_set_int (value, self->monitors->len);
     break;
-  case PROP_NIGHT_LIGHT_TEMP:
-    g_value_set_uint (value, self->night_light_temp);
-    break;
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     break;
@@ -1260,8 +1254,6 @@ on_gsd_color_temperature_changed (PhoshMonitorManager*self)
     if (!success)
       g_warning ("Failed to set gamma for %s", monitor->name);
   }
-
-  g_object_notify_by_pspec (G_OBJECT (self), props[PROP_NIGHT_LIGHT_TEMP]);
 }
 
 
@@ -1382,15 +1374,6 @@ phosh_monitor_manager_class_init (PhoshMonitorManagerClass *klass)
     g_param_spec_int ("n-monitors", "", "",
                       0, G_MAXINT, 0,
                       G_PARAM_READABLE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS);
-  /**
-   * PhoshMonitorManager:night-light-temp:
-   *
-   * Night light color temperature
-   */
-  props[PROP_NIGHT_LIGHT_TEMP] =
-    g_param_spec_uint ("night-light-temp", "", "",
-                       0, G_MAXUINT, 0,
-                       G_PARAM_READABLE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (object_class, PROP_LAST_PROP, props);
 
@@ -1690,20 +1673,4 @@ phosh_monitor_manager_get_night_light_supported (PhoshMonitorManager *self)
   g_return_val_if_fail (PHOSH_IS_MONITOR_MANAGER (self), FALSE);
 
   return phosh_dbus_display_config_get_night_light_supported (PHOSH_DBUS_DISPLAY_CONFIG (self));
-}
-
-/**
- * phosh_monitor_manager_get_night_light_temp:
- * @self: The monitor manager
- *
- * Get the night light color temperature
- *
- * Returns: The night light color temperature in K
- */
-guint32
-phosh_monitor_manager_get_night_light_temp (PhoshMonitorManager *self)
-{
-  g_return_val_if_fail (PHOSH_IS_MONITOR_MANAGER (self), 0);
-
-  return self->night_light_temp;
 }

@@ -56,7 +56,7 @@ test_plugin_loader_load (void)
   g_assert_true (GTK_IS_WIDGET (widget));
   g_object_ref_sink (widget);
 
-  gtk_widget_destroy (widget);
+  g_object_unref (widget);
 #endif
   g_assert_finalize_object (plugin_loader);
 }

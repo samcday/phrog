@@ -10,7 +10,7 @@
 #include "monitor/monitor.h"
 
 #define GNOME_DESKTOP_USE_UNSTABLE_API
-#include <libgnome-desktop/gnome-bg.h>
+#include <gnome-bg/gnome-bg.h>
 
 #include <gtk/gtk.h>
 
@@ -26,8 +26,7 @@ typedef struct _PhoshBackgroundData {
   GDesktopBackgroundStyle style;
 } PhoshBackgroundData;
 
-GtkWidget          *phosh_background_new              (gpointer                 layer_shell,
-                                                       PhoshMonitor            *monitor,
+GtkWidget          *phosh_background_new              (PhoshMonitor            *monitor,
                                                        gboolean                 primary,
                                                        guint                    layer);
 void                phosh_background_set_primary      (PhoshBackground         *self,

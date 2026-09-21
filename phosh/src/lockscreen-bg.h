@@ -18,8 +18,7 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (PhoshLockscreenBg, phosh_lockscreen_bg, PHOSH, LOCKSCREEN_BG,
                       PhoshLayerSurface)
 
-PhoshLockscreenBg *     phosh_lockscreen_bg_new (struct zwlr_layer_shell_v1 *layer_shell,
-                                                 struct wl_output           *wl_output);
+PhoshLockscreenBg *     phosh_lockscreen_bg_new (struct wl_output           *wl_output);
 void                    phosh_lockscreen_bg_set_image (PhoshLockscreenBg    *self,
                                                        PhoshBackgroundImage *image);
 

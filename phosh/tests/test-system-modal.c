@@ -19,11 +19,10 @@ test_system_modal_new (PhoshTestCompositorFixture *fixture, gconstpointer unused
   GtkWidget *modal = phosh_system_modal_new (phosh_test_get_monitor (fixture->state));
 
   g_assert_true (PHOSH_IS_SYSTEM_MODAL (modal));
-  g_assert_true (gtk_style_context_has_class (
-                   gtk_widget_get_style_context (modal),
+  g_assert_true (gtk_widget_has_css_class (modal,
                    "phosh-system-modal"));
 
-  gtk_widget_destroy (modal);
+  g_object_unref (modal);
 }
 
 
@@ -43,7 +42,7 @@ test_system_modal_g_object_new (PhoshTestCompositorFixture *fixture, gconstpoint
   gtk_widget_set_visible (modal, FALSE);
   g_assert_false (gtk_widget_get_visible (modal));
   g_assert_false (gtk_widget_get_mapped (modal));
-  gtk_widget_destroy (modal);
+  g_object_unref (modal);
 }
 
 

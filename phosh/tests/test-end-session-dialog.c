@@ -18,12 +18,12 @@ test_end_session_dialog_new (PhoshTestCompositorFixture *fixture, gconstpointer 
 {
   GtkWidget *dialog;
 
-  dialog = g_object_new (PHOSH_TYPE_END_SESSION_DIALOG,
+  dialog = g_object_ref_sink (g_object_new (PHOSH_TYPE_END_SESSION_DIALOG,
                          "monitor", phosh_test_get_monitor (fixture->state),
                          "action", PHOSH_END_SESSION_ACTION_LOGOUT,
                          "timeout", 0,
                          "inhibitor-paths", NULL,
-                         NULL);
+                         NULL));
 
   g_assert_true (PHOSH_IS_END_SESSION_DIALOG (dialog));
 
@@ -34,7 +34,7 @@ test_end_session_dialog_new (PhoshTestCompositorFixture *fixture, gconstpointer 
   gtk_widget_set_visible (dialog, FALSE);
   g_assert_false (gtk_widget_get_visible (dialog));
   g_assert_false (gtk_widget_get_mapped (dialog));
-  gtk_widget_destroy (dialog);
+  g_object_unref (dialog);
 }
 
 
@@ -59,12 +59,12 @@ test_end_session_dialog_timeout (PhoshTestCompositorFixture *fixture, gconstpoin
   PhoshEndSessionDialog *dialog = NULL;
   g_autoptr (GMainLoop) mainloop = NULL;
 
-  dialog = g_object_new (PHOSH_TYPE_END_SESSION_DIALOG,
+  dialog = g_object_ref_sink (g_object_new (PHOSH_TYPE_END_SESSION_DIALOG,
                          "monitor", phosh_test_get_monitor (fixture->state),
                          "action", PHOSH_END_SESSION_ACTION_LOGOUT,
                          "timeout", 1,
                          "inhibitor-paths", NULL,
-                         NULL);
+                         NULL));
   g_assert_true (PHOSH_IS_END_SESSION_DIALOG (dialog));
 
   mainloop = g_main_loop_new (NULL, FALSE);
@@ -77,7 +77,7 @@ test_end_session_dialog_timeout (PhoshTestCompositorFixture *fixture, gconstpoin
   /* Letting the dialog timeout means confirmation */
   g_assert_true (phosh_end_session_dialog_get_action_confirmed (dialog));
 
-  gtk_widget_destroy (GTK_WIDGET (dialog));
+  g_object_unref (GTK_WIDGET (dialog));
 }
 
 

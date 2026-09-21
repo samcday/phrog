@@ -30,9 +30,7 @@ typedef enum {
   PHOSH_TOP_PANEL_STATE_UNFOLDED,
 } PhoshTopPanelState;
 
-GtkWidget         *phosh_top_panel_new (struct zwlr_layer_shell_v1          *layer_shell,
-                                        struct zphoc_layer_shell_effects_v1 *layer_shell_effects,
-                                        PhoshMonitor                        *monitor,
+GtkWidget         *phosh_top_panel_new (PhoshMonitor                        *monitor,
                                         guint32                              layer);
 void               phosh_top_panel_toggle_fold (PhoshTopPanel *self);
 void               phosh_top_panel_fold (PhoshTopPanel *self);

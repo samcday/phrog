@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshMediaPlayer" parent="GtkGrid">
     <property name="margin-top">5</property>
     <property name="margin-bottom">5</property>
@@ -101,14 +101,15 @@
             </child>
           </object>
         </child>
+        <layout>
+          <property name="column">0</property>
+          <property name="row">2</property>
+        </layout>
       </object>
-      <packing>
-        <property name="left-attach">0</property>
-        <property name="top-attach">2</property>
-      </packing>
     </child>
     <child>
       <object class="GtkBox" id="box_pos_len">
+        <property name="visible">0</property>
         <property name="margin-start">8</property>
         <property name="margin-end">8</property>
         <property name="valign">center</property>
@@ -150,16 +151,15 @@
             </attributes>
           </object>
         </child>
+        <layout>
+          <property name="column">0</property>
+          <property name="row">1</property>
+        </layout>
       </object>
-      <packing>
-        <property name="left-attach">0</property>
-        <property name="top-attach">1</property>
-      </packing>
     </child>
     <child>
       <object class="GtkButton" id="btn_details">
         <property name="visible">1</property>
-        <property name="relief">none</property>
         <signal name="clicked" handler="btn_details_clicked_cb" object="PhoshMediaPlayer" swapped="yes"/>
         <property name="valign">center</property>
         <property name="focus-on-click">0</property>
@@ -220,11 +220,11 @@
         <style>
           <class name="media-player-details"/>
         </style>
+        <layout>
+          <property name="column">0</property>
+          <property name="row">0</property>
+        </layout>
       </object>
-      <packing>
-        <property name="left-attach">0</property>
-        <property name="top-attach">0</property>
-      </packing>
     </child>
   </template>
 </interface>

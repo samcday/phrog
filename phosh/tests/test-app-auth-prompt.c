@@ -13,19 +13,19 @@
 static void
 test_app_auth_prompt_new (PhoshTestCompositorFixture *fixture, gconstpointer unused)
 {
-  GtkWidget *prompt = g_object_new (PHOSH_TYPE_APP_AUTH_PROMPT,
+  GtkWidget *prompt = g_object_ref_sink (g_object_new (PHOSH_TYPE_APP_AUTH_PROMPT,
                                     "monitor", phosh_test_get_monitor (fixture->state),
                                     "title", "title",
                                     "subtitle", "subtitle",
                                     "body", "body",
                                     "grant-label", "ok",
                                     "deny-label", "cancel",
-                                    NULL);
+                                    NULL));
 
   g_assert_true (PHOSH_IS_APP_AUTH_PROMPT (prompt));
 
   gtk_widget_set_visible (prompt, TRUE);
-  gtk_widget_destroy (prompt);
+  g_object_unref (prompt);
 }
 
 int

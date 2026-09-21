@@ -42,7 +42,7 @@ enum {
 static GParamSpec *props[PROP_LAST_PROP];
 
 struct _PhoshQuickSettingsBox {
-  GtkContainer       parent;
+  GtkWidget          parent;
 
   guint              max_columns;
   guint              spacing;
@@ -54,7 +54,11 @@ struct _PhoshQuickSettingsBox {
   PhoshQuickSetting *to_show_child;
 };
 
-G_DEFINE_TYPE (PhoshQuickSettingsBox, phosh_quick_settings_box, GTK_TYPE_CONTAINER);
+static void phosh_quick_settings_box_buildable_iface_init (GtkBuildableIface *iface);
+
+G_DEFINE_TYPE_WITH_CODE (PhoshQuickSettingsBox, phosh_quick_settings_box, GTK_TYPE_WIDGET,
+                         G_IMPLEMENT_INTERFACE (GTK_TYPE_BUILDABLE,
+                                                phosh_quick_settings_box_buildable_iface_init));
 
 
 static void
@@ -106,13 +110,16 @@ phosh_quick_settings_box_get_property (GObject    *object,
 
 
 static void
-phosh_quick_settings_box_destroy (GtkWidget *widget)
+phosh_quick_settings_box_dispose (GObject *object)
 {
-  PhoshQuickSettingsBox *self = PHOSH_QUICK_SETTINGS_BOX (widget);
-
-  GTK_WIDGET_CLASS (phosh_quick_settings_box_parent_class)->destroy (widget);
+  PhoshQuickSettingsBox *self = PHOSH_QUICK_SETTINGS_BOX (object);
 
   if (self->children != NULL) {
+    g_autoptr (GPtrArray) children = g_ptr_array_copy (self->children, NULL, NULL);
+
+    for (int i = 0; i < children->len; i++)
+      phosh_quick_settings_box_remove (self, g_ptr_array_index (children, i));
+
     g_ptr_array_free (self->children, TRUE);
     self->children = NULL;
   }
@@ -121,6 +128,10 @@ phosh_quick_settings_box_destroy (GtkWidget *widget)
     gtk_widget_unparent (GTK_WIDGET (self->revealer));
     self->revealer = NULL;
   }
+
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_QUICK_SETTINGS_BOX);
+
+  G_OBJECT_CLASS (phosh_quick_settings_box_parent_class)->dispose (object);
 }
 
 
@@ -246,7 +257,9 @@ compute_child_height (PhoshQuickSettingsBox *self)
   int nat_height = 0;
 
   for (int i = 0; i < self->children->len; i++) {
-    gtk_widget_get_preferred_height (g_ptr_array_index (self->children, i), NULL, &nat_height);
+    gtk_widget_measure (g_ptr_array_index (self->children, i),
+                        GTK_ORIENTATION_VERTICAL, -1,
+                        NULL, &nat_height, NULL, NULL);
     height = MAX (height, nat_height);
   }
 
@@ -261,7 +274,9 @@ compute_child_width (PhoshQuickSettingsBox *self)
   int nat_width = 0;
 
   for (int i = 0; i < self->children->len; i++) {
-    gtk_widget_get_preferred_width (g_ptr_array_index (self->children, i), NULL, &nat_width);
+    gtk_widget_measure (g_ptr_array_index (self->children, i),
+                        GTK_ORIENTATION_HORIZONTAL, -1,
+                        NULL, &nat_width, NULL, NULL);
     width = MAX (width, nat_width);
   }
 
@@ -274,6 +289,61 @@ phosh_quick_settings_box_get_request_mode (GtkWidget *widget)
 {
   g_debug ("%p: Querying for request mode", widget);
   return GTK_SIZE_REQUEST_HEIGHT_FOR_WIDTH;
+}
+
+
+static void
+phosh_quick_settings_box_get_preferred_height (GtkWidget *widget, int *minimum_height,
+                                              int *natural_height)
+{
+  PhoshQuickSettingsBox *self = PHOSH_QUICK_SETTINGS_BOX (widget);
+  int len = 0;
+  int child_height;
+  int cols;
+  int rows;
+
+  g_debug ("%p: Querying for preferred height", self);
+
+  for (int i = 0; i < self->children->len; i++)
+    if (gtk_widget_get_visible (g_ptr_array_index (self->children, i)))
+      len += 1;
+
+  if (len == 0) {
+    g_debug ("%p: No visible children so preferred height is 0", self);
+    *natural_height = 0;
+    *minimum_height = 0;
+    return;
+  }
+
+  g_debug ("%p: Configuration: children = %d/%d\tcolumns = %d\tspacing = %d",
+           self, len, self->children->len, self->max_columns, self->spacing);
+
+  child_height = compute_child_height (self);
+  cols = self->max_columns;
+  rows = (int) ceil ((float) len / cols);
+
+  g_debug ("%p: Computed child height = %d", self, child_height);
+
+  *minimum_height = rows * (child_height + self->spacing) - self->spacing;
+  *natural_height = *minimum_height;
+
+  g_debug ("%p: Computed preferred height: minimum = %d\tnatural = %d",
+           self, *minimum_height, *natural_height);
+
+  if (self->shown_child != NULL) {
+    int rev_min_height = 0;
+    int rev_nat_height = 0;
+    gtk_widget_measure (GTK_WIDGET (self->revealer),
+                        GTK_ORIENTATION_VERTICAL, -1,
+                        &rev_min_height, &rev_nat_height, NULL, NULL);
+    *minimum_height += rev_min_height;
+    *natural_height += rev_nat_height;
+
+    g_debug ("%p: Revealer preferred height: minimum = %d\tnatural = %d",
+             self, rev_min_height, rev_nat_height);
+    g_debug ("%p: Adjusted preferred height: minimum = %d\tnatural = %d",
+             self, *minimum_height, *natural_height);
+  }
 }
 
 
@@ -316,9 +386,73 @@ phosh_quick_settings_box_get_preferred_width (GtkWidget *widget, int *minimum_wi
   if (self->shown_child != NULL) {
     int rev_min_width = 0;
     int rev_nat_width = 0;
-    gtk_widget_get_preferred_width (GTK_WIDGET (self->revealer), &rev_min_width, &rev_nat_width);
+    gtk_widget_measure (GTK_WIDGET (self->revealer),
+                        GTK_ORIENTATION_HORIZONTAL, -1,
+                        &rev_min_width, &rev_nat_width, NULL, NULL);
     *minimum_width = MAX (*minimum_width, rev_min_width);
     *natural_width = MAX (*natural_width, rev_nat_width);
+
+    g_debug ("%p: Revealer preferred width: minimum = %d\tnatural = %d",
+             self, rev_min_width, rev_nat_width);
+    g_debug ("%p: Adjusted preferred width: minimum = %d\tnatural = %d",
+             self, *minimum_width, *natural_width);
+  }
+}
+
+
+static void
+phosh_quick_settings_box_get_preferred_width_for_height (GtkWidget *widget, int height,
+                                                         int *minimum_width, int *natural_width)
+{
+  PhoshQuickSettingsBox *self = PHOSH_QUICK_SETTINGS_BOX (widget);
+  int len = 0;
+  int child_width;
+  int child_height;
+  int cols;
+  int rows;
+
+  g_debug ("%p: Querying preferred width for height = %d", self, height);
+
+  for (int i = 0; i < self->children->len; i++)
+    if (gtk_widget_get_visible (g_ptr_array_index (self->children, i)))
+      len += 1;
+
+  if (len == 0) {
+    g_debug ("%p: No visible children so preferred width is 0", self);
+    *natural_width = 0;
+    *minimum_width = 0;
+    return;
+  }
+
+  g_debug ("%p: Configuration: children = %d/%d\tcolumns = %d\tspacing = %d",
+           self, len, self->children->len, self->max_columns, self->spacing);
+
+  child_width = compute_child_width (self);
+  child_height = compute_child_height (self);
+  rows = (int) floor ((float) (height + self->spacing) / (child_height + self->spacing));
+  cols = (int) ceil ((float) len / rows);
+  cols = MIN (cols, self->max_columns);
+  rows = (int) ceil ((float) len / cols);
+
+  g_debug ("%p: Computed children values: width = %d\theight = %d\tcols = %d\trows = %d",
+           self, child_width, child_height, cols, rows);
+
+  g_return_if_fail (cols > 0 && rows > 0);
+
+  *minimum_width = cols * (child_width + self->spacing) - self->spacing;
+  *natural_width = *minimum_width;
+
+  g_debug ("%p: Computed preferred width: minimum = %d\tnatural = %d",
+           self, *minimum_width, *natural_width);
+
+  if (self->shown_child != NULL) {
+    int rev_min_width = 0;
+    int rev_nat_width = 0;
+    gtk_widget_measure (GTK_WIDGET (self->revealer),
+                        GTK_ORIENTATION_HORIZONTAL, height,
+                        &rev_min_width, &rev_nat_width, NULL, NULL);
+    *minimum_width = MAX (rev_min_width, *minimum_width);
+    *natural_width = MAX (rev_nat_width, *natural_width);
 
     g_debug ("%p: Revealer preferred width: minimum = %d\tnatural = %d",
              self, rev_min_width, rev_nat_width);
@@ -375,8 +509,9 @@ phosh_quick_settings_box_get_preferred_height_for_width (GtkWidget *widget, int 
   if (self->shown_child != NULL) {
     int rev_min_height = 0;
     int rev_nat_height = 0;
-    gtk_widget_get_preferred_height_for_width (GTK_WIDGET (self->revealer), width, &rev_min_height,
-                                               &rev_nat_height);
+    gtk_widget_measure (GTK_WIDGET (self->revealer),
+                        GTK_ORIENTATION_VERTICAL, width,
+                        &rev_min_height, &rev_nat_height, NULL, NULL);
     *minimum_height += rev_min_height;
     *natural_height += rev_nat_height;
 
@@ -387,6 +522,24 @@ phosh_quick_settings_box_get_preferred_height_for_width (GtkWidget *widget, int 
   }
 }
 
+
+static void
+phosh_quick_settings_box_measure (GtkWidget *widget,
+                                  GtkOrientation orientation, int for_size,
+                                  int* minimum, int* natural,
+                                  int* minimum_baseline, int* natural_baseline)
+{
+  if (orientation == GTK_ORIENTATION_HORIZONTAL && for_size == -1)
+    phosh_quick_settings_box_get_preferred_width (widget, minimum, natural);
+  else if (orientation == GTK_ORIENTATION_HORIZONTAL && for_size != -1)
+    phosh_quick_settings_box_get_preferred_width_for_height (widget, for_size, minimum, natural);
+  else if (orientation == GTK_ORIENTATION_VERTICAL && for_size == -1)
+    phosh_quick_settings_box_get_preferred_height (widget, minimum, natural);
+  else if (orientation == GTK_ORIENTATION_VERTICAL && for_size != -1)
+    phosh_quick_settings_box_get_preferred_height_for_width (widget, for_size, minimum, natural);
+  else
+    g_assert_not_reached ();
+}
 
 static void
 allocate_children (PhoshQuickSettingsBox *self,
@@ -405,7 +558,7 @@ allocate_children (PhoshQuickSettingsBox *self,
   if (self->shown_child == NULL) {
     rect.width = 0;
     rect.height = 0;
-    gtk_widget_size_allocate (GTK_WIDGET (self->revealer), &rect);
+    gtk_widget_size_allocate (GTK_WIDGET (self->revealer), &rect, 0);
   }
 
   rect.width = width;
@@ -417,7 +570,7 @@ allocate_children (PhoshQuickSettingsBox *self,
         PhoshQuickSetting *child = g_ptr_array_index (self->children, i);
         i += 1;
         if (gtk_widget_get_visible (GTK_WIDGET (child))) {
-          gtk_widget_size_allocate (GTK_WIDGET (child), &rect);
+          gtk_widget_size_allocate (GTK_WIDGET (child), &rect, 0);
           if (self->shown_child == child)
             show_at_this_row = TRUE;
           break;
@@ -435,7 +588,7 @@ allocate_children (PhoshQuickSettingsBox *self,
       rect.x = x;
       rect.height = revealer_height;
       rect.width = revealer_width;
-      gtk_widget_size_allocate (GTK_WIDGET (self->revealer), &rect);
+      gtk_widget_size_allocate (GTK_WIDGET (self->revealer), &rect, 0);
       rect.x = ltr ? x : x + (cols - 1) * (width + self->spacing);
       rect.height = height;
       rect.width = width;
@@ -447,9 +600,10 @@ allocate_children (PhoshQuickSettingsBox *self,
 
 
 static void
-phosh_quick_settings_box_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
+phosh_quick_settings_box_size_allocate (GtkWidget *widget, int width, int height, int baseline)
 {
   PhoshQuickSettingsBox *self = PHOSH_QUICK_SETTINGS_BOX (widget);
+  GtkAllocation allocation = {0, 0, width, height};
   int len = 0;
   int child_width;
   int child_height;
@@ -463,24 +617,25 @@ phosh_quick_settings_box_size_allocate (GtkWidget *widget, GtkAllocation *alloca
 
   g_debug ("%p: Doing size allocation", self);
 
-  GTK_WIDGET_CLASS (phosh_quick_settings_box_parent_class)->size_allocate (widget, allocation);
-
   for (int i = 0; i < self->children->len; i++)
     if (gtk_widget_get_visible (g_ptr_array_index (self->children, i)))
       len += 1;
 
   if (len == 0) {
     g_debug ("%p: Exiting allocation as there are no visible children", self);
+    allocation.width = 0;
+    allocation.height = 0;
+    gtk_widget_size_allocate (GTK_WIDGET (self->revealer), &allocation, 0);
     return;
   }
 
   g_debug ("%p: Allocation: x = %d\ty = %d\twidth = %d\theight = %d",
-           self, allocation->x, allocation->y, allocation->width, allocation->height);
+           self, allocation.x, allocation.y, allocation.width, allocation.height);
 
   if (self->shown_child) {
-    gtk_widget_get_preferred_height_for_width (GTK_WIDGET (self->revealer),
-                                               allocation->width, NULL,
-                                               &revealer_height);
+    gtk_widget_measure (GTK_WIDGET (self->revealer),
+                        GTK_ORIENTATION_VERTICAL, allocation.width,
+                        NULL, &revealer_height, NULL, NULL);
   } else {
     revealer_height = 0;
   }
@@ -492,9 +647,9 @@ phosh_quick_settings_box_size_allocate (GtkWidget *widget, GtkAllocation *alloca
            "child height = %d",
            self, revealer_width, revealer_height, child_width, child_height);
 
-  g_return_if_fail (allocation->width >= child_width && allocation->height >= child_height);
+  g_return_if_fail (allocation.width >= child_width && allocation.height >= child_height);
 
-  cols = (int) floor ((float) (allocation->width + self->spacing) / (child_width + self->spacing));
+  cols = (int) floor ((float) (allocation.width + self->spacing) / (child_width + self->spacing));
   cols = MIN (cols, self->max_columns);
   rows = (int) ceil ((float) len / cols);
   g_debug ("%p: cols = %d\trows = %d", self, cols, rows);
@@ -502,21 +657,21 @@ phosh_quick_settings_box_size_allocate (GtkWidget *widget, GtkAllocation *alloca
   total_width = cols * (child_width + self->spacing) - self->spacing;
   total_height = rows * (child_height + self->spacing) - self->spacing;
 
-  if (total_width <= allocation->width && total_height <= allocation->height) {
-    extra_space = allocation->width - total_width;
+  if (total_width <= allocation.width && total_height <= allocation.height) {
+    extra_space = allocation.width - total_width;
     child_width += extra_space / cols;
-    revealer_width = allocation->width;
+    revealer_width = allocation.width;
 
-    extra_space = allocation->height - total_height;
+    extra_space = allocation.height - total_height;
     revealer_height = MIN (extra_space, revealer_height);
-    extra_space = allocation->height - total_height - revealer_height;
+    extra_space = allocation.height - total_height - revealer_height;
     child_height += extra_space / rows;
   } else {
     cols = 1;
     rows = len;
-    child_width = allocation->width;
-    child_height = (allocation->height - revealer_height + self->spacing) / rows - self->spacing;
-    revealer_width = allocation->width;
+    child_width = allocation.width;
+    child_height = (allocation.height - revealer_height + self->spacing) / rows - self->spacing;
+    revealer_width = allocation.width;
   }
 
   g_return_if_fail (child_width >= 0 && child_height >= 0);
@@ -526,7 +681,7 @@ phosh_quick_settings_box_size_allocate (GtkWidget *widget, GtkAllocation *alloca
            self, revealer_width, revealer_height, child_width, child_height);
 
   allocate_children (self,
-                     allocation->x, allocation->y, child_width, child_height,
+                     allocation.x, allocation.y, child_width, child_height,
                      cols, rows,
                      revealer_width, revealer_height);
 }
@@ -534,8 +689,7 @@ phosh_quick_settings_box_size_allocate (GtkWidget *widget, GtkAllocation *alloca
 static void
 hide_status_page (PhoshQuickSettingsBox *self)
 {
-  PhoshStatusPage *status_page = phosh_quick_setting_get_status_page (self->shown_child);
-  gtk_container_remove (GTK_CONTAINER (self->revealer), GTK_WIDGET (status_page));
+  gtk_revealer_set_child (self->revealer, NULL);
   phosh_quick_setting_set_showing_status (self->shown_child, FALSE);
   self->shown_child = NULL;
 }
@@ -545,7 +699,7 @@ static void
 show_status_page (PhoshQuickSettingsBox *self)
 {
   PhoshStatusPage *status_page = phosh_quick_setting_get_status_page (self->shown_child);
-  gtk_container_add (GTK_CONTAINER (self->revealer), GTK_WIDGET (status_page));
+  gtk_revealer_set_child (self->revealer, GTK_WIDGET (status_page));
   phosh_quick_setting_set_showing_status (self->shown_child, TRUE);
   gtk_revealer_set_reveal_child (self->revealer, TRUE);
 }
@@ -604,15 +758,14 @@ on_status_page_changed (PhoshQuickSettingsBox *self, GParamSpec *pspec, PhoshQui
     gtk_widget_set_margin_bottom (GTK_WIDGET (status_page), self->spacing);
 
   if (child == self->shown_child) {
-    GtkWidget *existing_status = gtk_bin_get_child (GTK_BIN (self->revealer));
-    gtk_container_remove (GTK_CONTAINER (self->revealer), existing_status);
+    gtk_revealer_set_child (self->revealer, NULL);
 
     if (status_page == NULL) {
       phosh_quick_setting_set_showing_status (self->shown_child, FALSE);
       self->shown_child = NULL;
       gtk_revealer_set_reveal_child (self->revealer, FALSE);
     } else {
-      gtk_container_add (GTK_CONTAINER (self->revealer), GTK_WIDGET (status_page));
+      gtk_revealer_set_child (self->revealer, GTK_WIDGET (status_page));
     }
   } else if (child == self->to_show_child && status_page == NULL) {
     self->to_show_child = NULL;
@@ -657,58 +810,18 @@ on_visible_changed (PhoshQuickSettingsBox *self, GParamSpec *pspec, PhoshQuickSe
 
 
 static void
-container_add (GtkContainer *container, GtkWidget *widget)
-{
-  phosh_quick_settings_box_add (PHOSH_QUICK_SETTINGS_BOX (container),
-                                PHOSH_QUICK_SETTING (widget));
-}
-
-
-static void
-container_remove (GtkContainer *container, GtkWidget *widget)
-{
-  phosh_quick_settings_box_remove (PHOSH_QUICK_SETTINGS_BOX (container),
-                                   PHOSH_QUICK_SETTING (widget));
-}
-
-
-static void
-phosh_quick_settings_box_forall (GtkContainer *container, gboolean include_internals,
-                                 GtkCallback callback, gpointer data)
-{
-  PhoshQuickSettingsBox *self = PHOSH_QUICK_SETTINGS_BOX (container);
-
-  if (self->children != NULL) {
-    g_autoptr (GPtrArray) children = g_ptr_array_copy (self->children, NULL, NULL);
-
-    for (int i = 0; i < children->len; i++)
-      callback (g_ptr_array_index (children, i), data);
-  }
-
-  if (include_internals)
-    callback (GTK_WIDGET (self->revealer), data);
-}
-
-
-static void
 phosh_quick_settings_box_class_init (PhoshQuickSettingsBoxClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
-  GtkContainerClass *container_class = GTK_CONTAINER_CLASS (klass);
 
   object_class->set_property = phosh_quick_settings_box_set_property;
   object_class->get_property = phosh_quick_settings_box_get_property;
+  object_class->dispose = phosh_quick_settings_box_dispose;
 
-  widget_class->destroy = phosh_quick_settings_box_destroy;
   widget_class->get_request_mode = phosh_quick_settings_box_get_request_mode;
-  widget_class->get_preferred_width = phosh_quick_settings_box_get_preferred_width;
-  widget_class->get_preferred_height_for_width = phosh_quick_settings_box_get_preferred_height_for_width;
+  widget_class->measure = phosh_quick_settings_box_measure;
   widget_class->size_allocate = phosh_quick_settings_box_size_allocate;
-
-  container_class->add = container_add;
-  container_class->remove = container_remove;
-  container_class->forall = phosh_quick_settings_box_forall;
 
   /**
    * PhoshQuickSettingsBox:columns:
@@ -758,8 +871,33 @@ phosh_quick_settings_box_init (PhoshQuickSettingsBox *self)
   self->children = g_ptr_array_new ();
 
   gtk_widget_init_template (GTK_WIDGET (self));
-  gtk_widget_set_has_window (GTK_WIDGET (self), FALSE);
   gtk_widget_set_parent (GTK_WIDGET (self->revealer), GTK_WIDGET (self));
+}
+
+
+static GtkBuildableIface *parent_buildable_iface;
+
+static void
+phosh_quick_settings_box_buildable_add_child (GtkBuildable *buildable,
+                             GtkBuilder   *builder,
+                             GObject      *child,
+                             const char   *type)
+{
+  PhoshQuickSettingsBox *self = PHOSH_QUICK_SETTINGS_BOX (buildable);
+
+  if (PHOSH_IS_QUICK_SETTING (child))
+    phosh_quick_settings_box_add (self, PHOSH_QUICK_SETTING (child));
+  else
+    parent_buildable_iface->add_child (buildable, builder, child, type);
+}
+
+
+static void
+phosh_quick_settings_box_buildable_iface_init (GtkBuildableIface *iface)
+{
+  parent_buildable_iface = g_type_interface_peek_parent (iface);
+
+  iface->add_child = phosh_quick_settings_box_buildable_add_child;
 }
 
 

@@ -116,6 +116,20 @@ phosh_app_grid_button_get_property (GObject    *object,
 
 
 static void
+phosh_app_grid_button_dispose (GObject *object)
+{
+  PhoshAppGridButton *self = PHOSH_APP_GRID_BUTTON (object);
+  PhoshAppGridButtonPrivate *priv = phosh_app_grid_button_get_instance_private (self);
+
+  gtk_widget_unparent (priv->popover);
+
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_APP_GRID_BUTTON);
+
+  G_OBJECT_CLASS (phosh_app_grid_button_parent_class)->dispose (object);
+}
+
+
+static void
 phosh_app_grid_button_finalize (GObject *object)
 {
   PhoshAppGridButton *self = PHOSH_APP_GRID_BUTTON (object);
@@ -190,7 +204,7 @@ static void
 on_right_pressed (GtkWidget *self, int n_press, double x, double y, GtkGesture *gesture)
 {
   const GdkEvent *event = gtk_gesture_get_last_event (gesture, NULL);
-  if (gdk_event_triggers_context_menu (event))
+  if (gdk_event_triggers_context_menu ((GdkEvent *) event))
     context_menu (self, (GdkEvent *) event);
 }
 
@@ -223,6 +237,7 @@ phosh_app_grid_button_class_init (PhoshAppGridButtonClass *klass)
 
   object_class->set_property = phosh_app_grid_button_set_property;
   object_class->get_property = phosh_app_grid_button_get_property;
+  object_class->dispose = phosh_app_grid_button_dispose;
   object_class->finalize = phosh_app_grid_button_finalize;
 
   props[PROP_APP_INFO] =
@@ -549,9 +564,9 @@ phosh_app_grid_button_init (PhoshAppGridButton *self)
 
   gtk_widget_init_template (GTK_WIDGET (self));
 
-  gtk_popover_bind_model (GTK_POPOVER (priv->popover),
-                          G_MENU_MODEL (priv->menu),
-                          NULL);
+  gtk_popover_menu_set_menu_model (GTK_POPOVER_MENU (priv->popover),
+                                   G_MENU_MODEL (priv->menu));
+  gtk_widget_set_parent (priv->popover, GTK_WIDGET (self));
 }
 
 
@@ -646,13 +661,13 @@ phosh_app_grid_button_set_app_info (PhoshAppGridButton *self,
 
     icon = g_app_info_get_icon (priv->info);
     if (G_UNLIKELY (icon == NULL)) {
-      gtk_image_set_from_icon_name (GTK_IMAGE (priv->icon), PHOSH_APP_UNKNOWN_ICON, -1);
+      gtk_image_set_from_icon_name (GTK_IMAGE (priv->icon), PHOSH_APP_UNKNOWN_ICON);
     } else {
       if (G_IS_THEMED_ICON (icon)) {
         g_themed_icon_append_name (G_THEMED_ICON (icon),
                                    PHOSH_APP_UNKNOWN_ICON);
       }
-      gtk_image_set_from_gicon (GTK_IMAGE (priv->icon), icon, -1);
+      gtk_image_set_from_gicon (GTK_IMAGE (priv->icon), icon);
     }
 
     gtk_widget_set_sensitive (GTK_WIDGET (self), TRUE);
@@ -692,7 +707,7 @@ phosh_app_grid_button_set_app_info (PhoshAppGridButton *self,
     }
   } else {
     phosh_app_grid_base_button_set_label (PHOSH_APP_GRID_BASE_BUTTON (self), _("Application"));
-    gtk_image_set_from_icon_name (GTK_IMAGE (priv->icon), PHOSH_APP_UNKNOWN_ICON, -1);
+    gtk_image_set_from_icon_name (GTK_IMAGE (priv->icon), PHOSH_APP_UNKNOWN_ICON);
 
     gtk_widget_set_sensitive (GTK_WIDGET (self), FALSE);
   }

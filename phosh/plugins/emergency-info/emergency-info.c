@@ -68,33 +68,33 @@ struct _PhoshEmergencyInfo {
   GtkLabel            *label_height;
   GtkLabel            *label_weight;
 
-  HdyActionRow        *row_owner_name;
-  HdyActionRow        *row_dob;
-  HdyActionRow        *row_language;
-  HdyActionRow        *row_home_address;
-  HdyActionRow        *row_age;
-  HdyActionRow        *row_blood_type;
-  HdyActionRow        *row_height;
-  HdyActionRow        *row_weight;
-  HdyActionRow        *row_allergies;
-  HdyActionRow        *row_medications;
-  HdyActionRow        *row_other_info;
+  AdwActionRow        *row_owner_name;
+  AdwActionRow        *row_dob;
+  AdwActionRow        *row_language;
+  AdwActionRow        *row_home_address;
+  AdwActionRow        *row_age;
+  AdwActionRow        *row_blood_type;
+  AdwActionRow        *row_height;
+  AdwActionRow        *row_weight;
+  AdwActionRow        *row_allergies;
+  AdwActionRow        *row_medications;
+  AdwActionRow        *row_other_info;
 
-  HdyPreferencesGroup *pers_info;
-  HdyPreferencesGroup *emer_info;
-  HdyPreferencesGroup *emer_contacts;
+  AdwPreferencesGroup *pers_info;
+  AdwPreferencesGroup *emer_info;
+  AdwPreferencesGroup *emer_contacts;
 };
 
 G_DEFINE_TYPE (PhoshEmergencyInfo, phosh_emergency_info, GTK_TYPE_BOX);
 
 static gboolean
 set_subtitle_or_hide_widget (const char   *label,
-                             HdyActionRow *widget_action_row)
+                             AdwActionRow *widget_action_row)
 {
   gboolean visible;
 
   visible = !!(label && *label);
-  hdy_action_row_set_subtitle (widget_action_row, label);
+  adw_action_row_set_subtitle (widget_action_row, label);
   gtk_widget_set_visible (GTK_WIDGET (widget_action_row), visible);
   return visible;
 }
@@ -218,8 +218,8 @@ load_info (PhoshEmergencyInfo *self)
       new_row = phosh_emergency_info_row_new (self->contacts[i],
                                               number_split[0],
                                               number_split[1]);
-      gtk_container_add (GTK_CONTAINER (self->emer_contacts),
-                         GTK_WIDGET (new_row));
+      adw_preferences_group_add (self->emer_contacts,
+                                 GTK_WIDGET (new_row));
     }
   }
 
@@ -320,9 +320,9 @@ phosh_emergency_info_init (PhoshEmergencyInfo *self)
   gtk_css_provider_load_from_resource (css_provider,
                                        "/mobi/phosh/plugins/emergency-info/stylesheet/common.css");
 
-  gtk_style_context_add_provider (gtk_widget_get_style_context (GTK_WIDGET (self)),
-                                  GTK_STYLE_PROVIDER (css_provider),
-                                  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  gtk_style_context_add_provider_for_display (gdk_display_get_default (),
+                                              GTK_STYLE_PROVIDER (css_provider),
+                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
   load_info (self);
 }

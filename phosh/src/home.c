@@ -20,7 +20,7 @@
 #include "feedback-manager.h"
 #include "util.h"
 
-#include <handy.h>
+#include <adwaita.h>
 
 #define KEYBINDINGS_SCHEMA_ID "org.gnome.shell.keybindings"
 #define KEYBINDING_KEY_TOGGLE_OVERVIEW "toggle-overview"
@@ -151,7 +151,8 @@ static void
 update_drag_handle (PhoshHome *self, gboolean queue_draw)
 {
   gboolean success;
-  gint handle = 0;
+  graphene_point_t src = { 0, 0 };
+  graphene_point_t dst = { 0, 0 };
   PhoshAppGrid *app_grid;
   PhoshDragSurfaceDragMode drag_mode = PHOSH_DRAG_SURFACE_DRAG_MODE_HANDLE;
   PhoshDragSurfaceState drag_state = phosh_drag_surface_get_drag_state (PHOSH_DRAG_SURFACE (self));
@@ -168,16 +169,17 @@ update_drag_handle (PhoshHome *self, gboolean queue_draw)
 
   /* Update handle size */
   app_grid = phosh_overview_get_app_grid (PHOSH_OVERVIEW (self->overview));
-  success = gtk_widget_translate_coordinates (GTK_WIDGET (app_grid),
-                                              GTK_WIDGET (self),
-                                              0, 0, NULL, &handle);
+  success = gtk_widget_compute_point (GTK_WIDGET (app_grid),
+                                      GTK_WIDGET (self),
+                                      &src, &dst);
+
   if (!success) {
     g_warning ("Failed to get handle position");
-    handle = PHOSH_HOME_BAR_HEIGHT;
+    dst.y = PHOSH_HOME_BAR_HEIGHT;
   }
 
-  g_debug ("Drag Handle: %d", handle);
-  phosh_drag_surface_set_drag_handle (PHOSH_DRAG_SURFACE (self), handle);
+  g_debug ("Drag Handle: %d", (int) dst.y);
+  phosh_drag_surface_set_drag_handle (PHOSH_DRAG_SURFACE (self), dst.y);
   /* Trigger redraw and surface commit */
   if (queue_draw)
     gtk_widget_queue_draw (GTK_WIDGET (self));
@@ -191,25 +193,51 @@ get_margin (gint height)
 }
 
 
-static gboolean
-on_configure_event (PhoshHome *self, GdkEventConfigure *event)
+static void
+on_configure_event (PhoshHome *self)
 {
   guint margin;
+  int width, height;
 
-  margin = get_margin (event->height);
+  width = phosh_layer_surface_get_configured_width (PHOSH_LAYER_SURFACE (self));
+  height = phosh_layer_surface_get_configured_height (PHOSH_LAYER_SURFACE (self));
+  margin = get_margin (height);
 
-  /* ignore popovers like the power menu */
-  if (gtk_widget_get_window (GTK_WIDGET (self)) != event->window)
-    return FALSE;
-
-  g_debug ("%s: %dx%d, margin: %d", __func__, event->height, event->width, margin);
+  g_debug ("%s: %dx%d, margin: %d", __func__, height, width, margin);
 
   /* If the size changes we need to update the folded margin */
   phosh_drag_surface_set_margin (PHOSH_DRAG_SURFACE (self), margin, 0);
   /* Update drag handle since overview size might have changed */
   update_drag_handle (self, TRUE);
+}
 
-  return FALSE;
+
+static void
+phosh_home_add_background (PhoshHome *self)
+{
+  PhoshShell *shell = phosh_shell_get_default ();
+  PhoshMonitor *monitor;
+  GdkSurface *surface;
+  cairo_rectangle_int_t rect = { 0, 0, 0, 0 };
+  cairo_region_t *region;
+
+  monitor = phosh_shell_get_primary_monitor (shell);
+  self->background = PHOSH_BACKGROUND (phosh_background_new (monitor,
+                                                             /* Span over whole display */
+                                                             FALSE,
+                                                             ZWLR_LAYER_SHELL_V1_LAYER_TOP));
+  g_object_bind_property (self, "visible", self->background, "visible", G_BINDING_SYNC_CREATE);
+
+  g_signal_connect_object (phosh_shell_get_background_manager (shell),
+                           "config-changed",
+                           G_CALLBACK (phosh_background_needs_update),
+                           self->background,
+                           G_CONNECT_SWAPPED);
+
+  region = cairo_region_create_rectangle (&rect);
+  surface = gtk_native_get_surface (GTK_NATIVE (self->background));
+  gdk_surface_set_input_region (surface, region);
+  cairo_region_destroy (region);
 }
 
 
@@ -220,13 +248,14 @@ phosh_home_map (GtkWidget *widget)
 
   GTK_WIDGET_CLASS (phosh_home_parent_class)->map (widget);
 
+  phosh_home_add_background (self);
   phosh_layer_surface_set_stacked_below (PHOSH_LAYER_SURFACE (self->background),
                                          PHOSH_LAYER_SURFACE (self));
 }
 
 
 static void
-on_home_released (GtkButton *button, int n_press, double x, double y, GtkGestureMultiPress *gesture)
+on_home_released (GtkButton *button, int n_press, double x, double y, GtkGestureClick *gesture)
 {
   PhoshHome *self = g_object_get_data (G_OBJECT (gesture), "phosh-home");
 
@@ -329,29 +358,27 @@ on_has_activities_changed (PhoshHome *self)
 
 
 static gboolean
-window_key_press_event_cb (PhoshHome *self, GdkEvent *event, gpointer data)
+window_key_press_event_cb (PhoshHome *self, guint keyval, guint keycode, GdkModifierType state, GtkEventController *key_controller)
 {
   gboolean ret = GDK_EVENT_PROPAGATE;
-  guint keyval;
-  g_return_val_if_fail (PHOSH_IS_HOME (self), GDK_EVENT_PROPAGATE);
+  g_return_val_if_fail (PHOSH_IS_HOME (self), FALSE);
 
   if (self->state != PHOSH_HOME_STATE_UNFOLDED)
-    return GDK_EVENT_PROPAGATE;
-
-  if (!gdk_event_get_keyval (event, &keyval))
-    return GDK_EVENT_PROPAGATE;
+    return FALSE;
 
   switch (keyval) {
     case GDK_KEY_Escape:
       phosh_home_set_state (self, PHOSH_HOME_STATE_FOLDED);
-      ret = GDK_EVENT_STOP;
+      ret = TRUE;
       break;
     case GDK_KEY_Return:
-      ret = GDK_EVENT_PROPAGATE;
+      ret = FALSE;
       break;
     default:
       /* Focus search when typing */
-      ret = phosh_overview_handle_search (PHOSH_OVERVIEW (self->overview), event);
+      // FIXME Port to GTK 4
+      // ret = phosh_overview_handle_search (PHOSH_OVERVIEW (self->overview), event);
+      ret = FALSE;
   }
 
   return ret;
@@ -456,15 +483,15 @@ static void
 phosh_home_dragged (PhoshDragSurface *drag_surface, int margin)
 {
   PhoshHome *self = PHOSH_HOME (drag_surface);
-  int width, height;
+  int height;
   double progress, alpha;
 
-  gtk_window_get_size (GTK_WINDOW (self), &width, &height);
+  height = phosh_layer_surface_get_configured_height (PHOSH_LAYER_SURFACE (self));
   progress = 1.0 - (-margin / (double)(height - PHOSH_HOME_BAR_HEIGHT));
   /* Avoid negative values when resizing the surface */
   progress = MAX (0, progress);
 
-  alpha = hdy_ease_out_cubic (progress);
+  alpha = adw_easing_ease (ADW_EASE_OUT_CUBIC, progress);
   phosh_home_set_background_alpha (self, alpha);
 }
 
@@ -516,36 +543,6 @@ on_drag_state_changed (PhoshHome *self)
 
 
 static void
-phosh_home_add_background (PhoshHome *self)
-{
-  PhoshWayland *wl = phosh_wayland_get_default ();
-  PhoshShell *shell = phosh_shell_get_default ();
-  PhoshMonitor *monitor;
-  cairo_rectangle_int_t rect = { 0, 0, 0, 0 };
-  cairo_region_t *region;
-
-  monitor = phosh_shell_get_primary_monitor (shell);
-  self->background = PHOSH_BACKGROUND (phosh_background_new (
-                                         phosh_wayland_get_zwlr_layer_shell_v1 (wl),
-                                         monitor,
-                                         /* Span over whole display */
-                                         FALSE,
-                                         ZWLR_LAYER_SHELL_V1_LAYER_TOP));
-  g_object_bind_property (self, "visible", self->background, "visible", G_BINDING_SYNC_CREATE);
-
-  g_signal_connect_object (phosh_shell_get_background_manager (shell),
-                           "config-changed",
-                           G_CALLBACK (phosh_background_needs_update),
-                           self->background,
-                           G_CONNECT_SWAPPED);
-
-  region = cairo_region_create_rectangle (&rect);
-  gtk_widget_input_shape_combine_region (GTK_WIDGET (self->background), region);
-  cairo_region_destroy (region);
-}
-
-
-static void
 on_theme_name_changed (PhoshHome  *self, GParamSpec *pspec, PhoshStyleManager *style_manager)
 {
   g_assert (PHOSH_IS_HOME (self));
@@ -587,7 +584,6 @@ phosh_home_constructed (GObject *object)
   g_object_set_data (G_OBJECT (self->click_gesture), "phosh-home", self);
   g_object_set_data (G_OBJECT (self->osk_toggle_long_press), "phosh-home", self);
 
-  phosh_home_add_background (self);
   g_signal_connect_object (phosh_shell_get_style_manager (shell),
                            "notify::theme-name",
                            G_CALLBACK (on_theme_name_changed),
@@ -612,6 +608,8 @@ phosh_home_dispose (GObject *object)
   g_clear_handle_id (&self->debounce_handle, g_source_remove);
 
   g_clear_pointer (&self->background, phosh_cp_widget_destroy);
+
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_HOME);
 
   G_OBJECT_CLASS (phosh_home_parent_class)->dispose (object);
 }
@@ -693,7 +691,8 @@ phosh_home_init (PhoshHome *self)
   self->settings = g_settings_new (KEYBINDINGS_SCHEMA_ID);
 
   /* Adjust margins and folded state on size changes */
-  g_signal_connect (self, "configure-event", G_CALLBACK (on_configure_event), NULL);
+  g_signal_connect (self, "configured", G_CALLBACK (on_configure_event), NULL);
+  on_configure_event (self);
 
   settings = g_settings_new (PHOSH_SETTINGS);
   g_settings_bind (settings, "osk-unfold-delay",
@@ -709,17 +708,10 @@ phosh_home_new (struct zwlr_layer_shell_v1          *layer_shell,
 {
   return g_object_new (PHOSH_TYPE_HOME,
                        /* layer-surface */
-                       "layer-shell", layer_shell,
                        "wl-output", monitor->wl_output,
-                       "anchor", ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM |
-                                 ZWLR_LAYER_SURFACE_V1_ANCHOR_LEFT |
-                                 ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT,
-                       "layer", ZWLR_LAYER_SHELL_V1_LAYER_TOP,
                        "kbd-interactivity", FALSE,
                        "exclusive-zone", PHOSH_HOME_BAR_HEIGHT,
-                       "namespace", "phosh home",
                        /* drag-surface */
-                       "layer-shell-effects", layer_shell_effects,
                        "exclusive", PHOSH_HOME_BAR_HEIGHT,
                        "threshold", PHOSH_HOME_DRAG_THRESHOLD,
                        NULL);

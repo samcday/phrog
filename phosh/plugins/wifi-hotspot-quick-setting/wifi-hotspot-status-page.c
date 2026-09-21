@@ -12,10 +12,8 @@
 
 #include <qrcodegen.h>
 
+#define BYTES_PER_R8G8B8 3
 #define QR_CODE_SIZE 128
-
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (cairo_t, cairo_destroy)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (cairo_surface_t, cairo_surface_destroy)
 
 /**
  * PhoshWifiHotspotStatusPage:
@@ -42,18 +40,33 @@ struct _PhoshWifiHotspotStatusPage {
 G_DEFINE_TYPE (PhoshWifiHotspotStatusPage, phosh_wifi_hotspot_status_page, PHOSH_TYPE_STATUS_PAGE);
 
 
-static cairo_surface_t *
+static void
+fill_pixel (GByteArray *array, guint8 value, int pixel_size)
+{
+  guint i;
+
+  for (i = 0; i < pixel_size; i++)
+    {
+      g_byte_array_append (array, &value, 1); /* R */
+      g_byte_array_append (array, &value, 1); /* G */
+      g_byte_array_append (array, &value, 1); /* B */
+    }
+}
+
+
+static GdkPaintable *
 qr_from_text (const char *text, int size, int scale)
 {
   uint8_t qr_code[qrcodegen_BUFFER_LEN_FOR_VERSION (qrcodegen_VERSION_MAX)];
   uint8_t temp_buf[qrcodegen_BUFFER_LEN_FOR_VERSION (qrcodegen_VERSION_MAX)];
-  g_autoptr (cairo_t) cr = NULL;
-  cairo_surface_t *surface;
-  int pixel_size, qr_size, padding;
+  g_autoptr (GBytes) bytes = NULL;
+  GByteArray *qr_matrix;
+  int pixel_size, qr_size, total_size;
+  int column, row, i;
   gboolean success = FALSE;
+  GdkTexture *texture;
 
   g_return_val_if_fail (size > 0, NULL);
-  g_return_val_if_fail (scale > 0, NULL);
 
   success = qrcodegen_encodeText (text,
                                   temp_buf,
@@ -67,42 +80,34 @@ qr_from_text (const char *text, int size, int scale)
   if (!success)
     return NULL;
 
-  surface = cairo_image_surface_create (CAIRO_FORMAT_RGB24, size * scale, size * scale);
-  cairo_surface_set_device_scale (surface, scale, scale);
-  cr = cairo_create (surface);
-  cairo_set_antialias (cr, CAIRO_ANTIALIAS_NONE);
-
-  /* Draw white background */
-  cairo_set_source_rgba (cr, 1, 1, 1, 1);
-  cairo_rectangle (cr, 0, 0, size * scale, size * scale);
-  cairo_fill (cr);
-
   qr_size = qrcodegen_getSize (qr_code);
   pixel_size = MAX (1, size / (qr_size));
-  padding = (size - qr_size * pixel_size) / 2;
+  total_size = qr_size * pixel_size;
+  qr_matrix = g_byte_array_sized_new (total_size * total_size * pixel_size * BYTES_PER_R8G8B8);
 
-  /* If subpixel size is big and margin is pretty small,
-   * increase the margin */
-  if (pixel_size > 4 && padding < 12) {
-    pixel_size--;
-    padding = (size - qr_size * pixel_size) / 2;
-  }
-
-  /* Now draw the black QR code pixels */
-  cairo_set_source_rgba (cr, 0, 0, 0, 1);
-  for (int row = 0; row < qr_size; row++) {
-    for (int column = 0; column < qr_size; column++) {
-      if (qrcodegen_getModule (qr_code, row, column)) {
-        cairo_rectangle (cr,
-                         column * pixel_size + padding,
-                         row * pixel_size + padding,
-                         pixel_size, pixel_size);
-        cairo_fill (cr);
-      }
+  for (column = 0; column < total_size; column++)
+    {
+      for (i = 0; i < pixel_size; i++)
+        {
+          for (row = 0; row < total_size / pixel_size; row++)
+            {
+              if (qrcodegen_getModule (qr_code, column, row))
+                fill_pixel (qr_matrix, 0x00, pixel_size);
+              else
+                fill_pixel (qr_matrix, 0xff, pixel_size);
+            }
+        }
     }
-  }
 
-  return surface;
+  bytes = g_byte_array_free_to_bytes (qr_matrix);
+
+  texture = gdk_memory_texture_new (total_size,
+                                    total_size,
+                                    GDK_MEMORY_R8G8B8,
+                                    bytes,
+                                    total_size * BYTES_PER_R8G8B8);
+
+  return GDK_PAINTABLE (texture);
 }
 
 
@@ -254,14 +259,14 @@ on_secrets_ready (GObject *object, GAsyncResult *result, gpointer data)
   g_autoptr (GVariant) variant = NULL;
   g_autofree char *cnx_str = NULL;
   g_autofree char *password = NULL;
-  g_autoptr (cairo_surface_t) surface = NULL;
+  g_autoptr (GdkPaintable) paintable = NULL;
   int scale;
 
   variant = nm_remote_connection_get_secrets_finish (NM_REMOTE_CONNECTION (conn), result, &error);
   if (variant == NULL) {
     g_warning ("Unable to fetch secrets: %s", error->message);
-    gtk_image_set_from_icon_name (self->image, "face-sad-symbolic", -1);
-    gtk_entry_set_text (self->entry, "");
+    gtk_image_set_from_icon_name (self->image, "face-sad-symbolic");
+    gtk_editable_set_text (GTK_EDITABLE (self->entry), "");
     return;
   }
   if (!nm_connection_update_secrets (conn,
@@ -269,17 +274,17 @@ on_secrets_ready (GObject *object, GAsyncResult *result, gpointer data)
                                      variant,
                                      &error)) {
     g_warning ("Unable to set secrets: %s", error->message);
-    gtk_image_set_from_icon_name (self->image, "face-sad-symbolic", -1);
-    gtk_entry_set_text (self->entry, "");
+    gtk_image_set_from_icon_name (self->image, "face-sad-symbolic");
+    gtk_editable_set_text (GTK_EDITABLE (self->entry), "");
     return;
   }
 
   cnx_str = get_qr_string_for_connection (conn);
   scale = gtk_widget_get_scale_factor (GTK_WIDGET (self->image));
-  surface = qr_from_text (cnx_str, QR_CODE_SIZE, scale);
+  paintable = qr_from_text (cnx_str, QR_CODE_SIZE, scale);
   password = get_wifi_password (conn);
-  gtk_image_set_from_surface (self->image, surface);
-  gtk_entry_set_text (self->entry, password);
+  gtk_image_set_from_paintable (self->image, paintable);
+  gtk_editable_set_text (GTK_EDITABLE (self->entry), password);
   nm_connection_clear_secrets (conn);
 }
 

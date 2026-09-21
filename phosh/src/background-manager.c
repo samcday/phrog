@@ -20,10 +20,9 @@
 #include "util.h"
 
 #define GNOME_DESKTOP_USE_UNSTABLE_API
-#include <libgnome-desktop/gnome-bg.h>
-#include <libgnome-desktop/gnome-bg-slide-show.h>
+#include <gnome-bg/gnome-bg.h>
+#include <gnome-bg/gnome-bg-slide-show.h>
 
-#include <gdk/gdkwayland.h>
 #include <gio/gio.h>
 
 #include <math.h>
@@ -281,11 +280,9 @@ on_background_destroy (PhoshBackgroundManager *self, GtkWidget *widget)
 static PhoshBackground *
 create_background_for_monitor (PhoshBackgroundManager *self, PhoshMonitor *monitor)
 {
-  PhoshWayland *wl = phosh_wayland_get_default ();
   GtkWidget *background;
 
-  background = phosh_background_new (phosh_wayland_get_zwlr_layer_shell_v1 (wl),
-                                     monitor,
+  background = phosh_background_new (monitor,
                                      monitor == self->primary_monitor,
                                      ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND);
   g_signal_connect_object (background,
@@ -479,7 +476,7 @@ phosh_background_manager_init (PhoshBackgroundManager *self)
   self->backgrounds = g_hash_table_new_full (g_direct_hash,
                                              g_direct_equal,
                                              g_object_unref,
-                                             (GDestroyNotify)gtk_widget_destroy);
+                                             (GDestroyNotify)gtk_window_destroy);
 }
 
 PhoshBackgroundManager *

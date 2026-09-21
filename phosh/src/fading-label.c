@@ -24,14 +24,14 @@
 
 struct _PhoshFadingLabel
 {
-  GtkBin parent_instance;
+  GtkWidget parent_instance;
 
   GtkWidget *label;
   gfloat align;
   cairo_pattern_t *gradient;
 };
 
-G_DEFINE_TYPE (PhoshFadingLabel, phosh_fading_label, GTK_TYPE_BIN)
+G_DEFINE_TYPE (PhoshFadingLabel, phosh_fading_label, GTK_TYPE_WIDGET)
 
 enum {
   PROP_0,
@@ -72,88 +72,91 @@ ensure_gradient (PhoshFadingLabel *self)
 }
 
 static void
-phosh_fading_label_get_preferred_width (GtkWidget *widget,
-                                        gint      *min,
-                                        gint      *nat)
+phosh_fading_label_measure (GtkWidget     *widget,
+                            GtkOrientation orientation,
+                            int            for_size,
+                            int           *minimum,
+                            int           *natural,
+                            int           *minimum_baseline,
+                            int           *natural_baseline)
 {
   PhoshFadingLabel *self = PHOSH_FADING_LABEL (widget);
 
-  gtk_widget_get_preferred_width (self->label, min, nat);
+  gtk_widget_measure (self->label,
+                      orientation,
+                      for_size,
+                      minimum, natural,
+                      minimum_baseline, natural_baseline);
 
-  if (min)
-    *min = 0;
+  if (orientation == GTK_ORIENTATION_HORIZONTAL) {
+    if (minimum)
+      *minimum = 0;
+  }
 }
 
 static void
-phosh_fading_label_get_preferred_width_for_height (GtkWidget *widget,
-                                                   gint       for_height,
-                                                   gint      *min,
-                                                   gint      *nat)
-{
-  phosh_fading_label_get_preferred_width (widget, min, nat);
-}
-
-static void
-phosh_fading_label_size_allocate (GtkWidget     *widget,
-                                  GtkAllocation *allocation)
+phosh_fading_label_size_allocate (GtkWidget *widget,
+                                  int        width,
+                                  int        height,
+                                  int        baseline)
 {
   PhoshFadingLabel *self = PHOSH_FADING_LABEL (widget);
   gfloat align = is_rtl (self) ? 1 - self->align : self->align;
   GtkAllocation child_allocation;
   gint child_width;
 
-  gtk_widget_set_allocation (widget, allocation);
+  phosh_fading_label_measure (widget,
+                              GTK_ORIENTATION_HORIZONTAL,
+                              -1,
+                              NULL, &child_width,
+                              NULL, NULL);
 
-  phosh_fading_label_get_preferred_width (widget, NULL, &child_width);
-
-  child_allocation.x = allocation->x + (gint) ((allocation->width - child_width) * align);
-  child_allocation.y = allocation->y;
+  child_allocation.x = (gint) ((width - child_width) * align);
+  child_allocation.y = 0;
   child_allocation.width = child_width;
-  child_allocation.height = allocation->height;
+  child_allocation.height = height;
 
-  gtk_widget_size_allocate (self->label, &child_allocation);
-
-  gtk_widget_get_clip (self->label, &child_allocation);
-  child_allocation.x = allocation->x;
-  child_allocation.width = allocation->width;
-  gtk_widget_set_clip (self->label, &child_allocation);
+  gtk_widget_size_allocate (self->label, &child_allocation, baseline);
 }
 
-static gboolean
-phosh_fading_label_draw (GtkWidget *widget,
-                         cairo_t   *cr)
+static void
+phosh_fading_label_snapshot (GtkWidget   *widget,
+                             GtkSnapshot *snapshot)
 {
   PhoshFadingLabel *self = PHOSH_FADING_LABEL (widget);
+  cairo_t *cr;
   gfloat align = is_rtl (self) ? 1 - self->align : self->align;
-  GtkAllocation clip, alloc;
-  int child_width = gtk_widget_get_allocated_width (self->label);
+  graphene_rect_t clip, alloc;
+  int child_width = gtk_widget_get_width (self->label);
 
-  gtk_widget_get_allocation (widget, &alloc);
+  g_return_if_fail (gtk_widget_compute_bounds (widget, widget, &alloc));
 
-  if (child_width <= alloc.width) {
-      gtk_container_propagate_draw (GTK_CONTAINER (widget), self->label, cr);
-
-      return GDK_EVENT_PROPAGATE;
+  if (child_width <= alloc.size.width) {
+    gtk_widget_snapshot_child (widget, self->label, snapshot);
+    return;
   }
 
   ensure_gradient (self);
 
-  gtk_widget_get_clip (self->label, &clip);
-  clip.x = 0;
-  clip.y -= alloc.y;
-  clip.width = alloc.width;
+  g_return_if_fail (gtk_widget_compute_bounds (widget, widget, &clip));
+  clip.origin.x = 0;
+  clip.origin.y -= alloc.origin.y;
+  clip.size.width = alloc.size.width;
+
+  gtk_snapshot_push_clip (snapshot, &alloc);
+  cr = gtk_snapshot_append_cairo (snapshot, &alloc);
 
   cairo_save (cr);
-  cairo_rectangle (cr, clip.x, clip.y, clip.width, clip.height);
+  cairo_rectangle (cr, clip.origin.x, clip.origin.y, clip.size.width, clip.size.height);
   cairo_clip (cr);
 
   cairo_push_group (cr);
-  gtk_container_propagate_draw (GTK_CONTAINER (widget), self->label, cr);
+  gtk_widget_snapshot_child (widget, self->label, snapshot);
 
   if (align > 0) {
       cairo_save (cr);
-      cairo_translate (cr, clip.x + FADE_WIDTH, clip.y);
-      cairo_scale (cr, -FADE_WIDTH, clip.height);
+      cairo_translate (cr, clip.origin.x + FADE_WIDTH, clip.origin.y);
+      cairo_scale (cr, -FADE_WIDTH, clip.size.height);
       cairo_set_source (cr, self->gradient);
       cairo_rectangle (cr, 0, 0, 1, 1);
       cairo_set_operator (cr, CAIRO_OPERATOR_DEST_OUT);
@@ -162,8 +165,8 @@ phosh_fading_label_draw (GtkWidget *widget,
   }
 
   if (align < 1) {
-      cairo_translate (cr, clip.x + clip.width - FADE_WIDTH, clip.y);
-      cairo_scale (cr, FADE_WIDTH, clip.height);
+      cairo_translate (cr, clip.origin.x + clip.size.width - FADE_WIDTH, clip.origin.y);
+      cairo_scale (cr, FADE_WIDTH, clip.size.height);
       cairo_set_source (cr, self->gradient);
       cairo_rectangle (cr, 0, 0, 1, 1);
       cairo_set_operator (cr, CAIRO_OPERATOR_DEST_OUT);
@@ -174,8 +177,8 @@ phosh_fading_label_draw (GtkWidget *widget,
   cairo_paint (cr);
 
   cairo_restore (cr);
-
-  return GDK_EVENT_PROPAGATE;
+  cairo_destroy (cr);
+  gtk_snapshot_pop (snapshot);
 }
 
 static void
@@ -223,6 +226,16 @@ phosh_fading_label_set_property (GObject      *object,
 }
 
 static void
+phosh_fading_label_dispose (GObject *object)
+{
+  PhoshFadingLabel *self = PHOSH_FADING_LABEL (object);
+
+  g_clear_pointer (&self->label, gtk_widget_unparent);
+
+  G_OBJECT_CLASS (phosh_fading_label_parent_class)->dispose (object);
+}
+
+static void
 phosh_fading_label_finalize (GObject *object)
 {
   PhoshFadingLabel *self = PHOSH_FADING_LABEL (object);
@@ -240,12 +253,12 @@ phosh_fading_label_class_init (PhoshFadingLabelClass *klass)
 
   object_class->get_property = phosh_fading_label_get_property;
   object_class->set_property = phosh_fading_label_set_property;
+  object_class->dispose = phosh_fading_label_dispose;
   object_class->finalize = phosh_fading_label_finalize;
 
-  widget_class->get_preferred_width = phosh_fading_label_get_preferred_width;
-  widget_class->get_preferred_width_for_height = phosh_fading_label_get_preferred_width_for_height;
+  widget_class->measure = phosh_fading_label_measure;
   widget_class->size_allocate = phosh_fading_label_size_allocate;
-  widget_class->draw = phosh_fading_label_draw;
+  widget_class->snapshot = phosh_fading_label_snapshot;
 
   props[PROP_LABEL] =
     g_param_spec_string ("label", "", "",
@@ -263,13 +276,10 @@ phosh_fading_label_class_init (PhoshFadingLabelClass *klass)
 static void
 phosh_fading_label_init (PhoshFadingLabel *self)
 {
-  gtk_widget_set_has_window (GTK_WIDGET (self), FALSE);
-
   self->label = gtk_label_new (NULL);
   gtk_widget_set_visible (self->label, TRUE);
   gtk_label_set_single_line_mode (GTK_LABEL (self->label), TRUE);
-
-  gtk_container_add (GTK_CONTAINER (self), self->label);
+  gtk_widget_set_parent (self->label, GTK_WIDGET (self));
 }
 
 GtkWidget *

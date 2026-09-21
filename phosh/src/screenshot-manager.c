@@ -394,15 +394,17 @@ on_opaque_timeout (gpointer data)
 {
   PhoshScreenshotManager *self = data;
   GdkDisplay *display = gdk_display_get_default ();
-  GtkClipboard *clipboard;
+  GdkClipboard *clipboard;
+  g_autoptr (GdkTexture) texture = NULL;
 
   if (!display) {
     g_critical ("Couldn't get GDK display");
     goto out;
   }
 
-  clipboard = gtk_clipboard_get_for_display (display, GDK_SELECTION_CLIPBOARD);
-  gtk_clipboard_set_image (clipboard, self->for_clipboard);
+  clipboard = gdk_display_get_primary_clipboard (display);
+  texture = gdk_texture_new_for_pixbuf (self->for_clipboard);
+  gdk_clipboard_set_texture (clipboard, texture);
   g_debug ("Updated clipboard");
   self->frames->copy_to_clipboard = FALSE;
   screenshot_done (self, TRUE);

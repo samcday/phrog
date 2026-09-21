@@ -41,7 +41,7 @@ test_system_modal_dialog_new (PhoshTestCompositorFixture *fixture, gconstpointer
   gtk_widget_set_visible (dialog, FALSE);
   g_assert_false (gtk_widget_get_visible (dialog));
   g_assert_false (gtk_widget_get_mapped (dialog));
-  gtk_widget_destroy (dialog);
+  g_object_unref (dialog);
 }
 
 

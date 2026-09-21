@@ -24,7 +24,7 @@ enum {
 static GParamSpec *props[PROP_LAST_PROP];
 
 struct _PhoshWifiNetworkRow {
-  HdyActionRow      parent;
+  AdwActionRow      parent;
 
   GtkWidget        *wifi_icon;
   GtkWidget        *encrypted_icon;
@@ -33,7 +33,7 @@ struct _PhoshWifiNetworkRow {
   PhoshWifiNetwork *network;
 };
 
-G_DEFINE_TYPE (PhoshWifiNetworkRow, phosh_wifi_network_row, HDY_TYPE_ACTION_ROW);
+G_DEFINE_TYPE (PhoshWifiNetworkRow, phosh_wifi_network_row, ADW_TYPE_ACTION_ROW);
 
 static gboolean
 update_icon (GBinding     *binding,
@@ -121,6 +121,8 @@ phosh_wifi_network_row_dispose (GObject *object)
   PhoshWifiNetworkRow *self = PHOSH_WIFI_NETWORK_ROW (object);
 
   g_clear_object (&self->network);
+
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_WIFI_NETWORK_ROW);
 
   G_OBJECT_CLASS (phosh_wifi_network_row_parent_class)->dispose (object);
 }

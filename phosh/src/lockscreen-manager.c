@@ -11,6 +11,7 @@
 
 #include "background-cache.h"
 #include "background-image.h"
+#include "layersurface-priv.h"
 #include "lockscreen-manager-priv.h"
 #include "lockscreen-priv.h"
 #include "lockshield.h"
@@ -21,8 +22,6 @@
 #include "util.h"
 
 #include <gmobile.h>
-#include <gdesktop-enums.h>
-#include <gdk/gdkwayland.h>
 
 #define SCREENSAVER_SETTINGS "org.gnome.desktop.screensaver"
 #define KEY_PICTURE_URI       "picture-uri"
@@ -200,6 +199,7 @@ on_lockscreen_unlock (PhoshLockscreenManager *self, PhoshLockscreen *lockscreen)
   PhoshShell *shell = phosh_shell_get_default ();
   PhoshMonitorManager *monitor_manager = phosh_shell_get_monitor_manager (shell);
   PhoshMonitor *primary_monitor = phosh_shell_get_primary_monitor (shell);
+  PhoshLayerSurface *lockscreen_layer_surface = PHOSH_LAYER_SURFACE (lockscreen);
 
   g_return_if_fail (PHOSH_IS_LOCKSCREEN (lockscreen));
   g_return_if_fail (lockscreen == PHOSH_LOCKSCREEN (self->lockscreen));
@@ -207,7 +207,7 @@ on_lockscreen_unlock (PhoshLockscreenManager *self, PhoshLockscreen *lockscreen)
   g_signal_handlers_disconnect_by_data (monitor_manager, self);
   g_signal_handlers_disconnect_by_data (primary_monitor, self);
   g_signal_handlers_disconnect_by_data (shell, self);
-  g_clear_pointer (&self->lockscreen, phosh_cp_widget_destroy);
+  g_clear_pointer (&lockscreen_layer_surface, phosh_layer_surface_destroy);
 
   /* Unlock all other outputs */
   g_clear_pointer (&self->shields, g_ptr_array_unref);
@@ -235,7 +235,6 @@ lock_monitor (PhoshLockscreenManager *self,
               PhoshMonitor           *monitor)
 {
   PhoshShell *shell = phosh_shell_get_default ();
-  PhoshWayland *wl = phosh_wayland_get_default ();
   GtkWidget *shield;
 
   /* Primary monitor is handled via on_primary_monitor_changed */
@@ -243,7 +242,7 @@ lock_monitor (PhoshLockscreenManager *self,
     return;
 
   g_debug ("Adding shield for %s", monitor->name);
-  shield = phosh_lockshield_new (phosh_wayland_get_zwlr_layer_shell_v1 (wl), monitor);
+  shield = phosh_lockshield_new (monitor);
 
   g_object_set_data (G_OBJECT (shield), "phosh-monitor", monitor);
 
@@ -395,7 +394,7 @@ lockscreen_lock (PhoshLockscreenManager *self)
     g_message ("No primary monitor to lock");
 
   /* Lock all other outputs */
-  self->shields = g_ptr_array_new_with_free_func ((GDestroyNotify) (gtk_widget_destroy));
+  self->shields = g_ptr_array_new_with_free_func ((GDestroyNotify) (gtk_window_destroy));
   for (int i = 0; i < phosh_monitor_manager_get_num_monitors (monitor_manager); i++) {
     PhoshMonitor *monitor = phosh_monitor_manager_get_monitor (monitor_manager, i);
 
