@@ -86,6 +86,7 @@ static guint signals[N_SIGNALS] = { 0 };
 typedef struct {
   char           *title;
 
+  GtkWidget      *swipe_bin;
   GtkWidget      *lbl_title;
   GtkWidget      *box_dialog;
   GtkWidget      *box_buttons;
@@ -99,6 +100,7 @@ static void phosh_system_modal_dialog_buildable_init (GtkBuildableIface *iface);
 G_DEFINE_TYPE_WITH_CODE (PhoshSystemModalDialog, phosh_system_modal_dialog,
                          PHOSH_TYPE_SYSTEM_MODAL,
                          G_ADD_PRIVATE (PhoshSystemModalDialog)
+                         G_IMPLEMENT_INTERFACE (GTK_TYPE_SHORTCUT_MANAGER, NULL)
                          G_IMPLEMENT_INTERFACE (GTK_TYPE_BUILDABLE,
                                                 phosh_system_modal_dialog_buildable_init))
 
@@ -162,6 +164,11 @@ on_removed_by_swipe (PhoshSystemModalDialog *self)
 static void
 phosh_system_modal_dialog_dispose (GObject *object)
 {
+  PhoshSystemModalDialog *self = PHOSH_SYSTEM_MODAL_DIALOG (object);
+  PhoshSystemModalDialogPrivate *priv = phosh_system_modal_dialog_get_instance_private (self);
+
+  g_clear_pointer (&priv->swipe_bin, gtk_widget_unparent);
+
   gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_SYSTEM_MODAL_DIALOG);
 
   G_OBJECT_CLASS (phosh_system_modal_dialog_parent_class)->dispose (object);
@@ -222,6 +229,7 @@ phosh_system_modal_dialog_class_init (PhoshSystemModalDialogClass *klass)
   g_type_ensure (PHOSH_TYPE_SWIPE_AWAY_BIN);
   gtk_widget_class_set_template_from_resource (widget_class,
                                                "/mobi/phosh/ui/system-modal-dialog.ui");
+  gtk_widget_class_bind_template_child_private (widget_class, PhoshSystemModalDialog, swipe_bin);
   gtk_widget_class_bind_template_child_private (widget_class, PhoshSystemModalDialog, lbl_title);
   gtk_widget_class_bind_template_child_private (widget_class, PhoshSystemModalDialog, box_dialog);
   gtk_widget_class_bind_template_child_private (widget_class, PhoshSystemModalDialog, box_buttons);
@@ -285,7 +293,7 @@ animation_done_cb (PhoshSystemModalDialog *self)
   g_clear_pointer (&priv->animation, phosh_animation_unref);
 
   if (priv->fade_out)
-    gtk_window_destroy (GTK_WINDOW (self));
+    phosh_layer_surface_destroy (PHOSH_LAYER_SURFACE (self));
 }
 
 

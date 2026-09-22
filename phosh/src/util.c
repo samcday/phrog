@@ -42,12 +42,16 @@
 static gboolean have_gnome_software = -1;
 
 
-/* Just wraps gtk_widget_destroy so we can use it with g_clear_pointer */
+/* Destroy a toplevel so we can use it with g_clear_pointer. */
 void
 phosh_cp_widget_destroy (void *widget)
 {
-  g_return_if_fail (GTK_IS_WINDOW (widget));
-  gtk_window_destroy (GTK_WINDOW (widget));
+  g_return_if_fail (GTK_IS_WINDOW (widget) || GTK_IS_PLAIN (widget));
+
+  if (GTK_IS_PLAIN (widget))
+    gtk_plain_destroy (GTK_PLAIN (widget));
+  else
+    gtk_window_destroy (GTK_WINDOW (widget));
 }
 
 
