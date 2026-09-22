@@ -3,7 +3,7 @@ FROM localhost/phrog-gtk4-ci:latest
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-       sudo libnss-myhostname zsh libvte-2.91-common p11-kit flatpak-xdg-utils \
+       sudo git-lfs libnss-myhostname zsh libvte-2.91-common p11-kit flatpak-xdg-utils \
     && apt-get clean \
     && mkdir -p /etc/krb5.conf.d /etc/pkcs11/modules /usr/share/empty \
     && echo '%sudo ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/toolbox \

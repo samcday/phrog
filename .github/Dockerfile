@@ -8,10 +8,8 @@ FROM registry.gitlab.gnome.org/world/phosh/phosh/debian:v0.0.2025-11-06
 ARG GTK_REMOTE=https://gitlab.gnome.org/guidog/gtk.git
 ARG GTK_REF=a4cba2e3c84fafc4745c7d4cacbe062b32774e0e
 
-# phosh-gtk4: build-deps feed the vendored phosh build, and the installed
-# libphosh is used by the explicitly tested dynamic build.
-ARG PHOSH_REMOTE=https://gitlab.gnome.org/guidog/phosh.git
-ARG PHOSH_REF=37d48c69b2414fb8b8f9cee19eae60a700c4c551
+# The shared and embedded modes use the same checked-in Phosh subtree,
+# including downstream GTK4 compatibility fixes.
 
 # The custom GTK in /usr/local must win over the distro GTK for building and
 # running phrog. phoc comes from the base image (phosh's own CI image ships
@@ -42,8 +40,7 @@ RUN eatmydata meson setup --prefix=/usr/local -Dlibdir=lib \
    && eatmydata meson compile -C /gtk/_build \
    && eatmydata meson install -C /gtk/_build
 
-RUN eatmydata git clone ${PHOSH_REMOTE} /phosh \
-   && git -C /phosh checkout ${PHOSH_REF}
+COPY phosh /phosh
 
 RUN export DEBIAN_FRONTEND=noninteractive \
    && apt-get -y update \
@@ -51,10 +48,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
    && eatmydata apt-get --no-install-recommends -y build-dep . \
    && apt-get --no-install-recommends -y install \
     libgcr-4-dev libgnome-desktop-4-dev libgnome-bg-4-dev phoc
-
-# Match the immutable native subproject pins in the vendored GTK4 snapshot.
-RUN sed -i 's/^revision=.*/revision=1cdc1cb2d622d64e9ad2781093bcc63719c5ea5b/' /phosh/subprojects/gvc.wrap \
-   && sed -i 's/^revision=.*/revision=f66056ace818ff19b507335634dd67138a92c77f/' /phosh/subprojects/libcall-ui.wrap
 
 RUN eatmydata meson setup --prefix=/usr -Dbindings-lib=true -Dtests=false \
     -Dphoc_tests=disabled -Dlockscreen-plugins=false -Dquick-setting-plugins=false \

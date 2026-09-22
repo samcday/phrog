@@ -28,11 +28,11 @@ jobs:
         id: hash
         run: |
           set -uexo pipefail
-          echo "value=${{ hashFiles('.github/Dockerfile') }}" >> $GITHUB_OUTPUT
+          echo "value=${{ hashFiles('.github/Dockerfile', '.dockerignore', 'phosh/**') }}" >> $GITHUB_OUTPUT
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: .github/
+          context: .
           file: .github/Dockerfile
           push: true
           tags: ghcr.io/samcday/phrog-ci:${{ steps.hash.outputs.value }}

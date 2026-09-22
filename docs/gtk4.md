@@ -5,6 +5,8 @@ integration branch for the GTK4/libadwaita migration. It becomes eligible for
 integration into `main` when the required GTK/Phosh APIs are available upstream
 and the migration's functional and packaging gaps are resolved.
 
+The remaining work is tracked in [#215](https://github.com/samcday/phrog/issues/215).
+
 ## Branch maintenance
 
 - The GTK4 series has two layers above #186: PR #213 (`codex/gtk4-phosh`)
@@ -41,7 +43,9 @@ libphosh snapshot; static embedding remains an independent proposal.
 The GTK custom-surface snapshot provides `GtkPlain`, which this Phosh snapshot
 requires. A sufficiently high stock GTK version alone is not enough. GTK is
 built in `.github/Dockerfile`; Phosh and its Rust bindings are repository
-subtrees. Keep the Dockerfile's Phosh pin aligned with the Phosh subtree.
+subtrees. The CI image copies the Phosh subtree, including downstream fixes, so
+dynamic and embedded builds use the same native sources. Its image tag hashes
+the Dockerfile, build-context exclusions, and Phosh subtree.
 
 ## Build and test
 
@@ -49,7 +53,7 @@ The supported CI environment builds the pinned GTK and a shared GTK4 libphosh,
 then tests both dynamically linked and embedded phrog. Build that environment:
 
 ```sh
-podman build -t phrog-gtk4-ci -f .github/Dockerfile .github
+podman build -t phrog-gtk4-ci -f .github/Dockerfile .
 ```
 
 Within an environment providing those dependencies and the Rust toolchain from
@@ -87,7 +91,7 @@ Distribution recipes are not yet GTK4-ready.
 Create a Toolbox from the same patched GTK/Phosh environment used by CI:
 
 ```sh
-podman build -t localhost/phrog-gtk4-ci -f .github/Dockerfile .github
+podman build -t localhost/phrog-gtk4-ci -f .github/Dockerfile .
 podman build -t localhost/phrog-gtk4-toolbox -f tools/toolbox/Containerfile tools/toolbox
 toolbox create --image localhost/phrog-gtk4-toolbox phrog-gtk4
 ```
@@ -122,12 +126,22 @@ of the launcher.
   instance structs too small for subclass registration. This temporary workaround
   needs replacement and ABI validation when GtkPlain gains introspection.
 - The lockscreen uses the layer surface's `configured` signal to select the
-  default page because the upstream GTK4 port still relies on widget `show`.
-- The emergency menu currently crashes while constructing its upstream template,
-  according to the original migration's local run. `tests/emergency_calls.rs`
-  currently checks fixture setup and power-menu interaction only; it does not
-  validate emergency dialling or incoming calls. Restore that coverage before
-  treating the migration as feature-complete.
+  initial page once because the upstream GTK4 port still relies on widget `show`.
+  Later configure events preserve navigation, including an in-flight transition
+  to the single-user keypad.
+- Downstream system-modal fixes provide the shortcut-manager interface required
+  by GTK4 mnemonic controls and destroy GtkPlain surfaces correctly. The
+  emergency test opens the dialler through the power menu, enters a fictional
+  number, and checks the exact request on a private D-Bus fixture. It also checks
+  incoming-call presentation, Accept/Hangup, and call removal. No modem or host
+  Calls service is used. Active-call page pinning remains #100.
+- The pinned Rust/C ABI checks compare 21 type sizes/alignments and 12 constants.
+  They do not validate field offsets, vfunc behavior, or compatibility with future
+  GTK/Phosh revisions. The C LayerSurface class still embeds GtkWindowClass despite
+  its GtkPlain parent; Rust must mirror the current C header until both change.
+- Other GtkWindow assumptions remain in upstream error-dialog and shutdown paths.
+  Their GTK critical messages are recorded as migration debt in #215; the passing
+  emergency path does not establish that those paths are correct.
 - GTK4 distro packaging, a separate snapshot distribution channel, and final
   upstream ABI compatibility remain outstanding. A passing development build is
   not a declaration that GTK4 is ready to replace GTK3 stable releases.

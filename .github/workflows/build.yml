@@ -42,7 +42,7 @@ jobs:
         id: hash
         run: |
           set -uexo pipefail
-          echo "value=${{ hashFiles('.github/Dockerfile') }}" >> $GITHUB_OUTPUT
+          echo "value=${{ hashFiles('.github/Dockerfile', '.dockerignore', 'phosh/**') }}" >> $GITHUB_OUTPUT
   build:
     if: inputs.release_mode || github.event_name != 'pull_request_target' || !startsWith(github.event.pull_request.head.ref || '', 'release/v')
     needs: image-hash
@@ -99,6 +99,9 @@ jobs:
       - name: Lint
         run: |
           ${{ matrix.cargo }} clippy --locked --all-targets --no-deps --verbose -- -D warnings
+      - name: Check Rust/C ABI
+        if: matrix.libphosh == 'system'
+        run: cargo test --locked --manifest-path libphosh-rs/Cargo.toml -p libphosh-sys --test abi
       - name: Test embedding build support
         if: matrix.libphosh == 'bundled'
         run: cargo vendored-phosh test --locked --manifest-path libphosh-rs/Cargo.toml -p libphosh-sys --test native_source
