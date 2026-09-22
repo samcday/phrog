@@ -251,7 +251,7 @@ handle_authorize_app (PhoshDBusGeoClue2Agent *object,
 
   /* Cancel any ongoing prompt */
   if (self->prompt)
-    gtk_widget_destroy (GTK_WIDGET (self->prompt));
+    gtk_window_destroy (GTK_WINDOW (self->prompt));
 
   if (self->invocation) {
     phosh_dbus_geo_clue2_agent_complete_authorize_app (

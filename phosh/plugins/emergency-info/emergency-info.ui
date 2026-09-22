@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
-  <requires lib="libhandy" version="0.0"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshEmergencyInfo" parent="GtkBox">
     <property name="orientation">vertical</property>
     <property name="margin-start">12</property>
@@ -14,13 +13,13 @@
         <property name="hscrollbar-policy">never</property>
         <property name="vexpand">1</property>
         <property name="propagate-natural-height">1</property>
-        <child>
+        <property name="child">
           <object class="GtkBox">
             <property name="visible">1</property>
             <property name="vexpand">1</property>
             <property name="orientation">vertical</property>
             <child>
-              <object class="HdyActionRow" id="row_owner_name">
+              <object class="AdwActionRow" id="row_owner_name">
                 <property name="visible">1</property>
                 <property name="can-focus">0</property>
                 <property name="use-underline">1</property>
@@ -38,13 +37,13 @@
               </object>
             </child>
             <child>
-              <object class="HdyPreferencesGroup" id="pers_info">
+              <object class="AdwPreferencesGroup" id="pers_info">
                 <property name="visible">1</property>
                 <property name="title" translatable="yes">Personal Information</property>
                 <property name="margin-top">12</property>
                 <property name="margin-bottom">12</property>
                 <child>
-                  <object class="HdyActionRow" id="row_dob">
+                  <object class="AdwActionRow" id="row_dob">
                     <property name="visible">1</property>
                     <property name="can-focus">0</property>
                     <property name="use-underline">1</property>
@@ -64,7 +63,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="HdyActionRow" id="row_language">
+                  <object class="AdwActionRow" id="row_language">
                     <property name="visible">1</property>
                     <property name="can-focus">0</property>
                     <property name="use-underline">1</property>
@@ -84,7 +83,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="HdyActionRow" id="row_home_address">
+                  <object class="AdwActionRow" id="row_home_address">
                     <property name="visible">1</property>
                     <property name="can-focus">0</property>
                     <property name="use-underline">1</property>
@@ -94,13 +93,13 @@
               </object>
             </child>
             <child>
-              <object class="HdyPreferencesGroup" id="emer_info">
+              <object class="AdwPreferencesGroup" id="emer_info">
                 <property name="visible">1</property>
                 <property name="title" translatable="yes">Medical Information</property>
                 <property name="margin-top">12</property>
                 <property name="margin-bottom">12</property>
                 <child>
-                  <object class="HdyActionRow" id="row_age">
+                  <object class="AdwActionRow" id="row_age">
                     <property name="visible">1</property>
                     <property name="can-focus">0</property>
                     <property name="use-underline">1</property>
@@ -120,7 +119,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="HdyActionRow" id="row_blood_type">
+                  <object class="AdwActionRow" id="row_blood_type">
                     <property name="visible">1</property>
                     <property name="can-focus">0</property>
                     <property name="use-underline">1</property>
@@ -140,7 +139,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="HdyActionRow" id="row_height">
+                  <object class="AdwActionRow" id="row_height">
                     <property name="visible">1</property>
                     <property name="can-focus">0</property>
                     <property name="use-underline">1</property>
@@ -160,7 +159,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="HdyActionRow" id="row_weight">
+                  <object class="AdwActionRow" id="row_weight">
                     <property name="visible">1</property>
                     <property name="can-focus">0</property>
                     <property name="use-underline">1</property>
@@ -180,7 +179,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="HdyActionRow" id="row_allergies">
+                  <object class="AdwActionRow" id="row_allergies">
                     <property name="visible">1</property>
                     <property name="can-focus">0</property>
                     <property name="use-underline">1</property>
@@ -188,15 +187,16 @@
                   </object>
                 </child>
                 <child>
-                  <object class="HdyActionRow" id="row_medications">
+                  <object class="AdwActionRow" id="row_medications">
                     <property name="visible">1</property>
                     <property name="can-focus">0</property>
+                    <property name="use-markup">0</property>
                     <property name="use-underline">1</property>
                     <property name="title" translatable="yes">Medications &amp; Conditions</property>
                   </object>
                 </child>
                 <child>
-                  <object class="HdyActionRow" id="row_other_info">
+                  <object class="AdwActionRow" id="row_other_info">
                     <property name="visible">1</property>
                     <property name="can-focus">0</property>
                     <property name="use-underline">1</property>
@@ -206,7 +206,7 @@
               </object>
             </child>
             <child>
-              <object class="HdyPreferencesGroup" id="emer_contacts">
+              <object class="AdwPreferencesGroup" id="emer_contacts">
                 <property name="visible">1</property>
                 <property name="title" translatable="yes">Emergency Contacts</property>
                 <property name="margin-top">12</property>
@@ -214,7 +214,7 @@
               </object>
             </child>
           </object>
-        </child>
+        </property>
       </object>
     </child>
   </template>

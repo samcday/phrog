@@ -12,9 +12,9 @@
 #include "fake-clock.h"
 #include "shell-priv.h"
 
+#include <adwaita.h>
 #include <call-ui.h>
 #include <gmobile.h>
-#include <handy.h>
 
 
 /**
@@ -26,12 +26,14 @@
 
 GPid comp_pid;
 
+GMainLoop *loop;
+
 
 static gboolean
 stop_shell (gpointer unused)
 {
   g_debug ("Stopping shell");
-  gtk_main_quit ();
+  g_main_loop_quit (loop);
 
   return G_SOURCE_REMOVE;
 }
@@ -64,8 +66,8 @@ phosh_test_full_shell_thread (gpointer data)
 
   signal (SIGTRAP, kill_compositor);
 
-  gtk_init (NULL, NULL);
-  hdy_init ();
+  gtk_init ();
+  adw_init ();
   cui_init (TRUE);
 
   g_log_writer_default_set_debug_domains ((const char *const *)fixture->log_domains);
@@ -81,9 +83,9 @@ phosh_test_full_shell_thread (gpointer data)
 
   gtk_css_provider_load_from_resource (provider,
                                        "/mobi/phosh/tests/screenshot-no-anim-overrides.css");
-  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
-                                             GTK_STYLE_PROVIDER (provider),
-                                             GTK_STYLE_PROVIDER_PRIORITY_USER);
+  gtk_style_context_add_provider_for_display (gdk_display_get_default (),
+                                              GTK_STYLE_PROVIDER (provider),
+                                              GTK_STYLE_PROVIDER_PRIORITY_USER);
 
   g_assert_false (phosh_shell_is_startup_finished (shell));
 
@@ -95,7 +97,8 @@ phosh_test_full_shell_thread (gpointer data)
 
   g_async_queue_push (fixture->queue, (gpointer)TRUE);
 
-  gtk_main ();
+  loop = g_main_loop_new (NULL, FALSE);
+  g_main_loop_run (loop);
 
   g_assert_finalize_object (wall_clock);
   g_assert_finalize_object (shell);
@@ -177,7 +180,7 @@ phosh_test_full_shell_teardown (PhoshTestFullShellFixture *fixture, gconstpointe
 {
   g_autoptr (GFile) file = g_file_new_for_path (fixture->tmpdir);
 
-  gdk_threads_add_idle (stop_shell, NULL);
+  g_idle_add (stop_shell, NULL);
   g_thread_join (fixture->comp_and_shell);
   g_async_queue_unref (fixture->queue);
 

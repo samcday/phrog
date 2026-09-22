@@ -27,14 +27,14 @@ enum {
 static GParamSpec *props[PROP_LAST_PROP];
 
 struct _PhoshScaleRow {
-  HdyActionRow      parent;
+  AdwActionRow      parent;
 
   GtkRevealer      *revealer;
   double            scale;
   gboolean          selected;
 };
 
-G_DEFINE_TYPE (PhoshScaleRow, phosh_scale_row, HDY_TYPE_ACTION_ROW);
+G_DEFINE_TYPE (PhoshScaleRow, phosh_scale_row, ADW_TYPE_ACTION_ROW);
 
 
 static void
@@ -47,7 +47,7 @@ phosh_scale_row_set_device (PhoshScaleRow *self, double scale)
   /* Translators: This is scale factor of a monitor in percent */
   label = g_strdup_printf (_("%d%%"), (int)round((scale * 100)));
 
-  hdy_preferences_row_set_title (HDY_PREFERENCES_ROW (self), label);
+  adw_preferences_row_set_title (ADW_PREFERENCES_ROW (self), label);
 
   g_object_bind_property (self,
                           "selected",

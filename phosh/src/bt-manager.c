@@ -16,7 +16,6 @@
 #include "dbus/gsd-rfkill-dbus.h"
 #include "util.h"
 
-#include "gtk-list-models/gtkfilterlistmodel.h"
 #include "gnome-bluetooth-enum-types.h"
 #include "bluetooth-client.h"
 #include "bluetooth-device.h"
@@ -56,6 +55,7 @@ struct _PhoshBtManager {
   char               *info;
 
   BluetoothClient    *bt_client;
+  GtkFilter          *filter;
   GtkFilterListModel *connectable_devices;
 
   PhoshDBusRfkill    *proxy;
@@ -331,7 +331,7 @@ refilter_cb (PhoshBtManager *self)
 {
   g_assert (PHOSH_IS_BT_MANAGER (self));
 
-  gtk_filter_list_model_refilter (self->connectable_devices);
+  gtk_filter_changed (self->filter, GTK_FILTER_CHANGE_DIFFERENT);
 }
 
 
@@ -409,10 +409,9 @@ setup_devices (PhoshBtManager *self)
 
   /* Keep a list of connectable devices */
   devices = bluetooth_client_get_devices (self->bt_client);
+  self->filter = GTK_FILTER (gtk_custom_filter_new (filter_devices, self, NULL));
   self->connectable_devices = gtk_filter_list_model_new (G_LIST_MODEL (devices),
-                                                         filter_devices,
-                                                         self,
-                                                         NULL);
+                                                         self->filter);
   g_object_connect (self->bt_client,
                     "swapped-object-signal::device-added", on_device_added, self,
                     "swapped-object-signal::device-removed", on_device_removed, self,

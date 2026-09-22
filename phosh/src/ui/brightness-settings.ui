@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
-  <template class="PhoshBrightnessSettings" parent="GtkBin">
+  <requires lib="gtk" version="4.0"/>
+  <template class="PhoshBrightnessSettings" parent="GtkWidget">
     <child>
       <object class="GtkBox">
         <property name="visible">1</property>
@@ -36,22 +36,26 @@
                     <property name="visible">1</property>
                     <property name="transition-type">crossfade</property>
                     <child>
+                      <object class="GtkStackPage">
+                        <property name="name">hide-details</property>
+                        <property name="child">
                       <object class="GtkImage">
                         <property name="visible">1</property>
                         <property name="icon-name">go-next-symbolic</property>
                       </object>
-                      <packing>
-                        <property name="name">hide-details</property>
-                      </packing>
+                        </property>
+                      </object>
                     </child>
                     <child>
+                      <object class="GtkStackPage">
+                        <property name="name">show-details</property>
+                        <property name="child">
                       <object class="GtkImage">
                         <property name="visible">1</property>
                         <property name="icon-name">go-down-symbolic</property>
                       </object>
-                      <packing>
-                        <property name="name">show-details</property>
-                      </packing>
+                        </property>
+                      </object>
                     </child>
                   </object>
                 </child>
@@ -67,7 +71,7 @@
           <object class="GtkRevealer">
             <property name="visible">1</property>
             <property name="reveal-child" bind-source="toggle_btn" bind-property="active" bind-flags="sync-create"/>
-            <child>
+            <property name="child">
               <object class="GtkBox">
                 <property name="visible">1</property>
                 <property name="orientation">vertical</property>
@@ -82,7 +86,7 @@
                     <property name="visible">1</property>
                     <property name="selection-mode">none</property>
                     <child>
-                      <object class="HdyActionRow">
+                      <object class="AdwActionRow">
                         <property name="visible">1</property>
                         <property name="title" translatable="yes">Automatic Brightness</property>
                         <property name="activatable">1</property>
@@ -112,7 +116,7 @@
                   <object class="GtkButton">
                     <property name="visible">1</property>
                     <property name="action-name">panel.launch-panel</property>
-                    <property name="action-target">(&quot;power&quot;, [&lt;&quot;&quot;&gt;])</property>
+                    <property name="action-target">&quot;power&quot;</property>
                     <child>
                       <object class="GtkLabel">
                         <property name="visible">1</property>
@@ -123,7 +127,7 @@
                   </object>
                 </child>
               </object>
-            </child>
+            </property>
           </object>
         </child>
       </object>

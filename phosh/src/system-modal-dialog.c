@@ -86,6 +86,7 @@ static guint signals[N_SIGNALS] = { 0 };
 typedef struct {
   char           *title;
 
+  GtkWidget      *swipe_bin;
   GtkWidget      *lbl_title;
   GtkWidget      *box_dialog;
   GtkWidget      *box_buttons;
@@ -99,6 +100,7 @@ static void phosh_system_modal_dialog_buildable_init (GtkBuildableIface *iface);
 G_DEFINE_TYPE_WITH_CODE (PhoshSystemModalDialog, phosh_system_modal_dialog,
                          PHOSH_TYPE_SYSTEM_MODAL,
                          G_ADD_PRIVATE (PhoshSystemModalDialog)
+                         G_IMPLEMENT_INTERFACE (GTK_TYPE_SHORTCUT_MANAGER, NULL)
                          G_IMPLEMENT_INTERFACE (GTK_TYPE_BUILDABLE,
                                                 phosh_system_modal_dialog_buildable_init))
 
@@ -160,6 +162,20 @@ on_removed_by_swipe (PhoshSystemModalDialog *self)
 
 
 static void
+phosh_system_modal_dialog_dispose (GObject *object)
+{
+  PhoshSystemModalDialog *self = PHOSH_SYSTEM_MODAL_DIALOG (object);
+  PhoshSystemModalDialogPrivate *priv = phosh_system_modal_dialog_get_instance_private (self);
+
+  g_clear_pointer (&priv->swipe_bin, gtk_widget_unparent);
+
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_SYSTEM_MODAL_DIALOG);
+
+  G_OBJECT_CLASS (phosh_system_modal_dialog_parent_class)->dispose (object);
+}
+
+
+static void
 phosh_system_modal_dialog_finalize (GObject *object)
 {
   PhoshSystemModalDialog *self = PHOSH_SYSTEM_MODAL_DIALOG (object);
@@ -177,10 +193,10 @@ phosh_system_modal_dialog_class_init (PhoshSystemModalDialogClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
-  GtkBindingSet *binding_set;
 
   object_class->get_property = phosh_system_modal_dialog_get_property;
   object_class->set_property = phosh_system_modal_dialog_set_property;
+  object_class->dispose = phosh_system_modal_dialog_dispose;
   object_class->finalize = phosh_system_modal_dialog_finalize;
 
   widget_class->map = phosh_system_modal_dialog_map;
@@ -213,13 +229,13 @@ phosh_system_modal_dialog_class_init (PhoshSystemModalDialogClass *klass)
   g_type_ensure (PHOSH_TYPE_SWIPE_AWAY_BIN);
   gtk_widget_class_set_template_from_resource (widget_class,
                                                "/mobi/phosh/ui/system-modal-dialog.ui");
+  gtk_widget_class_bind_template_child_private (widget_class, PhoshSystemModalDialog, swipe_bin);
   gtk_widget_class_bind_template_child_private (widget_class, PhoshSystemModalDialog, lbl_title);
   gtk_widget_class_bind_template_child_private (widget_class, PhoshSystemModalDialog, box_dialog);
   gtk_widget_class_bind_template_child_private (widget_class, PhoshSystemModalDialog, box_buttons);
   gtk_widget_class_bind_template_callback (widget_class, on_removed_by_swipe);
 
-  binding_set = gtk_binding_set_by_class (klass);
-  gtk_binding_entry_add_signal (binding_set, GDK_KEY_Escape, 0, "dialog-canceled", 0);
+  gtk_widget_class_add_binding_signal (widget_class, GDK_KEY_Escape, 0, "dialog-canceled", NULL);
 }
 
 
@@ -277,7 +293,7 @@ animation_done_cb (PhoshSystemModalDialog *self)
   g_clear_pointer (&priv->animation, phosh_animation_unref);
 
   if (priv->fade_out)
-    gtk_widget_destroy (GTK_WIDGET (self));
+    phosh_layer_surface_destroy (PHOSH_LAYER_SURFACE (self));
 }
 
 
@@ -330,10 +346,9 @@ phosh_system_modal_dialog_set_content (PhoshSystemModalDialog *self, GtkWidget *
 
   priv = phosh_system_modal_dialog_get_instance_private (PHOSH_SYSTEM_MODAL_DIALOG (self));
 
-  gtk_box_pack_start (GTK_BOX (priv->box_dialog), GTK_WIDGET (content), FALSE, FALSE, 0);
-  gtk_box_reorder_child (GTK_BOX (priv->box_dialog), GTK_WIDGET (content), 1);
-  gtk_style_context_add_class (gtk_widget_get_style_context (GTK_WIDGET (content)),
-                               "phosh-system-modal-dialog-content");
+  gtk_box_insert_child_after (GTK_BOX (priv->box_dialog), content, priv->lbl_title);
+  gtk_widget_add_css_class (content,
+                            "phosh-system-modal-dialog-content");
 }
 
 
@@ -350,15 +365,28 @@ void
 phosh_system_modal_dialog_add_button (PhoshSystemModalDialog *self, GtkWidget *button, gint position)
 {
   PhoshSystemModalDialogPrivate *priv;
+  GtkWidget *child;
+  guint i;
 
   g_return_if_fail (PHOSH_IS_SYSTEM_MODAL_DIALOG (self));
   g_return_if_fail (GTK_IS_BUTTON (button));
 
   priv = phosh_system_modal_dialog_get_instance_private (PHOSH_SYSTEM_MODAL_DIALOG (self));
 
-  gtk_box_pack_start (GTK_BOX (priv->box_buttons), GTK_WIDGET (button), TRUE, TRUE, 0);
-  if (position >= 0)
-    gtk_box_reorder_child (GTK_BOX (priv->box_buttons), GTK_WIDGET (button), position);
+  if (position <= 0) {
+    gtk_box_prepend (GTK_BOX (priv->box_buttons), button);
+    return;
+  }
+
+  i = 0;
+  child = gtk_widget_get_first_child (priv->box_buttons);
+  while (child != NULL) {
+    if (i == position - 1)
+      break;
+    child = gtk_widget_get_next_sibling (child);
+    i += 1;
+  }
+  gtk_box_insert_child_after (GTK_BOX (priv->box_buttons), button, child);
 }
 
 
@@ -371,7 +399,7 @@ phosh_system_modal_dialog_remove_button (PhoshSystemModalDialog *self, GtkWidget
   g_return_if_fail (GTK_IS_BUTTON (button));
   priv = phosh_system_modal_dialog_get_instance_private (PHOSH_SYSTEM_MODAL_DIALOG (self));
 
-  gtk_container_remove (GTK_CONTAINER (priv->box_buttons), button);
+  gtk_box_remove (GTK_BOX (priv->box_buttons), button);
 }
 
 /**
@@ -386,11 +414,18 @@ GList *
 phosh_system_modal_dialog_get_buttons (PhoshSystemModalDialog *self)
 {
   PhoshSystemModalDialogPrivate *priv;
+  GList *children = NULL;
+  GtkWidget *child;
 
   g_return_val_if_fail (PHOSH_IS_SYSTEM_MODAL_DIALOG (self), NULL);
   priv = phosh_system_modal_dialog_get_instance_private (PHOSH_SYSTEM_MODAL_DIALOG (self));
 
-  return gtk_container_get_children (GTK_CONTAINER (priv->box_buttons));
+  child = gtk_widget_get_last_child (priv->box_buttons);
+  while (child != NULL) {
+    children = g_list_prepend (children, child);
+    child = gtk_widget_get_prev_sibling (child);
+  }
+  return children;
 }
 
 /**

@@ -18,7 +18,7 @@
 #include "util.h"
 
 #include <glib/gi18n.h>
-#include <handy.h>
+#include <adwaita.h>
 
 
 /**
@@ -54,7 +54,7 @@ struct _PhoshEmergencyMenu {
 
   PhoshEmergencyCallsManager   *manager;
 
-  HdyCarousel                  *emergency_carousel;
+  AdwCarousel                  *emergency_carousel;
   GtkBox                       *emergency_dialpad_box;
   GtkBox                       *emergency_info_box;
   GtkListBox                   *emergency_contacts_list_box;
@@ -76,7 +76,7 @@ on_go_back_activated (GSimpleAction *action, GVariant *param, gpointer data)
   if (close) {
     g_signal_emit (self, signals[DONE], 0);
   } else {
-    hdy_carousel_scroll_to (self->emergency_carousel, GTK_WIDGET (self->emergency_dialpad_box));
+    adw_carousel_scroll_to (self->emergency_carousel, GTK_WIDGET (self->emergency_dialpad_box), TRUE);
   }
 }
 
@@ -103,13 +103,13 @@ on_dial_error (PhoshEmergencyMenu *self, GError *error)
     gtk_label_set_label (GTK_LABEL (error_label), error->message);
   else
     gtk_label_set_label (GTK_LABEL (error_label), _("Internal error"));
-  gtk_label_set_line_wrap (GTK_LABEL (error_label), TRUE);
+  gtk_label_set_wrap (GTK_LABEL (error_label), TRUE);
   phosh_system_modal_dialog_set_content (error_dialog, error_label);
 
-  g_signal_connect_swapped (ok_button, "clicked", G_CALLBACK (gtk_widget_destroy), error_dialog);
+  g_signal_connect_swapped (ok_button, "clicked", G_CALLBACK (gtk_window_destroy), error_dialog);
   g_signal_connect_swapped (error_dialog,
                             "dialog-canceled",
-                            G_CALLBACK (gtk_widget_destroy),
+                            G_CALLBACK (gtk_window_destroy),
                             error_dialog);
 
   gtk_widget_set_visible (error_label, TRUE);
@@ -179,6 +179,8 @@ emergency_menu_dispose (GObject *object)
 
   g_clear_object (&self->actions);
 
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_EMERGENCY_MENU);
+
   G_OBJECT_CLASS (phosh_emergency_menu_parent_class)->dispose (object);
 }
 
@@ -210,7 +212,7 @@ static void
 on_emergency_contacts_button_clicked (PhoshEmergencyMenu *self)
 {
   g_debug ("Emergency info button pressed");
-  hdy_carousel_scroll_to (self->emergency_carousel, GTK_WIDGET (self->emergency_info_box));
+  adw_carousel_scroll_to (self->emergency_carousel, GTK_WIDGET (self->emergency_info_box), TRUE);
 }
 
 

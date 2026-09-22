@@ -34,7 +34,7 @@ test_phosh_app_grid_folder_button_new (void)
   GtkWidget *button;
 
   info = create_dummy_folder_info ();
-  button = phosh_app_grid_folder_button_new_from_folder_info (info);
+  button = g_object_ref_sink (phosh_app_grid_folder_button_new_from_folder_info (info));
   g_assert_true (PHOSH_IS_APP_GRID_FOLDER_BUTTON (button));
 
   g_object_get (button, "folder-info", &got_info, NULL);
@@ -43,7 +43,7 @@ test_phosh_app_grid_folder_button_new (void)
   g_object_get (button, "label", &label, NULL);
   g_assert_cmpstr (label, ==, "Foo");
 
-  gtk_widget_destroy (button);
+  g_object_unref (button);
 }
 
 

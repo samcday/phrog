@@ -121,6 +121,15 @@ on_dialog_canceled (PhoshCellBroadcastPrompt *self)
 
 
 static void
+phosh_cell_broadcast_prompt_dispose (GObject *object)
+{
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_CELL_BROADCAST_PROMPT);
+
+  G_OBJECT_CLASS (phosh_cell_broadcast_prompt_parent_class)->dispose (object);
+}
+
+
+static void
 phosh_cell_broadcast_prompt_finalize (GObject *obj)
 {
   PhoshCellBroadcastPrompt *self = PHOSH_CELL_BROADCAST_PROMPT (obj);
@@ -139,6 +148,7 @@ phosh_cell_broadcast_prompt_class_init (PhoshCellBroadcastPromptClass *klass)
 
   object_class->get_property = phosh_cell_broadcast_prompt_get_property;
   object_class->set_property = phosh_cell_broadcast_prompt_set_property;
+  object_class->dispose = phosh_cell_broadcast_prompt_dispose;
   object_class->finalize = phosh_cell_broadcast_prompt_finalize;
 
   props[PROP_MESSAGE] =

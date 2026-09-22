@@ -11,7 +11,6 @@
 
 #include "phosh-config.h"
 
-#include "audio-manager.h"
 #include "shell-priv.h"
 #include "phosh-wayland.h"
 #include "wall-clock.h"
@@ -19,7 +18,7 @@
 #include "background-cache.h"
 #include "metainfo-cache.h"
 
-#include <handy.h>
+#include <adwaita.h>
 #include <libfeedback.h>
 
 #include <glib/gi18n.h>
@@ -31,7 +30,8 @@ static gboolean
 quit (gpointer unused)
 {
   g_debug ("Cleaning up");
-  gtk_main_quit ();
+  // FIXME Port to GTK 4
+  // gtk_main_quit ();
 
   return G_SOURCE_REMOVE;
 }
@@ -110,7 +110,7 @@ main (int argc, char *argv[])
   g_autoptr (PhoshMetainfoCache) metainfo_cache = NULL;
   g_autoptr (GTimer) timer = g_timer_new ();
   g_autoptr (PhoshWallClock) wall_clock = NULL;
-  g_autoptr (PhoshAudioManager) audio_manager = NULL;
+  g_autoptr (GMainLoop) loop = NULL;
 
   const GOptionEntry options [] = {
     {"unlocked", 'U', 0, G_OPTION_ARG_NONE, &unlocked,
@@ -124,7 +124,8 @@ main (int argc, char *argv[])
 
   opt_context = g_option_context_new ("- A phone graphical shell");
   g_option_context_add_main_entries (opt_context, options, NULL);
-  g_option_context_add_group (opt_context, gtk_get_option_group (FALSE));
+  // FIXME Port to GTK 4
+  // g_option_context_add_group (opt_context, gtk_get_option_group (FALSE));
   if (!g_option_context_parse (opt_context, &argc, &argv, &err)) {
     g_warning ("%s", err->message);
     return 1;
@@ -136,8 +137,8 @@ main (int argc, char *argv[])
   textdomain (GETTEXT_PACKAGE);
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
-  gtk_init (&argc, &argv);
-  hdy_init ();
+  gtk_init ();
+  adw_init ();
   lfb_init (PHOSH_APP_ID, NULL);
 
   g_unix_signal_add (SIGTERM, on_shutdown_signal, NULL);
@@ -148,7 +149,6 @@ main (int argc, char *argv[])
   wl = phosh_wayland_get_default ();
   background_cache = phosh_background_cache_get_default ();
   metainfo_cache = phosh_metainfo_cache_get_default ();
-  audio_manager = phosh_audio_manager_get_default ();
   shell = phosh_shell_new ();
   phosh_shell_set_default (shell);
 
@@ -157,7 +157,8 @@ main (int argc, char *argv[])
   if (!(unlocked || phosh_shell_started_by_display_manager (shell)) || locked)
     phosh_shell_lock (shell);
 
-  gtk_main ();
+  loop = g_main_loop_new (NULL, FALSE);
+  g_main_loop_run (loop);
 
   return EXIT_SUCCESS;
 }

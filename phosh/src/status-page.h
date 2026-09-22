@@ -11,10 +11,10 @@
 G_BEGIN_DECLS
 
 #define PHOSH_TYPE_STATUS_PAGE phosh_status_page_get_type ()
-G_DECLARE_DERIVABLE_TYPE (PhoshStatusPage, phosh_status_page, PHOSH, STATUS_PAGE, GtkBin)
+G_DECLARE_DERIVABLE_TYPE (PhoshStatusPage, phosh_status_page, PHOSH, STATUS_PAGE, GtkWidget)
 
 struct _PhoshStatusPageClass {
-  GtkBinClass parent_class;
+  GtkWidgetClass parent_class;
 
   /* Padding for future expansion */
   void        (*_phosh_reserved0) (void);

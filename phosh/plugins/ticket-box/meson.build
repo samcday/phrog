@@ -3,8 +3,8 @@ name = 'ticket-box'
 ticket_box_plugin_deps = [
   plugin_dep,
   gio_unix_dep,
-  dependency('evince-document-3.0'),
-  dependency('evince-view-3.0'),
+  dependency('papers-document-4.0'),
+  dependency('papers-view-4.0'),
 ]
 
 ticket_box_resources = gnome.compile_resources(

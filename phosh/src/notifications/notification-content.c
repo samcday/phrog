@@ -150,12 +150,15 @@ set_actions (PhoshNotificationContent *self,  PhoshNotification *notification)
 {
   GStrv actions;
   g_auto (GStrv) filters = NULL;
+  GtkWidget *child;
 
-  gtk_container_foreach (GTK_CONTAINER (self->box_actions),
-                         (GtkCallback) gtk_widget_destroy,
-                         NULL);
+  child = gtk_widget_get_first_child (self->box_actions);
+  while (child != NULL) {
+    gtk_box_remove (GTK_BOX (self->box_actions), child);
+    child = gtk_widget_get_first_child (self->box_actions);
+  }
 
-  if (notification == NULL)
+   if (notification == NULL)
     return;
 
   actions = phosh_notification_get_actions (notification);
@@ -171,8 +174,7 @@ set_actions (PhoshNotificationContent *self,  PhoshNotification *notification)
 
     /* The default action is already triggered by the notification body */
     if (g_strcmp0 (actions[i], "default") == 0) {
-      GtkStyleContext *context = gtk_widget_get_style_context (GTK_WIDGET (self->msg_body));
-      gtk_style_context_add_class (context, "phosh-notification-body");
+      gtk_widget_add_css_class (self->msg_body, "phosh-notification-body");
       continue;
     }
 
@@ -204,9 +206,9 @@ set_actions (PhoshNotificationContent *self,  PhoshNotification *notification)
                         "vexpand", TRUE,
                         "visible", TRUE,
                         NULL);
-    gtk_container_add (GTK_CONTAINER (btn), lbl);
+    gtk_button_set_child ( GTK_BUTTON (btn), lbl);
 
-    gtk_container_add (GTK_CONTAINER (self->box_actions), btn);
+    gtk_box_append (GTK_BOX (self->box_actions), btn);
   }
 }
 
@@ -315,6 +317,15 @@ phosh_notification_content_get_property (GObject    *object,
 
 
 static void
+phosh_notification_content_dispose (GObject *object)
+{
+  gtk_widget_dispose_template (GTK_WIDGET (object), PHOSH_TYPE_NOTIFICATION_CONTENT);
+
+  G_OBJECT_CLASS (phosh_notification_content_parent_class)->dispose (object);
+}
+
+
+static void
 phosh_notification_content_finalize (GObject *object)
 {
   PhoshNotificationContent *self = PHOSH_NOTIFICATION_CONTENT (object);
@@ -332,6 +343,7 @@ phosh_notification_content_class_init (PhoshNotificationContentClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
+  object_class->dispose = phosh_notification_content_dispose;
   object_class->finalize = phosh_notification_content_finalize;
   object_class->set_property = phosh_notification_content_set_property;
   object_class->get_property = phosh_notification_content_get_property;

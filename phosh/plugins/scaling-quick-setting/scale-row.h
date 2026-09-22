@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include <handy.h>
+#include <adwaita.h>
 
 G_BEGIN_DECLS
 
 #define PHOSH_TYPE_SCALE_ROW phosh_scale_row_get_type ()
 
-G_DECLARE_FINAL_TYPE (PhoshScaleRow, phosh_scale_row, PHOSH, SCALE_ROW, HdyActionRow)
+G_DECLARE_FINAL_TYPE (PhoshScaleRow, phosh_scale_row, PHOSH, SCALE_ROW, AdwActionRow)
 
 GtkWidget *phosh_scale_row_new (double scale, gboolean selected);
 double     phosh_scale_row_get_scale (PhoshScaleRow *self);

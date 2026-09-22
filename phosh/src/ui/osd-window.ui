@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshOsdWindow" parent="PhoshSystemModal">
     <child>
       <object class="GtkGrid">
@@ -21,7 +21,6 @@
             <child>
               <object class="GtkImage" id="icon">
                 <property name="visible">1</property>
-                <property name="stock">gtk-missing-image</property>
                 <property name="pixel-size">16</property>
                 <property name="margin-start">12</property>
                 <property name="margin-top">12</property>
@@ -31,6 +30,7 @@
             </child>
             <child>
               <object class="GtkBox" id="box">
+                <property name="visible">0</property>
                 <property name="halign">center</property>
                 <property name="valign">center</property>
                 <property name="orientation">vertical</property>
@@ -58,9 +58,10 @@
         </child>
       </object>
     </child>
+    <child>
+      <object class="GtkGestureClick" id="click_gesture">
+        <signal name="released" handler="on_button_released" swapped="true"/>
+      </object>
+    </child>
   </template>
-  <object class="GtkGestureMultiPress" id="click_gesture">
-    <property name="widget">PhoshOsdWindow</property>
-    <signal name="released" handler="on_button_released" swapped="true"/>
-  </object>
 </interface>

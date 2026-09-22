@@ -129,13 +129,11 @@ phosh_system_modal_constructed (GObject *object)
 {
   PhoshSystemModal *self = PHOSH_SYSTEM_MODAL (object);
   PhoshSystemModalPrivate *priv = phosh_system_modal_get_instance_private (self);
-  PhoshWayland *wl = phosh_wayland_get_default ();
 
   if (priv->monitor == NULL)
     priv->monitor = g_object_ref (phosh_shell_get_primary_monitor (phosh_shell_get_default ()));
 
   g_object_set (PHOSH_LAYER_SURFACE (self),
-                "layer-shell", phosh_wayland_get_zwlr_layer_shell_v1 (wl),
                 "wl-output", phosh_monitor_get_wl_output (priv->monitor),
                 "anchor", ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP |
                 ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM |
@@ -147,8 +145,8 @@ phosh_system_modal_constructed (GObject *object)
                 "namespace", "phosh system-modal",
                 NULL);
 
-  gtk_style_context_add_class (gtk_widget_get_style_context (GTK_WIDGET (self)),
-                               "phosh-system-modal");
+  gtk_widget_add_css_class (GTK_WIDGET (self),
+                            "phosh-system-modal");
 
   G_OBJECT_CLASS (phosh_system_modal_parent_class)->constructed (object);
 }

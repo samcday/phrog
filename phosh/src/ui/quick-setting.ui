@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshQuickSetting" parent="GtkBox">
     <property name="visible">1</property>
     <child>
@@ -23,6 +23,17 @@
             </child>
           </object>
         </child>
+        <child>
+          <object class="GtkGestureLongPress" id="long_press">
+            <signal name="pressed" handler="on_long_pressed" object="PhoshQuickSetting" swapped="true"/>
+          </object>
+        </child>
+        <child>
+          <object class="GtkGestureClick" id="multi_press">
+            <property name="button">3</property>
+            <signal name="pressed" handler="on_right_pressed" object="PhoshQuickSetting" swapped="true"/>
+          </object>
+        </child>
       </object>
     </child>
     <child>
@@ -32,6 +43,7 @@
     </child>
     <child>
       <object class="GtkButton" id="arrow_btn">
+        <property name="visible">0</property>
         <property name="focus-on-click">0</property>
         <signal name="clicked" handler="on_arrow_clicked" object="PhoshQuickSetting" swapped="yes"/>
         <child>
@@ -44,13 +56,4 @@
       </object>
     </child>
   </template>
-  <object class="GtkGestureLongPress" id="long_press">
-    <property name="widget">primary</property>
-    <signal name="pressed" handler="on_long_pressed" object="PhoshQuickSetting" swapped="true"/>
-  </object>
-  <object class="GtkGestureMultiPress" id="multi_press">
-    <property name="button">3</property>
-    <property name="widget">primary</property>
-    <signal name="pressed" handler="on_right_pressed" object="PhoshQuickSetting" swapped="true"/>
-  </object>
 </interface>

@@ -6,8 +6,7 @@
 
 #include <gio/gio.h>
 #include <gio/gdesktopappinfo.h>
-
-#include <handy.h>
+#include <gtk/gtk.h>
 
 #include "phosh-settings-enums.h"
 

@@ -101,7 +101,7 @@ struct _PhoshSystemPrompt
 };
 
 
-static void phosh_system_prompt_iface_init (GcrPromptIface *iface);
+static void phosh_system_prompt_iface_init (GcrPromptInterface *iface);
 G_DEFINE_TYPE_WITH_CODE(PhoshSystemPrompt, phosh_system_prompt, PHOSH_TYPE_SYSTEM_MODAL_DIALOG,
                         G_IMPLEMENT_INTERFACE (GCR_TYPE_PROMPT,
                                                phosh_system_prompt_iface_init)
@@ -460,7 +460,7 @@ on_password_changed (PhoshSystemPrompt *self,
     return;
 
   gtk_widget_set_sensitive (priv->btn_continue, TRUE);
-  password = gtk_entry_get_text (GTK_ENTRY (editable));
+  password = gtk_editable_get_text (editable);
 
   /*
    * This code is based on the Master Password dialog in Firefox
@@ -520,7 +520,7 @@ on_dialog_canceled (PhoshSystemPrompt *self)
 }
 
 static void
-phosh_system_prompt_iface_init (GcrPromptIface *iface)
+phosh_system_prompt_iface_init (GcrPromptInterface *iface)
 {
   iface->prompt_confirm_async = phosh_system_prompt_confirm_async;
   iface->prompt_confirm_finish = phosh_system_prompt_confirm_finish;
@@ -543,6 +543,9 @@ phosh_system_prompt_dispose (GObject *obj)
     prompt_cancel (self);
 
   g_assert (priv->task == NULL);
+
+  gtk_widget_dispose_template (GTK_WIDGET (obj), PHOSH_TYPE_SYSTEM_PROMPT);
+
   G_OBJECT_CLASS (phosh_system_prompt_parent_class)->dispose (obj);
 }
 
@@ -576,14 +579,14 @@ phosh_system_prompt_constructed (GObject *object)
   g_object_bind_property (self, "description", priv->lbl_description, "label", G_BINDING_DEFAULT);
   g_object_bind_property (self, "password-visible", priv->lbl_password, "visible", G_BINDING_DEFAULT);
 
-  priv->password_buffer = gcr_secure_entry_buffer_new ();
+  priv->password_buffer = gtk_password_entry_buffer_new ();
   gtk_entry_set_buffer (GTK_ENTRY (priv->entry_password), GTK_ENTRY_BUFFER (priv->password_buffer));
   g_object_bind_property (self, "password-visible", priv->entry_password,
                           "visible", G_BINDING_DEFAULT);
 
   g_object_bind_property (self, "confirm-visible", priv->lbl_confirm, "visible", G_BINDING_DEFAULT);
 
-  priv->confirm_buffer = gcr_secure_entry_buffer_new ();
+  priv->confirm_buffer = gtk_password_entry_buffer_new ();
   gtk_entry_set_buffer (GTK_ENTRY (priv->entry_confirm), GTK_ENTRY_BUFFER (priv->confirm_buffer));
   g_object_bind_property (self, "confirm-visible", priv->entry_confirm, "visible", G_BINDING_DEFAULT);
 
@@ -605,8 +608,6 @@ phosh_system_prompt_constructed (GObject *object)
 
   g_object_bind_property (self, "cancel-label", priv->btn_cancel, "label", G_BINDING_DEFAULT);
   g_object_bind_property (self, "continue-label", priv->btn_continue, "label", G_BINDING_DEFAULT);
-
-  gtk_widget_grab_default (priv->btn_continue);
 }
 
 
@@ -706,7 +707,8 @@ phosh_system_prompt_init (PhoshSystemPrompt *self)
    * e0a506eeb29bc6be01a96e805e0244a03428ebf5.
    * Otherwise it gets clean up too early.
    */
-  gtk_window_set_has_user_ref_count (GTK_WINDOW (self), FALSE);
+  // FIXME Find out if we need this in GTK 4
+  // gtk_window_set_has_user_ref_count (GTK_WINDOW (self), FALSE);
   gtk_widget_init_template (GTK_WIDGET (self));
 }
 

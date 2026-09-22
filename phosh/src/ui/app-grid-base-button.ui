@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
+  <requires lib="gtk" version="4.0"/>
   <template class="PhoshAppGridBaseButton" parent="GtkFlowBoxChild">
-    <property name="can-focus">0</property>
+    <property name="visible">0</property>
+    <property name="focusable">0</property>
     <child>
       <object class="PhoshClamp">
         <property name="visible">1</property>
@@ -12,7 +13,6 @@
         <property name="width-request">84</property>
         <child>
           <object class="GtkButton" id="button">
-            <property name="relief">none</property>
             <property name="visible">1</property>
             <property name="focus-on-click">0</property>
             <signal name="clicked" handler="on_clicked_cb" object="PhoshAppGridBaseButton" swapped="yes"/>
@@ -29,7 +29,6 @@
                 <child>
                   <object class="PhoshFadingLabel" id="label">
                     <property name="visible">1</property>
-                    <property name="no-show-all">1</property>
                     <property name="halign">center</property>
                     <property name="valign">end</property>
                   </object>

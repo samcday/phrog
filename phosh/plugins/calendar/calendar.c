@@ -40,18 +40,10 @@ on_settings_changed (GSettings  *settings,
                      gpointer    user_data)
 {
   PhoshCalendar *self = PHOSH_CALENDAR (user_data);
-  GtkCalendarDisplayOptions display_options;
   gboolean display_week;
 
-  display_options = gtk_calendar_get_display_options (self->calendar);
   display_week = g_settings_get_boolean (settings, key);
-
-  if (display_week)
-    display_options |= GTK_CALENDAR_SHOW_WEEK_NUMBERS;
-  else
-    display_options &= ~GTK_CALENDAR_SHOW_WEEK_NUMBERS;
-
-  gtk_calendar_set_display_options (self->calendar, display_options);
+  gtk_calendar_set_show_week_numbers (self->calendar, display_week);
 }
 
 
@@ -82,9 +74,9 @@ phosh_calendar_init (PhoshCalendar *self)
   css_provider = gtk_css_provider_new ();
   gtk_css_provider_load_from_resource (css_provider,
                                        "/mobi/phosh/plugins/calendar/stylesheet/common.css");
-  gtk_style_context_add_provider (gtk_widget_get_style_context (GTK_WIDGET (self)),
-                                  GTK_STYLE_PROVIDER (css_provider),
-                                  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  gtk_style_context_add_provider_for_display (gdk_display_get_default (),
+                                              GTK_STYLE_PROVIDER (css_provider),
+                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
   self->calendar_settings = g_settings_new ("org.gnome.desktop.calendar");
   g_signal_connect (self->calendar_settings,

@@ -1,0 +1,96 @@
+From d7c9d071cdaf148d7ca2b512fab9a9cbdb0d1d37 Mon Sep 17 00:00:00 2001
+From: Arun Mani J <j.arunmani@proton.me>
+Date: Fri, 9 May 2025 15:10:56 +0530
+Subject: [PATCH] tree: Add configure callback and remove default size
+
+---
+ include/gtk4-layer-shell.h | 2 +-
+ src/gtk4-layer-shell.c     | 4 +++-
+ src/layer-surface.c        | 7 +++++--
+ src/layer-surface.h        | 3 +++
+ 4 files changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/include/gtk4-layer-shell.h b/include/gtk4-layer-shell.h
+index d954285..18bc244 100644
+--- a/include/gtk4-layer-shell.h
++++ b/include/gtk4-layer-shell.h
+@@ -137,7 +137,7 @@ guint gtk_layer_get_protocol_version();
+  * Set the @window up to be a layer surface once it is mapped. this must be called before
+  * the @window is realized.
+  */
+-void gtk_layer_init_for_window(GtkWindow* window);
++void gtk_layer_init_for_window(GtkWindow* window, void (*configure)(uint32_t w, uint32_t h, void *data), void *data);
+ 
+ /**
+  * gtk_layer_is_layer_window:
+diff --git a/src/gtk4-layer-shell.c b/src/gtk4-layer-shell.c
+index 686b60d..c736d07 100644
+--- a/src/gtk4-layer-shell.c
++++ b/src/gtk4-layer-shell.c
+@@ -151,7 +151,7 @@ static void gtk_layer_surface_remap(struct layer_surface_t* super) {
+ }
+ 
+ GTK4_LAYER_SHELL_EXPORT
+-void gtk_layer_init_for_window(GtkWindow* window) {
++void gtk_layer_init_for_window(GtkWindow* window, void (*configure)(uint32_t w, uint32_t h, void *data), void *data) {
+     if (!GDK_IS_WAYLAND_DISPLAY(gdk_display_get_default())) {
+         g_warning("Failed to initialize layer surface, not on Wayland");
+         return;
+@@ -186,6 +186,8 @@ void gtk_layer_init_for_window(GtkWindow* window) {
+     layer_surface->super = layer_surface_make();
+     layer_surface->super.remap = gtk_layer_surface_remap;
+     layer_surface->super.get_preferred_size = gtk_layer_surface_get_preferred_size;
++    layer_surface->super.data = data;
++    layer_surface->super.configure = configure;
+     g_object_set_data_full(G_OBJECT(window), layer_surface_key, layer_surface, (GDestroyNotify)gtk_layer_surface_destroy);
+ 
+     all_layer_surfaces = g_list_append(all_layer_surfaces, layer_surface);
+diff --git a/src/layer-surface.c b/src/layer-surface.c
+index 90e9c45..adfb64a 100644
+--- a/src/layer-surface.c
++++ b/src/layer-surface.c
+@@ -15,8 +15,8 @@ static void layer_surface_send_set_size(struct layer_surface_t* self) {
+     struct geom_size_t size = self->last_xdg_window_geom_size;
+ 
+     // Default values because setting 0 is only allowed when anchored
+-    if (size.width  <= 0) size.width  = 200;
+-    if (size.height <= 0) size.height = 200;
++    if (size.width  <= 0) size.width  = 0;
++    if (size.height <= 0) size.height = 0;
+ 
+     if (self->anchored.left && self->anchored.right) {
+         size.width = 0;
+@@ -54,6 +54,8 @@ static void layer_surface_configure_xdg_surface(
+     if (self->anchored.top && self->anchored.bottom && self->last_layer_configured_size.height > 0) {
+         size.height = self->last_layer_configured_size.height;
+     }
++    size.width = self->last_layer_configured_size.width;
++    size.height = self->last_layer_configured_size.height;
+ 
+     // Ideally this wouldn't be needed, see the layer_surface_t.get_preferred_size documentation
+     if (self->get_preferred_size && (size.width == 0 || size.height == 0)) {
+@@ -96,6 +98,7 @@ static void layer_surface_handle_configure(
+     self->last_layer_configured_size = (struct geom_size_t){w, h};
+     self->has_initial_layer_shell_configure = true;
+     layer_surface_configure_xdg_surface(self, serial, true);
++    self->configure(w, h, self->data);
+ }
+ 
+ static void layer_surface_handle_closed(void* data, struct zwlr_layer_surface_v1* _surface) {
+diff --git a/src/layer-surface.h b/src/layer-surface.h
+index e955147..6b0397f 100644
+--- a/src/layer-surface.h
++++ b/src/layer-surface.h
+@@ -18,6 +18,9 @@ struct geom_size_t {
+ struct layer_surface_t {
+     struct xdg_surface_server_t super;
+ 
++    void *data;
++    void (*configure)(uint32_t w, uint32_t h, void *data);
++
+     // Virtual functions (NULL by default, can be overridden by the user of this library)
+     // Ask the toolkit to unmap and remap the surface
+     void (*remap)(struct layer_surface_t* super);
+-- 
+2.48.1
+

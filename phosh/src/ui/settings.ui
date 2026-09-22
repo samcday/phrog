@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="3.24"/>
-  <requires lib="libhandy" version="1.8"/>
-  <template class="PhoshSettings" parent="GtkBin">
+  <requires lib="gtk" version="4.0"/>
+  <template class="PhoshSettings" parent="GtkWidget">
     <property name="width-request">250</property>
     <signal name="notify::on-lockscreen" handler="update_drag_handle_offset"/>
     <child>
@@ -12,7 +11,7 @@
         <property name="propagate-natural-height">1</property>
         <property name="min-content-height">150</property>
         <child>
-          <object class="HdyClamp">
+          <object class="AdwClamp">
             <property name="visible">1</property>
             <property name="maximum-size">720</property>
             <property name="vexpand">1</property>
@@ -21,7 +20,7 @@
                 <property name="visible">1</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="HdyClamp">
+                  <object class="AdwClamp">
                     <property name="visible">1</property>
                     <property name="maximum-size">360</property>
                     <child>
@@ -51,7 +50,7 @@
                 <child>
                   <object class="GtkRevealer" id="revealer">
                     <property name="visible">1</property>
-                    <child>
+                    <property name="child">
                       <object class="GtkBox">
                         <property name="visible">1</property>
                         <property name="margin-bottom">5</property>
@@ -73,11 +72,11 @@
                           </object>
                         </child>
                       </object>
-                    </child>
+                    </property>
                   </object>
                 </child>
                 <child>
-                  <object class="HdyClamp">
+                  <object class="AdwClamp">
                     <property name="visible">1</property>
                     <property name="maximum-size">360</property>
                     <child>
@@ -97,6 +96,9 @@
                             <property name="visible">1</property>
                             <property name="transition-type">crossfade</property>
                             <child>
+                              <object class="GtkStackPage">
+                                <property name="name">no-notifications</property>
+                                <property name="child">
                               <object class="GtkBox">
                                 <property name="visible">1</property>
                                 <property name="orientation">vertical</property>
@@ -130,11 +132,13 @@
                                   <class name="dim-label"/>
                                 </style>
                               </object>
-                              <packing>
-                                <property name="name">no-notifications</property>
-                              </packing>
+                                </property>
+                              </object>
                             </child>
                             <child>
+                              <object class="GtkStackPage">
+                                <property name="name">notifications</property>
+                                <property name="child">
                               <object class="GtkBox">
                                 <property name="visible">1</property>
                                 <property name="orientation">vertical</property>
@@ -183,9 +187,8 @@
                                   </object>
                                 </child>
                               </object>
-                              <packing>
-                                <property name="name">notifications</property>
-                              </packing>
+                                </property>
+                              </object>
                             </child>
                           </object>
                         </child>

@@ -63,17 +63,15 @@ static void
 set_style (PhoshSplash *self, gboolean prefer_dark)
 {
   PhoshSplashPrivate *priv = phosh_splash_get_instance_private (self);
-  GtkStyleContext    *context;
 
   priv->prefer_dark = prefer_dark;
 
-  context = gtk_widget_get_style_context (GTK_WIDGET (self));
   if (prefer_dark) {
-    gtk_style_context_add_class (context, "dark");
-    gtk_style_context_remove_class (context, "light");
+    gtk_widget_add_css_class (GTK_WIDGET (self), "dark");
+    gtk_widget_remove_css_class (GTK_WIDGET (self), "light");
   } else {
-    gtk_style_context_add_class (context, "light");
-    gtk_style_context_remove_class (context, "dark");
+    gtk_widget_add_css_class (GTK_WIDGET (self), "light");
+    gtk_widget_remove_css_class (GTK_WIDGET (self), "dark");
   }
 }
 
@@ -133,6 +131,8 @@ phosh_splash_dispose (GObject *obj)
   g_clear_pointer (&priv->fadeout, phosh_animation_unref);
   g_clear_object (&priv->info);
 
+  gtk_widget_dispose_template (GTK_WIDGET (obj), PHOSH_TYPE_SPLASH);
+
   G_OBJECT_CLASS (phosh_splash_parent_class)->dispose (obj);
 }
 
@@ -141,7 +141,6 @@ static void
 phosh_splash_constructed (GObject *object)
 {
   PhoshSplash *self = PHOSH_SPLASH (object);
-  PhoshWayland *wl = phosh_wayland_get_default ();
   PhoshSplashPrivate *priv = phosh_splash_get_instance_private (self);
   PhoshMonitor *monitor;
 
@@ -149,7 +148,6 @@ phosh_splash_constructed (GObject *object)
   monitor = phosh_shell_get_primary_monitor (phosh_shell_get_default ());
 
   g_object_set (PHOSH_LAYER_SURFACE (self),
-                "layer-shell", phosh_wayland_get_zwlr_layer_shell_v1 (wl),
                 "wl-output", phosh_monitor_get_wl_output (monitor),
                 "anchor", (ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP |
                            ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM |
@@ -166,13 +164,17 @@ phosh_splash_constructed (GObject *object)
 
 
 static gboolean
-phosh_splash_key_press_event (GtkWidget *self, GdkEventKey *event)
+phosh_splash_key_press_event (GtkWidget             *self,
+                              guint                  keyval,
+                              guint                  keycode,
+                              GdkModifierType        state,
+                              GtkEventControllerKey *controller)
 {
   gboolean handled = FALSE;
 
   g_return_val_if_fail (PHOSH_IS_SPLASH (self), FALSE);
 
-  switch (event->keyval) {
+  switch (keyval) {
   case GDK_KEY_Escape:
     g_signal_emit (self, signals[CLOSED], 0);
     handled = TRUE;
@@ -196,10 +198,9 @@ phosh_splash_show (GtkWidget *widget)
   icon = g_app_info_get_icon (priv->info);
   if (G_UNLIKELY (icon == NULL)) {
     gtk_image_set_from_icon_name (GTK_IMAGE (priv->img_app),
-                                  PHOSH_APP_UNKNOWN_ICON,
-                                  -1);
+                                  PHOSH_APP_UNKNOWN_ICON);
   } else {
-    gtk_image_set_from_gicon (GTK_IMAGE (priv->img_app), icon, -1);
+    gtk_image_set_from_gicon (GTK_IMAGE (priv->img_app), icon);
   }
 
   GTK_WIDGET_CLASS (phosh_splash_parent_class)->show (widget);
@@ -217,7 +218,6 @@ phosh_splash_class_init (PhoshSplashClass *klass)
   object_class->constructed = phosh_splash_constructed;
   object_class->dispose = phosh_splash_dispose;
   widget_class->show = phosh_splash_show;
-  widget_class->key_press_event = phosh_splash_key_press_event;
 
   /**
    * PhoshSplash:app-info:
@@ -258,6 +258,8 @@ phosh_splash_class_init (PhoshSplashClass *klass)
   gtk_widget_class_bind_template_child_private (widget_class, PhoshSplash, img_app);
   gtk_widget_class_bind_template_child_private (widget_class, PhoshSplash, box);
 
+  gtk_widget_class_bind_template_callback (widget_class, phosh_splash_key_press_event);
+
   gtk_widget_class_set_css_name (widget_class, "phosh-splash");
 }
 
@@ -296,7 +298,7 @@ fadeout_done_cb (gpointer data)
 
   g_clear_pointer (&priv->fadeout, phosh_animation_unref);
 
-  gtk_widget_destroy (GTK_WIDGET (self));
+  gtk_window_destroy (GTK_WINDOW (self));
 }
 
 
@@ -317,26 +319,4 @@ phosh_splash_hide (PhoshSplash *self)
                                        fadeout_done_cb,
                                        self);
   phosh_animation_start (priv->fadeout);
-}
-
-
-void
-phosh_splash_lower (PhoshSplash *self)
-{
-  g_return_if_fail (PHOSH_IS_SPLASH (self));
-
-  phosh_layer_surface_set_layer (PHOSH_LAYER_SURFACE (self),
-                                 ZWLR_LAYER_SHELL_V1_LAYER_BOTTOM);
-  gtk_widget_queue_draw (GTK_WIDGET (self));
-}
-
-
-void
-phosh_splash_raise (PhoshSplash *self)
-{
-  g_return_if_fail (PHOSH_IS_SPLASH (self));
-
-  phosh_layer_surface_set_layer (PHOSH_LAYER_SURFACE (self),
-                                 ZWLR_LAYER_SHELL_V1_LAYER_TOP);
-  gtk_widget_queue_draw (GTK_WIDGET (self));
 }

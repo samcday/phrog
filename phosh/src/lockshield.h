@@ -13,5 +13,4 @@
 
 G_DECLARE_FINAL_TYPE (PhoshLockshield, phosh_lockshield, PHOSH, LOCKSHIELD, PhoshLayerSurface)
 
-GtkWidget *phosh_lockshield_new (struct zwlr_layer_shell_v1 *layer_shell,
-                                 PhoshMonitor               *monitor);
+GtkWidget *phosh_lockshield_new (PhoshMonitor *monitor);

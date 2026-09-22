@@ -29,7 +29,7 @@ enum {
 
 struct _PhoshClamp
 {
-  GtkBin parent_instance;
+  GtkWidget parent_instance;
 
   gint natural_size;
 
@@ -38,7 +38,7 @@ struct _PhoshClamp
 
 static GParamSpec *props[LAST_PROP];
 
-G_DEFINE_TYPE_WITH_CODE (PhoshClamp, phosh_clamp, GTK_TYPE_BIN,
+G_DEFINE_TYPE_WITH_CODE (PhoshClamp, phosh_clamp, GTK_TYPE_WIDGET,
                          G_IMPLEMENT_INTERFACE (GTK_TYPE_ORIENTABLE, NULL))
 
 static void
@@ -93,9 +93,19 @@ phosh_clamp_set_property (GObject      *object,
   }
 }
 
-/* This private method is prefixed by the call name because it will be a virtual
- * method in GTK 4.
- */
+static void
+phosh_clamp_dispose (GObject *object)
+{
+  PhoshClamp *self = PHOSH_CLAMP (object);
+  GtkWidget *child;
+
+  child = gtk_widget_get_first_child (GTK_WIDGET (self));
+  if (child)
+    gtk_widget_unparent (child);
+
+  G_OBJECT_CLASS (phosh_clamp_parent_class)->dispose (object);
+}
+
 static void
 phosh_clamp_measure (GtkWidget      *widget,
                      GtkOrientation  orientation,
@@ -106,7 +116,6 @@ phosh_clamp_measure (GtkWidget      *widget,
                      int            *natural_baseline)
 {
   PhoshClamp *self = PHOSH_CLAMP (widget);
-  GtkBin *bin = GTK_BIN (widget);
   GtkWidget *child;
   int child_min = 0;
   int child_nat = 0;
@@ -122,33 +131,33 @@ phosh_clamp_measure (GtkWidget      *widget,
   if (natural_baseline)
     *natural_baseline = -1;
 
-  child = gtk_bin_get_child (bin);
+  child = gtk_widget_get_first_child (widget);
 
   if (!child || !gtk_widget_is_visible (child))
     return;
 
   if (self->orientation == orientation) {
     if (orientation == GTK_ORIENTATION_HORIZONTAL)
-      gtk_widget_get_preferred_width (child, &child_min, &child_nat);
+      gtk_widget_measure (child, GTK_ORIENTATION_HORIZONTAL, -1, &child_min, &child_nat, NULL,  NULL);
     else
-      gtk_widget_get_preferred_height_and_baseline_for_width (child, -1,
-                                                              &child_min,
-                                                              &child_nat,
-                                                              &child_min_baseline,
-                                                              &child_nat_baseline);
+      gtk_widget_measure (child, GTK_ORIENTATION_VERTICAL, -1,
+                          &child_min,
+                          &child_nat,
+                          &child_min_baseline,
+                          &child_nat_baseline);
 
     child_nat = MIN (child_nat, self->natural_size);
     child_nat = MAX (child_min, child_nat);
   } else {
     if (orientation == GTK_ORIENTATION_HORIZONTAL)
-      gtk_widget_get_preferred_width_for_height (child, for_size,
-                                                 &child_min, &child_nat);
+      gtk_widget_measure (child, GTK_ORIENTATION_HORIZONTAL, for_size,
+                          &child_min, &child_nat, NULL, NULL);
     else
-      gtk_widget_get_preferred_height_and_baseline_for_width (child, for_size,
-                                                              &child_min,
-                                                              &child_nat,
-                                                              &child_min_baseline,
-                                                              &child_nat_baseline);
+      gtk_widget_measure (child, GTK_ORIENTATION_VERTICAL, for_size,
+                          &child_min,
+                          &child_nat,
+                          &child_min_baseline,
+                          &child_nat_baseline);
   }
 
   if (minimum)
@@ -171,74 +180,35 @@ phosh_clamp_get_request_mode (GtkWidget *widget)
     GTK_SIZE_REQUEST_WIDTH_FOR_HEIGHT;
 }
 
-static void
-phosh_clamp_get_preferred_width_for_height (GtkWidget *widget,
-                                            gint       height,
-                                            gint      *minimum,
-                                            gint      *natural)
-{
-  phosh_clamp_measure (widget, GTK_ORIENTATION_HORIZONTAL, height,
-                       minimum, natural, NULL, NULL);
-}
 
 static void
-phosh_clamp_get_preferred_width (GtkWidget *widget,
-                                 gint      *minimum,
-                                 gint      *natural)
+phosh_clamp_size_allocate (GtkWidget *widget, int width, int height, int baseline)
 {
-  phosh_clamp_measure (widget, GTK_ORIENTATION_HORIZONTAL, -1,
-                       minimum, natural, NULL, NULL);
+  GtkWidget *child;
+  GtkAllocation allocation = {0, 0, width, height};
+
+  child = gtk_widget_get_first_child (widget);
+
+  if (!child)
+    return;
+
+  gtk_widget_size_allocate (child, &allocation, baseline);
 }
 
-static void
-phosh_clamp_get_preferred_height_and_baseline_for_width (GtkWidget *widget,
-                                                         gint       width,
-                                                         gint      *minimum,
-                                                         gint      *natural,
-                                                         gint      *minimum_baseline,
-                                                         gint      *natural_baseline)
-{
-  phosh_clamp_measure (widget, GTK_ORIENTATION_VERTICAL, width,
-                       minimum, natural, minimum_baseline, natural_baseline);
-}
-
-static void
-phosh_clamp_get_preferred_height_for_width (GtkWidget *widget,
-                                            gint       width,
-                                            gint      *minimum,
-                                            gint      *natural)
-{
-  phosh_clamp_measure (widget, GTK_ORIENTATION_VERTICAL, width,
-                       minimum, natural, NULL, NULL);
-}
-
-static void
-phosh_clamp_get_preferred_height (GtkWidget *widget,
-                                  gint      *minimum,
-                                  gint      *natural)
-{
-  phosh_clamp_measure (widget, GTK_ORIENTATION_VERTICAL, -1,
-                       minimum, natural, NULL, NULL);
-}
 
 static void
 phosh_clamp_class_init (PhoshClampClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
-  GtkContainerClass *container_class = GTK_CONTAINER_CLASS (klass);
 
   object_class->get_property = phosh_clamp_get_property;
   object_class->set_property = phosh_clamp_set_property;
+  object_class->dispose = phosh_clamp_dispose;
 
   widget_class->get_request_mode = phosh_clamp_get_request_mode;
-  widget_class->get_preferred_width = phosh_clamp_get_preferred_width;
-  widget_class->get_preferred_width_for_height = phosh_clamp_get_preferred_width_for_height;
-  widget_class->get_preferred_height = phosh_clamp_get_preferred_height;
-  widget_class->get_preferred_height_for_width = phosh_clamp_get_preferred_height_for_width;
-  widget_class->get_preferred_height_and_baseline_for_width = phosh_clamp_get_preferred_height_and_baseline_for_width;
-
-  gtk_container_class_handle_border_width (container_class);
+  widget_class->measure = phosh_clamp_measure;
+  widget_class->size_allocate = phosh_clamp_size_allocate;
 
   g_object_class_override_property (object_class,
                                     PROP_ORIENTATION,

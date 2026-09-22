@@ -167,7 +167,6 @@ static void
 phosh_upcoming_event_set_color (PhoshUpcomingEvent *self, const char *color)
 {
   g_autofree char* css = NULL;
-  g_autoptr (GError) err = NULL;
   g_autofree char *colorstr = NULL;
   GdkRGBA rgba;
 
@@ -182,10 +181,7 @@ phosh_upcoming_event_set_color (PhoshUpcomingEvent *self, const char *color)
 
   colorstr = gdk_rgba_to_string (&rgba);
   css = g_strdup_printf (COLOR_BAR_CSS, colorstr);
-  if (gtk_css_provider_load_from_data (self->color_css, css, -1, &err) == FALSE) {
-    g_warning ("Failed to load css: %s", err->message);
-    return;
-  }
+  gtk_css_provider_load_from_string (self->color_css, css);
 }
 
 
@@ -363,9 +359,9 @@ phosh_upcoming_event_init (PhoshUpcomingEvent *self)
   gtk_widget_init_template (GTK_WIDGET (self));
 
   self->color_css = gtk_css_provider_new ();
-  gtk_style_context_add_provider (gtk_widget_get_style_context (GTK_WIDGET (self->color_bar)),
-                                  GTK_STYLE_PROVIDER (self->color_css),
-                                  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION + 1);
+  gtk_style_context_add_provider_for_display (gdk_display_get_default (),
+                                              GTK_STYLE_PROVIDER (self->color_css),
+                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION + 1);
   self->is_24h = TRUE;
 }
 
