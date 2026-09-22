@@ -22,6 +22,7 @@ xmlstarlet ed -L \
 # unnamed <type> elements for the parent_instance field, which trip up gir.
 # Point them at Gtk.Widget so instance structs keep a workable layout.
 xmlstarlet ed -L \
-	-i '//_:field[_:type[not(@name)]]/_:type' -t attr -n 'name' -v 'Gtk.Widget' \
-	-u '//_:field[_:type[@c:type="GtkPlain"]]/_:type/@c:type' -v 'GtkWidget' \
+	--var plain_parent '//_:field[@name="parent_instance"]/_:type[@c:type="GtkPlain" and not(@name)]' \
+	-i '$plain_parent' -t attr -n 'name' -v 'Gtk.Widget' \
+	-u '$plain_parent/@c:type' -v 'GtkWidget' \
 	Phosh-0.gir
