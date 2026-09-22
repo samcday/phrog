@@ -8,10 +8,10 @@
 
 #define G_LOG_DOMAIN "phosh-power-menu-manager"
 
+#include "layersurface-priv.h"
 #include "power-menu-manager.h"
 #include "power-menu.h"
 #include "shell-priv.h"
-#include "util.h"
 
 /**
  * PhoshPowerMenuManager:
@@ -36,7 +36,10 @@ G_DEFINE_TYPE (PhoshPowerMenuManager, phosh_power_menu_manager, G_TYPE_OBJECT)
 static void
 close_menu (PhoshPowerMenuManager *self)
 {
-  g_clear_pointer (&self->dialog, phosh_cp_widget_destroy);
+  PhoshPowerMenu *dialog = g_steal_pointer (&self->dialog);
+
+  if (dialog)
+    phosh_layer_surface_destroy (PHOSH_LAYER_SURFACE (dialog));
 }
 
 
@@ -172,7 +175,7 @@ phosh_power_menu_manager_finalize (GObject *object)
   g_action_map_remove_action (G_ACTION_MAP (phosh_shell_get_default ()), "power.toggle-menu");
 
   g_clear_object (&self->menu_actions);
-  g_clear_pointer (&self->dialog, phosh_cp_widget_destroy);
+  close_menu (self);
 
   G_OBJECT_CLASS (phosh_power_menu_manager_parent_class)->finalize (object);
 }
