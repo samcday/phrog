@@ -1,5 +1,9 @@
 ## 🐸 (phrog)
 
+> **GTK4 development branch.** GTK3 stable releases continue on `main`.
+> This branch needs unreleased GTK and Phosh snapshots, not normal distro
+> packages. See [GTK4 development](docs/gtk4.md) for builds and known gaps.
+
 <img align="right" width="180" height="360" src="https://github.com/samcday/phrog/releases/download/0.53.0/demo.webp">
 
 <br />
@@ -71,15 +75,8 @@ cargo binstall phrog
 
 ## Development
 
-`libphosh` 0.45 is required to build this project.
-
-* Alpine (v3.21+): `sudo apk add libphosh`
-* Debian (trixie): `sudo apt install libphosh-0.45-dev`
-* Fedora: `sudo dnf install libphosh-devel`
-
-If `libphosh` is not packaged for your distro, you need to build Phosh+libphosh manually. See the [Phosh][] README for more info.
-
-Once `libphosh` is installed, building and running 🐸 should be quite simple:
+Both modes use local GTK4 Rust bindings. Install the pinned GTK4 stack from
+[the development notes](docs/gtk4.md) before running these commands:
 
 ```sh
 # To run phrog without greetd, pass --fake

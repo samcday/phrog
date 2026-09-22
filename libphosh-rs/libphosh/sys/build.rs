@@ -14,6 +14,20 @@ fn main() {
     match env::var("PHROG_LIBPHOSH_BUILD_INTERNAL").as_deref() {
         Ok("always") => build_bundled(),
         Err(env::VarError::NotPresent) | Ok("never") => {
+            // The GTK3 and experimental GTK4 libraries share the same pkg-config
+            // name and ABI version. A version check alone can select GTK3 here.
+            let library = pkg_config::Config::new()
+                // GTK can be in Requires.private. Inspect it without emitting
+                // these static flags; system-deps below emits the dynamic link.
+                .statik(true)
+                .cargo_metadata(false)
+                .probe("libphosh-0.45")
+                .expect("an installed GTK4 libphosh is required; see docs/gtk4.md");
+            assert!(
+                library.libs.iter().any(|name| name == "gtk-4")
+                    && !library.libs.iter().any(|name| name == "gtk-3"),
+                "libphosh-0.45 resolves to GTK3; select a GTK4 libphosh with PKG_CONFIG_PATH, or use cargo vendored-phosh build (see docs/gtk4.md)"
+            );
             system_deps::Config::new()
                 .probe()
                 .expect("system libphosh-0.45 is required (or set PHROG_LIBPHOSH_BUILD_INTERNAL=always)");

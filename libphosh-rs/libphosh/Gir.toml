@@ -40,9 +40,7 @@ manual = [
   "Gio.AsyncResult",
   "Gio.Cancellable",
   "GLib.Error",
-  "Gtk.Bin",
   "Gtk.Button",
-  "Gtk.Container",
   "Gtk.Widget",
   "Gtk.Window",
 ]

@@ -21,7 +21,8 @@ permissions:
 
 jobs:
   alpine:
-    if: inputs.release_mode == 'pr' || inputs.release_mode == 'tag' || github.event_name != 'pull_request' || (contains(github.event.pull_request.labels.*.name, 'apk') && !startsWith(github.event.pull_request.head.ref || '', 'release/v'))
+    # Re-enable with a distro repository providing the pinned GTK4/Phosh stack.
+    if: ${{ false }}
     runs-on: ubuntu-24.04${{ matrix.arch == 'aarch64' && '-arm' || '' }}
     strategy:
       fail-fast: false

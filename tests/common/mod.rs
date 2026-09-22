@@ -12,7 +12,7 @@ use gtk::gio::{ListStore, Settings};
 use gtk::glib::{clone, timeout_add_once};
 use gtk::prelude::*;
 use gtk::{Button, Grid, Revealer};
-use libhandy::Carousel;
+use libadwaita as adw;
 use libphosh::prelude::ShellExt;
 use libphosh::prelude::WallClockExt;
 use libphosh::WallClock;
@@ -64,23 +64,31 @@ impl Test {
         let timed_out = Arc::new(AtomicBool::new(false));
         timeout_add_once(
             Duration::from_secs(60),
-            clone!(@strong timed_out => move || {
-                timed_out.store(true, Ordering::SeqCst);
-                g_critical!("phrog", "Test timed out!");
-                gtk::main_quit();
-            }),
+            clone!(
+                #[strong]
+                timed_out,
+                move || {
+                    timed_out.store(true, Ordering::SeqCst);
+                    g_critical!("phrog", "Test timed out!");
+                    phrog::quit();
+                }
+            ),
         );
 
         let failed = Arc::new(AtomicBool::new(false));
-        spawn_future_local(clone!(@strong failed => async move {
-            if jh.await.is_err() {
-                g_critical!("phrog", "Test failed!");
-                gtk::main_quit();
-                failed.store(true, Ordering::SeqCst);
+        spawn_future_local(clone!(
+            #[strong]
+            failed,
+            async move {
+                if jh.await.is_err() {
+                    g_critical!("phrog", "Test failed!");
+                    phrog::quit();
+                    failed.store(true, Ordering::SeqCst);
+                }
             }
-        }));
+        ));
 
-        gtk::main();
+        phrog::run();
 
         assert!(!timed_out.load(Ordering::SeqCst));
         assert!(!failed.load(Ordering::SeqCst));
@@ -192,14 +200,24 @@ pub fn test_init(options: Option<TestOptions>) -> Test {
     let ready_called = Arc::new(AtomicBool::new(false));
     let ready_called2 = ready_called.clone();
     let (ready_tx, ready_rx) = async_channel::bounded(1);
-    shell.connect_ready(clone!(@strong ready_called2 => move |shell| {
-        ready_called2.store(true, Ordering::Relaxed);
+    shell.connect_ready(clone!(
+        #[strong]
+        ready_called2,
+        move |shell| {
+            ready_called2.store(true, Ordering::Relaxed);
 
-        let (_, _, width, height) = shell.usable_area();
-        let vp = VirtualPointer::new(wayland_client::Connection::connect_to_env().unwrap(), width as _, height as _);
-        let kb = VirtualKeyboard::new(wayland_client::Connection::connect_to_env().unwrap());
-        ready_tx.send_blocking((vp, kb)).expect("notify ready failed");
-    }));
+            let (_, _, width, height) = shell.usable_area();
+            let vp = VirtualPointer::new(
+                wayland_client::Connection::connect_to_env().unwrap(),
+                width as _,
+                height as _,
+            );
+            let kb = VirtualKeyboard::new(wayland_client::Connection::connect_to_env().unwrap());
+            ready_tx
+                .send_blocking((vp, kb))
+                .expect("notify ready failed");
+        }
+    ));
 
     Test {
         system_dbus_conn,
@@ -226,81 +244,88 @@ pub fn fake_greetd(logged_in: &Arc<AtomicBool>) {
             .as_secs()
     ));
     std::env::set_var("GREETD_SOCK", &path);
-    std::thread::spawn(clone!(@strong logged_in => move || {
-        let listener = UnixListener::bind(&path).unwrap();
-        loop {
-            let (mut stream, _addr) = listener
-                .accept()
-                .expect("failed to accept greetd connection");
+    std::thread::spawn(clone!(
+        #[strong]
+        logged_in,
+        move || {
+            let listener = UnixListener::bind(&path).unwrap();
+            loop {
+                let (mut stream, _addr) = listener
+                    .accept()
+                    .expect("failed to accept greetd connection");
 
-            match Request::read_from(&mut stream).unwrap() {
-                Request::CreateSession { .. } => Response::AuthMessage {
-                    auth_message_type: Secret,
-                    auth_message: "Password:".to_string(),
+                match Request::read_from(&mut stream).unwrap() {
+                    Request::CreateSession { .. } => Response::AuthMessage {
+                        auth_message_type: Secret,
+                        auth_message: "Password:".to_string(),
+                    }
+                    .write_to(&mut stream)
+                    .unwrap(),
+                    req => panic!("wrong request: {:?}", req),
                 }
-                .write_to(&mut stream)
-                .unwrap(),
-                req => panic!("wrong request: {:?}", req),
-            }
 
-            match Request::read_from(&mut stream).unwrap() {
-                Request::PostAuthMessageResponse {
-                    response: Some(password),
-                } => {
-                    assert_eq!(password, "0451");
-                    Response::Success.write_to(&mut stream).unwrap();
+                match Request::read_from(&mut stream).unwrap() {
+                    Request::PostAuthMessageResponse {
+                        response: Some(password),
+                    } => {
+                        assert_eq!(password, "0451");
+                        Response::Success.write_to(&mut stream).unwrap();
+                    }
+                    req => panic!("wrong request: {:?}", req),
                 }
-                req => panic!("wrong request: {:?}", req),
-            }
 
-            match Request::read_from(&mut stream).unwrap() {
-                Request::StartSession { .. } => {
-                    Response::Success.write_to(&mut stream).unwrap();
-                    logged_in.store(true, Ordering::Relaxed);
+                match Request::read_from(&mut stream).unwrap() {
+                    Request::StartSession { .. } => {
+                        Response::Success.write_to(&mut stream).unwrap();
+                        logged_in.store(true, Ordering::Relaxed);
+                    }
+                    req => panic!("wrong request: {:?}", req),
                 }
-                req => panic!("wrong request: {:?}", req),
             }
         }
-    }));
+    ));
 }
 
-pub fn get_lockscreen_bits(lockscreen: &mut Lockscreen) -> (Grid, Button) {
+pub fn nth_child(widget: &impl IsA<gtk::Widget>, idx: u32) -> gtk::Widget {
+    widget
+        .observe_children()
+        .item(idx)
+        .and_downcast::<gtk::Widget>()
+        .unwrap()
+}
+
+pub fn get_unlock_box(lockscreen: &Lockscreen) -> gtk::Box {
+    // The PhoshLockscreen's content includes an AdwCarousel with the pages
+    // [navigation view, extra page, unlock box]. The extra page in the middle is
+    // phrog's UserSessionPage. See phosh/src/ui/lockscreen.ui.
+    let carousel = (0..lockscreen.observe_children().n_items())
+        .filter_map(|i| {
+            lockscreen
+                .observe_children()
+                .item(i)
+                .and_downcast::<adw::Carousel>()
+        })
+        .next()
+        .unwrap();
+    nth_child(&carousel, 2).downcast::<gtk::Box>().unwrap()
+}
+
+pub fn get_lockscreen_bits(lockscreen: &Lockscreen) -> (Grid, Button) {
     // Here we do some yucky traversal of the UI structure in phosh/src/ui/lockscreen.ui in the
     // name of "art". We drill through to find the keypad, and then pick out the individual
     // digits + submit button to drive the UI interactions entirely via mouse.
     // This looks nice for the video recording.
-    let carousel = lockscreen.child().unwrap().downcast::<Carousel>().unwrap();
-
-    let keypad_page = carousel
-        .children()
-        .get(2)
-        .unwrap()
-        .clone()
-        .downcast::<gtk::Box>()
-        .unwrap();
-    let keypad_revealer = keypad_page
-        .children()
-        .get(2)
-        .unwrap()
-        .clone()
-        .downcast::<Revealer>()
-        .unwrap();
+    let box_unlock = get_unlock_box(lockscreen);
+    let keypad_revealer = nth_child(&box_unlock, 2).downcast::<Revealer>().unwrap();
     let keypad = keypad_revealer.child().unwrap().downcast::<Grid>().unwrap();
-    let submit_box = keypad_page
-        .children()
-        .get(3)
-        .unwrap()
-        .clone()
-        .downcast::<gtk::Box>()
-        .unwrap();
-    let submit_btn = submit_box
-        .children()
-        .first()
-        .unwrap()
-        .clone()
-        .downcast::<Button>()
-        .unwrap();
+    let submit_box = nth_child(&box_unlock, 3).downcast::<gtk::Box>().unwrap();
+    let submit_btn = nth_child(&submit_box, 0).downcast::<Button>().unwrap();
     (keypad, submit_btn)
+}
+
+pub fn get_unlock_status_label(lockscreen: &Lockscreen) -> gtk::Label {
+    let box_unlock = get_unlock_box(lockscreen);
+    nth_child(&box_unlock, 0).downcast::<gtk::Label>().unwrap()
 }
 
 pub fn keypad_digit(grid: &gtk::Grid, digit: i32) -> gtk::Widget {
@@ -315,6 +340,6 @@ pub fn fade_quit() {
     Shell::default().fade_out(0);
     // Keep this timeout in sync with fadeout animation duration in phrog.css
     timeout_add_once(Duration::from_millis(500), || {
-        gtk::main_quit();
+        phrog::quit();
     });
 }
