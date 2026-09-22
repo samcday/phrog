@@ -45,7 +45,7 @@ mod imp {
     use libphosh::prelude::*;
     use libphosh::subclass::lockscreen::LockscreenImpl;
     use libphosh::LockscreenPage;
-    use std::cell::{OnceCell, RefCell};
+    use std::cell::{Cell, OnceCell, RefCell};
     use std::os::unix::net::UnixStream;
     use std::time::Duration;
 
@@ -58,6 +58,7 @@ mod imp {
         pub user_session_page: OnceCell<UserSessionPage>,
         greetd: RefCell<Option<(Sender<Request>, Receiver<Response>)>>,
         session: RefCell<Option<String>>,
+        initial_page: Cell<Option<LockscreenPage>>,
     }
 
     #[glib::object_subclass]
@@ -115,6 +116,7 @@ mod imp {
             // We default to this page (which means inactivity bounces user back to it).
             self_obj.add_extra_page(&usp);
             self_obj.set_default_page(LockscreenPage::Extra);
+            self.initial_page.set(Some(LockscreenPage::Extra));
 
             // GTK4 removed GtkWidget's "show" signal, which the GTK4 phosh still uses to apply
             // the default page when the lockscreen appears, and GtkPlain-based layer surfaces
@@ -127,10 +129,11 @@ mod imp {
                     false,
                     glib::RustClosure::new_local(move |_| {
                         let obj = weak.upgrade()?;
-                        // Only bounce back to the extra page if we're still sitting on the
-                        // info page (i.e. we just appeared, the user hasn't navigated yet).
-                        if obj.page() == LockscreenPage::Info {
-                            obj.set_page(LockscreenPage::Extra);
+                        // Configure can recur while a page transition is in flight. Apply
+                        // the initial default once, preserving the single-user choice and
+                        // avoiding later resize events resetting navigation.
+                        if let Some(page) = obj.imp().initial_page.take() {
+                            obj.set_page(page);
                         }
                         None
                     }),
@@ -181,6 +184,13 @@ mod imp {
                     let session_count = shell.sessions().map_or(0, |s| s.n_items());
                     // If there's only one user and one session, set the default + active page to the keypad.
                     if session_count == 1 && user_count == 1 {
+                        if self_obj.imp().initial_page.get().is_some() {
+                            self_obj
+                                .imp()
+                                .initial_page
+                                .set(Some(LockscreenPage::Unlock));
+                        }
+                        self_obj.set_default_page(LockscreenPage::Unlock);
                         self_obj.set_page(LockscreenPage::Unlock);
                     }
                 }

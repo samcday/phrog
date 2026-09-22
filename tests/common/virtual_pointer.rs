@@ -1,6 +1,6 @@
 use gtk::prelude::*;
 use gtk::{glib, Widget};
-use std::time::{Duration, SystemTime};
+use std::time::{Duration, Instant, SystemTime};
 use wayland_client::protocol::wl_pointer::ButtonState;
 use wayland_client::protocol::wl_registry;
 use wayland_client::protocol::wl_seat::WlSeat;
@@ -51,6 +51,46 @@ impl Dispatch<wl_registry::WlRegistry, ()> for State {
     }
 }
 
+#[allow(dead_code)]
+// A page/model change precedes its animation and final allocation. Wait until
+// the target's on-screen rectangle has stopped changing before moving to it.
+pub async fn wait_for_click_target(widget: &Widget) {
+    let mut last_bounds = None;
+    let mut stable_since = Instant::now();
+    let deadline = Instant::now() + Duration::from_secs(5);
+    loop {
+        assert!(
+            Instant::now() < deadline,
+            "timed out waiting for click target transition to settle"
+        );
+        if (|| {
+            if !widget.is_visible() || !widget.is_sensitive() {
+                return None;
+            }
+            let root = widget.root()?.upcast::<Widget>();
+            let bounds = widget.compute_bounds(&root)?;
+            if last_bounds.as_ref() != Some(&bounds) {
+                last_bounds = Some(bounds);
+                stable_since = Instant::now();
+                return None;
+            }
+            (bounds.width() > 0.0
+                && bounds.height() > 0.0
+                && bounds.x() >= 0.0
+                && bounds.y() >= 0.0
+                && bounds.x() + bounds.width() <= root.width() as f32
+                && bounds.y() + bounds.height() <= root.height() as f32
+                && stable_since.elapsed() >= Duration::from_millis(100))
+            .then_some(())
+        })()
+        .is_some()
+        {
+            return;
+        }
+        glib::timeout_future(Duration::from_millis(10)).await;
+    }
+}
+
 impl VirtualPointer {
     pub fn new(conn: Connection, width: u32, height: u32) -> Self {
         let mut event_queue = conn.new_event_queue();
@@ -65,8 +105,11 @@ impl VirtualPointer {
             .unwrap()
             .create_virtual_pointer(state.seat.as_ref(), &event_queue.handle(), ());
 
-        let x = width / 2;
-        let y = height / 2;
+        // Start at the known output origin. The supplied dimensions describe the
+        // usable area, which can exclude panels; its midpoint is not necessarily
+        // the compositor output midpoint used by motion_absolute.
+        let x = 0;
+        let y = 0;
         ptr.motion_absolute(ts.elapsed().unwrap().as_millis() as _, x, y, width, height);
         ptr.frame();
         event_queue.flush().unwrap();
@@ -82,10 +125,11 @@ impl VirtualPointer {
 
     pub async fn click_on(&mut self, widget: &impl IsA<Widget>) {
         let root = widget.root().unwrap();
-        let (mut x, y) = widget
+        let (mut x, mut y) = widget
             .translate_coordinates(root.upcast_ref::<Widget>(), 0.0, 0.0)
             .unwrap();
         x += widget.allocated_width() as f64 / 2.0;
+        y += widget.allocated_height() as f64 / 2.0;
         self.click_at(x as u32, y as u32).await;
     }
 
