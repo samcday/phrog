@@ -107,7 +107,7 @@ impl CallFixture {
 fn test_emergency_calls() {
     let mut test = test_init(None);
 
-    let e_c_settings = Settings::new("sm.puri.phosh.emergency-calls");
+    let e_c_settings = Settings::new("mobi.phosh.shell.emergency-calls");
     e_c_settings.set_boolean("enabled", true).unwrap();
 
     let ready_rx = test.ready_rx.clone();
